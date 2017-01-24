@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+<p>9874 Project Charter. To create an interactive, graphical editor and simulator for digital circuits.</p>
+<p>&nbsp;</p>
+<p>Functional requirements: As a user I will be able to:</p>
+<ul>
+  <li> Add components to a circuit diagram.
+    <ul>
+      <li>Components are things like inputs, outputs, and&nbsp;gates, adders.</li>
+      <li>Some components have a fixed set of input or ports.</li>
+      <li>Some components have a variable number of input (or output?) ports.</li>
+    </ul>
+  </li>
+  <li>Move components around a circuit diagram.</li>
+  <li>Rotate components (4 directions).</li>
+  <li>Delete components from a circuit diagram.</li>
+  <li>Add probes for debugging.</li>
+  <li>Add links</li>
+  <li>Delete links</li>
+  <li>Move an endpoint of a link</li>
+  <li>Automatic layout of links or components and links</li>
+  <li>Create, edit, and use, save, compound (user-defined) components.
+    <ul>
+      <li>Using compound components could be
+        <ul>
+          <li>black&nbsp;box (no display of internals, no stopping for internal events)</li>
+          <li>white box (display internals, stop during simulation) </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Server stuff
+    <ul>
+      <li>Save circuit diagrams to the server.&nbsp;</li>
+      <li>Login</li>
+      <li>Create a new login name and password.</li>
+      <li>Recover my password.</li>
+      <li>Access library</li>
+      <li>Upload/download&nbsp;circuits&nbsp;(and compound components) and test inputs.</li>
+    </ul>
+  </li>
+  <li>Open circuit diagrams from disk files.</li>
+  <li>Edit the input values of input components
+    <ul>
+      <li>Value includes bits (at least 3 values), sequences of bits, an error value </li>
+      <li>Input&nbsp;signals are functions from time to values.</li>
+      <li>Also expected outputs. </li>
+    </ul>
+  </li>
+  <li>Simulate the circuit for a period of time with animation.
+    <ul>
+      <li>Step by step.</li>
+      <li>Continuous (real-time slowed down)</li>
+      <li>Instant</li>
+    </ul>
+  </li>
+  <li>View the values of inputs and outputs graphically (wave form, binary, octal, hex, decimal).</li>
+  <li>Question: Run time or static type checking.</li>
+  <li></li>
+  <li> Nonfunctional requirements   
+    <ul>
+      <li>Servers could be written in Java 1.8 or Haxe 3 and run on the the JavaSE 1.8 platform. </li>
+      <li>Should run on tablets&nbsp;as well as desk/laptop computers.</li>
+      <li>Client&nbsp;could be written in Haxe 3&nbsp;or TypeScript. 
+        <ul>
+          <li>Question: Canvas vs SVG</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+</body>
+</html>
