@@ -1,5 +1,6 @@
 package com.mun.component;
 
+import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
  * Every gate should have port to access the logic value
@@ -10,6 +11,7 @@ public abstract class Port {
 	protected double xPosition;
 	protected double yPosition;
 	protected ValueLogic value;
+	protected IO portDescription;
 	
 	
 	public double getxPosition() {
@@ -36,10 +38,14 @@ public abstract class Port {
 		return value;
 	}
 
+	public IO getPortDescription() {
+		return portDescription;
+	}
 
-	/**
-	 * set the port value
-	 * @param value
-	 */
-	abstract void setValue(ValueLogic value);
+	abstract void setPortDescription(IO portDescription);
+
+	public void setValue(ValueLogic value) {
+		this.value = value;
+	}
+
 }

@@ -8,11 +8,15 @@ package com.mun.emun;
  *
  */
 public enum IO {
+	//below are inputs
 	INPUT,//COMMON INPUT
-	OUTPUT,//COMMON OUTPUT
+	S,// MUX
 	D,//FLIP-FLOP
 	CLK, //CLOCK FOR FLIP-FLOP
+	
+	//below are outputs
+	OUTPUT,//COMMON OUTPUT
 	Q,//FLIP-FLOP
-	QN,//QN MEANS Q NOT
-	S;// MUX
+	QN;//QN MEANS Q NOT
+	
 }

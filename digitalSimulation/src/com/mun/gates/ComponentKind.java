@@ -2,8 +2,8 @@ package com.mun.gates;
 
 import java.util.LinkedHashMap;
 
+import com.mun.component.Port;
 import com.mun.emun.IO;
-import com.mun.emun.ValueLogic;
 
 
 /**
@@ -30,10 +30,10 @@ public abstract class ComponentKind {
 	 * this method is to calculate the gate value.
 	 * The reason why use Map is because for every input and output we
 	 * should identify what the value belongs to. 
-	 * @param valueLogicMap using map to store all of the input values 
-	 * @return all of the output values
+	 * @param valueLogicMap using map to store all of the port including the input ports and output ports
+	 * @return the port map which also contains all of the ports of this gate
 	 */
-	abstract public LinkedHashMap<IO, ValueLogic> algorithm(LinkedHashMap<IO, ValueLogic> valueLogicMap);
+	abstract public LinkedHashMap<IO, Port> algorithm(LinkedHashMap<IO, Port> portMap);
 	
 	
 }

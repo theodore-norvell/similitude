@@ -1,6 +1,8 @@
 package com.mun.gates;
 
 import java.util.LinkedHashMap;
+
+import com.mun.component.Port;
 import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
@@ -22,15 +24,17 @@ import com.mun.emun.ValueLogic;
 public class NAND extends ComponentKind {
 
 	@Override
-	public LinkedHashMap<IO, ValueLogic> algorithm(LinkedHashMap<IO, ValueLogic> valueLogicMap) {
-		LinkedHashMap<IO, ValueLogic> map = new LinkedHashMap<IO, ValueLogic>();
-		if(valueLogicMap.containsValue(ValueLogic.FALSE)){//if any of the input value has the false value, then the output should be true
-			map.put(IO.OUTPUT, ValueLogic.TRUE);
-		}else{//if all of the value of input is true, the output should be false
-			map.put(IO.OUTPUT, ValueLogic.FALSE);
+	public LinkedHashMap<IO, Port> algorithm(LinkedHashMap<IO, Port> portMap) {
+		for(Port port : portMap.values()){//if any of the input value has the false value, then the output should be true
+			if(port.getValue() == ValueLogic.FALSE){
+				portMap.get(IO.OUTPUT).setValue(ValueLogic.TRUE);
+				return portMap;
+			}
 		}
 		
-		return map;
+		//if all of the value of input is true, the output should be false
+		portMap.get(IO.OUTPUT).setValue(ValueLogic.FALSE);
+		return portMap;
 	}
 
 }

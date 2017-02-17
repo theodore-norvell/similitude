@@ -1,8 +1,10 @@
 package com.mun.gates;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 
 import com.mun.component.CircuitDiagram;
+import com.mun.component.Port;
 import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
@@ -26,20 +28,26 @@ public class CompoundComponent extends ComponentKind {
 		this.circuitDiagram = circuitDiagram;
 	}
 	/**
-	 * {@inheritDoc}<br><br><br>
+	 * {@inheritDoc}<br><br>
 	 * There is no actual algorithm for the compound component,
 	 * the output value only defined by the circuit diagram. For the 
 	 * current input should find the corresponding Input gate in the 
-	 * inner circuit diagram.
+	 * inner circuit diagram.<br>
 	 */
 	@Override
-	public LinkedHashMap<IO, ValueLogic> algorithm(
-			LinkedHashMap<IO, ValueLogic> valueLogicMap) {
-		LinkedHashMap<IO, ValueLogic> map = new LinkedHashMap<IO, ValueLogic>();
+	public LinkedHashMap<IO, Port> algorithm(
+			LinkedHashMap<IO, Port> portMap) {
+		
 		//find the input gate, and  calculate the value 
+		for(int i = 0; i < circuitDiagram.getComponentArrayList().size(); i++){
+			if( circuitDiagram.getComponentArrayList().get(i).getComponentKind().equals(new Input())){
+				Input input = (Input) circuitDiagram.getComponentArrayList().get(i).getComponentKind();
+				//the problem is how to figure out which port connect to which input
+				
+			}
+		}
 		
-		
-		return null;
+		return portMap;
 	}
 
 }

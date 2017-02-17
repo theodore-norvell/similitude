@@ -1,6 +1,8 @@
 package com.mun.gates;
 
 import java.util.LinkedHashMap;
+
+import com.mun.component.Port;
 import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
@@ -22,15 +24,18 @@ import com.mun.emun.ValueLogic;
 public class NOR extends ComponentKind {
 
 	@Override
-	public LinkedHashMap<IO, ValueLogic> algorithm(LinkedHashMap<IO, ValueLogic> valueLogicMap) {
-		LinkedHashMap<IO, ValueLogic> map = new LinkedHashMap<IO, ValueLogic>();
-		if(valueLogicMap.containsValue(ValueLogic.TRUE)){//if any of the input value has the true value, then the output should be false
-			map.put(IO.OUTPUT, ValueLogic.FALSE);
-		}else{//if all of the value of input is false, the output should be true
-			map.put(IO.OUTPUT, ValueLogic.TRUE);
+	public LinkedHashMap<IO, Port> algorithm(LinkedHashMap<IO, Port> portMap) {
+		
+		for(Port port : portMap.values()){//if any of the input value has the true value, then the output should be false
+			if(port.getValue() == ValueLogic.TRUE){
+				portMap.get(IO.OUTPUT).setValue(ValueLogic.FALSE);
+				return portMap;
+			}
 		}
 		
-		return map;
+		//if all of the value of input is false, the output should be true
+		portMap.get(IO.OUTPUT).setValue(ValueLogic.TRUE);
+		return portMap;
 	}
 
 }

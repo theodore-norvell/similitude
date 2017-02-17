@@ -1,6 +1,8 @@
 package com.mun.gates;
 
 import java.util.LinkedHashMap;
+
+import com.mun.component.Port;
 import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
@@ -22,21 +24,20 @@ import com.mun.emun.ValueLogic;
 public class FLIPFLOP extends ComponentKind {
 
 	@Override
-	public LinkedHashMap<IO, ValueLogic> algorithm(LinkedHashMap<IO, ValueLogic> valueLogicMap) {
-		LinkedHashMap<IO, ValueLogic> map = new LinkedHashMap<IO, ValueLogic>();
+	public LinkedHashMap<IO, Port> algorithm(LinkedHashMap<IO, Port> portMap) {
 		
-		if(map.get(IO.CLK) != ValueLogic.RISING_EDGE){//if clock is not at rising edge, then the value of flip-flop will not change
-			map = valueLogicMap;
+		if(portMap.get(IO.CLK).getValue() != ValueLogic.RISING_EDGE){//if clock is not at rising edge, then the value of flip-flop will not change
+			return portMap;
 		}else{
-			if(map.get(IO.D) == ValueLogic.FALSE){
-				map.put(IO.Q, ValueLogic.FALSE);
-				map.put(IO.QN, ValueLogic.TRUE);
+			if(portMap.get(IO.D).getValue() == ValueLogic.FALSE){
+				portMap.get(IO.Q).setValue(ValueLogic.FALSE);
+				portMap.get(IO.QN).setValue(ValueLogic.TRUE);
 			}else{
-				map.put(IO.Q, ValueLogic.TRUE);
-				map.put(IO.QN, ValueLogic.FALSE);
+				portMap.get(IO.Q).setValue(ValueLogic.TRUE);
+				portMap.get(IO.QN).setValue(ValueLogic.FALSE);
 			}
 		}
-		return map;
+		return portMap;
 	}
 
 }

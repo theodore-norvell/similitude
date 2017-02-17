@@ -2,6 +2,7 @@ package com.mun.gates;
 
 import java.util.LinkedHashMap;
 
+import com.mun.component.Port;
 import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
@@ -11,14 +12,30 @@ import com.mun.emun.ValueLogic;
  *
  */
 public class Output extends ComponentKind {
+	private int sequence = 1;//the sequence of the output order
+	
+	//constructor
+	public Output(int sequence) {
+		super();
+		this.sequence = sequence;
+	}
+
+	public int getSequence() {
+		return sequence;
+	}
+
+
+
+	public void setSequence(int sequence) {
+		this.sequence = sequence;
+	}
 
 	@Override
-	public LinkedHashMap<IO, ValueLogic> algorithm(
-			LinkedHashMap<IO, ValueLogic> valueLogicMap) {
+	public LinkedHashMap<IO, Port> algorithm(
+			LinkedHashMap<IO, Port> portMap) {
 		// TODO Auto-generated method stub
-		LinkedHashMap<IO, ValueLogic> map = new LinkedHashMap<IO, ValueLogic>();
-		map.put(IO.OUTPUT, valueLogicMap.get(IO.INPUT));
-		return map;
+		portMap.get(IO.INPUT).setValue(portMap.get(IO.OUTPUT).getValue());
+		return portMap;
 	}
 
 }

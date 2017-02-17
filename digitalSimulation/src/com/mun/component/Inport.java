@@ -1,12 +1,12 @@
 package com.mun.component;
 
-import com.mun.emun.ValueLogic;
+import com.mun.emun.IO;
 
 public class Inport extends Port {
 
 	@Override
-	void setValue(ValueLogic value) {
-		this.value = value;
+	void setPortDescription(IO portDescription) {
+		this.portDescription = portDescription;
 	}
 
 }

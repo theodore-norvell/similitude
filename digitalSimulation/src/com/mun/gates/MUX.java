@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.mun.component.Port;
 import com.mun.emun.IO;
 import com.mun.emun.ValueLogic;
 /**
@@ -33,23 +34,23 @@ import com.mun.emun.ValueLogic;
 public class MUX extends ComponentKind {
 
 	@Override
-	public LinkedHashMap<IO, ValueLogic> algorithm(LinkedHashMap<IO, ValueLogic> valueLogicMap) {
-		LinkedHashMap<IO, ValueLogic> map = new LinkedHashMap<IO, ValueLogic>();
-		if(valueLogicMap.get(IO.S) == ValueLogic.FALSE){//if S == 0, the output should as the same as input 1
-			valueLogicMap.remove(IO.S);
-			for(ValueLogic value : valueLogicMap.values()){
-				map.put(IO.OUTPUT, value);
-				break;
+	public LinkedHashMap<IO, Port> algorithm(LinkedHashMap<IO, Port> portMap) {
+		if(portMap.get(IO.S).getValue() == ValueLogic.FALSE){//if S == 0, the output should as the same as input 1
+			for(Port port : portMap.values()){
+				if(port.getPortDescription() == IO.INPUT){
+					portMap.get(IO.OUTPUT).setValue(port.getValue());
+					return portMap;
+				}
 			}
 		}else{//if s == 1 the output should as the same as the input 2
-			ListIterator<Map.Entry<IO, ValueLogic>> i = new ArrayList<Map.Entry<IO, ValueLogic>>(valueLogicMap.entrySet()).listIterator(valueLogicMap.size());
+			ListIterator<Map.Entry<IO, Port>> i = new ArrayList<Map.Entry<IO, Port>>(portMap.entrySet()).listIterator(portMap.size());
 			while(i.hasPrevious()){
-				Map.Entry<IO, ValueLogic> entry = i.previous();
-				map.put(IO.OUTPUT, entry.getValue());
-				break;
+				Map.Entry<IO, Port> entry = i.previous();
+				portMap.put(IO.OUTPUT, entry.getValue());
+				return portMap;
 			}
 		}
-		return map;
+		return null;
 	}
 
 }
