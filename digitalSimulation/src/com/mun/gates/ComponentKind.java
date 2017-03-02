@@ -30,7 +30,7 @@ public abstract class ComponentKind {
 	 * this method is to calculate the gate value.
 	 * The reason why use Map is because for every input and output we
 	 * should identify what the value belongs to. 
-	 * @param valueLogicMap using map to store all of the port including the input ports and output ports
+	 * @param portMap using map to store all of the port including the input ports and output ports
 	 * @return the port map which also contains all of the ports of this gate
 	 */
 	abstract public LinkedHashMap<IO, Port> algorithm(LinkedHashMap<IO, Port> portMap);

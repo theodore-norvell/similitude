@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 
 import com.mun.component.Port;
 import com.mun.emun.IO;
-import com.mun.emun.ValueLogic;
 /**
  * input<br>
  * the output is the same as input
