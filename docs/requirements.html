@@ -86,22 +86,20 @@
   <dt>Compound Component Kind</dt>
   <dd>Compound component kinds are little other than references to circuits. For each Circuit there is a corresponding component kind.&nbsp; When the circuit&nbsp;that a compound component refers to changes, the compound component kind changes implicitly. See discussion below: in <a href="onCompoundComponentKinds">section On Compound Component Kinds.</a> </dd>
   <dt>Port</dt>
-  <dd>A Port is the representation of an input or output to a component. Each Port is associated with a component.&nbsp; Each Port is either an in port or an outport.&nbsp; Ports may have names.&nbsp;The number of input and output ports and their names are generally determined by the component kind.&nbsp; For example any D-flip-flop would have two Input Ports named D and CLK and one Output Port named Q. However some Component&nbsp;Kinds will allow variable numbers&nbsp;of Input or Output Ports: for example a gate would allow a variable number of Input Ports with a minumum of 2.&nbsp; The location of a port is determined by the Kind and the Component.&nbsp;For example the Kind might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.)&nbsp; The position of a port is constrained to be on a Grid Point. (Implementation note: The&nbsp;size of a device therefore imposes a maximum on the number of ports it can have on a side. An AND gate that is 10 by 10 can only have 11 inputs.)</dd>
+  <dd>A Port is the representation of an input or output to a component. Each Port is associated with a component.&nbsp; Each Port is either an in port or an outport.&nbsp; Ports may have names.&nbsp;The number of input and output ports and their names are generally determined by the component kind.&nbsp; For example any D-flip-flop would have two Input Ports named D and CLK and one Output Port named Q. However some Component&nbsp;Kinds will allow variable numbers&nbsp;of Input or Output Ports: for example a gate would allow a variable number of Input Ports with a minumum of 2.&nbsp; The location of a port is determined by the Kind and the Component.&nbsp;For example the Kind might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.) Ports that are not Connected to anything links could be displayed in dark orange.</dd>
   <dt>Input Port</dt>
-  <dd>A Port used for input.&nbsp; Input ports might be represented by small squares&nbsp;with black stroke and white fills. However clock inputs are traditionally shown as a triangle.</dd>
+  <dd>A Port used for input.&nbsp; Input ports might be represented by small squares&nbsp;with black stroke and white fills. </dd>
   <dd>&nbsp;</dd>
   <dt>Output Port</dt>
   <dd>A Port used for output. Output ports might be represented by small squares with black stroke and gray fill.</dd>
   <dt>Links</dt>
-  <dd>A link&nbsp;is a wire with two end points. The end points are always on a grid point. (They may even be on the same grid point, so be careful about dividing by the length of a link.) The end points should be shown as small  circles, unless the end point is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation.</dd>
+  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles, unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation.</dd>
   <dt>Connected</dt>
-  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;is on&nbsp;the same Grid Point as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same Grid Point&nbsp;or if one has an end point on a grid point that the other intersects.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
+  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
   <dt>Net</dt>
   <dd>A maximal set of Ports and Links that are all connected to each other is called a Net.&nbsp; Note that each Port and Link is a member of exactly one Net. (Implementation note:&nbsp; There is no need to represent Nets explicitely. However, it will be useful for simulation if we can calculate the Net of a Port or Link.</dd>
-  <dt>Grid Points</dt>
-  <dd>Each Circuit is laid out on a grid such that all end points of links and all ports are on a grid point. By default the grid is XGRIDMAX+1 by YGRIDMAX+1.&nbsp; (We might allow different circuits to have different grid sizes, but changing the grid  of an existing circuit will be difficult unless we are simply doubling one of its dimenions. For now, let us assume all Circuits have the same sized grids). A grid point is thus a pair (x, y) where 0 &le; x &le; XGRIDMAX and 0 &le; y &le;YGRIDMAX.   All measurements regarding the circuit are in Grid Units (GUs). So a gate might measure 10 by 10 GUs.</dd>
-  <dt>Grid Units</dt>
-  <dd>See Grid Points.</dd>
+  <dt>World coordinates</dt>
+  <dd>Each Circuit Diagram is laid out on a rectagle of the real plane.&nbsp; This rectangle has x coordinates from 0 to W and y coordinates from 0 to H.</dd>
   <dt>abc</dt>
   <dd>def</dd>
   <dt>abc</dt>
@@ -115,6 +113,14 @@
   <dt>abc</dt>
   <dd>def</dd>
 </dl>
+<h2>Layout of the  UI</h2>
+<h3>Main screen</h3>
+<p>Along the top&nbsp;of the client screen is tool bar that contains buttons for the various command.</p>
+<p>To the right is a tool bar (or pallette) that contains icons representing various tools. This will include tools for the most common component kinds.</p>
+<p>In the middle, is the drawing canvas containing a visualization of the circuit being edited.&nbsp;Above the canvas is the name of the current circuit. The canvas is surrounded by four buttons for scrolling the canvas.</p>
+<p>During simulation, the bottom part of the main screen contains the simulation panel.</p>
+<h3>Use cases for editing</h3>
+<h3>[...]</h3>
 <h2>Discussion</h2>
 <h3><a name="onCompoundComponentKinds"></a>On compound component kinds</h3>
 <p>One issue with compound component kinds is that they must not be allowed to form a cycle. I.e. we can not add to Circuit A a Component whose Kind is a compound kind that refers directly or indirectly to Circuit A.</p>
