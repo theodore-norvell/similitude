@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+<h1>Requirements and specification for Similitude</h1>
+<h2>User stories</h2>
+<p>Functional requirements: As a user I will be able to:</p>
+<ul>
+  <li> Add components to a circuit diagram.
+    <ul>
+      <li>Components are things like inputs, outputs, and&nbsp;gates, adders.</li>
+      <li>Some components have a fixed set of input or ports.</li>
+      <li>Some components have a variable number of input (or output?) ports.</li>
+    </ul>
+  </li>
+  <li>Move components around a circuit diagram.</li>
+  <li>Rotate components (4 directions).</li>
+  <li>Delete components from a circuit diagram.</li>
+  <li>Add probes for debugging.</li>
+  <li>Add links</li>
+  <li>Delete links</li>
+  <li>Move an endpoint of a link</li>
+  <li>Automatic layout of links or components and links</li>
+  <li>Create, edit, and use, save, compound (user-defined) components.
+    <ul>
+      <li>Using compound components could be
+        <ul>
+          <li>black&nbsp;box (no display of internals, no stopping for internal events)</li>
+          <li>white box (display internals, stop during simulation) </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Server stuff
+    <ul>
+      <li>Save circuit diagrams to the server.&nbsp;</li>
+      <li>Login</li>
+      <li>Create a new login name and password.</li>
+      <li>Recover my password.</li>
+      <li>Access library</li>
+      <li>Upload/download&nbsp;circuits&nbsp;(and compound components) and test inputs.</li>
+    </ul>
+  </li>
+  <li>Open circuit diagrams from disk files.</li>
+  <li>Edit the input values of input components
+    <ul>
+      <li>Value includes bits (at least 3 values), sequences of bits, an error value </li>
+      <li>Input&nbsp;signals are functions from time to values.</li>
+      <li>Also expected outputs. </li>
+    </ul>
+  </li>
+  <li>Simulate the circuit for a period of time with animation.
+    <ul>
+      <li>Step by step.</li>
+      <li>Continuous (real-time slowed down)</li>
+      <li>Instant</li>
+    </ul>
+  </li>
+  <li>View the values of inputs and outputs graphically (wave form, binary, octal, hex, decimal).</li>
+  <li>See run time errors reported as soon as they occur.</li>
+</ul>
+<h2> Nonfunctional requirements </h2>
+<ul>
+  <li>Servers could be written in Java 1.8 or Haxe 3 and run on the the JavaSE 1.8 platform. </li>
+  <li>Should run on tablets&nbsp;as well as desk/laptop computers.</li>
+  <li>Client&nbsp;could be written in Haxe 3&nbsp;or TypeScript.
+    <ul>
+      <li>Question: Canvas or SVG</li>
+    </ul>
+  </li>
+</ul>
+<h2>Domain model and definitions</h2>
+<dl>
+  <dt>Circuit</dt>
+  <dd>A circuit is&nbsp;a named arrangement of components and links. Copies of circuits exist on one or more clients and on the server</dd>
+  <dt>Component</dt>
+  <dd>A&nbsp; component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of attributes that can be edited. Attributes of components include a position (x,y), size (w, h),  orientation.&nbsp; (North, South, East, West), and flip (Up or Down). Depending on the component kind, components may have other attributes. For example, a component whose kind is and-gate would have attribute indicating the number of inputs. A component whose component kind is compound&nbsp;has an attribute saying whether it is white-box or black-box.&nbsp; Most primitive components have an attribute for the delay.&nbsp; A flip-flop component might have attributes for set-up and hold times. (Implementation note: the state of a Component does not include any information associated with Simulations.)</dd>
+  <dt>Component kind</dt>
+  <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound components, q.v.)</dd>
+  <dt>Primitive Component&nbsp;Kind</dt>
+  <dd>Primitive component kinds&nbsp;are things such and gate, not&nbsp;gates, adders,&nbsp;etc., that are build in.</dd>
+  <dt>Compound Component Kind</dt>
+  <dd>Compound component kinds are little other than references to circuits. For each Circuit there is a corresponding component kind.&nbsp; When the circuit&nbsp;that a compound component refers to changes, the compound component kind changes implicitly. See discussion below: in <a href="onCompoundComponentKinds">section On Compound Component Kinds.</a> </dd>
+  <dt>Port</dt>
+  <dd>A Port is the representation of an input or output to a component. Each Port is associated with a component.&nbsp; Each Port is either an in port or an outport.&nbsp; Ports may have names.&nbsp;The number of input and output ports and their names are generally determined by the component kind.&nbsp; For example any D-flip-flop would have two Input Ports named D and CLK and one Output Port named Q. However some Component&nbsp;Kinds will allow variable numbers&nbsp;of Input or Output Ports: for example a gate would allow a variable number of Input Ports with a minumum of 2.&nbsp; The location of a port is determined by the Kind and the Component.&nbsp;For example the Kind might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.) Ports that are not Connected to anything links could be displayed in dark orange.</dd>
+  <dt>Input Port</dt>
+  <dd>A Port used for input.&nbsp; Input ports might be represented by small squares&nbsp;with black stroke and white fills. </dd>
+  <dd>&nbsp;</dd>
+  <dt>Output Port</dt>
+  <dd>A Port used for output. Output ports might be represented by small squares with black stroke and gray fill.</dd>
+  <dt>Links</dt>
+  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles, unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation.</dd>
+  <dt>Connected</dt>
+  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
+  <dt>Net</dt>
+  <dd>A maximal set of Ports and Links that are all connected to each other is called a Net.&nbsp; Note that each Port and Link is a member of exactly one Net. (Implementation note:&nbsp; There is no need to represent Nets explicitely. However, it will be useful for simulation if we can calculate the Net of a Port or Link.</dd>
+  <dt>World coordinates</dt>
+  <dd>Each Circuit Diagram is laid out on a rectagle of the real plane.&nbsp; This rectangle has x coordinates from 0 to W and y coordinates from 0 to H.</dd>
+  <dt>abc</dt>
+  <dd>def</dd>
+  <dt>abc</dt>
+  <dd>def</dd>
+  <dt>abc</dt>
+  <dd>def</dd>
+  <dt>abc</dt>
+  <dd>def</dd>
+  <dt>abc</dt>
+  <dd>def</dd>
+  <dt>abc</dt>
+  <dd>def</dd>
+</dl>
+<h2>Layout of the  UI</h2>
+<h3>Main screen</h3>
+<p>Along the top&nbsp;of the client screen is tool bar that contains buttons for the various command.</p>
+<p>To the right is a tool bar (or pallette) that contains icons representing various tools. This will include tools for the most common component kinds.</p>
+<p>In the middle, is the drawing canvas containing a visualization of the circuit being edited.&nbsp;Above the canvas is the name of the current circuit. The canvas is surrounded by four buttons for scrolling the canvas.</p>
+<p>During simulation, the bottom part of the main screen contains the simulation panel.</p>
+<h3>Use cases for editing</h3>
+<h3>[...]</h3>
+<h2>Discussion</h2>
+<h3><a name="onCompoundComponentKinds"></a>On compound component kinds</h3>
+<p>One issue with compound component kinds is that they must not be allowed to form a cycle. I.e. we can not add to Circuit A a Component whose Kind is a compound kind that refers directly or indirectly to Circuit A.</p>
+<p>When the circuit&nbsp;that a compound component refers to changes, the compound component kind changes implicitly. For example: Suppose Circuit A contains two Components A.0&nbsp;and A.1 that are of the same Compound Component Kind&nbsp;that refers to another Circuit B.&nbsp; If B changes, then Components A.0 and A.1 may become invalid, for example the number of input and output ports that they have may need to be adjusted.&nbsp; Furthermore if the component shows a white-box view, then Circuit A will have to be re-rendered even if the attributes of its components haven't changed. From an implementation point of view, this can be accomodated by two measures:</p>
+<ul>
+  <li>First when the Circuit is opened for editing, all its components need to be validated. Validating a component means checking that it has the right number of input ports with the right names and positions, that it has the right set of output ports with the right set of names and positions, and possibly updating attribute and their values that are derived from the kind.</li>
+  <li>Second, when a Circuit is changed, any component in an open Circuit that refers to that Circuit needs to be validated.&nbsp; This can be accomplished by the observer pattern.&nbsp; For example: suppose Circuit A is open and has a component A.1 that refers to a Circuit B. A.1 observes B. Thus when B is changes, it notifies A.1 which then validates itself.&nbsp;Whether or not&nbsp;A.1 was invalid, the change to B is a change to A and so A notifies its observers that it has changed.</li>
+</ul>
+<h2>On client copies and server copies</h2>
+<p>Note that while Circuits  are stored on the server, a client may obtain a copy of a Circuit for editing&nbsp;or simulation. We need to avoid the&nbsp;problem that two clients might try to edit the same circuit at the same time.&nbsp; Conflicting edits must be resolved in some way. The simplest way to resolve conflicts is that the most recent update prevails, even if it overwrites changes from another client.&nbsp; <a href="concurrentEditing.html">Elsewhere</a>&nbsp;I'll discuss a scheme that allows concurrent editing.</p>
+</body>
+</html>

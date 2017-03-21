@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+<h1>Concurrent editing for Similitude</h1>
+<p>[[Work in progress]]</p>
+<p>I would suggest the following scheme.&nbsp;When a&nbsp;client obtains a copy of the circuit, it not only gets the current value of the circuit, it also gets a unique ticket number&nbsp;and a time. The&nbsp;circuit is considered checked out to the client for a length of time (say 5 minutes). If the client makes an update before that time is up, the update is accepted&nbsp;and the lease is renewed. After the lease has expired, updates will still be accepted as long as another client has not checked out the circuit in the mean time.</p>
+<p>Server state (for each circuit):</p>
+<blockquote>
+  <p>x -- The current value of the circuit</p>
+  <p>k -- The latest ticket number</p>
+  <p>t -- a time</p>
+</blockquote>
+<p>Server algorithm:</p>
+<pre>
+Initially t is 0
+
+While true do
+	m := receive a message
+	now := current time
+	if m = checkout() and t < now
+		k := new ticket, never used before
+		t := now + 300 seconds
+		reply with checkoutAccepted( t-now, k, x )
+	else if m is a checkout message and t >= now
+		// There is still a lease
+		reply with checkoutRejected( t-now )
+	else if m = update( x', k' ) and k' = k
+		x := x'	
+		t := now + 300 seconds
+		reply with pack( t-now )
+	else if m =&nbsp;update( x', k' ) and k' /= k
+		if  t &lt; now  
+			x := x'
+			k := k'
+			t := now + 300 seconds
+			reply with updateAccepted(t-now, k)
+		else 
+			reply with updateRejected( t-now )
+	else if m =&nbsp;release( k' ) and k' = k
+	&nbsp;	t := now
+		reply with releaseAccepted( 0 )
+	else if m = release( k' ) and k' /= k
+		reply with releaseAccepted( 0 )
+
+</pre>
+<p>The client behaves as follows</p>
+</body>
+</html>
