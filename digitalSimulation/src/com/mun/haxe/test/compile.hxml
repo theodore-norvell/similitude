@@ -1,0 +1,5 @@
+-lib pixijs
+-js test.js
+-main Test
+-D js-flatten
+-dce full
