@@ -1,8 +1,8 @@
 package com.mun.view.drawingImpl;
 
+import js.html.CanvasRenderingContext2D;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.Orientation;
-import js.html.CanvasRenderingContext2D;
 
 /** This class used for drawing the base components
 *

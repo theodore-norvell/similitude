@@ -13,7 +13,7 @@
             <property name="hibernate.archive.autodetection" value="class"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-            <property name="hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
 
             <!-- 在显示SQL语句时格式化语句 -->
             <property name="hibernate.use_sql_comments" value="false"/>
@@ -24,6 +24,11 @@
             <property name="hibernate.connection.autoReconnect" value="true"/>
             <property name="connection.autoReconnectForPools" value="true"/>
             <property name="connection.is-connection-validation-required" value="true"/>
+
+            <property name="acquireIncrement" value="2" />
+            <property name="minPoolSize" value="20" />
+            <property name="maxPoolSize" value="50" />
+            <property name="maxIdleTime" value="600" />
         </properties>
     </persistence-unit>
 </persistence>
