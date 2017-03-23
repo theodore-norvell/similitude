@@ -113,14 +113,84 @@
   <dt>abc</dt>
   <dd>def</dd>
 </dl>
-<h2>Layout of the  UI</h2>
-<h3>Main screen</h3>
+<h2>UI</h2>
+<h3>Layout of the  UI</h3>
+<h4>Main screen</h4>
 <p>Along the top&nbsp;of the client screen is tool bar that contains buttons for the various command.</p>
 <p>To the right is a tool bar (or pallette) that contains icons representing various tools. This will include tools for the most common component kinds.</p>
 <p>In the middle, is the drawing canvas containing a visualization of the circuit being edited.&nbsp;Above the canvas is the name of the current circuit. The canvas is surrounded by four buttons for scrolling the canvas.</p>
 <p>During simulation, the bottom part of the main screen contains the simulation panel.</p>
+<h3>Selection model</h3>
+<p>At each point in time a set of components and links on each  diagram are considered selected.</p>
 <h3>Use cases for editing</h3>
-<h3>[...]</h3>
+<h4>Add component by drag and drop</h4>
+<p>Requirements: Add components to a circuit diagram.</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: May scroll the palette so that the appropriate item is displayed.</li>
+  <li>User: Moves mouse over a palette item&nbsp;and depresses the mouse.</li>
+  <li>User: Drags mouse to the drawing canvas.</li>
+  <li>Client: As long as the mouse is over the palette or drawing canvas, as preview of the component is shown.</li>
+  <li>User: Releases the mouse over the drawing canvas.</li>
+  <li>Client: Adds the component to the diagram.</li>
+  <li>Client: The newly added component becomes the selected component.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>In step 2 the palette items should light up as the mouse passes over them.</li>
+  <li>The component might actually be added to the drawing as soon as the mouse moves over the canvas.</li>
+  <li>On a touch device, the drag may be done with touch event rather than mouse events.</li>
+</ul>
+<h4>Add component by click or tap</h4>
+<p>Requirements: Add components to a circuit diagram.</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: May scroll the palette so that the appropriate item is displayed.</li>
+  <li>User: Moves mouse over a palette item&nbsp;and clicks with the mouse.</li>
+  <li>Client: Adds the component to the diagram&nbsp;at world coordinates that correspond to the center of the view coordinates.</li>
+  <li>Client: The newly added component becomes the selected component.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>In step 2 the palette items should light up as the mouse passes over them.</li>
+  <li>On a touch device, as tap can be used instead of a mouse click.</li>
+</ul>
+<h4>Move components, links, and endpoints by drag</h4>
+<p>Requirements: Move components around the circuit diagram.</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Depresses mouse button over a component, link, or endpoint.</li>
+  <li>User: Moves mouse to another part of the diagram.</li>
+  <li>If the component, link, or&nbsp;the link that the endpoint belongs to is in the current selection:
+    <ol>
+      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
+      <li>When the mouse is released the selection is unchanged</li>
+    </ol>
+  </li>
+  <li>Otherwise
+    <ol>
+      <li>Client: As the mouse moves, the component, link, or endpoint moves.</li>
+      <li>When the mouse is released, the component, link, or the link that the endpoint belongs to become the only&nbsp;selected thing.</li>
+      <li>When a component moves, all endpoints connected to its ports should also move.</li>
+    </ol>
+  </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>On a touch device, touch events can be used.</li>
+</ul>
+<p>&nbsp;</p>
+<p></p>
+<p>&nbsp;</p>
 <h2>Discussion</h2>
 <h3><a name="onCompoundComponentKinds"></a>On compound component kinds</h3>
 <p>One issue with compound component kinds is that they must not be allowed to form a cycle. I.e. we can not add to Circuit A a Component whose Kind is a compound kind that refers directly or indirectly to Circuit A.</p>
