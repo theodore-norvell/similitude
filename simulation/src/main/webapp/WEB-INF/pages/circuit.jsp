@@ -49,7 +49,7 @@
     <div class="row-fluid">
         <div class="row">
             <div class="col-sm-1 col-md-1 col-lg-1" style="border: 1px solid;" id="leftDIV">
-                <!--add button by js-->没有${username}这个用户!
+                <!--add button by js-->
             </div>
             <div class="col-sm-11 col-md-11 col-lg-11" style="border: 1px solid" >
                 <canvas id="canvas" style="border: 1px solid;height: 100%;width: 100%;"></canvas>
@@ -58,6 +58,7 @@
         </div>
     </div>
 </div>
+<div id="haxe:trace"></div>
 <script type="application/javascript" src="js/test.js"></script>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

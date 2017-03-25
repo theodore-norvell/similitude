@@ -41,6 +41,6 @@ public class Login {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index() {
-        return "index";
+        return "circuit";//for test consideration, set the circuit to the first page
     }
 }

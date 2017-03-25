@@ -3,8 +3,6 @@ package com.mun.dao;
 import com.mun.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 /**
  * Created by wanhui on 23/03/2017.
  */
@@ -23,10 +21,4 @@ public interface UserDao extends JpaRepository<UserEntity, Integer> {
      */
     UserEntity findById(int id);
 
-    /**
-     * find all by name
-     * @param name  part of name
-     * @return list of user
-     */
-    List<UserEntity> findByNameLike(String name);
 }

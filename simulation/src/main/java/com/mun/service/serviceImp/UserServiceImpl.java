@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService{
 
     public boolean login(String name, String password) {
         UserEntity user = userDao.findByName(name);
-        if(user.getPassword() == password) {
+        if(user != null && user.getPassword().contentEquals(password)) {
             return true;
         }else {
             return false;
