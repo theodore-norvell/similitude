@@ -618,13 +618,9 @@ Test.main = function() {
 	Test.canvas = window.document.getElementById("canvas");
 	Test.cxt = Test.canvas.getContext("2d");
 	var scale = window.devicePixelRatio;
-	if(scale == 2) {
-		Test.canvas.setAttribute("width",window.innerWidth * 2 + "");
-		Test.canvas.setAttribute("height",window.innerHeight * 2 + "");
-	} else {
-		Test.canvas.setAttribute("width",window.innerWidth + "");
-		Test.canvas.setAttribute("height",window.innerHeight + "");
-	}
+	haxe_Log.trace(scale,{ fileName : "Test.hx", lineNumber : 25, className : "Test", methodName : "main"});
+	Test.canvas.setAttribute("width",window.innerWidth * scale + "");
+	Test.canvas.setAttribute("height",window.innerHeight * scale + "");
 	var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(Test.cxt);
 	var circuitDiagram = new com_mun_model_component_CircuitDiagram();
 	var and_gate = new com_mun_model_gates_AND();
@@ -2876,6 +2872,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;

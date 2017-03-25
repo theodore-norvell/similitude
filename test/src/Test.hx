@@ -22,13 +22,10 @@ class Test {
         cxt = untyped canvas.getContext("2d");
 
         var scale = Browser.window.devicePixelRatio;
-        if(scale == 2){
-            canvas.setAttribute("width",Browser.window.innerWidth*2+"");
-            canvas.setAttribute("height",Browser.window.innerHeight*2+"");
-        }else{
-            canvas.setAttribute("width",Browser.window.innerWidth*1+"");
-            canvas.setAttribute("height",Browser.window.innerHeight*1+"");
-        }
+        trace(scale);
+        canvas.setAttribute("width",Browser.window.innerWidth*scale+"");
+        canvas.setAttribute("height",Browser.window.innerHeight*scale+"");
+
 
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
 
