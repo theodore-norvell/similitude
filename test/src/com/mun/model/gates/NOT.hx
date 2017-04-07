@@ -32,8 +32,8 @@ class NOT implements ComponentKind extends GateAbstract {
             }
         }
         for (port in portArray) {
-            if (port.get_portDescription == IOTYPE.OUTPUT) {
-                portArray.remove(portArray);
+            if (port.get_portDescription() == IOTYPE.OUTPUT) {
+                portArray.remove(port);
                 if (value == ValueLogic.TRUE)
                     port.set_value(ValueLogic.FALSE);
                 else if (value == ValueLogic.FALSE)
@@ -45,8 +45,11 @@ class NOT implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, inportNum:Int = 2):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
+        if(true){//not gate not have one input
+            inportNum = 1;
+        }
         switch (orientation){
             case Orientation.EAST : {
                 var counter:Int = 0;

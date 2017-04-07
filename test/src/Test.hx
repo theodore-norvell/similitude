@@ -1,13 +1,8 @@
 package ;
 
+import com.mun.controller.buttonClick.ButtonClick;
 import com.mun.model.component.CircuitDiagram;
-import com.mun.model.component.Component;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.enumeration.Orientation;
-import com.mun.model.gates.AND;
-import com.mun.model.gates.ComponentKind;
-import com.mun.view.drawComponents.DrawAND;
-import com.mun.view.drawComponents.DrawComponent;
 import com.mun.view.drawingImpl.DrawingAdapter;
 import js.Browser;
 import js.html.CanvasElement;
@@ -20,21 +15,36 @@ class Test {
         canvas = cast Browser.document.getElementById("canvas");
         //draw and gate
         cxt = untyped canvas.getContext("2d");
-
         var scale = Browser.window.devicePixelRatio;
-        trace(scale);
-        canvas.setAttribute("width",Browser.window.innerWidth*scale+"");
-        canvas.setAttribute("height",Browser.window.innerHeight*scale+"");
+
+        var backingStoreRatioDynamic : Dynamic = Reflect.field( cxt, "webKitBackingStorePixelRatio" ) ;
+        if( backingStoreRatioDynamic == null )
+            backingStoreRatioDynamic = Reflect.field( cxt, "mozBackingStorePixelRatio" ) ;
+        if( backingStoreRatioDynamic == null )
+            backingStoreRatioDynamic = Reflect.field( cxt, "msBackingStorePixelRatio" ) ;
+        if( backingStoreRatioDynamic == null )
+            backingStoreRatioDynamic = Reflect.field( cxt, "oBackingStorePixelRatio" ) ;
+        if( backingStoreRatioDynamic == null )
+            backingStoreRatioDynamic = Reflect.field( cxt, "backingStorePixelRatio" ) ;
+        var backingStoreRatio : Float =
+        if( backingStoreRatioDynamic == null ) 1.0
+        else cast( backingStoreRatioDynamic, Float ) ;
+
+        var pixelRatio = (Browser.window.devicePixelRatio || 1)/backingStoreRatioDynamic;
+        trace(pixelRatio);
 
 
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
-
         var circuitDiagram:CircuitDiagram = new CircuitDiagram();
-        var and_gate:ComponentKind = new AND();
 
-        var component:Component = new Component(60, 50, 40, 40, Orientation.SOUTH, and_gate, 2);
-        var drawAnd:DrawComponent = new DrawAND(component, drawingAdapter);
-        drawAnd.drawCorrespondingComponent();
+//        var component_:ComponentKind = Type.createInstance(Type.resolveClass("com.mun.model.gates.OR"),[]);
+////        var and_gate:ComponentKind = new AND();
+//        var component__:Component = new Component(250, 50, 40, 40, Orientation.EAST, component_, 2);
+////        var drawAnd:DrawComponent = new DrawAND(component__, drawingAdapter);
+//        var draw:DrawComponent = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.DrawOR"),[component__,drawingAdapter]);
+//        draw.drawCorrespondingComponent();
 
+//        new CreateAndDraw("OR",250, 50, 40, 40, Orientation.EAST, 3, drawingAdapter);
+        new ButtonClick(drawingAdapter);
     }
 }

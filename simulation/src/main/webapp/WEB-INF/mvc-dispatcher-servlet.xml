@@ -6,41 +6,41 @@
        xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!--扫描其中的注解-->
+    <!--扫描其中的注解 scan the annotation-->
     <context:component-scan base-package="com.mun.service"/>
     <context:component-scan base-package="com.mun.controller"/>
 
-    <!-- 静态资源(js、image等)的访问 -->
+    <!-- 静态资源(js、image等)的访问 Static resources-->
     <mvc:resources mapping="/css/**" location="/WEB-INF/css/" />
     <mvc:resources mapping="/images/**" location="/WEB-INF/images/" />
     <mvc:resources mapping="/js/**" location="/WEB-INF/js/" />
     <mvc:default-servlet-handler/>
 
-    <!-- 开启注解 -->
+    <!-- 开启注解 open annotation-->
     <mvc:annotation-driven/>
 
     <!--ViewResolver 视图解析器-->
-    <!--用于支持Servlet、JSP视图解析-->
+    <!--用于支持Servlet、JSP视图解析  Servlet, jsp view Resolver-->
     <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
         <property name="prefix" value="/WEB-INF/pages/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
 
-    <!-- 表示JPA Repository所在的包 -->
+    <!-- 表示JPA Repository所在的包 The package of the JPA Repository-->
     <jpa:repositories base-package="com.mun.dao" entity-manager-factory-ref="entityManagerFactory"
                       transaction-manager-ref="transactionManager"/>
 
-    <!-- 链接到persistence.xml -->
+    <!-- 链接到persistence.xml.  Link to persistence.xml-->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
         <property name="persistenceUnitName" value="defaultPersistenceUnit"/>
     </bean>
 
-    <!-- 事务管理 -->
+    <!-- 事务管理 transaction manager-->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
 
-    <!-- 开启事务管理注解 -->
+    <!-- 开启事务管理注解 open transaction manager-->
     <tx:annotation-driven transaction-manager="transactionManager"/>
 </beans>

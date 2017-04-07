@@ -19,11 +19,22 @@
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="row">
-            <div class="col-sm-1 col-md-1 col-lg-1" style="border: 1px solid;" id="leftDIV">
-                <!--add button by js-->
-
+            <div class="col-sm-1 col-md-1 col-lg-1" id="leftDIV">
+                <div class="btn-group-vertical btn-group-sm" role="group" aria-label="...">
+                    <!--add initial gate button-->
+                    <button id="AND" type="button" class="btn btn-default">AND Gate</button>
+                    <button id="OR" type="button" class="btn btn-default">OR Gate</button>
+                    <button id="NOT" type="button" class="btn btn-default">NOT Gate</button>
+                    <button id="NOR" type="button" class="btn btn-default">NOR Gate</button>
+                    <button id="NAND" type="button" class="btn btn-default">NAND Gate</button>
+                    <button id="XOR" type="button" class="btn btn-default">XOR Gate</button>
+                    <button id="MUX" type="button" class="btn btn-default">MUX</button>
+                    <button id="FlipFlop" type="button" class="btn btn-default">FlipFlop</button>
+                    <button id="INPUT" type="button" class="btn btn-default">INPUT</button>
+                    <button id="OUTPUT" type="button" class="btn btn-default">OUTPUT</button>
+                </div>
             </div>
-            <div class="col-sm-11 col-md-11 col-lg-11" style="border: 1px solid" id="rightDIV">
+            <div class="col-sm-11 col-md-11 col-lg-11" id="rightDIV">
                 <canvas id="canvas" style="border: 1px solid;height: 100%;width: 100%;" ></canvas>
 
             </div>

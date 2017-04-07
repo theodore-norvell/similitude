@@ -45,8 +45,11 @@ class OR implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, inportNum:Int = 2):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
+        if(inportNum == null || inportNum < 3){
+            inportNum = 2;
+        }
         switch (orientation){
             case Orientation.EAST : {
                 var counter:Int = 0;

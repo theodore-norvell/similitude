@@ -3,10 +3,9 @@ import com.mun.model.component.Component;
 import com.mun.model.component.Port;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 /**
-* draw output gate
-* @author wanhui
+* draw not gate
 **/
-class DrawOutput implements DrawComponent{
+class DrawNOT implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
@@ -16,12 +15,7 @@ class DrawOutput implements DrawComponent{
     }
 
     public function drawCorrespondingComponent():Void {
-        //set the radius equal to 7
-        drawingAdapter.setFillColor("red");
-        drawingAdapter.drawCricle(component.get_xPosition(), component.get_yPosition(), 7);
-        drawingAdapter.setTextColor("black");
-        //drawingAdapter.drawText("Output", component.get_yPosition, component.get_yPosition(), component.get_width() - 2);
-        //output gate shouldn't have output port
+        drawingAdapter.drawNotShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
         //draw inport
         var inportArray:Array<Port> = component.get_inportArray();
         for (i in 0...inportArray.length) {
@@ -30,8 +24,18 @@ class DrawOutput implements DrawComponent{
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), 2);
         }
+        //draw outport
+        var outportArray:Array<Port> = component.get_outportArray();
+        for (i in 0...outportArray.length) {
+            var port:Port = outportArray[i];
+            //init set the radius is 2
+            drawingAdapter.setFillColor("black");
+            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), 2);
+        }
 
         //reset drawing parameter
         drawingAdapter.resetDrawingParam();
+
     }
+
 }

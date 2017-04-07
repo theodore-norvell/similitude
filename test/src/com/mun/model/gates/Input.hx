@@ -27,8 +27,8 @@ class Input implements ComponentKind extends GateAbstract {
             }
         }
         for (port in portArray) {
-            if (port.get_portDescription == IOTYPE.OUTPUT) {
-                portArray.remove(portArray);
+            if (port.get_portDescription() == IOTYPE.OUTPUT) {
+                portArray.remove(port);
                 port.set_value(value);
                 portArray.push(port);
             }
@@ -37,8 +37,11 @@ class Input implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, inportNum:Int = 1):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
+        if(true){//input should only have one input
+            inportNum = 1;
+        }
         switch (orientation){
             case Orientation.EAST : {
                 //inport

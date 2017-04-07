@@ -26,19 +26,19 @@ class XOR implements ComponentKind extends GateAbstract {
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
         var value:ValueLogic;
-        var counter:Int;//counter
+        var counter:Int = 0;//counter
         //for 2 or more inputs, if the number of  ValueLogic.TRUE is even, the output should be ValueLogic.FALSE
         //otherwise, the output should be ValueLogic.TRUE
         for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.INPUT && port.get_value().TRUE) {
+            if (port.get_portDescription() == IOTYPE.INPUT && port.get_value() == ValueLogic.TRUE) {
                 counter++;
             }
         }
 
         if (counter % 2 == 0) {
-            value == ValueLogic.FALSE;
+            value = ValueLogic.FALSE;
         } else {
-            value == ValueLogic.TRUE;
+            value = ValueLogic.TRUE;
         }
 
         for (port in portArray) {
@@ -51,8 +51,11 @@ class XOR implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, inportNum:Int = 2):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
+        if(inportNum == null || inportNum <2){
+            inportNum = 2;
+        }
         switch (orientation){
             case Orientation.EAST : {
                 var counter:Int = 0;

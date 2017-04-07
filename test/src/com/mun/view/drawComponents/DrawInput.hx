@@ -19,8 +19,8 @@ class DrawInput implements DrawComponent {
         //set the radius equal to 7
         drawingAdapter.setFillColor("red");
         drawingAdapter.drawCricle(component.get_xPosition(), component.get_yPosition(), 7);
-        drawingAdapter.setTextColor("black")
-        drawingAdapter.drawText("Input", component.get_yPosition, component.get_yPosition(), component.get_width() - 2);
+        drawingAdapter.setTextColor("black");
+        //drawingAdapter.drawText("Input", component.get_yPosition(), component.get_yPosition(), component.get_width() - 2);
         //input gate shouldn't have inport
         //draw outport
         var outportArray:Array<Port> = component.get_outportArray();
