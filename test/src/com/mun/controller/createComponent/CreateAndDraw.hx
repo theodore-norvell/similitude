@@ -6,7 +6,28 @@ import com.mun.model.enumeration.Orientation;
 import com.mun.model.gates.ComponentKind;
 import com.mun.view.drawComponents.DrawComponent;
 //all of those imports below can not be deleted, because of using Type.resolveClass
+import com.mun.model.gates.AND;
+import com.mun.model.gates.FlipFlop;
+import com.mun.model.gates.Input;
+import com.mun.model.gates.MUX;
+import com.mun.model.gates.NAND;
+import com.mun.model.gates.NOR;
+import com.mun.model.gates.NOT;
+import com.mun.model.gates.OR;
+import com.mun.model.gates.Output;
+import com.mun.model.gates.XOR;
 
+import com.mun.view.drawComponents.DrawAND;
+import com.mun.view.drawComponents.DrawFlipFlop;
+import com.mun.view.drawComponents.DrawInput;
+import com.mun.view.drawComponents.DrawLink;
+import com.mun.view.drawComponents.DrawMUX;
+import com.mun.view.drawComponents.DrawNAND;
+import com.mun.view.drawComponents.DrawNOR;
+import com.mun.view.drawComponents.DrawNOT;
+import com.mun.view.drawComponents.DrawOR;
+import com.mun.view.drawComponents.DrawOutput;
+import com.mun.view.drawComponents.DrawXOR;
 /**
 * this method can create component by using the name of the gate
 * the name of the gate comes from the button id on the front page
