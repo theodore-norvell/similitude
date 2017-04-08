@@ -1,4 +1,4 @@
-package com.mun.controller.buttonClick;
+package com.mun.controller.mouseAction;
 
 import com.mun.controller.createComponent.CreateAndDraw;
 import com.mun.model.drawingInterface.DrawingAdapterI;
