@@ -21,6 +21,7 @@ class Component {
     var name:String;//the name of the component
     var delay:Int;//delay of the component
     var inportsNum:Int;//init
+    var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"
     /**
     *   create component
      *   @param xPosition: x position
@@ -140,7 +141,12 @@ class Component {
     public function get_inportsNum():Int {
         return inportsNum;
     }
-
+    public function setNameOfTheComponentKind(name:String){
+        this.nameOfTheComponentKind = name;
+    }
+    public function getNameOfTheComponentKind():String{
+        return this.nameOfTheComponentKind;
+    }
     public function set_inportsNum(value:Int):Bool {
         if (value <= componentKind.getLeastInportNumber()) {
             return false;

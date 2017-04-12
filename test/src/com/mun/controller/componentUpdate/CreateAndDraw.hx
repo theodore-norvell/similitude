@@ -1,4 +1,4 @@
-package com.mun.controller.createComponent;
+package com.mun.controller.componentUpdate;
 
 import com.mun.model.component.Component;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -28,6 +28,7 @@ import com.mun.view.drawComponents.DrawNOT;
 import com.mun.view.drawComponents.DrawOR;
 import com.mun.view.drawComponents.DrawOutput;
 import com.mun.view.drawComponents.DrawXOR;
+//the above imports shouldn't be deleted
 /**
 * this method can create component by using the name of the gate
 * the name of the gate comes from the button id on the front page
@@ -43,19 +44,20 @@ class CreateAndDraw {
 
         componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
         component_ = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
+        component_.setNameOfTheComponentKind(name);
         draw = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.Draw" + name),[component_,drawingAdapter]);
         draw.drawCorrespondingComponent();
     }
 
-    function get_componentkind_():ComponentKind {
+    public function get_componentkind_():ComponentKind {
         return componentkind_;
     }
 
-    function get_component_():Component {
+    public function get_component_():Component {
         return component_;
     }
 
-    function get_drawingAdapter():DrawingAdapterI {
+    public function get_drawingAdapter():DrawingAdapterI {
         return drawingAdapter;
     }
 }

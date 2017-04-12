@@ -1,22 +1,21 @@
 package com.mun.view.drawComponents;
 
-import com.mun.model.component.Port;
+import com.mun.model.component.Link;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 /**
 * draw link
 **/
 class DrawLink implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
-    var port1:Port;
-    var port2:Port;
+    var link:Link;
 
-    public function new(port1:Port, port2:Port, drawingAdapter:DrawingAdapterI) {
-        this.port1 = port1;
-        this.port2 = port2;
+    public function new(link:Link, drawingAdapter:DrawingAdapterI) {
+        this.link = link;
         this.drawingAdapter = drawingAdapter;
     }
     public function drawCorrespondingComponent():Void {
-        drawingAdapter.drawLine(port1.get_xPosition(), port1.get_yPosition(), port2.get_xPosition(), port2.get_yPosition());
+
+        drawingAdapter.drawLine(link.get_leftEndpoint().get_port().get_xPosition(), link.get_leftEndpoint().get_port().get_yPosition(), link.get_rightEndpoint().get_port().get_xPosition(), link.get_rightEndpoint().get_port().get_yPosition());
     }
 
 }

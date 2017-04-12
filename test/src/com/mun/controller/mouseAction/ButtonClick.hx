@@ -1,14 +1,17 @@
 package com.mun.controller.mouseAction;
 
-import com.mun.controller.createComponent.CreateAndDraw;
+import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
+import com.mun.controller.componentUpdate.CreateAndDraw;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.Orientation;
 import js.Browser;
 class ButtonClick {
     var drawingAdapter:DrawingAdapterI;
+    var updateCircuitDiagram:UpdateCircuitDiagram;
 
-    public function new(drawingAdapter:DrawingAdapterI) {
+    public function new(drawingAdapter:DrawingAdapterI,updateCircuitDiagram:UpdateCircuitDiagram) {
         this.drawingAdapter = drawingAdapter;
+        this.updateCircuitDiagram = updateCircuitDiagram;
 
         Browser.document.getElementById("AND").onclick = andOnClick;
         Browser.document.getElementById("FlipFlop").onclick = flipFlopOnClick;
@@ -23,33 +26,33 @@ class ButtonClick {
     }
 
     public function andOnClick(){
-        new CreateAndDraw("AND",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("AND",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function flipFlopOnClick(){
-        new CreateAndDraw("FlipFlop",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("FlipFlop",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function inputOnClick(){
-        new CreateAndDraw("Input",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("Input",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function muxOnClick(){
-        new CreateAndDraw("MUX",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("MUX",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function nandOnClick(){
-        new CreateAndDraw("NAND",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("NAND",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function norOnClick(){
-        new CreateAndDraw("NOR",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("NOR",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function notOnClick(){
-        new CreateAndDraw("NOT",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("NOT",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function orOnClick(){
-        new CreateAndDraw("OR",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("OR",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function outputOnClick(){
-        new CreateAndDraw("Output",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("Output",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
     public function xorOnClick(){
-        new CreateAndDraw("XOR",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
+        updateCircuitDiagram.createComponentByButton("XOR",250, 50, 40, 40, Orientation.EAST, 2, drawingAdapter);
     }
 }

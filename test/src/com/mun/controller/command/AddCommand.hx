@@ -1,5 +1,5 @@
 package com.mun.controller.command;
-import com.mun.controller.circuitDiagram.StaticCircuitDiagram;
+
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
@@ -34,6 +34,7 @@ class AddCommand implements Command {
     }
 
     public function execute():Void {
+        trace("111");
         if (link != null) {
             circuitDiagram.addLink(link);
         }
@@ -42,9 +43,4 @@ class AddCommand implements Command {
             circuitDiagram.addComponent(component);
         }
     }
-
-    public function setCommandManager(commandManager:CommandManager):Void {
-        this.commandManager = commandManager;
-    }
-
 }

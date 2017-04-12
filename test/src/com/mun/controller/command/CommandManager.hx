@@ -1,27 +1,22 @@
 package com.mun.controller.command;
+
+import com.mun.model.component.CircuitDiagram;
 /**
 * command manager used to manage those command
 * @author wanhui
 **/
-import com.mun.model.component.CircuitDiagram;
 class CommandManager {
     var undoStack:Array<Command> = new Array<Command>();
     var redoStack:Array<Command> = new Array<Command>();
-    var undoCounter:Int = -1;//set how many command can store
+    var circuitDiagram:CircuitDiagram;
 
     public function new(circuitDiagram:CircuitDiagram) {
-        this.undoCounter = 10;//undo 10 steps
         this.circuitDiagram = circuitDiagram;
     }
 
     public function execute(command:Command):Void {
         command.execute();
         undoStack.push(command);
-
-        //make sure only 10 steps stores in the stack
-        if (undoCounter != -1 && undoStack.length > undoCounter) {
-            undoStack.remove(0);
-        }
 
         //set the redo stack empty
         if (redoStack.length != 0) {

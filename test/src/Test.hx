@@ -1,7 +1,8 @@
 package ;
 
-import com.mun.type.Type.Cooridnate;
-import js.html.MouseEvent;
+import com.mun.controller.componentUpdate.UpdateCanvas;
+import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
+import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.controller.mouseAction.ButtonClick;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -45,23 +46,15 @@ class Test {
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
 
         var circuitDiagram:CircuitDiagram = new CircuitDiagram();
-        new ButtonClick(drawingAdapter);
 
-        canvas.addEventListener("mousedown", doMouseDown,false);
+        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
+        var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram,updateCanvas);
+
+        //add button click listener
+        new ButtonClick(drawingAdapter,updateCircuitDiagram);
+        //add canvas listener
+        new CanvasListener(canvas);
     }
 
-    public static function getPointOnCanvas(canvas:CanvasElement, x:Float, y:Float) {
-        var bbox = canvas.getBoundingClientRect();
-        var coordinate:Cooridnate = {"xPosition":0,"yPosition":0};
-        coordinate.xPosition = x - bbox.left * (canvas.width  / bbox.width);
-        coordinate.yPosition = y - bbox.top  * (canvas.height / bbox.height);
-        return coordinate;
-    }
-    public static function doMouseDown(event:MouseEvent){
-        var x:Float = event.pageX;
-        var y:Float = event.pageY;
-        var loc:Cooridnate = null;
-        loc = getPointOnCanvas(canvas,x,y);
-        trace(loc.xPosition + "   " + loc.yPosition);
-    }
+
 }
