@@ -1,7 +1,6 @@
 package com.mun.controller.mouseAction;
 
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
-import com.mun.controller.componentUpdate.CreateAndDraw;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.Orientation;
 import js.Browser;

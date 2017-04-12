@@ -1,6 +1,5 @@
 package com.mun.controller.command;
 
-import com.mun.controller.circuitDiagram.StaticCircuitDiagram;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;

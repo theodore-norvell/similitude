@@ -53,7 +53,7 @@ class Test {
         //add button click listener
         new ButtonClick(drawingAdapter,updateCircuitDiagram);
         //add canvas listener
-        new CanvasListener(canvas);
+        new CanvasListener(canvas,updateCircuitDiagram);
     }
 
 

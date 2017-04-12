@@ -3,7 +3,7 @@ package com.mun.type;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
-typedef Cooridnate = {
+typedef Coordinate = {
     var xPosition:Float;
     var yPosition:Float;
 }

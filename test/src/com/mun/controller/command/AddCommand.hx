@@ -34,7 +34,6 @@ class AddCommand implements Command {
     }
 
     public function execute():Void {
-        trace("111");
         if (link != null) {
             circuitDiagram.addLink(link);
         }
