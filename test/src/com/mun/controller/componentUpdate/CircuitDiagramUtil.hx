@@ -29,7 +29,7 @@ class CircuitDiagramUtil {
     }
 
     function isInScope(orignalXposition:Float, orignalYposition:Float, mouseXPosition:Float, mouseYposition:Float, heigh:Float, width:Float):Bool{
-        if((mouseXPosition >= orignalXposition - width/2 || orignalXposition <= orignalXposition + width/2)&&(mouseYposition >= orignalYposition - heigh/2 || mouseYposition <= orignalYposition + heigh/2)){
+        if((mouseXPosition >= orignalXposition - width/2 && orignalXposition <= orignalXposition + width/2)&&(mouseYposition >= orignalYposition - heigh/2 && mouseYposition <= orignalYposition + heigh/2)){
             return true;
         }else{
             return false;

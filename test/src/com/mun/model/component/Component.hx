@@ -166,8 +166,9 @@ class Component {
     public function removeInport(inport:Inport):Bool {
         return inportArray.remove(inport);
     }
-    public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float){
-        componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
-        componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
+    public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{
+        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
+        return this;
     }
 }

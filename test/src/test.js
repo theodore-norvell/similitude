@@ -1021,7 +1021,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
 			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.newXPosition);
 			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.newYPosition);
-			this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
+			this.circuitDiagram.updateComponent(this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition),index);
 		}
 		if(this.link != null) {
 			var xDifference = this.newXPosition - this.oldXPosition;
@@ -1099,7 +1099,7 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		return object;
 	}
 	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
-		if((mouseXPosition >= orignalXposition - width / 2 || orignalXposition <= orignalXposition + width / 2) && (mouseYposition >= orignalYposition - heigh / 2 || mouseYposition <= orignalYposition + heigh / 2)) {
+		if(mouseXPosition >= orignalXposition - width / 2 && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= orignalYposition - heigh / 2 && mouseYposition <= orignalYposition + heigh / 2)) {
 			return true;
 		} else {
 			return false;
@@ -1118,6 +1118,9 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	canvas: null
 	,circuit: null
 	,drawingAdapter: null
+	,getcircuit: function() {
+		return this.circuit;
+	}
 	,update: function() {
 		this.canvas.width = this.canvas.width;
 		var _g1 = 0;
@@ -1335,6 +1338,9 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,deleteComponent: function(component) {
 		HxOverrides.remove(this.componentArray,component);
 	}
+	,updateComponent: function(component,index) {
+		this.componentArray[index] = component;
+	}
 	,__class__: com_mun_model_component_CircuitDiagram
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
@@ -1463,8 +1469,9 @@ com_mun_model_component_Component.prototype = {
 		return HxOverrides.remove(this.inportArray,inport);
 	}
 	,updateMoveComponentPortPosition: function(xPosition,yPosition) {
-		this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,this.orientation);
-		this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		return this;
 	}
 	,__class__: com_mun_model_component_Component
 };

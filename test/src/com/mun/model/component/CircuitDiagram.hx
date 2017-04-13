@@ -79,4 +79,8 @@ class CircuitDiagram {
     public function deleteComponent(component:Component) {
         componentArray.remove(component);
     }
+
+    public function updateComponent(component:Component, index:Int){
+        componentArray[index] = component;
+    }
 }

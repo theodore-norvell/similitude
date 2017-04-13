@@ -78,7 +78,7 @@ class MoveCommand implements Command {
             var index = circuitDiagram.get_componentArray().indexOf(component);
             circuitDiagram.get_componentArray()[index].set_xPosition(newXPosition);
             circuitDiagram.get_componentArray()[index].set_yPosition(newYPosition);
-            circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(newXPosition, newYPosition);
+            circuitDiagram.updateComponent(circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(newXPosition, newYPosition), index);
         }
 
         if (link != null) {

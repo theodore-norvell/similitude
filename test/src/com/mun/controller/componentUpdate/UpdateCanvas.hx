@@ -28,6 +28,9 @@ class UpdateCanvas {
         this.circuit = circuitDiagram;
         this.drawingAdapter = drawingAdapter;
     }
+    public function getcircuit():CircuitDiagram{
+        return circuit;
+    }
 
     public function update(){
         //clear the canvas
