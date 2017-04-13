@@ -984,6 +984,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
 			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.oldXPosition);
 			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.oldYPosition);
+			this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.oldXPosition,this.oldYPosition);
 		}
 		if(this.link != null) {
 			var xDifference = this.newXPosition - this.oldXPosition;
@@ -1020,6 +1021,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
 			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.newXPosition);
 			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.newYPosition);
+			this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
 		}
 		if(this.link != null) {
 			var xDifference = this.newXPosition - this.oldXPosition;
@@ -1454,11 +1456,15 @@ com_mun_model_component_Component.prototype = {
 		} else {
 			return false;
 		}
-		this.inportArray = this.componentKind.updatePortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
 		return true;
 	}
 	,removeInport: function(inport) {
 		return HxOverrides.remove(this.inportArray,inport);
+	}
+	,updateMoveComponentPortPosition: function(xPosition,yPosition) {
+		this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
 	}
 	,__class__: com_mun_model_component_Component
 };
@@ -1714,7 +1720,7 @@ com_mun_model_gates_GateAbstract.prototype = {
 	,addInPort: function() {
 		return new com_mun_model_component_Inport();
 	}
-	,updatePortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
 		switch(orientation[1]) {
 		case 0:
 			var _g1 = 0;
@@ -1767,6 +1773,47 @@ com_mun_model_gates_GateAbstract.prototype = {
 		}
 		return portArray;
 	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				portArray[i].set_xPosition(xPosition);
+				portArray[i].set_yPosition(yPosition - height / 2);
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				portArray[i1].set_xPosition(xPosition);
+				portArray[i1].set_yPosition(yPosition + height / 2);
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				portArray[i2].set_xPosition(xPosition - width / 2);
+				portArray[i2].set_yPosition(yPosition);
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				portArray[i3].set_xPosition(xPosition + width / 2);
+				portArray[i3].set_yPosition(yPosition);
+			}
+			break;
+		}
+		return portArray;
+	}
 	,__class__: com_mun_model_gates_GateAbstract
 };
 var com_mun_model_gates_ComponentKind = function() { };
@@ -1777,7 +1824,8 @@ com_mun_model_gates_ComponentKind.prototype = {
 	,algorithm: null
 	,createPorts: null
 	,addInPort: null
-	,updatePortPosition: null
+	,updateInPortPosition: null
+	,updateOutPortPosition: null
 	,__class__: com_mun_model_gates_ComponentKind
 };
 var com_mun_model_gates_AND = function() {
@@ -1987,8 +2035,135 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 	,addInPort: function() {
 		return null;
 	}
-	,updatePortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
-		return null;
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i].set_yPosition(yPosition + height / 2);
+				}
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i].set_yPosition(yPosition + height / 2);
+				}
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i1].set_yPosition(yPosition - height / 2);
+				}
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i1].set_yPosition(yPosition - height / 2);
+				}
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i2].set_xPosition(xPosition + width / 2);
+					portArray[i2].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i2].set_xPosition(xPosition + width / 2);
+					portArray[i2].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i3].set_xPosition(xPosition - width / 2);
+					portArray[i3].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i3].set_xPosition(xPosition - width / 2);
+					portArray[i3].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i].set_yPosition(yPosition - height / 2);
+				}
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i].set_yPosition(yPosition - height / 2);
+				}
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i1].set_yPosition(yPosition + height / 2);
+				}
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i1].set_yPosition(yPosition + height / 2);
+				}
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i2].set_xPosition(xPosition - width / 2);
+					portArray[i2].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i2].set_xPosition(xPosition - width / 2);
+					portArray[i2].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i3].set_xPosition(xPosition + width / 2);
+					portArray[i3].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i3].set_xPosition(xPosition + width / 2);
+					portArray[i3].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		}
+		return portArray;
 	}
 	,__class__: com_mun_model_gates_FlipFlop
 });
@@ -2077,8 +2252,47 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 	,addInPort: function() {
 		return null;
 	}
-	,updatePortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
-		return null;
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
 	}
 	,__class__: com_mun_model_gates_Input
 });
@@ -2207,7 +2421,7 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,updatePortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
 		switch(orientation[1]) {
 		case 0:
 			var _g1 = 0;
@@ -2220,6 +2434,9 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 					if(portArray[i].get_sequence() == -1) {
 						portArray[i].set_sequence(i);
 					}
+				} else {
+					portArray[i].set_xPosition(xPosition - width / 2);
+					portArray[i].set_yPosition(yPosition);
 				}
 			}
 			break;
@@ -2234,6 +2451,9 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 					if(portArray[i1].get_sequence() == -1) {
 						portArray[i1].set_sequence(i1);
 					}
+				} else {
+					portArray[i1].set_xPosition(xPosition + width / 2);
+					portArray[i1].set_yPosition(yPosition);
 				}
 			}
 			break;
@@ -2248,6 +2468,9 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 					if(portArray[i2].get_sequence() == -1) {
 						portArray[i2].set_sequence(i2);
 					}
+				} else {
+					portArray[i2].set_xPosition(xPosition);
+					portArray[i2].set_yPosition(yPosition - height / 2);
 				}
 			}
 			break;
@@ -2262,6 +2485,9 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 					if(portArray[i3].get_sequence() == -1) {
 						portArray[i3].set_sequence(i3);
 					}
+				} else {
+					portArray[i3].set_xPosition(xPosition);
+					portArray[i3].set_yPosition(yPosition - height / 2);
 				}
 			}
 			break;
@@ -2727,11 +2953,47 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 		}
 		return portArray;
 	}
-	,addInPort: function() {
-		return null;
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
 	}
-	,updatePortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
-		return null;
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
 	}
 	,__class__: com_mun_model_gates_Output
 });

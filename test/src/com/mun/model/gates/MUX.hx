@@ -154,8 +154,10 @@ class MUX implements ComponentKind extends GateAbstract {
         }
         return portArray;
     }
-
-    override public function updatePortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+    /**
+    * different from others, this function used in move command when the componenet has been re-located
+    **/
+    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
         switch (orientation){
             case Orientation.EAST : {
                 for (i in 0...portArray.length) {
@@ -165,6 +167,9 @@ class MUX implements ComponentKind extends GateAbstract {
                         if (portArray[i].get_sequence() == -1) {
                             portArray[i].set_sequence(i);
                         }
+                    }else{//IOTYPE.S
+                        portArray[i].set_xPosition(xPosition);
+                        portArray[i].set_yPosition(yPosition - height/2);
                     }
                 }
             };
@@ -176,6 +181,9 @@ class MUX implements ComponentKind extends GateAbstract {
                         if (portArray[i].get_sequence() == -1) {
                             portArray[i].set_sequence(i);
                         }
+                    }else{//IOTYPE.S
+                        portArray[i].set_xPosition(xPosition - width/2);
+                        portArray[i].set_yPosition(yPosition);
                     }
                 }
             };
@@ -187,6 +195,9 @@ class MUX implements ComponentKind extends GateAbstract {
                         if (portArray[i].get_sequence() == -1) {
                             portArray[i].set_sequence(i);
                         }
+                    }else{//IOTYPE.S
+                        portArray[i].set_xPosition(xPosition + width/2);
+                        portArray[i].set_yPosition(yPosition);
                     }
                 }
             };
@@ -198,6 +209,9 @@ class MUX implements ComponentKind extends GateAbstract {
                         if (portArray[i].get_sequence() == -1) {
                             portArray[i].set_sequence(i);
                         }
+                    }else{//IOTYPE.S
+                        portArray[i].set_xPosition(xPosition);
+                        portArray[i].set_yPosition(yPosition - height/2);
                     }
                 }
             };
@@ -207,8 +221,7 @@ class MUX implements ComponentKind extends GateAbstract {
         }
         return portArray;
     }
-
-    public function new() {
+        public function new() {
         super(2);
     }
 }

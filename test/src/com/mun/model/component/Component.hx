@@ -159,11 +159,15 @@ class Component {
                 return false;
             }
         }
-        this.inportArray = componentKind.updatePortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
         return true;
     }
 
     public function removeInport(inport:Inport):Bool {
         return inportArray.remove(inport);
+    }
+    public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float){
+        componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+        componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
     }
 }
