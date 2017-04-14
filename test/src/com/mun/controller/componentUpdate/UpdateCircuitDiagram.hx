@@ -1,5 +1,7 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.component.Endpoint;
+import com.mun.model.component.Link;
 import com.mun.controller.command.MoveCommand;
 import com.mun.type.Type.Object;
 import com.mun.controller.command.Command;
@@ -64,6 +66,24 @@ class UpdateCircuitDiagram {
         }
 
     }
+
+    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate){
+        var object:Object = {"link":null,"component":null,"endPoint":null};
+        var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.xPosition, coordinateFrom.yPosition);
+        var rightEndpoint:Endpoint = new Endpoint(coordinateTo.xPosition, coordinateTo.yPosition);
+        var link:Link = new Link(leftEndpoint,rightEndpoint);
+        object.link = link;
+        var command:Command = new AddCommand(object,circuitDiagram);
+    }
+
+    public function moveEndpoint(coordinate:Coordinate){
+
+    }
+
+    public function portAction(coordinate:Coordinate):Object{
+        return circuitDiagramUtil.isOnPort(coordinate);
+    }
+
     function redrawCanvas(){
         updateCanvas.update();
     }

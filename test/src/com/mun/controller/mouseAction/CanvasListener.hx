@@ -9,6 +9,7 @@ class CanvasListener {
     var canvas:CanvasElement;
     var mouseDownFlag:Bool = false;
     var updateCircuitDiagram:UpdateCircuitDiagram;
+    var mouseDownLocation:Coordinate;
 
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram) {
         this.canvas = canvas;
@@ -29,7 +30,7 @@ class CanvasListener {
     public function doMouseDown(event:MouseEvent){
         var x:Float = event.pageX;
         var y:Float = event.pageY;
-        var loc:Coordinate = getPointOnCanvas(canvas,x,y);
+        mouseDownLocation = getPointOnCanvas(canvas,x,y);
         mouseDownFlag = true;
     }
     public function doMouseMove(event:MouseEvent){
@@ -37,6 +38,15 @@ class CanvasListener {
         var y:Float = event.pageY;
         var loc:Coordinate = getPointOnCanvas(canvas,x,y);
         if(mouseDownFlag == true){//mouse down efect
+            //if mouse on the port, draw link or move endpoint
+            if(updateCircuitDiagram.portAction(loc).endPoint != null){
+                //if the mouse position have a endpoint
+
+            }else{
+                //the mouse position does not have a endpoint
+
+            }
+            //if mouse not on the port, it is on the component
             updateCircuitDiagram.moveComponent(loc);
         }
     }

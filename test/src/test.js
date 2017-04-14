@@ -1098,6 +1098,69 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		}
 		return object;
 	}
+	,isOnPort: function(cooridnate) {
+		var object = { "link" : null, "component" : null, "endPoint" : null};
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_componentArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var _g3 = 0;
+			var _g2 = this.circuitDiagram.get_componentArray()[i].get_inportArray().length;
+			while(_g3 < _g2) {
+				var j = _g3++;
+				if(this.isInCircle(cooridnate,this.circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_yPosition())) {
+					var _g5 = 0;
+					var _g4 = this.circuitDiagram.get_linkArray().length;
+					while(_g5 < _g4) {
+						var k = _g5++;
+						object = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k],this.circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+						return object;
+					}
+				}
+			}
+			var _g31 = 0;
+			var _g21 = this.circuitDiagram.get_componentArray()[i].get_outportArray().length;
+			while(_g31 < _g21) {
+				var j1 = _g31++;
+				if(this.isInCircle(cooridnate,this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1].get_yPosition())) {
+					var _g51 = 0;
+					var _g41 = this.circuitDiagram.get_linkArray().length;
+					while(_g51 < _g41) {
+						var k1 = _g51++;
+						object = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k1],this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1]);
+						return object;
+					}
+				}
+			}
+		}
+		return object;
+	}
+	,isLinkOnPort: function(link,port) {
+		var object = { "link" : null, "component" : null, "endPoint" : null};
+		if(this.isEndpointOnPort(link.get_leftEndpoint(),port)) {
+			object.endPoint = link.get_leftEndpoint();
+			return object;
+		}
+		if(this.isEndpointOnPort(link.get_rightEndpoint(),port)) {
+			object.endPoint = link.get_rightEndpoint();
+			return object;
+		}
+		return object;
+	}
+	,isEndpointOnPort: function(endpoint,port) {
+		if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isInCircle: function(cooridnate,orignalXPosition,orignalYPosition) {
+		if(cooridnate.xPosition - orignalXPosition <= 2 && cooridnate.yPosition - orignalYPosition <= 2) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
 		if(mouseXPosition >= orignalXposition - width / 2 && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= orignalYposition - heigh / 2 && mouseYposition <= orignalYposition + heigh / 2)) {
 			return true;
@@ -1171,6 +1234,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		} else if(object.endPoint == null) {
 			var tmp = object.link != null;
 		}
+	}
+	,portAction: function(coordinate) {
+		return this.circuitDiagramUtil.isOnPort(coordinate);
 	}
 	,redrawCanvas: function() {
 		this.updateCanvas.update();
@@ -1260,6 +1326,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var y = event.pageY;
 		var loc = this.getPointOnCanvas(this.canvas,x,y);
 		if(this.mouseDownFlag == true) {
+			var tmp = this.updateCircuitDiagram.portAction(loc).endPoint != null;
 			this.updateCircuitDiagram.moveComponent(loc);
 		}
 	}

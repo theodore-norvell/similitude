@@ -1,5 +1,8 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.component.Link;
+import com.mun.model.component.Port;
+import com.mun.model.component.Endpoint;
 import com.mun.type.Type.Coordinate;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.type.Type.Object;
@@ -16,16 +19,76 @@ class CircuitDiagramUtil {
         var object:Object = {"link":null,"component":null,"endPoint":null};
         while(i >= 0){
             if(isInScope(circuitDiagram.get_componentArray()[i].get_xPosition(),
-                circuitDiagram.get_componentArray()[i].get_yPosition(),
-                cooridnate.xPosition, cooridnate.yPosition,
-                circuitDiagram.get_componentArray()[i].get_height(),
-                circuitDiagram.get_componentArray()[i].get_width()) == true){
+            circuitDiagram.get_componentArray()[i].get_yPosition(),
+            cooridnate.xPosition, cooridnate.yPosition,
+            circuitDiagram.get_componentArray()[i].get_height(),
+            circuitDiagram.get_componentArray()[i].get_width()) == true){
                 object.component= circuitDiagram.get_componentArray()[i];
                 return object;
             }
             i--;
         }
         return object;
+    }
+
+    public function isOnPort(cooridnate:Coordinate):Object{
+        var object:Object = {"link":null,"component":null,"endPoint":null};
+        for(i in 0...circuitDiagram.get_componentArray().length){
+            for(j in 0...circuitDiagram.get_componentArray()[i].get_inportArray().length){
+                if(isInCircle(cooridnate, circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_xPosition(),
+                circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    for(k in 0...circuitDiagram.get_linkArray().length){
+                        object = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+                        return object;
+                    }
+                }
+            }
+            for(j in 0...circuitDiagram.get_componentArray()[i].get_outportArray().length){
+                if(isInCircle(cooridnate, circuitDiagram.get_componentArray()[i].get_outportArray()[j].get_xPosition(),
+                circuitDiagram.get_componentArray()[i].get_outportArray()[j].get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    for(k in 0...circuitDiagram.get_linkArray().length){
+                        object = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_outportArray()[j]);
+                        return object;
+                    }
+                }
+            }
+        }
+        return object;
+    }
+
+    function isLinkOnPort(link:Link, port:Port):Object{
+        var object:Object = {"link":null,"component":null,"endPoint":null};
+        //if this port has a endpoint (left)
+        if(isEndpointOnPort(link.get_leftEndpoint(), port)){
+            object.endPoint = link.get_leftEndpoint();
+            return object;
+        }
+        //if this port has a endpoint (right)
+        if(isEndpointOnPort(link.get_rightEndpoint(), port)){
+            object.endPoint = link.get_rightEndpoint();
+            return object;
+        }
+        return object;
+    }
+
+    function isEndpointOnPort(endpoint:Endpoint, port:Port):Bool{
+        if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    function isInCircle(cooridnate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
+        //the radius is 2
+        if(cooridnate.xPosition - orignalXPosition <= 2 && cooridnate.yPosition - orignalYPosition <= 2){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     function isInScope(orignalXposition:Float, orignalYposition:Float, mouseXPosition:Float, mouseYposition:Float, heigh:Float, width:Float):Bool{
