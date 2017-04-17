@@ -83,9 +83,6 @@ class UpdateCircuitDiagram {
             object.link = link;
         }
         var command:Command = new AddCommand(object,circuitDiagram);
-        commandManager.execute(command);
-        trace(circuitDiagram.get_linkArray());
-        trace(object.port);
         redrawCanvas();
     }
 

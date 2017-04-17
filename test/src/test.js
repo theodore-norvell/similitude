@@ -1253,9 +1253,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			object.link = link1;
 		}
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
-		this.commandManager.execute(command);
-		haxe_Log.trace(this.circuitDiagram.get_linkArray(),{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 87, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "addLink"});
-		haxe_Log.trace(object.port,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 88, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "addLink"});
 		this.redrawCanvas();
 	}
 	,moveEndpoint: function(coordinate) {
@@ -5001,15 +4998,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;
