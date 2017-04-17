@@ -15,7 +15,7 @@ class DrawingAdapter implements DrawingAdapterI {
     var strokeColor:String = "black";//default line color is black
     var fillColor:String = "gray";//default fill color is gray
     var textColor:String = "black";//default text color is black
-    var lineWidth:Float = 1.0;//because the defalut line width is 1.0
+    var lineWidth:Float = 2.0;//because the defalut line width is 1.0
     var font:String = "8px serif";//initial is 15
 
 

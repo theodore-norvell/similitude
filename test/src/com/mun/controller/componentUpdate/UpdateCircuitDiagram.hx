@@ -46,7 +46,7 @@ class UpdateCircuitDiagram {
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
         component_.setNameOfTheComponentKind(name);
 
-        var object:Object = {"link":null,"component":component_,"endPoint":null};
+        var object:Object = {"link":null,"component":component_,"endPoint":null, "port":null};
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
         redrawCanvas();
@@ -68,16 +68,34 @@ class UpdateCircuitDiagram {
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate){
-        var object:Object = {"link":null,"component":null,"endPoint":null};
-        var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.xPosition, coordinateFrom.yPosition);
-        var rightEndpoint:Endpoint = new Endpoint(coordinateTo.xPosition, coordinateTo.yPosition);
-        var link:Link = new Link(leftEndpoint,rightEndpoint);
-        object.link = link;
+        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+        object = portAction(coordinateFrom);
+        if(object.port != null){
+            var leftEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
+            var rightEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
+            var link:Link = new Link(leftEndpoint,rightEndpoint);
+            object.link = link;
+            object.endPoint = null;
+        }else{
+            var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.xPosition, coordinateFrom.yPosition);
+            var rightEndpoint:Endpoint = new Endpoint(coordinateTo.xPosition+100, coordinateTo.yPosition+100);
+            var link:Link = new Link(leftEndpoint,rightEndpoint);
+            object.link = link;
+        }
         var command:Command = new AddCommand(object,circuitDiagram);
+        commandManager.execute(command);
+        trace(circuitDiagram.get_linkArray());
+        trace(object.port);
+        redrawCanvas();
     }
 
     public function moveEndpoint(coordinate:Coordinate){
-
+        var object:Object = circuitDiagramUtil.isOnPort(coordinate);
+        if(object.endPoint != null){
+            var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+            commandManager.execute(command);
+            redrawCanvas();
+        }
     }
 
     public function portAction(coordinate:Coordinate):Object{

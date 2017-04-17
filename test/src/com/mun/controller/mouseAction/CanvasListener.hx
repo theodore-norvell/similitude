@@ -32,6 +32,10 @@ class CanvasListener {
         var y:Float = event.pageY;
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
         mouseDownFlag = true;
+
+        if(updateCircuitDiagram.portAction(mouseDownLocation).endPoint == null){
+            updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
+        }
     }
     public function doMouseMove(event:MouseEvent){
         var x:Float = event.pageX;
@@ -41,13 +45,15 @@ class CanvasListener {
             //if mouse on the port, draw link or move endpoint
             if(updateCircuitDiagram.portAction(loc).endPoint != null){
                 //if the mouse position have a endpoint
-
+                updateCircuitDiagram.moveEndpoint(loc);
             }else{
                 //the mouse position does not have a endpoint
+                //but the endpoint has been created in the doMouseDown function
 
+                //if mouse not on the port, it is on the component
+                updateCircuitDiagram.moveComponent(loc);
             }
-            //if mouse not on the port, it is on the component
-            updateCircuitDiagram.moveComponent(loc);
+
         }
     }
     public function doMouseUp(event:MouseEvent){

@@ -16,7 +16,7 @@ class CircuitDiagramUtil {
 
     public function isInComponent(cooridnate:Coordinate):Object{
         var i = circuitDiagram.get_componentArray().length - 1;
-        var object:Object = {"link":null,"component":null,"endPoint":null};
+        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
         while(i >= 0){
             if(isInScope(circuitDiagram.get_componentArray()[i].get_xPosition(),
             circuitDiagram.get_componentArray()[i].get_yPosition(),
@@ -32,13 +32,14 @@ class CircuitDiagramUtil {
     }
 
     public function isOnPort(cooridnate:Coordinate):Object{
-        var object:Object = {"link":null,"component":null,"endPoint":null};
+        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
         for(i in 0...circuitDiagram.get_componentArray().length){
             for(j in 0...circuitDiagram.get_componentArray()[i].get_inportArray().length){
                 if(isInCircle(cooridnate, circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_xPosition(),
                 circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
+                    object.port = circuitDiagram.get_componentArray()[i].get_inportArray()[j];
                     for(k in 0...circuitDiagram.get_linkArray().length){
                         object = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
                         return object;
@@ -50,6 +51,7 @@ class CircuitDiagramUtil {
                 circuitDiagram.get_componentArray()[i].get_outportArray()[j].get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
+                    object.port = circuitDiagram.get_componentArray()[i].get_outportArray()[j];
                     for(k in 0...circuitDiagram.get_linkArray().length){
                         object = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_outportArray()[j]);
                         return object;
@@ -61,7 +63,7 @@ class CircuitDiagramUtil {
     }
 
     function isLinkOnPort(link:Link, port:Port):Object{
-        var object:Object = {"link":null,"component":null,"endPoint":null};
+        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
         //if this port has a endpoint (left)
         if(isEndpointOnPort(link.get_leftEndpoint(), port)){
             object.endPoint = link.get_leftEndpoint();
@@ -83,8 +85,8 @@ class CircuitDiagramUtil {
         }
     }
     function isInCircle(cooridnate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
-        //the radius is 2
-        if(cooridnate.xPosition - orignalXPosition <= 2 && cooridnate.yPosition - orignalYPosition <= 2){
+        //the radius is 5
+        if(cooridnate.xPosition - orignalXPosition <= 5 && cooridnate.yPosition - orignalYPosition <= 5){
             return true;
         }else{
             return false;

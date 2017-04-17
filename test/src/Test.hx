@@ -54,6 +54,7 @@ class Test {
         new ButtonClick(drawingAdapter,updateCircuitDiagram);
         //add canvas listener
         new CanvasListener(canvas,updateCircuitDiagram);
+
     }
 
 
