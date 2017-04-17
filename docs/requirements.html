@@ -10,16 +10,16 @@
 <h2>User stories</h2>
 <p>Functional requirements: As a user I will be able to:</p>
 <ul>
-  <li> Add components to a circuit diagram.
+  <li> Add components to a circuit.
     <ul>
       <li>Components are things like inputs, outputs, and&nbsp;gates, adders.</li>
       <li>Some components have a fixed set of input or ports.</li>
       <li>Some components have a variable number of input (or output?) ports.</li>
     </ul>
   </li>
-  <li>Move components around a circuit diagram.</li>
+  <li>Move components around a circuit.</li>
   <li>Rotate components (4 directions).</li>
-  <li>Delete components from a circuit diagram.</li>
+  <li>Delete components from a circuit.</li>
   <li>Add probes for debugging.</li>
   <li>Add links</li>
   <li>Delete links</li>
@@ -37,7 +37,7 @@
   </li>
   <li>Server stuff
     <ul>
-      <li>Save circuit diagrams to the server.&nbsp;</li>
+      <li>Save circuits to the server.&nbsp;</li>
       <li>Login</li>
       <li>Create a new login name and password.</li>
       <li>Recover my password.</li>
@@ -45,7 +45,7 @@
       <li>Upload/download&nbsp;circuits&nbsp;(and compound components) and test inputs.</li>
     </ul>
   </li>
-  <li>Open circuit diagrams from disk files.</li>
+  <li>Open circuits from disk files.</li>
   <li>Edit the input values of input components
     <ul>
       <li>Value includes bits (at least 3 values), sequences of bits, an error value </li>
@@ -77,8 +77,10 @@
 <dl>
   <dt>Circuit</dt>
   <dd>A circuit is&nbsp;a named arrangement of components and links. Copies of circuits exist on one or more clients and on the server</dd>
+  <dt>Circuit Diagram</dt>
+  <dd>A circuit diagram is a visual representation of a circuit. There may be multiple diagrams of the same circuit. For example if circuit A contains two compount components that both have the same kind and that both refer to circuit B, then the diagram of circuit A will contain two diagrams of circuit B. The two circuit diagrams may show different values for the same links.</dd>
   <dt>Component</dt>
-  <dd>A&nbsp; component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of attributes that can be edited. Attributes of components include a position (x,y), size (w, h),  orientation.&nbsp; (North, South, East, West), and flip (Up or Down). Depending on the component kind, components may have other attributes. For example, a component whose kind is and-gate would have attribute indicating the number of inputs. A component whose component kind is compound&nbsp;has an attribute saying whether it is white-box or black-box.&nbsp; Most primitive components have an attribute for the delay.&nbsp; A flip-flop component might have attributes for set-up and hold times. (Implementation note: the state of a Component does not include any information associated with Simulations.)</dd>
+  <dd>A component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of attributes that can be edited. Attributes of components include a position (x,y), size (w, h),  orientation.&nbsp; (North, South, East, West), and flip (Up or Down). Depending on the component kind, components may have other attributes. For example, a component whose kind is and-gate would have attribute indicating the number of inputs. A component whose component kind is compound&nbsp;has an attribute saying whether it is white-box or black-box.&nbsp; Most primitive components have an attribute for the delay.&nbsp; A flip-flop component might have attributes for set-up and hold times. (Implementation note: the state of a Component does not include any information associated with Simulations.)</dd>
   <dt>Component kind</dt>
   <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound components, q.v.)</dd>
   <dt>Primitive Component&nbsp;Kind</dt>
@@ -93,7 +95,7 @@
   <dt>Output Port</dt>
   <dd>A Port used for output. Output ports might be represented by small squares with black stroke and gray fill.</dd>
   <dt>Links</dt>
-  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles, unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation.</dd>
+  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  coloured circles with white centres when not connected. Endpoints that are connected to ports are not shown at all. Endpoints that are connected to links are shown as coloured circles that are filled. The Link itself is shown as a straight  line.&nbsp; (Although where two links cross, on might be shown in a way that indicates that the links are not connected. The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation.&nbsp;</dd>
   <dt>Connected</dt>
   <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
   <dt>Net</dt>
@@ -189,6 +191,118 @@
   <li>On a touch device, touch events can be used.</li>
   <li>Disambiguating a mouse down should be done as follows: Endpoints have top priority, then links, then components.</li>
 </ul>
+<h4>Rotate components</h4>
+<p>Requirements: As a user I will be able to rotate components</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and one or more components are selected.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: clicks on the rotate button.</li>
+  <li>Client: rotates all selected components by 90 degrees.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>Rotation is roughly around the geometric centre of each component.</li>
+  <li>As components rotate, the&nbsp;position of  ports will likely change. And connected endpoints will also change position.</li>
+</ul>
+<h4>Delete components and links</h4>
+<p>Requirements: As a user, I can delete components.&nbsp; As a user, I can delete links.</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and one or&nbsp;more components and links are selected</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: clicks on the trash button&nbsp;or presses the delete button, or presses the backspace button.</li>
+  <li>Client: Removes all selected components and links.</li>
+</ol>
+<p></p>
+<h4>Name</h4>
+<p>Requirements: xxx</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>xxx </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>xxx</li>
+</ul>
+<p></p>
+<h4>Name</h4>
+<p>Requirements: xxx</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>xxx </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>xxx</li>
+</ul>
+<p></p>
+<h4>Name</h4>
+<p>Requirements: xxx</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>xxx </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>xxx</li>
+</ul>
+<p></p>
+<h4>Name</h4>
+<p>Requirements: xxx</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>xxx </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>xxx</li>
+</ul>
+<p></p>
+<h4>Name</h4>
+<p>Requirements: xxx</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>xxx </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>xxx</li>
+</ul>
+<p></p>
+<p></p>
+<h4>Name</h4>
+<p>Requirements: xxx</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>xxx  </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>xxx</li>
+</ul>
+<p>&nbsp;</p>
+<p></p>
 <p>&nbsp;</p>
 <p></p>
 <p>&nbsp;</p>
