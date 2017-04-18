@@ -41,7 +41,7 @@ class CircuitDiagramUtil {
                     //verify is there any link link to this port
                     object.port = circuitDiagram.get_componentArray()[i].get_inportArray()[j];
                     for(k in 0...circuitDiagram.get_linkArray().length){
-                        object = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+                        object.endPoint = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
                         return object;
                     }
                 }
@@ -53,7 +53,7 @@ class CircuitDiagramUtil {
                     //verify is there any link link to this port
                     object.port = circuitDiagram.get_componentArray()[i].get_outportArray()[j];
                     for(k in 0...circuitDiagram.get_linkArray().length){
-                        object = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_outportArray()[j]);
+                        object.endPoint = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_outportArray()[j]);
                         return object;
                     }
                 }
@@ -62,19 +62,17 @@ class CircuitDiagramUtil {
         return object;
     }
 
-    function isLinkOnPort(link:Link, port:Port):Object{
-        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+    function isLinkOnPort(link:Link, port:Port):Endpoint{
+        var endpoint:Endpoint = null;
         //if this port has a endpoint (left)
         if(isEndpointOnPort(link.get_leftEndpoint(), port)){
-            object.endPoint = link.get_leftEndpoint();
-            return object;
+            endpoint = link.get_leftEndpoint();
         }
         //if this port has a endpoint (right)
         if(isEndpointOnPort(link.get_rightEndpoint(), port)){
-            object.endPoint = link.get_rightEndpoint();
-            return object;
+            endpoint = link.get_rightEndpoint();
         }
-        return object;
+        return endpoint;
     }
 
     function isEndpointOnPort(endpoint:Endpoint, port:Port):Bool{
@@ -85,8 +83,8 @@ class CircuitDiagramUtil {
         }
     }
     function isInCircle(cooridnate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
-        //the radius is 5
-        if(cooridnate.xPosition - orignalXPosition <= 5 && cooridnate.yPosition - orignalYPosition <= 5){
+        //the radius is 3
+        if(Math.abs(cooridnate.xPosition - orignalXPosition) <= 3 && Math.abs(cooridnate.yPosition - orignalYPosition) <= 3){
             return true;
         }else{
             return false;
@@ -94,7 +92,7 @@ class CircuitDiagramUtil {
     }
 
     function isInScope(orignalXposition:Float, orignalYposition:Float, mouseXPosition:Float, mouseYposition:Float, heigh:Float, width:Float):Bool{
-        if((mouseXPosition >= orignalXposition - width/2 && orignalXposition <= orignalXposition + width/2)&&(mouseYposition >= orignalYposition - heigh/2 && mouseYposition <= orignalYposition + heigh/2)){
+        if((mouseXPosition >= Math.abs(orignalXposition - width/2) && orignalXposition <= orignalXposition + width/2)&&(mouseYposition >= Math.abs(orignalYposition - heigh/2) && mouseYposition <= orignalYposition + heigh/2)){
             return true;
         }else{
             return false;

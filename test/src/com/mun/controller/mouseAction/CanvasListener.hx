@@ -1,5 +1,6 @@
 package com.mun.controller.mouseAction;
 
+import com.mun.model.component.Link;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import js.html.MouseEvent;
 import com.mun.type.Type.Coordinate;
@@ -10,6 +11,9 @@ class CanvasListener {
     var mouseDownFlag:Bool = false;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var mouseDownLocation:Coordinate;
+    //local varible
+    var link:Link;
+    var createLinkFlag:Bool = false;
 
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram) {
         this.canvas = canvas;
@@ -32,9 +36,9 @@ class CanvasListener {
         var y:Float = event.pageY;
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
         mouseDownFlag = true;
-
-        if(updateCircuitDiagram.portAction(mouseDownLocation).endPoint == null){
-            updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
+        if(updateCircuitDiagram.portAction(mouseDownLocation).port != null){
+            link = updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
+            createLinkFlag = true;
         }
     }
     public function doMouseMove(event:MouseEvent){
@@ -43,13 +47,13 @@ class CanvasListener {
         var loc:Coordinate = getPointOnCanvas(canvas,x,y);
         if(mouseDownFlag == true){//mouse down efect
             //if mouse on the port, draw link or move endpoint
-            if(updateCircuitDiagram.portAction(loc).endPoint != null){
+//            if(updateCircuitDiagram.portAction(loc).endPoint != null){
+            if(createLinkFlag){
                 //if the mouse position have a endpoint
-                updateCircuitDiagram.moveEndpoint(loc);
+                updateCircuitDiagram.moveEndpoint(loc, link.get_rightEndpoint());
             }else{
                 //the mouse position does not have a endpoint
                 //but the endpoint has been created in the doMouseDown function
-
                 //if mouse not on the port, it is on the component
                 updateCircuitDiagram.moveComponent(loc);
             }
@@ -61,5 +65,7 @@ class CanvasListener {
         var y:Float = event.pageY;
         var loc:Coordinate = getPointOnCanvas(canvas,x,y);
         mouseDownFlag = false;
+        link = null;
+        createLinkFlag = false;
     }
 }

@@ -56,6 +56,8 @@ class UpdateCircuitDiagram {
         if(object.component != null){
             var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
             commandManager.execute(command);
+            //those wires which link to this component should move either
+
             redrawCanvas();
         }else {
             if(object.endPoint != null){
@@ -67,7 +69,7 @@ class UpdateCircuitDiagram {
 
     }
 
-    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate){
+    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
         var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
         object = portAction(coordinateFrom);
         if(object.port != null){
@@ -83,11 +85,13 @@ class UpdateCircuitDiagram {
             object.link = link;
         }
         var command:Command = new AddCommand(object,circuitDiagram);
+        commandManager.execute(command);
         redrawCanvas();
+        return object.link;
     }
 
-    public function moveEndpoint(coordinate:Coordinate){
-        var object:Object = circuitDiagramUtil.isOnPort(coordinate);
+    public function moveEndpoint(coordinate:Coordinate, endpoint:Endpoint){
+        var object:Object = {"link":null,"component":null,"endPoint":endpoint, "port":null};
         if(object.endPoint != null){
             var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
             commandManager.execute(command);

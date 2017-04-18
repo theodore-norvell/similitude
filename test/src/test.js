@@ -1114,7 +1114,7 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 					var _g4 = this.circuitDiagram.get_linkArray().length;
 					while(_g5 < _g4) {
 						var k = _g5++;
-						object = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k],this.circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+						object.endPoint = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k],this.circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
 						return object;
 					}
 				}
@@ -1129,7 +1129,7 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 					var _g41 = this.circuitDiagram.get_linkArray().length;
 					while(_g51 < _g41) {
 						var k1 = _g51++;
-						object = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k1],this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1]);
+						object.endPoint = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k1],this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1]);
 						return object;
 					}
 				}
@@ -1138,16 +1138,14 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		return object;
 	}
 	,isLinkOnPort: function(link,port) {
-		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		var endpoint = null;
 		if(this.isEndpointOnPort(link.get_leftEndpoint(),port)) {
-			object.endPoint = link.get_leftEndpoint();
-			return object;
+			endpoint = link.get_leftEndpoint();
 		}
 		if(this.isEndpointOnPort(link.get_rightEndpoint(),port)) {
-			object.endPoint = link.get_rightEndpoint();
-			return object;
+			endpoint = link.get_rightEndpoint();
 		}
-		return object;
+		return endpoint;
 	}
 	,isEndpointOnPort: function(endpoint,port) {
 		if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()) {
@@ -1157,14 +1155,14 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		}
 	}
 	,isInCircle: function(cooridnate,orignalXPosition,orignalYPosition) {
-		if(cooridnate.xPosition - orignalXPosition <= 5 && cooridnate.yPosition - orignalYPosition <= 5) {
+		if(Math.abs(cooridnate.xPosition - orignalXPosition) <= 3 && Math.abs(cooridnate.yPosition - orignalYPosition) <= 3) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
-		if(mouseXPosition >= orignalXposition - width / 2 && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= orignalYposition - heigh / 2 && mouseYposition <= orignalYposition + heigh / 2)) {
+		if(mouseXPosition >= Math.abs(orignalXposition - width / 2) && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= Math.abs(orignalYposition - heigh / 2) && mouseYposition <= orignalYposition + heigh / 2)) {
 			return true;
 		} else {
 			return false;
@@ -1253,10 +1251,12 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			object.link = link1;
 		}
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
+		this.commandManager.execute(command);
 		this.redrawCanvas();
+		return object.link;
 	}
-	,moveEndpoint: function(coordinate) {
-		var object = this.circuitDiagramUtil.isOnPort(coordinate);
+	,moveEndpoint: function(coordinate,endpoint) {
+		var object = { "link" : null, "component" : null, "endPoint" : endpoint, "port" : null};
 		if(object.endPoint != null) {
 			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 			this.commandManager.execute(command);
@@ -1323,6 +1323,7 @@ com_mun_controller_mouseAction_ButtonClick.prototype = {
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
 var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram) {
+	this.createLinkFlag = false;
 	this.mouseDownFlag = false;
 	this.canvas = canvas;
 	this.updateCircuitDiagram = updateCircuitDiagram;
@@ -1337,6 +1338,8 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,mouseDownFlag: null
 	,updateCircuitDiagram: null
 	,mouseDownLocation: null
+	,link: null
+	,createLinkFlag: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
@@ -1349,8 +1352,9 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var y = event.pageY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.mouseDownFlag = true;
-		if(this.updateCircuitDiagram.portAction(this.mouseDownLocation).endPoint == null) {
-			this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
+		if(this.updateCircuitDiagram.portAction(this.mouseDownLocation).port != null) {
+			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
+			this.createLinkFlag = true;
 		}
 	}
 	,doMouseMove: function(event) {
@@ -1358,8 +1362,8 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var y = event.pageY;
 		var loc = this.getPointOnCanvas(this.canvas,x,y);
 		if(this.mouseDownFlag == true) {
-			if(this.updateCircuitDiagram.portAction(loc).endPoint != null) {
-				this.updateCircuitDiagram.moveEndpoint(loc);
+			if(this.createLinkFlag) {
+				this.updateCircuitDiagram.moveEndpoint(loc,this.link.get_rightEndpoint());
 			} else {
 				this.updateCircuitDiagram.moveComponent(loc);
 			}
@@ -1370,6 +1374,8 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var y = event.pageY;
 		var loc = this.getPointOnCanvas(this.canvas,x,y);
 		this.mouseDownFlag = false;
+		this.link = null;
+		this.createLinkFlag = false;
 	}
 	,__class__: com_mun_controller_mouseAction_CanvasListener
 };
@@ -3737,7 +3743,7 @@ com_mun_view_drawingImpl_Box.prototype = {
 };
 var com_mun_view_drawingImpl_DrawingAdapter = function(cxt) {
 	this.font = "8px serif";
-	this.lineWidth = 2.0;
+	this.lineWidth = 1.0;
 	this.textColor = "black";
 	this.fillColor = "gray";
 	this.strokeColor = "black";
