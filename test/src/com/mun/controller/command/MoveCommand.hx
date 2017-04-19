@@ -79,6 +79,28 @@ class MoveCommand implements Command {
             circuitDiagram.get_componentArray()[index].set_xPosition(newXPosition);
             circuitDiagram.get_componentArray()[index].set_yPosition(newYPosition);
             circuitDiagram.updateComponent(circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(newXPosition, newYPosition), index);
+            for(i in 0...circuitDiagram.get_linkArray().length){
+                for(j in 0...component.get_inportArray().length){
+                    if(component.get_inportArray()[j] == circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()){
+                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(component.get_inportArray()[j].get_xPosition());
+                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(component.get_inportArray()[j].get_yPosition());
+                    }
+                    if(component.get_inportArray()[j] == circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()){
+                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(component.get_inportArray()[j].get_xPosition());
+                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(component.get_inportArray()[j].get_yPosition());
+                    }
+                }
+                for(j in 0...component.get_outportArray().length){
+                    if(component.get_outportArray()[j] == circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()){
+                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
+                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
+                    }
+                    if(component.get_outportArray()[j] == circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()){
+                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
+                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
+                    }
+                }
+            }
         }
 
         if (link != null) {

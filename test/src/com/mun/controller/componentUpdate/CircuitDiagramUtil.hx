@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
@@ -82,7 +83,7 @@ class CircuitDiagramUtil {
             return false;
         }
     }
-    function isInCircle(cooridnate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
+    public function isInCircle(cooridnate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
         //the radius is 3
         if(Math.abs(cooridnate.xPosition - orignalXPosition) <= 3 && Math.abs(cooridnate.yPosition - orignalYPosition) <= 3){
             return true;
