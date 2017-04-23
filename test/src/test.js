@@ -1232,8 +1232,8 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 		var _g2 = this.circuit.get_linkArray().length;
 		while(_g11 < _g2) {
 			var i1 = _g11++;
-			var drawComponent1 = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.DrawLink"),[this.circuit.get_linkArray()[i1],this.drawingAdapter]);
-			if(object.link != null && object.link == this.circuit.get_linkArray()[i1]) {
+			var drawComponent1 = new com_mun_view_drawComponents_DrawLink(this.circuit.get_linkArray()[i1],this.drawingAdapter);
+			if(object != null && object.link != null && object.link == this.circuit.get_linkArray()[i1]) {
 				drawComponent1.drawCorrespondingComponent("red");
 			} else {
 				drawComponent1.drawCorrespondingComponent("black");
@@ -1292,7 +1292,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		}
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
 		this.commandManager.execute(command);
-		this.redrawCanvas();
+		this.redrawCanvas(object);
 		return object.link;
 	}
 	,moveEndpoint: function(coordinate,endpoint) {
@@ -3488,6 +3488,7 @@ com_mun_view_drawComponents_DrawLink.prototype = {
 			strokeColor = "black";
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
+		haxe_Log.trace(this.link.get_leftEndpoint().get_xPosition() + "   " + this.link.get_leftEndpoint().get_yPosition() + "   " + this.link.get_rightEndpoint().get_xPosition() + "   " + this.link.get_rightEndpoint().get_yPosition(),{ fileName : "DrawLink.hx", lineNumber : 21, className : "com.mun.view.drawComponents.DrawLink", methodName : "drawCorrespondingComponent"});
 		this.drawingAdapter.drawLine(this.link.get_leftEndpoint().get_xPosition(),this.link.get_leftEndpoint().get_yPosition(),this.link.get_rightEndpoint().get_xPosition(),this.link.get_rightEndpoint().get_yPosition());
 	}
 	,__class__: com_mun_view_drawComponents_DrawLink
@@ -5142,6 +5143,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;

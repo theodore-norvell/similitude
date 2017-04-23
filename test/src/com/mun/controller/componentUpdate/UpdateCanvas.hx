@@ -5,11 +5,11 @@ import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.CircuitDiagram;
 import js.html.CanvasElement;
+import com.mun.view.drawComponents.DrawLink;
 //all of those imports below can not be deleted, because of using Type.resolveClass
 import com.mun.view.drawComponents.DrawAND;
 import com.mun.view.drawComponents.DrawFlipFlop;
 import com.mun.view.drawComponents.DrawInput;
-import com.mun.view.drawComponents.DrawLink;
 import com.mun.view.drawComponents.DrawMUX;
 import com.mun.view.drawComponents.DrawNAND;
 import com.mun.view.drawComponents.DrawNOR;
@@ -48,8 +48,8 @@ class UpdateCanvas {
         }
         //update link array
         for(i in 0...circuit.get_linkArray().length){
-            var drawComponent:DrawComponent = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.DrawLink"),[circuit.get_linkArray()[i],drawingAdapter]);
-            if(object.link != null && object.link == circuit.get_linkArray()[i]){
+            var drawComponent:DrawComponent = new DrawLink(circuit.get_linkArray()[i], drawingAdapter);
+            if(object != null && object.link != null && object.link == circuit.get_linkArray()[i]){
                 drawComponent.drawCorrespondingComponent("red");
             }else{
                 drawComponent.drawCorrespondingComponent("black");

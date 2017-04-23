@@ -18,7 +18,6 @@ class DrawLink implements DrawComponent{
             strokeColor = "black";
         }
         drawingAdapter.setStrokeColor(strokeColor);
-
         drawingAdapter.drawLine(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition(), link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
     }
 
