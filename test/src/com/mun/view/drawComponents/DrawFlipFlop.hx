@@ -17,7 +17,12 @@ class DrawFlipFlop implements DrawComponent {
         this.drawingAdapter = drawingAdapter;
     }
 
-    public function drawCorrespondingComponent():Void {
+    public function drawCorrespondingComponent(strokeColor:String):Void {
+        if(strokeColor == null || strokeColor == ""){
+            strokeColor = "black";
+        }
+        drawingAdapter.setStrokeColor(strokeColor);
+
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.drawText("FF", component.get_xPosition() - 4, component.get_yPosition(), component.get_width());
         //draw inport

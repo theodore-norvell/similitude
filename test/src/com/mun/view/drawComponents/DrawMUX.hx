@@ -17,7 +17,12 @@ class DrawMUX implements DrawComponent {
         this.drawingAdapter = drawingAdapter;
     }
 
-    public function drawCorrespondingComponent():Void {
+    public function drawCorrespondingComponent(strokeColor:String):Void {
+        if(strokeColor == null || strokeColor == ""){
+            strokeColor = "black";
+        }
+        drawingAdapter.setStrokeColor(strokeColor);
+
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.setTextColor("black");
         drawingAdapter.drawText("MUX", component.get_xPosition() - 8, component.get_yPosition(), component.get_width() - 2);

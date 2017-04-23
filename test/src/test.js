@@ -1215,21 +1215,29 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	,getcircuit: function() {
 		return this.circuit;
 	}
-	,update: function() {
+	,update: function(object) {
 		this.canvas.width = this.canvas.width;
 		var _g1 = 0;
 		var _g = this.circuit.get_componentArray().length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			var drawComponent = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.Draw" + this.circuit.get_componentArray()[i].getNameOfTheComponentKind()),[this.circuit.get_componentArray()[i],this.drawingAdapter]);
-			drawComponent.drawCorrespondingComponent();
+			if(object != null && object.component != null && object.component == this.circuit.get_componentArray()[i]) {
+				drawComponent.drawCorrespondingComponent("red");
+			} else {
+				drawComponent.drawCorrespondingComponent("black");
+			}
 		}
 		var _g11 = 0;
 		var _g2 = this.circuit.get_linkArray().length;
 		while(_g11 < _g2) {
 			var i1 = _g11++;
 			var drawComponent1 = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.DrawLink"),[this.circuit.get_linkArray()[i1],this.drawingAdapter]);
-			drawComponent1.drawCorrespondingComponent();
+			if(object.link != null && object.link == this.circuit.get_linkArray()[i1]) {
+				drawComponent1.drawCorrespondingComponent("red");
+			} else {
+				drawComponent1.drawCorrespondingComponent("black");
+			}
 		}
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
@@ -1257,11 +1265,11 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.redrawCanvas();
 	}
 	,moveComponent: function(coordinate) {
-		var object = this.circuitDiagramUtil.isInComponent(coordinate);
+		var object = this.getComponent(coordinate);
 		if(object.component != null) {
 			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
 			this.commandManager.execute(command);
-			this.redrawCanvas();
+			this.redrawCanvas(object);
 		} else if(object.endPoint == null) {
 			var tmp = object.link != null;
 		}
@@ -1303,10 +1311,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 				var _g2 = inportArray.length;
 				while(_g3 < _g2) {
 					var j = _g3++;
-					if(this.circuitDiagramUtil.isInCircle(coordinate,inportArray[j].get_xPosition(),inportArray[i].get_yPosition())) {
-						haxe_Log.trace(1,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 108, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "moveEndpoint"});
+					if(this.circuitDiagramUtil.isInCircle(coordinate,inportArray[j].get_xPosition(),inportArray[j].get_yPosition())) {
 						object.endPoint.set_port(inportArray[j]);
-						var command1 = new com_mun_controller_command_MoveCommand(object,inportArray[j].get_xPosition(),inportArray[i].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+						var command1 = new com_mun_controller_command_MoveCommand(object,inportArray[j].get_xPosition(),inportArray[j].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 						this.commandManager.execute(command1);
 						this.redrawCanvas();
 					}
@@ -1316,10 +1323,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 				var _g21 = outportArray.length;
 				while(_g31 < _g21) {
 					var j1 = _g31++;
-					if(this.circuitDiagramUtil.isInCircle(coordinate,outportArray[j1].get_xPosition(),outportArray[i].get_yPosition())) {
-						haxe_Log.trace(2,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 119, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "moveEndpoint"});
+					if(this.circuitDiagramUtil.isInCircle(coordinate,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition())) {
 						object.endPoint.set_port(outportArray[j1]);
-						var command2 = new com_mun_controller_command_MoveCommand(object,outportArray[j1].get_xPosition(),outportArray[i].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+						var command2 = new com_mun_controller_command_MoveCommand(object,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 						this.commandManager.execute(command2);
 						this.redrawCanvas();
 					}
@@ -1327,11 +1333,17 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			}
 		}
 	}
+	,getComponent: function(coordinate) {
+		return this.circuitDiagramUtil.isInComponent(coordinate);
+	}
+	,hightLightObject: function(object) {
+		this.redrawCanvas(object);
+	}
 	,portAction: function(coordinate) {
 		return this.circuitDiagramUtil.isOnPort(coordinate);
 	}
-	,redrawCanvas: function() {
-		this.updateCanvas.update();
+	,redrawCanvas: function(object) {
+		this.updateCanvas.update(object);
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
 };
@@ -1394,6 +1406,7 @@ var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircui
 	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
+	canvas.addEventListener("click",$bind(this,this.doClick),false);
 };
 $hxClasses["com.mun.controller.mouseAction.CanvasListener"] = com_mun_controller_mouseAction_CanvasListener;
 com_mun_controller_mouseAction_CanvasListener.__name__ = ["com","mun","controller","mouseAction","CanvasListener"];
@@ -1410,6 +1423,13 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		coordinate.xPosition = x - bbox.left * (canvas.width / bbox.width);
 		coordinate.yPosition = y - bbox.top * (canvas.height / bbox.height);
 		return coordinate;
+	}
+	,doClick: function(event) {
+		var x = event.pageX;
+		var y = event.pageY;
+		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
+		var object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
+		this.updateCircuitDiagram.hightLightObject(object);
 	}
 	,doMouseDown: function(event) {
 		var x = event.pageX;
@@ -3293,7 +3313,11 @@ com_mun_view_drawComponents_DrawAND.__interfaces__ = [com_mun_view_drawComponent
 com_mun_view_drawComponents_DrawAND.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
@@ -3327,7 +3351,11 @@ com_mun_view_drawComponents_DrawFlipFlop.__interfaces__ = [com_mun_view_drawComp
 com_mun_view_drawComponents_DrawFlipFlop.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		this.drawingAdapter.drawText("FF",this.component.get_xPosition() - 4,this.component.get_yPosition(),this.component.get_width());
 		var inportArray = this.component.get_inportArray();
@@ -3424,7 +3452,11 @@ com_mun_view_drawComponents_DrawInput.__interfaces__ = [com_mun_view_drawCompone
 com_mun_view_drawComponents_DrawInput.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.setFillColor("red");
 		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
 		this.drawingAdapter.setTextColor("black");
@@ -3451,7 +3483,11 @@ com_mun_view_drawComponents_DrawLink.__interfaces__ = [com_mun_view_drawComponen
 com_mun_view_drawComponents_DrawLink.prototype = {
 	drawingAdapter: null
 	,link: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawLine(this.link.get_leftEndpoint().get_xPosition(),this.link.get_leftEndpoint().get_yPosition(),this.link.get_rightEndpoint().get_xPosition(),this.link.get_rightEndpoint().get_yPosition());
 	}
 	,__class__: com_mun_view_drawComponents_DrawLink
@@ -3466,7 +3502,11 @@ com_mun_view_drawComponents_DrawMUX.__interfaces__ = [com_mun_view_drawComponent
 com_mun_view_drawComponents_DrawMUX.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		this.drawingAdapter.setTextColor("black");
 		this.drawingAdapter.drawText("MUX",this.component.get_xPosition() - 8,this.component.get_yPosition(),this.component.get_width() - 2);
@@ -3533,7 +3573,11 @@ com_mun_view_drawComponents_DrawNAND.__name__ = ["com","mun","view","drawCompone
 com_mun_view_drawComponents_DrawNAND.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawNAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
@@ -3567,7 +3611,11 @@ com_mun_view_drawComponents_DrawNOR.__interfaces__ = [com_mun_view_drawComponent
 com_mun_view_drawComponents_DrawNOR.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawNOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
@@ -3601,7 +3649,11 @@ com_mun_view_drawComponents_DrawNOT.__interfaces__ = [com_mun_view_drawComponent
 com_mun_view_drawComponents_DrawNOT.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawNotShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
@@ -3635,7 +3687,11 @@ com_mun_view_drawComponents_DrawOR.__interfaces__ = [com_mun_view_drawComponents
 com_mun_view_drawComponents_DrawOR.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
@@ -3669,7 +3725,11 @@ com_mun_view_drawComponents_DrawOutput.__interfaces__ = [com_mun_view_drawCompon
 com_mun_view_drawComponents_DrawOutput.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.setFillColor("red");
 		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
 		this.drawingAdapter.setTextColor("black");
@@ -3696,7 +3756,11 @@ com_mun_view_drawComponents_DrawXOR.__interfaces__ = [com_mun_view_drawComponent
 com_mun_view_drawComponents_DrawXOR.prototype = {
 	drawingAdapter: null
 	,component: null
-	,drawCorrespondingComponent: function() {
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawXorShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
@@ -3873,6 +3937,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.lineTo(r.get_xd(),r.get_yd());
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -3909,6 +3974,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.closePath();
 		this.cxt.arc((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2,radius,0,2 * Math.PI,false);
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -3921,6 +3987,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -3945,6 +4012,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.lineTo((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
 		this.cxt.lineTo(r.get_xd(),r.get_yd());
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.closePath();
 		this.cxt.fill();
 		this.cxt.stroke();
@@ -3974,6 +4042,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 			break;
 		}
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -3986,6 +4055,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		switch(orientation[1]) {
 		case 0:
@@ -4014,12 +4084,14 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		var y1 = this.worldToView.convertY(y + height / 2);
 		this.cxt.rect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
 	,drawText: function(str,x,y,width) {
 		this.cxt.font = this.font;
 		this.cxt.fillStyle = this.textColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fillText(str,x,y,width);
 	}
 	,drawCricle: function(x,y,radius) {
@@ -4030,6 +4102,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.beginPath();
 		this.cxt.arc(Math.min(x0,x1),Math.min(y0,y1),radius,0,2 * Math.PI,false);
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -4044,6 +4117,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.closePath();
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -5068,15 +5142,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;

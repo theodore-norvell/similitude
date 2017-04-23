@@ -15,7 +15,12 @@ class DrawInput implements DrawComponent {
         this.drawingAdapter = drawingAdapter;
     }
 
-    public function drawCorrespondingComponent():Void {
+    public function drawCorrespondingComponent(strokeColor:String):Void {
+        if(strokeColor == null || strokeColor == ""){
+            strokeColor = "black";
+        }
+        drawingAdapter.setStrokeColor(strokeColor);
+
         //set the radius equal to 7
         drawingAdapter.setFillColor("red");
         drawingAdapter.drawCricle(component.get_xPosition(), component.get_yPosition(), 7);

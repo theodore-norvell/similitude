@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.type.Type.Object;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.CircuitDiagram;
@@ -32,18 +33,28 @@ class UpdateCanvas {
         return circuit;
     }
 
-    public function update(){
+    public function update(?object:Object){
         //clear the canvas
         canvas.width = canvas.width;
         //update component array
         for(i in 0...circuit.get_componentArray().length){
             var drawComponent:DrawComponent = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.Draw" + circuit.get_componentArray()[i].getNameOfTheComponentKind()),[circuit.get_componentArray()[i],drawingAdapter]);
-            drawComponent.drawCorrespondingComponent();
+            if(object != null && object.component != null && object.component == circuit.get_componentArray()[i]){
+                drawComponent.drawCorrespondingComponent("red");
+            }else{
+                drawComponent.drawCorrespondingComponent("black");
+            }
+
         }
         //update link array
         for(i in 0...circuit.get_linkArray().length){
             var drawComponent:DrawComponent = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.DrawLink"),[circuit.get_linkArray()[i],drawingAdapter]);
-            drawComponent.drawCorrespondingComponent();
+            if(object.link != null && object.link == circuit.get_linkArray()[i]){
+                drawComponent.drawCorrespondingComponent("red");
+            }else{
+                drawComponent.drawCorrespondingComponent("black");
+            }
         }
     }
+
 }

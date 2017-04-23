@@ -15,7 +15,12 @@ class DrawOR implements DrawComponent {
         this.drawingAdapter = drawingAdapter;
     }
 
-    public function drawCorrespondingComponent():Void {
+    public function drawCorrespondingComponent(strokeColor:String):Void {
+        if(strokeColor == null || strokeColor == ""){
+            strokeColor = "black";
+        }
+        drawingAdapter.setStrokeColor(strokeColor);
+
         drawingAdapter.drawOrShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
         //draw inport
         var inportArray:Array<Port> = component.get_inportArray();

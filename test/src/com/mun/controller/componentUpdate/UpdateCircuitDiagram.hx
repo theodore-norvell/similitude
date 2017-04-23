@@ -53,13 +53,13 @@ class UpdateCircuitDiagram {
         redrawCanvas();
     }
     public function moveComponent(coordinate:Coordinate){
-        var object:Object = circuitDiagramUtil.isInComponent(coordinate);
+        var object:Object = getComponent(coordinate);
         if(object.component != null){
             var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
             commandManager.execute(command);
             //those wires which link to this component should move either
 
-            redrawCanvas();
+            redrawCanvas(object);
         }else {
             if(object.endPoint != null){
 
@@ -88,7 +88,7 @@ class UpdateCircuitDiagram {
         }
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
-        redrawCanvas();
+        redrawCanvas(object);
         return object.link;
     }
 
@@ -104,10 +104,9 @@ class UpdateCircuitDiagram {
             for(i in 0...componentArray.length){
                 var inportArray:Array<Port> = componentArray[i].get_inportArray();
                 for(j in 0...inportArray.length){
-                    if(circuitDiagramUtil.isInCircle(coordinate, inportArray[j].get_xPosition(), inportArray[i].get_yPosition())){
-                        trace(1);
+                    if(circuitDiagramUtil.isInCircle(coordinate, inportArray[j].get_xPosition(), inportArray[j].get_yPosition())){
                         object.endPoint.set_port(inportArray[j]);
-                        var command:Command = new MoveCommand(object,inportArray[j].get_xPosition(), inportArray[i].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+                        var command:Command = new MoveCommand(object,inportArray[j].get_xPosition(), inportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
                         commandManager.execute(command);
                         redrawCanvas();
                     }
@@ -115,10 +114,9 @@ class UpdateCircuitDiagram {
 
                 var outportArray:Array<Port> = componentArray[i].get_outportArray();
                 for(j in 0...outportArray.length){
-                    if(circuitDiagramUtil.isInCircle(coordinate, outportArray[j].get_xPosition(), outportArray[i].get_yPosition())){
-                        trace(2);
+                    if(circuitDiagramUtil.isInCircle(coordinate, outportArray[j].get_xPosition(), outportArray[j].get_yPosition())){
                         object.endPoint.set_port(outportArray[j]);
-                        var command:Command = new MoveCommand(object,outportArray[j].get_xPosition(), outportArray[i].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+                        var command:Command = new MoveCommand(object,outportArray[j].get_xPosition(), outportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
                         commandManager.execute(command);
                         redrawCanvas();
                     }
@@ -128,11 +126,19 @@ class UpdateCircuitDiagram {
         }
     }
 
+    public function getComponent(coordinate:Coordinate):Object{
+        return circuitDiagramUtil.isInComponent(coordinate);
+    }
+
+    public function hightLightObject(object:Object){
+        redrawCanvas(object);
+    }
+
     public function portAction(coordinate:Coordinate):Object{
         return circuitDiagramUtil.isOnPort(coordinate);
     }
 
-    function redrawCanvas(){
-        updateCanvas.update();
+    function redrawCanvas(?object:Object){
+        updateCanvas.update(object);
     }
 }

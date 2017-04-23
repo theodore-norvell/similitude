@@ -5,6 +5,7 @@ import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import js.html.MouseEvent;
 import com.mun.type.Type.Coordinate;
 import js.html.CanvasElement;
+import com.mun.type.Type.Object;
 
 class CanvasListener {
     var canvas:CanvasElement;
@@ -22,6 +23,7 @@ class CanvasListener {
         canvas.addEventListener("mousedown", doMouseDown,false);
         canvas.addEventListener("mousemove", doMouseMove,false);
         canvas.addEventListener("mouseup", doMouseUp,false);
+        canvas.addEventListener("click", doClick,false);
     }
 
     public function getPointOnCanvas(canvas:CanvasElement, x:Float, y:Float) {
@@ -31,6 +33,16 @@ class CanvasListener {
         coordinate.yPosition = y - bbox.top  * (canvas.height / bbox.height);
         return coordinate;
     }
+
+    public function doClick(event:MouseEvent){
+        var x:Float = event.pageX;
+        var y:Float = event.pageY;
+        mouseDownLocation = getPointOnCanvas(canvas,x,y);
+        var object:Object = updateCircuitDiagram.getComponent(mouseDownLocation);
+        updateCircuitDiagram.hightLightObject(object);
+
+    }
+
     public function doMouseDown(event:MouseEvent){
         var x:Float = event.pageX;
         var y:Float = event.pageY;

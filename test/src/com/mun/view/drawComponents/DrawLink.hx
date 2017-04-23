@@ -13,7 +13,12 @@ class DrawLink implements DrawComponent{
         this.link = link;
         this.drawingAdapter = drawingAdapter;
     }
-    public function drawCorrespondingComponent():Void {
+    public function drawCorrespondingComponent(strokeColor:String):Void {
+        if(strokeColor == null || strokeColor == ""){
+            strokeColor = "black";
+        }
+        drawingAdapter.setStrokeColor(strokeColor);
+
         drawingAdapter.drawLine(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition(), link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
     }
 

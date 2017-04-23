@@ -81,6 +81,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineTo(r.get_xd(), r.get_yd());
         cxt.closePath();
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -127,6 +128,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.closePath();
         cxt.arc((r.get_xb() + r.get_xc()) / 2, (r.get_yb() + r.get_yc()) / 2, radius, 0, 2 * Math.PI, false);
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -145,6 +147,7 @@ class DrawingAdapter implements DrawingAdapterI {
 
         cxt.closePath();
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -182,6 +185,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineTo(r.get_xd(), r.get_yd()) ;
         // Back to a
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.closePath();
         cxt.fill();
         cxt.stroke();
@@ -218,6 +222,7 @@ class DrawingAdapter implements DrawingAdapterI {
             }
         }
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -235,6 +240,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()), 0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()), r.get_xa(), r.get_ya()) ;
         cxt.closePath();
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         // Curve from (a+d)/8 to (a+d)/8 * 7
         switch (orientation){
@@ -268,6 +274,7 @@ class DrawingAdapter implements DrawingAdapterI {
         var y1:Float = worldToView.convertY(y + height / 2);
         cxt.rect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -275,6 +282,7 @@ class DrawingAdapter implements DrawingAdapterI {
     public function drawText(str:String, x:Float, y:Float, width:Float):Void {
         cxt.font = font;
         cxt.fillStyle = textColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fillText(str, x, y, width);
     }
 
@@ -287,6 +295,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.arc(Math.min(x0, x1), Math.min(y0, y1), radius, 0, 2 * Math.PI, false);
         cxt.closePath;
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -302,6 +311,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.closePath();
         cxt.lineWidth = lineWidth;
         cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
