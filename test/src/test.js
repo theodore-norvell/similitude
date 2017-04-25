@@ -1264,8 +1264,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.commandManager.execute(command);
 		this.redrawCanvas();
 	}
-	,moveComponent: function(coordinate) {
-		var object = this.getComponent(coordinate);
+	,moveComponent: function(object,coordinate) {
 		if(object.component != null) {
 			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
 			this.commandManager.execute(command);
@@ -1417,6 +1416,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,mouseDownLocation: null
 	,link: null
 	,createLinkFlag: null
+	,object: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
@@ -1428,13 +1428,15 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var x = event.pageX;
 		var y = event.pageY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
-		var object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
-		this.updateCircuitDiagram.hightLightObject(object);
+		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
+		this.updateCircuitDiagram.hightLightObject(this.object);
+		this.doMouseUp(event);
 	}
 	,doMouseDown: function(event) {
 		var x = event.pageX;
 		var y = event.pageY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
+		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
 		this.mouseDownFlag = true;
 		if(this.updateCircuitDiagram.portAction(this.mouseDownLocation).port != null) {
 			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
@@ -1449,17 +1451,15 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 			if(this.createLinkFlag) {
 				this.updateCircuitDiagram.moveEndpoint(loc,this.link.get_rightEndpoint());
 			} else {
-				this.updateCircuitDiagram.moveComponent(loc);
+				this.updateCircuitDiagram.moveComponent(this.object,loc);
 			}
 		}
 	}
 	,doMouseUp: function(event) {
-		var x = event.pageX;
-		var y = event.pageY;
-		var loc = this.getPointOnCanvas(this.canvas,x,y);
 		this.mouseDownFlag = false;
 		this.link = null;
 		this.createLinkFlag = false;
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 	}
 	,__class__: com_mun_controller_mouseAction_CanvasListener
 };
@@ -3488,7 +3488,6 @@ com_mun_view_drawComponents_DrawLink.prototype = {
 			strokeColor = "black";
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
-		haxe_Log.trace(this.link.get_leftEndpoint().get_xPosition() + "   " + this.link.get_leftEndpoint().get_yPosition() + "   " + this.link.get_rightEndpoint().get_xPosition() + "   " + this.link.get_rightEndpoint().get_yPosition(),{ fileName : "DrawLink.hx", lineNumber : 21, className : "com.mun.view.drawComponents.DrawLink", methodName : "drawCorrespondingComponent"});
 		this.drawingAdapter.drawLine(this.link.get_leftEndpoint().get_xPosition(),this.link.get_leftEndpoint().get_yPosition(),this.link.get_rightEndpoint().get_xPosition(),this.link.get_rightEndpoint().get_yPosition());
 	}
 	,__class__: com_mun_view_drawComponents_DrawLink
@@ -5143,15 +5142,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;

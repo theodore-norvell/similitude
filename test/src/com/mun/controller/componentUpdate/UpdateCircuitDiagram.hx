@@ -52,8 +52,7 @@ class UpdateCircuitDiagram {
         commandManager.execute(command);
         redrawCanvas();
     }
-    public function moveComponent(coordinate:Coordinate){
-        var object:Object = getComponent(coordinate);
+    public function moveComponent(object:Object, coordinate:Coordinate){
         if(object.component != null){
             var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
             commandManager.execute(command);
