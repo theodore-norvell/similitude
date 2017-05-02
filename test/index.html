@@ -20,7 +20,7 @@
     <div class="row-fluid">
         <div class="row">
             <div class="col-sm-1 col-md-1 col-lg-1" id="leftDIV">
-                <div class="btn-group-vertical btn-group-sm" role="group" aria-label="...">
+                <div class="btn-group-vertical btn-group-sm" role="group" aria-label="..." style="border: 1px solid">
                     <!--add initial gate button-->
                     <button id="AND" type="button" class="btn btn-default">AND Gate</button>
                     <button id="OR" type="button" class="btn btn-default">OR Gate</button>
@@ -34,8 +34,43 @@
                     <button id="OUTPUT" type="button" class="btn btn-default">OUTPUT</button>
                 </div>
             </div>
+            <!-- canvas -->
             <div class="col-sm-11 col-md-11 col-lg-11" id="rightDIV">
                 <canvas id="canvas" style="border: 1px solid;" >update your browser to enjoy canvas</canvas>
+            </div>
+            <div class="col-sm-1 col-md-1 col-lg-1">
+                <!-- nothing -->
+            </div>
+            <div class="col-sm-11 col-md-11 col-lg-11" style="border: 1px solid">
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="component_name">name</span>
+                        <input type="text" class="form-control" placeholder="Component Name" aria-describedby="basic-addon1">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <!-- Button and dropdown menu -->
+                            <div class="btn-group dropup">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orientation <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">NORTH</a></li>
+                                    <li><a href="#">SOUTH</a></li>
+                                    <li><a href="#">WEST</a></li>
+                                    <li><a href="#">EAST</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" aria-label="..." disabled="disabled" id="orientation">
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="basic-addon1">@</span>
+                        <input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+                    </div>
+                </div>
 
             </div>
         </div>

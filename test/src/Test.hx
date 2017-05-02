@@ -32,7 +32,7 @@ class Test {
         else cast( backingStoreRatioDynamic, Float ) ;
 
         var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
-        var oldWidth:Int = cast Browser.window.innerWidth * 0.9;
+        var oldWidth:Int = cast Browser.window.innerWidth;
         var oldHeight:Int =cast Browser.window.innerHeight * 0.9;
         canvas.width = oldWidth * pixelRatio;
         canvas.height = oldHeight * pixelRatio;

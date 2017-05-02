@@ -632,7 +632,7 @@ Test.main = function() {
 	}
 	var backingStoreRatio = backingStoreRatioDynamic == null ? 1.0 : js_Boot.__cast(backingStoreRatioDynamic , Float);
 	var pixelRatio = window.devicePixelRatio / backingStoreRatio;
-	var oldWidth = window.innerWidth * 0.9;
+	var oldWidth = window.innerWidth;
 	var oldHeight = window.innerHeight * 0.9;
 	Test.canvas.width = oldWidth * pixelRatio;
 	Test.canvas.height = oldHeight * pixelRatio;
