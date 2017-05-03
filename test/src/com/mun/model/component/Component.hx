@@ -18,7 +18,7 @@ class Component {
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    var name:String;//the name of the component
+    var name:String = "component";//the name of the component
     var delay:Int;//delay of the component
     var inportsNum:Int;//init
     var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"

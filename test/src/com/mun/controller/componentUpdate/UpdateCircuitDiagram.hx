@@ -51,6 +51,7 @@ class UpdateCircuitDiagram {
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
         redrawCanvas();
+        new UpdateToolBar().createUpdate(object);
     }
     public function moveComponent(object:Object, coordinate:Coordinate){
         if(object.component != null){

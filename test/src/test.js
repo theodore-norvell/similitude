@@ -1263,6 +1263,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
 		this.commandManager.execute(command);
 		this.redrawCanvas();
+		new com_mun_controller_componentUpdate_UpdateToolBar().createUpdate(object);
 	}
 	,moveComponent: function(object,coordinate) {
 		if(object.component != null) {
@@ -1345,6 +1346,18 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.updateCanvas.update(object);
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
+};
+var com_mun_controller_componentUpdate_UpdateToolBar = function() {
+};
+$hxClasses["com.mun.controller.componentUpdate.UpdateToolBar"] = com_mun_controller_componentUpdate_UpdateToolBar;
+com_mun_controller_componentUpdate_UpdateToolBar.__name__ = ["com","mun","controller","componentUpdate","UpdateToolBar"];
+com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
+	createUpdate: function(object) {
+		haxe_Log.trace(object.component.get_name(),{ fileName : "UpdateToolBar.hx", lineNumber : 11, className : "com.mun.controller.componentUpdate.UpdateToolBar", methodName : "createUpdate"});
+		window.document.getElementById("name_input").setAttribute("value",object.component.get_name());
+		window.document.getElementById("orientation").setAttribute("value",Std.string(object.component.get_orientation()) + "");
+	}
+	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
 var com_mun_controller_mouseAction_ButtonClick = function(drawingAdapter,updateCircuitDiagram) {
 	this.drawingAdapter = drawingAdapter;
@@ -1536,6 +1549,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,__class__: com_mun_model_component_CircuitDiagram
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
+	this.name = "component";
 	this.outportArray = [];
 	this.inportArray = [];
 	this.xPosition = xPosition;
@@ -5142,6 +5156,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;
