@@ -1,5 +1,6 @@
 package com.mun.controller.mouseAction;
 
+import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Link;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import js.html.MouseEvent;
@@ -12,14 +13,16 @@ class CanvasListener {
     var mouseDownFlag:Bool = false;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var mouseDownLocation:Coordinate;
+    var updateToolBar:UpdateToolBar;
     //local varible
     var link:Link;
     var createLinkFlag:Bool = false;
     var object:Object;
 
-    public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram) {
+    public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram, updateToolBar:UpdateToolBar) {
         this.canvas = canvas;
         this.updateCircuitDiagram = updateCircuitDiagram;
+        this.updateToolBar = updateToolBar;
         //add mouse down listener
         canvas.addEventListener("mousedown", doMouseDown,false);
         canvas.addEventListener("mousemove", doMouseMove,false);
@@ -41,6 +44,11 @@ class CanvasListener {
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
         object = updateCircuitDiagram.getComponent(mouseDownLocation);
         updateCircuitDiagram.hightLightObject(object);
+        if(object.component != null){
+            updateToolBar.update(object.component);
+        }else{
+            updateToolBar.hidden();
+        }
         doMouseUp(event);
     }
 

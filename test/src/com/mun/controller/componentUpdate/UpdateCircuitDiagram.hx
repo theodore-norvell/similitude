@@ -33,10 +33,12 @@ class UpdateCircuitDiagram {
     var updateCanvas:UpdateCanvas;
     var commandManager:CommandManager;
     var circuitDiagramUtil:CircuitDiagramUtil;
+    var updateToolBar:UpdateToolBar;
 
-    public function new(circuitDiagram:CircuitDiagram,updateCanvas:UpdateCanvas) {
+    public function new(circuitDiagram:CircuitDiagram,updateCanvas:UpdateCanvas, updateToolBar:UpdateToolBar) {
         this.circuitDiagram = circuitDiagram;
         this.updateCanvas = updateCanvas;
+        this.updateToolBar = updateToolBar;
 
         commandManager = new CommandManager(circuitDiagram);
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
@@ -51,7 +53,8 @@ class UpdateCircuitDiagram {
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
         redrawCanvas();
-        new UpdateToolBar().createUpdate(object);
+        updateToolBar.update(object.component);
+        hightLightObject(object);
     }
     public function moveComponent(object:Object, coordinate:Coordinate){
         if(object.component != null){

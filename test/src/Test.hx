@@ -1,5 +1,6 @@
 package ;
 
+import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.controller.mouseAction.CanvasListener;
@@ -32,7 +33,7 @@ class Test {
         else cast( backingStoreRatioDynamic, Float ) ;
 
         var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
-        var oldWidth:Int = cast Browser.window.innerWidth;
+        var oldWidth:Int = cast Browser.window.innerWidth * 0.9;
         var oldHeight:Int =cast Browser.window.innerHeight * 0.9;
         canvas.width = oldWidth * pixelRatio;
         canvas.height = oldHeight * pixelRatio;
@@ -47,13 +48,15 @@ class Test {
 
         var circuitDiagram:CircuitDiagram = new CircuitDiagram();
 
+        var updateToolBar:UpdateToolBar = new UpdateToolBar();
+
         var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
-        var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram,updateCanvas);
+        var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram,updateCanvas,updateToolBar);
 
         //add button click listener
         new ButtonClick(drawingAdapter,updateCircuitDiagram);
         //add canvas listener
-        new CanvasListener(canvas,updateCircuitDiagram);
+        new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
 
     }
 

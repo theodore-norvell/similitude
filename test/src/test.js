@@ -632,7 +632,7 @@ Test.main = function() {
 	}
 	var backingStoreRatio = backingStoreRatioDynamic == null ? 1.0 : js_Boot.__cast(backingStoreRatioDynamic , Float);
 	var pixelRatio = window.devicePixelRatio / backingStoreRatio;
-	var oldWidth = window.innerWidth;
+	var oldWidth = window.innerWidth * 0.9;
 	var oldHeight = window.innerHeight * 0.9;
 	Test.canvas.width = oldWidth * pixelRatio;
 	Test.canvas.height = oldHeight * pixelRatio;
@@ -641,10 +641,11 @@ Test.main = function() {
 	Test.cxt.scale(pixelRatio,pixelRatio);
 	var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(Test.cxt);
 	var circuitDiagram = new com_mun_model_component_CircuitDiagram();
+	var updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar();
 	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,drawingAdapter);
-	var updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(circuitDiagram,updateCanvas);
+	var updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(circuitDiagram,updateCanvas,updateToolBar);
 	new com_mun_controller_mouseAction_ButtonClick(drawingAdapter,updateCircuitDiagram);
-	new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram);
+	new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -1242,9 +1243,10 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
-var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDiagram,updateCanvas) {
+var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDiagram,updateCanvas,updateToolBar) {
 	this.circuitDiagram = circuitDiagram;
 	this.updateCanvas = updateCanvas;
+	this.updateToolBar = updateToolBar;
 	this.commandManager = new com_mun_controller_command_CommandManager(circuitDiagram);
 	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
 };
@@ -1255,6 +1257,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,updateCanvas: null
 	,commandManager: null
 	,circuitDiagramUtil: null
+	,updateToolBar: null
 	,createComponentByButton: function(name,xPosition,yPosition,width,height,orientation,inportNum,drawingAdapter) {
 		var componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
 		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
@@ -1263,7 +1266,8 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
 		this.commandManager.execute(command);
 		this.redrawCanvas();
-		new com_mun_controller_componentUpdate_UpdateToolBar().createUpdate(object);
+		this.updateToolBar.update(object.component);
+		this.hightLightObject(object);
 	}
 	,moveComponent: function(object,coordinate) {
 		if(object.component != null) {
@@ -1348,14 +1352,32 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
 };
 var com_mun_controller_componentUpdate_UpdateToolBar = function() {
+	this.nameInput = window.document.getElementById("name_input");
+	this.orientation = window.document.getElementById("orientation");
+	this.toolBar = window.document.getElementById("toolbar_div");
+	this.nameInput.addEventListener("change",$bind(this,this.inputChange),false);
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateToolBar"] = com_mun_controller_componentUpdate_UpdateToolBar;
 com_mun_controller_componentUpdate_UpdateToolBar.__name__ = ["com","mun","controller","componentUpdate","UpdateToolBar"];
 com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
-	createUpdate: function(object) {
-		haxe_Log.trace(object.component.get_name(),{ fileName : "UpdateToolBar.hx", lineNumber : 11, className : "com.mun.controller.componentUpdate.UpdateToolBar", methodName : "createUpdate"});
-		window.document.getElementById("name_input").setAttribute("value",object.component.get_name());
-		window.document.getElementById("orientation").setAttribute("value",Std.string(object.component.get_orientation()) + "");
+	component: null
+	,nameInput: null
+	,orientation: null
+	,toolBar: null
+	,update: function(component) {
+		this.component = component;
+		this.nameInput.setAttribute("value",component.get_name());
+		this.orientation.setAttribute("value",Std.string(component.get_orientation()) + "");
+		this.visible();
+	}
+	,inputChange: function() {
+		haxe_Log.trace(this.nameInput.getAttribute("value"),{ fileName : "UpdateToolBar.hx", lineNumber : 27, className : "com.mun.controller.componentUpdate.UpdateToolBar", methodName : "inputChange"});
+	}
+	,visible: function() {
+		this.toolBar.style.visibility = "visible";
+	}
+	,hidden: function() {
+		this.toolBar.style.visibility = "hidden";
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
@@ -1410,11 +1432,12 @@ com_mun_controller_mouseAction_ButtonClick.prototype = {
 	}
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
-var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram) {
+var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
 	this.createLinkFlag = false;
 	this.mouseDownFlag = false;
 	this.canvas = canvas;
 	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.updateToolBar = updateToolBar;
 	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
@@ -1427,6 +1450,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,mouseDownFlag: null
 	,updateCircuitDiagram: null
 	,mouseDownLocation: null
+	,updateToolBar: null
 	,link: null
 	,createLinkFlag: null
 	,object: null
@@ -1443,6 +1467,11 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
 		this.updateCircuitDiagram.hightLightObject(this.object);
+		if(this.object.component != null) {
+			this.updateToolBar.update(this.object.component);
+		} else {
+			this.updateToolBar.hidden();
+		}
 		this.doMouseUp(event);
 	}
 	,doMouseDown: function(event) {
@@ -1549,7 +1578,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,__class__: com_mun_model_component_CircuitDiagram
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
-	this.name = "component";
+	this.name = "component1";
 	this.outportArray = [];
 	this.inportArray = [];
 	this.xPosition = xPosition;
