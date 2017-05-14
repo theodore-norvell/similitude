@@ -48,9 +48,10 @@ class Test {
 
         var circuitDiagram:CircuitDiagram = new CircuitDiagram();
 
-        var updateToolBar:UpdateToolBar = new UpdateToolBar();
+
 
         var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
+        var updateToolBar:UpdateToolBar = new UpdateToolBar(circuitDiagram, updateCanvas);
         var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram,updateCanvas,updateToolBar);
 
         //add button click listener

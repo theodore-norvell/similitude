@@ -45,7 +45,7 @@ class CanvasListener {
         object = updateCircuitDiagram.getComponent(mouseDownLocation);
         updateCircuitDiagram.hightLightObject(object);
         if(object.component != null){
-            updateToolBar.update(object.component);
+            updateToolBar.update(object);
         }else{
             updateToolBar.hidden();
         }

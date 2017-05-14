@@ -78,6 +78,32 @@ class CircuitDiagram {
 
     public function deleteComponent(component:Component) {
         componentArray.remove(component);
+        //delete port setted in the link
+        for(i in 0...component.get_inportArray().length){
+            for(j in 0...linkArray.length){
+                if(component.get_inportArray()[i] == linkArray[j].get_leftEndpoint().get_port()){
+                    linkArray[j].get_leftEndpoint().set_port(null);
+                }
+
+                if(component.get_inportArray()[i] == linkArray[j].get_rightEndpoint().get_port()){
+                    linkArray[j].get_rightEndpoint().set_port(null);
+                }
+
+            }
+        }
+        //
+        for(i in 0...component.get_outportArray().length){
+            for(j in 0...linkArray.length){
+                if(component.get_outportArray()[i] == linkArray[j].get_leftEndpoint().get_port()){
+                    linkArray[j].get_leftEndpoint().set_port(null);
+                }
+
+                if(component.get_outportArray()[i] == linkArray[j].get_rightEndpoint().get_port()){
+                    linkArray[j].get_rightEndpoint().set_port(null);
+                }
+
+            }
+        }
     }
 
     public function updateComponent(component:Component, index:Int){
