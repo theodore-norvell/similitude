@@ -92,12 +92,14 @@ class MoveCommand implements Command {
                 }
                 for(j in 0...component.get_outportArray().length){
                     if(component.get_outportArray()[j] == circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()){
-                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
-                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
+//                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
+//                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
+                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
                     }
                     if(component.get_outportArray()[j] == circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()){
-                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
-                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
+//                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
+//                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
+                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
                     }
                 }
             }

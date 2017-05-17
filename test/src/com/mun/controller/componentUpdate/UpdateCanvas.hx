@@ -5,7 +5,6 @@ import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.CircuitDiagram;
 import js.html.CanvasElement;
-import com.mun.view.drawComponents.DrawLink;
 //all of those imports below can not be deleted, because of using Type.resolveClass
 //include all of the class under com.mun.view.drawComponents
 import com.mun.view.drawComponents.DrawAND;
@@ -18,6 +17,7 @@ import com.mun.view.drawComponents.DrawNOT;
 import com.mun.view.drawComponents.DrawOR;
 import com.mun.view.drawComponents.DrawOutput;
 import com.mun.view.drawComponents.DrawXOR;
+import com.mun.view.drawComponents.DrawLink;
 //the above imports shouldn't be deleted
 
 class UpdateCanvas {

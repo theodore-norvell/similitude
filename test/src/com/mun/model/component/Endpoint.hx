@@ -45,5 +45,10 @@ class Endpoint {
         return this.port = value;
     }
 
-
+    public function updatePosition(){
+        if(port != null){
+            xPosition = port.get_xPosition();
+            yPosition = port.get_yPosition();
+        }
+    }
 }

@@ -109,4 +109,14 @@ class CircuitDiagram {
     public function updateComponent(component:Component, index:Int){
         componentArray[index] = component;
     }
+
+    /**
+    * because component may update the port position, so the link should update all of the port connect to the component port
+    **/
+    public function linkArraySelfUpdate(){
+        for(i in 0...linkArray.length){
+            linkArray[i].get_leftEndpoint().updatePosition();
+            linkArray[i].get_rightEndpoint().updatePosition();
+        }
+    }
 }

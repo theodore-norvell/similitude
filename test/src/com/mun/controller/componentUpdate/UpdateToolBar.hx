@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.type.Type.Object;
@@ -44,6 +45,7 @@ class UpdateToolBar {
         if(object.component != null){
             object.component.set_orientation(Orientation.NORTH);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
+            circuitDiagram.linkArraySelfUpdate();
             updateCanvas.update();
         }
     }
@@ -51,7 +53,7 @@ class UpdateToolBar {
         if(object.component != null){
             object.component.set_orientation(Orientation.SOUTH);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
-
+            circuitDiagram.linkArraySelfUpdate();
             updateCanvas.update();
         }
     }
@@ -59,6 +61,7 @@ class UpdateToolBar {
         if(object.component != null){
             object.component.set_orientation(Orientation.WEST);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
+            circuitDiagram.linkArraySelfUpdate();
             updateCanvas.update();
         }
     }
@@ -66,15 +69,18 @@ class UpdateToolBar {
         if(object.component != null){
             object.component.set_orientation(Orientation.EAST);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
+            circuitDiagram.linkArraySelfUpdate();
             updateCanvas.update();
         }
     }
 
     public function inputChange(){
 
-//        if(object.component != null){
+        if(object.component != null){
 //            object.component.set_name(nameInput.);
-//        }
+//            trace(new JQuery("#name_input").val());
+//            new JQuery("#name_input").val();
+        }
     }
 
     public function deleteObject(){

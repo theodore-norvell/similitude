@@ -1045,12 +1045,10 @@ com_mun_controller_command_MoveCommand.prototype = {
 				while(_g31 < _g21) {
 					var j1 = _g31++;
 					if(this.component.get_outportArray()[j1] == this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()) {
-						this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(this.component.get_outportArray()[j1].get_xPosition());
-						this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(this.component.get_outportArray()[j1].get_yPosition());
+						this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
 					}
 					if(this.component.get_outportArray()[j1] == this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()) {
-						this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(this.component.get_outportArray()[j1].get_xPosition());
-						this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(this.component.get_outportArray()[j1].get_yPosition());
+						this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
 					}
 				}
 			}
@@ -1305,6 +1303,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 			this.commandManager.execute(command);
 			this.redrawCanvas();
+			if(Math.abs(coordinate.xPosition - endpoint.get_xPosition()) < 10 || Math.abs(coordinate.yPosition - endpoint.get_yPosition()) < 10) {
+				return;
+			}
 			var componentArray = this.circuitDiagram.get_componentArray();
 			var _g1 = 0;
 			var _g = componentArray.length;
@@ -1387,6 +1388,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		if(this.object.component != null) {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.NORTH);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
+			this.circuitDiagram.linkArraySelfUpdate();
 			this.updateCanvas.update();
 		}
 	}
@@ -1394,6 +1396,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		if(this.object.component != null) {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.SOUTH);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
+			this.circuitDiagram.linkArraySelfUpdate();
 			this.updateCanvas.update();
 		}
 	}
@@ -1401,6 +1404,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		if(this.object.component != null) {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.WEST);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
+			this.circuitDiagram.linkArraySelfUpdate();
 			this.updateCanvas.update();
 		}
 	}
@@ -1408,10 +1412,12 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		if(this.object.component != null) {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.EAST);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
+			this.circuitDiagram.linkArraySelfUpdate();
 			this.updateCanvas.update();
 		}
 	}
 	,inputChange: function() {
+		var tmp = this.object.component != null;
 	}
 	,deleteObject: function() {
 		if(this.object.component != null) {
@@ -1656,6 +1662,15 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,updateComponent: function(component,index) {
 		this.componentArray[index] = component;
 	}
+	,linkArraySelfUpdate: function() {
+		var _g1 = 0;
+		var _g = this.linkArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.linkArray[i].get_leftEndpoint().updatePosition();
+			this.linkArray[i].get_rightEndpoint().updatePosition();
+		}
+	}
 	,__class__: com_mun_model_component_CircuitDiagram
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
@@ -1818,6 +1833,12 @@ com_mun_model_component_Endpoint.prototype = {
 	}
 	,set_port: function(value) {
 		return this.port = value;
+	}
+	,updatePosition: function() {
+		if(this.port != null) {
+			this.xPosition = this.port.get_xPosition();
+			this.yPosition = this.port.get_yPosition();
+		}
 	}
 	,__class__: com_mun_model_component_Endpoint
 };

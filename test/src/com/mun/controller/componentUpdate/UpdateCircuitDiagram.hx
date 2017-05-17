@@ -103,6 +103,12 @@ class UpdateCircuitDiagram {
             var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
             commandManager.execute(command);
             redrawCanvas();
+            //verify the right endpoint step into another component port or not
+
+            //in case of make two endpoint on one line get the same port
+            if(Math.abs(coordinate.xPosition - endpoint.get_xPosition()) < 10 || Math.abs(coordinate.yPosition - endpoint.get_yPosition()) < 10){
+                return;
+            }
 
             var componentArray:Array<Component> = circuitDiagram.get_componentArray();
             for(i in 0...componentArray.length){
