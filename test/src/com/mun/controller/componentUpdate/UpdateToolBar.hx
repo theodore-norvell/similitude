@@ -71,9 +71,10 @@ class UpdateToolBar {
     }
 
     public function inputChange(){
-        if(object.component != null){
-            object.component.set_name(nameInput.getAttribute("value"));
-        }
+
+//        if(object.component != null){
+//            object.component.set_name(nameInput.);
+//        }
     }
 
     public function deleteObject(){

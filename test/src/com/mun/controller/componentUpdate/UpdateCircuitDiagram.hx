@@ -16,6 +16,7 @@ import com.mun.model.component.Component;
 import com.mun.type.Type.Coordinate;
 
 //all of those imports below can not be deleted, because of using Type.resolveClass
+//include all of the class under com.mun.model.gates
 import com.mun.model.gates.AND;
 import com.mun.model.gates.FlipFlop;
 import com.mun.model.gates.Input;

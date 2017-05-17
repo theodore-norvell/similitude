@@ -33,14 +33,14 @@ class CanvasListener {
     public function getPointOnCanvas(canvas:CanvasElement, x:Float, y:Float) {
         var bbox = canvas.getBoundingClientRect();
         var coordinate:Coordinate = {"xPosition":0,"yPosition":0};
-        coordinate.xPosition = x - bbox.left * (canvas.width  / bbox.width);
-        coordinate.yPosition = y - bbox.top  * (canvas.height / bbox.height);
+        coordinate.xPosition = (x - bbox.left) * (canvas.width  / bbox.width);
+        coordinate.yPosition = (y - bbox.top)  * (canvas.height / bbox.height);
         return coordinate;
     }
 
     public function doClick(event:MouseEvent){
-        var x:Float = event.pageX;
-        var y:Float = event.pageY;
+        var x:Float = event.clientX;
+        var y:Float = event.clientY;
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
         object = updateCircuitDiagram.getComponent(mouseDownLocation);
         updateCircuitDiagram.hightLightObject(object);
@@ -53,8 +53,8 @@ class CanvasListener {
     }
 
     public function doMouseDown(event:MouseEvent){
-        var x:Float = event.pageX;
-        var y:Float = event.pageY;
+        var x:Float = event.clientX;
+        var y:Float = event.clientY;
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
         object = updateCircuitDiagram.getComponent(mouseDownLocation);
         mouseDownFlag = true;
@@ -64,8 +64,8 @@ class CanvasListener {
         }
     }
     public function doMouseMove(event:MouseEvent){
-        var x:Float = event.pageX;
-        var y:Float = event.pageY;
+        var x:Float = event.clientX;
+        var y:Float = event.clientY;
         var loc:Coordinate = getPointOnCanvas(canvas,x,y);
         if(mouseDownFlag == true){//mouse down efect
             //if mouse on the port, draw link or move endpoint

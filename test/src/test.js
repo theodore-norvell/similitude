@@ -1412,9 +1412,6 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		}
 	}
 	,inputChange: function() {
-		if(this.object.component != null) {
-			this.object.component.set_name(this.nameInput.getAttribute("value"));
-		}
 	}
 	,deleteObject: function() {
 		if(this.object.component != null) {
@@ -1509,13 +1506,13 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
-		coordinate.xPosition = x - bbox.left * (canvas.width / bbox.width);
-		coordinate.yPosition = y - bbox.top * (canvas.height / bbox.height);
+		coordinate.xPosition = (x - bbox.left) * (canvas.width / bbox.width);
+		coordinate.yPosition = (y - bbox.top) * (canvas.height / bbox.height);
 		return coordinate;
 	}
 	,doClick: function(event) {
-		var x = event.pageX;
-		var y = event.pageY;
+		var x = event.clientX;
+		var y = event.clientY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
 		this.updateCircuitDiagram.hightLightObject(this.object);
@@ -1527,8 +1524,8 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.doMouseUp(event);
 	}
 	,doMouseDown: function(event) {
-		var x = event.pageX;
-		var y = event.pageY;
+		var x = event.clientX;
+		var y = event.clientY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
 		this.mouseDownFlag = true;
@@ -1538,8 +1535,8 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		}
 	}
 	,doMouseMove: function(event) {
-		var x = event.pageX;
-		var y = event.pageY;
+		var x = event.clientX;
+		var y = event.clientY;
 		var loc = this.getPointOnCanvas(this.canvas,x,y);
 		if(this.mouseDownFlag == true) {
 			if(this.createLinkFlag) {

@@ -7,6 +7,7 @@ import com.mun.model.component.CircuitDiagram;
 import js.html.CanvasElement;
 import com.mun.view.drawComponents.DrawLink;
 //all of those imports below can not be deleted, because of using Type.resolveClass
+//include all of the class under com.mun.view.drawComponents
 import com.mun.view.drawComponents.DrawAND;
 import com.mun.view.drawComponents.DrawFlipFlop;
 import com.mun.view.drawComponents.DrawInput;
