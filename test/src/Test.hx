@@ -55,7 +55,7 @@ class Test {
         var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram,updateCanvas,updateToolBar);
 
         //add button click listener
-        new ButtonClick(drawingAdapter,updateCircuitDiagram);
+        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
         //add canvas listener
         new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
 

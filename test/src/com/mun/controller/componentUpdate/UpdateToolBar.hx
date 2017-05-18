@@ -1,6 +1,6 @@
 package com.mun.controller.componentUpdate;
 
-
+import js.jquery.JQuery;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.type.Type.Object;
@@ -35,10 +35,14 @@ class UpdateToolBar {
     public function update(object:Object){
         this.object = object;
         if(object.component != null){
-            nameInput.setAttribute("value",object.component.get_name());
-            orientation.setAttribute("value", object.component.get_orientation() + "");
+            setAttribute();
             visible();
         }
+    }
+
+    public function setAttribute(){
+        nameInput.setAttribute("value",object.component.get_name());
+        orientation.setAttribute("value", object.component.get_orientation() + "");
     }
 
     public function changeToNorth(){
@@ -46,6 +50,7 @@ class UpdateToolBar {
             object.component.set_orientation(Orientation.NORTH);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
             circuitDiagram.linkArraySelfUpdate();
+            setAttribute();
             updateCanvas.update();
         }
     }
@@ -54,6 +59,7 @@ class UpdateToolBar {
             object.component.set_orientation(Orientation.SOUTH);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
             circuitDiagram.linkArraySelfUpdate();
+            setAttribute();
             updateCanvas.update();
         }
     }
@@ -62,6 +68,7 @@ class UpdateToolBar {
             object.component.set_orientation(Orientation.WEST);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
             circuitDiagram.linkArraySelfUpdate();
+            setAttribute();
             updateCanvas.update();
         }
     }
@@ -70,6 +77,7 @@ class UpdateToolBar {
             object.component.set_orientation(Orientation.EAST);
             object.component.updateMoveComponentPortPosition(object.component.get_xPosition(),object.component.get_yPosition());
             circuitDiagram.linkArraySelfUpdate();
+            setAttribute();
             updateCanvas.update();
         }
     }
@@ -77,9 +85,8 @@ class UpdateToolBar {
     public function inputChange(){
 
         if(object.component != null){
-//            object.component.set_name(nameInput.);
-//            trace(new JQuery("#name_input").val());
-//            new JQuery("#name_input").val();
+            var temp:Dynamic = new JQuery(nameInput).val();
+            object.component.set_name(temp);
         }
     }
 

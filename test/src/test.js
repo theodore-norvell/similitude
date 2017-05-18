@@ -644,7 +644,7 @@ Test.main = function() {
 	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,drawingAdapter);
 	var updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(circuitDiagram,updateCanvas);
 	var updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(circuitDiagram,updateCanvas,updateToolBar);
-	new com_mun_controller_mouseAction_ButtonClick(drawingAdapter,updateCircuitDiagram);
+	new com_mun_controller_mouseAction_ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
 	new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
@@ -1303,33 +1303,51 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 			this.commandManager.execute(command);
 			this.redrawCanvas();
-			if(Math.abs(coordinate.xPosition - endpoint.get_xPosition()) < 10 || Math.abs(coordinate.yPosition - endpoint.get_yPosition()) < 10) {
-				return;
-			}
-			var componentArray = this.circuitDiagram.get_componentArray();
+			var port = null;
 			var _g1 = 0;
-			var _g = componentArray.length;
+			var _g = this.circuitDiagram.get_linkArray().length;
 			while(_g1 < _g) {
 				var i = _g1++;
-				var inportArray = componentArray[i].get_inportArray();
-				var _g3 = 0;
-				var _g2 = inportArray.length;
-				while(_g3 < _g2) {
-					var j = _g3++;
-					if(this.circuitDiagramUtil.isInCircle(coordinate,inportArray[j].get_xPosition(),inportArray[j].get_yPosition())) {
-						object.endPoint.set_port(inportArray[j]);
-						var command1 = new com_mun_controller_command_MoveCommand(object,inportArray[j].get_xPosition(),inportArray[j].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
-						this.commandManager.execute(command1);
-						this.redrawCanvas();
+				if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint) {
+					if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null) {
+						port = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
 					}
 				}
-				var outportArray = componentArray[i].get_outportArray();
+				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
+					if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null) {
+						port = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
+					}
+				}
+			}
+			haxe_Log.trace(port,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 122, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "moveEndpoint"});
+			var componentArray = this.circuitDiagram.get_componentArray();
+			var _g11 = 0;
+			var _g2 = componentArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				var inportArray = componentArray[i1].get_inportArray();
+				var _g3 = 0;
+				var _g21 = inportArray.length;
+				while(_g3 < _g21) {
+					var j = _g3++;
+					if(inportArray[i1] != port) {
+						if(this.circuitDiagramUtil.isInCircle(coordinate,inportArray[j].get_xPosition(),inportArray[j].get_yPosition())) {
+							object.endPoint.set_port(inportArray[j]);
+							object.endPoint.updatePosition();
+							var command1 = new com_mun_controller_command_MoveCommand(object,inportArray[j].get_xPosition(),inportArray[j].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+							this.commandManager.execute(command1);
+							this.redrawCanvas();
+						}
+					}
+				}
+				var outportArray = componentArray[i1].get_outportArray();
 				var _g31 = 0;
-				var _g21 = outportArray.length;
-				while(_g31 < _g21) {
+				var _g22 = outportArray.length;
+				while(_g31 < _g22) {
 					var j1 = _g31++;
 					if(this.circuitDiagramUtil.isInCircle(coordinate,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition())) {
 						object.endPoint.set_port(outportArray[j1]);
+						object.endPoint.updatePosition();
 						var command2 = new com_mun_controller_command_MoveCommand(object,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 						this.commandManager.execute(command2);
 						this.redrawCanvas();
@@ -1379,16 +1397,20 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,update: function(object) {
 		this.object = object;
 		if(object.component != null) {
-			this.nameInput.setAttribute("value",object.component.get_name());
-			this.orientation.setAttribute("value",Std.string(object.component.get_orientation()) + "");
+			this.setAttribute();
 			this.visible();
 		}
+	}
+	,setAttribute: function() {
+		this.nameInput.setAttribute("value",this.object.component.get_name());
+		this.orientation.setAttribute("value",Std.string(this.object.component.get_orientation()) + "");
 	}
 	,changeToNorth: function() {
 		if(this.object.component != null) {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.NORTH);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
 			this.circuitDiagram.linkArraySelfUpdate();
+			this.setAttribute();
 			this.updateCanvas.update();
 		}
 	}
@@ -1397,6 +1419,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.SOUTH);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
 			this.circuitDiagram.linkArraySelfUpdate();
+			this.setAttribute();
 			this.updateCanvas.update();
 		}
 	}
@@ -1405,6 +1428,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.WEST);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
 			this.circuitDiagram.linkArraySelfUpdate();
+			this.setAttribute();
 			this.updateCanvas.update();
 		}
 	}
@@ -1413,11 +1437,15 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 			this.object.component.set_orientation(com_mun_model_enumeration_Orientation.EAST);
 			this.object.component.updateMoveComponentPortPosition(this.object.component.get_xPosition(),this.object.component.get_yPosition());
 			this.circuitDiagram.linkArraySelfUpdate();
+			this.setAttribute();
 			this.updateCanvas.update();
 		}
 	}
 	,inputChange: function() {
-		var tmp = this.object.component != null;
+		if(this.object.component != null) {
+			var temp = $(this.nameInput).val();
+			this.object.component.set_name(temp);
+		}
 	}
 	,deleteObject: function() {
 		if(this.object.component != null) {
@@ -1436,9 +1464,10 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
-var com_mun_controller_mouseAction_ButtonClick = function(drawingAdapter,updateCircuitDiagram) {
+var com_mun_controller_mouseAction_ButtonClick = function(drawingAdapter,updateCircuitDiagram,pixelRatio) {
 	this.drawingAdapter = drawingAdapter;
 	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.pixelRatio = pixelRatio;
 	window.document.getElementById("AND").onclick = $bind(this,this.andOnClick);
 	window.document.getElementById("FlipFlop").onclick = $bind(this,this.flipFlopOnClick);
 	window.document.getElementById("INPUT").onclick = $bind(this,this.inputOnClick);
@@ -1455,35 +1484,36 @@ com_mun_controller_mouseAction_ButtonClick.__name__ = ["com","mun","controller",
 com_mun_controller_mouseAction_ButtonClick.prototype = {
 	drawingAdapter: null
 	,updateCircuitDiagram: null
+	,pixelRatio: null
 	,andOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("AND",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("AND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,flipFlopOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("FlipFlop",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("FlipFlop",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,inputOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("Input",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("Input",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,muxOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("MUX",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("MUX",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,nandOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("NAND",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("NAND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,norOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("NOR",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("NOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,notOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("NOT",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("NOT",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,orOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("OR",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("OR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,outputOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("Output",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("Output",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,xorOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("XOR",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.updateCircuitDiagram.createComponentByButton("XOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
 	}
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
@@ -5288,6 +5318,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 	}
 	return result;
 };
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
+};
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;
 haxe_io_FPHelper.__name__ = ["haxe","io","FPHelper"];
@@ -5900,6 +5939,40 @@ js_html_compat_Uint8Array._subarray = function(start,end) {
 	a.byteOffset = start;
 	return a;
 };
+var js_jquery_JqEltsIterator = function(j) {
+	this.i = 0;
+	this.j = j;
+};
+$hxClasses["js.jquery.JqEltsIterator"] = js_jquery_JqEltsIterator;
+js_jquery_JqEltsIterator.__name__ = ["js","jquery","JqEltsIterator"];
+js_jquery_JqEltsIterator.prototype = {
+	j: null
+	,i: null
+	,hasNext: function() {
+		return this.i < this.j.length;
+	}
+	,next: function() {
+		return $(this.j[this.i++]);
+	}
+	,__class__: js_jquery_JqEltsIterator
+};
+var js_jquery_JqIterator = function(j) {
+	this.i = 0;
+	this.j = j;
+};
+$hxClasses["js.jquery.JqIterator"] = js_jquery_JqIterator;
+js_jquery_JqIterator.__name__ = ["js","jquery","JqIterator"];
+js_jquery_JqIterator.prototype = {
+	j: null
+	,i: null
+	,hasNext: function() {
+		return this.i < this.j.length;
+	}
+	,next: function() {
+		return this.j[this.i++];
+	}
+	,__class__: js_jquery_JqIterator
+};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -5926,6 +5999,16 @@ if(ArrayBuffer.prototype.slice == null) {
 }
 var Float32Array = $global.Float32Array || js_html_compat_Float32Array._new;
 var Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
+if(typeof($) != "undefined" && $.fn != null) {
+	$.fn.elements = function() {
+		return new js_jquery_JqEltsIterator(this);
+	};
+}
+if(typeof($) != "undefined" && $.fn != null) {
+	$.fn.iterator = function() {
+		return new js_jquery_JqIterator(this);
+	};
+}
 StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
