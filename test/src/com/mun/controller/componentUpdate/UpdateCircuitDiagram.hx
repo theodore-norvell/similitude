@@ -61,7 +61,7 @@ class UpdateCircuitDiagram {
         if(object.component != null){
             var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
             commandManager.execute(command);
-            //those wires which link to this component should move either
+            //those wires which link to this component should move either, which automactilly completed while move endpoint
 
             redrawCanvas(object);
         }else {

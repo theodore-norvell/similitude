@@ -1,6 +1,5 @@
 package com.mun.controller.componentUpdate;
 
-import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
