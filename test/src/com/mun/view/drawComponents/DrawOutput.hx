@@ -6,11 +6,12 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 * draw output gate
 * @author wanhui
 **/
-class DrawOutput implements DrawComponent{
+class DrawOutput implements DrawComponent extends Constant{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
     public function new(component:Component, drawingAdapter:DrawingAdapterI) {
+        super();
         this.component = component;
         this.drawingAdapter = drawingAdapter;
     }
@@ -33,7 +34,7 @@ class DrawOutput implements DrawComponent{
             var port:Port = inportArray[i];
             //init set the radius is 2
             drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), 2);
+            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
         }
 
         //reset drawing parameter

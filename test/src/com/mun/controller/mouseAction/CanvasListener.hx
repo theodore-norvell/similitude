@@ -1,5 +1,8 @@
 package com.mun.controller.mouseAction;
 
+import com.mun.model.component.Port;
+import com.mun.model.component.Endpoint;
+import com.mun.model.component.Component;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Link;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
@@ -18,6 +21,9 @@ class CanvasListener {
     var link:Link;
     var createLinkFlag:Bool = false;
     var object:Object;
+    var component:Component;
+    var endpoint:Endpoint;
+    var port:Port;
 
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram, updateToolBar:UpdateToolBar) {
         this.canvas = canvas;
@@ -27,10 +33,9 @@ class CanvasListener {
         canvas.addEventListener("mousedown", doMouseDown,false);
         canvas.addEventListener("mousemove", doMouseMove,false);
         canvas.addEventListener("mouseup", doMouseUp,false);
-        canvas.addEventListener("click", doClick,false);
     }
 
-    public function getPointOnCanvas(canvas:CanvasElement, x:Float, y:Float) {
+    public function getPointOnCanvas(canvas:CanvasElement, x:Float, y:Float):Coordinate {
         var bbox = canvas.getBoundingClientRect();
         var coordinate:Coordinate = {"xPosition":0,"yPosition":0};
         coordinate.xPosition = (x - bbox.left) * (canvas.width  / bbox.width);
@@ -38,46 +43,56 @@ class CanvasListener {
         return coordinate;
     }
 
-    public function doClick(event:MouseEvent){
+    public function doMouseDown(event:MouseEvent){
+
+        //initialize object
+        object =  {"link":null,"component":null,"endPoint":null, "port":null};
+        doMouseUp(event);
+        //initial end
+
         var x:Float = event.clientX;
         var y:Float = event.clientY;
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
-        object = updateCircuitDiagram.getComponent(mouseDownLocation);
+        mouseDownFlag = true;//mouse down flag
+
+        //get the component or link on this mouse location
+        link = updateCircuitDiagram.getLink(mouseDownLocation);
+        object.link = link;
+        if(link == null){//if this mouse location on the link, should be select link first
+            component = updateCircuitDiagram.getComponent(mouseDownLocation);
+            object.component = component;
+        }
+
         updateCircuitDiagram.hightLightObject(object);
-        if(object.component != null){
+        if(object.component != null || object.link != null){
             updateToolBar.update(object);
         }else{
             updateToolBar.hidden();
         }
-        doMouseUp(event);
-    }
 
-    public function doMouseDown(event:MouseEvent){
-        var x:Float = event.clientX;
-        var y:Float = event.clientY;
-        mouseDownLocation = getPointOnCanvas(canvas,x,y);
-        object = updateCircuitDiagram.getComponent(mouseDownLocation);
-        mouseDownFlag = true;
-        if(updateCircuitDiagram.portAction(mouseDownLocation).port != null){
+        //if link has been selected, then prepare the endpoint
+        if(object.link != null){
+            endpoint = updateCircuitDiagram.getEndpoint(mouseDownLocation);
+            return;
+        }
+        if(link == null && updateCircuitDiagram.isOnPort(mouseDownLocation).port != null){
             link = updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
             createLinkFlag = true;
         }
     }
+
     public function doMouseMove(event:MouseEvent){
         var x:Float = event.clientX;
         var y:Float = event.clientY;
         var loc:Coordinate = getPointOnCanvas(canvas,x,y);
         if(mouseDownFlag == true){//mouse down efect
-            //if mouse on the port, draw link or move endpoint
-//            if(updateCircuitDiagram.portAction(loc).endPoint != null){
-            if(createLinkFlag){
+
+            if(createLinkFlag){//link has been created, so move this endpoint
                 //if the mouse position have a endpoint
                 updateCircuitDiagram.moveEndpoint(loc, link.get_rightEndpoint());
             }else{
-                //the mouse position does not have a endpoint
-                //but the endpoint has been created in the doMouseDown function
-                //if mouse not on the port, it is on the component
-                updateCircuitDiagram.moveComponent(object,loc);
+                //move component
+                updateCircuitDiagram.moveComponent(component,loc);
             }
 
         }
@@ -85,7 +100,9 @@ class CanvasListener {
     public function doMouseUp(event:MouseEvent){
         mouseDownFlag = false;
         link = null;
+        component = null;
+        endpoint = null;
+        port = null;
         createLinkFlag = false;
-        object = {"link":null,"component":null,"endPoint":null, "port":null};
     }
 }

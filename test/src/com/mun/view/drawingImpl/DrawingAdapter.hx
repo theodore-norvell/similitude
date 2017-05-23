@@ -18,7 +18,6 @@ class DrawingAdapter implements DrawingAdapterI {
     var lineWidth:Float = 1.0;//because the defalut line width is 1.0
     var font:String = "8px serif";//initial is 15
 
-
     public function new(cxt:CanvasRenderingContext2D) {
         this.cxt = cxt;
         worldToView = new WorldToView(1);
