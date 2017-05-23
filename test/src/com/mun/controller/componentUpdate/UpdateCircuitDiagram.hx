@@ -130,22 +130,27 @@ class UpdateCircuitDiagram {
                             var command:Command = new MoveCommand(object,inportArray[j].get_xPosition(), inportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
                             commandManager.execute(command);
                             redrawCanvas();
+                        }else{
+                            object.endPoint.set_port(null);
                         }
                     }
                 }
 
                 var outportArray:Array<Port> = componentArray[i].get_outportArray();
                 for(j in 0...outportArray.length){
-                    if(circuitDiagramUtil.isInCircle(coordinate, outportArray[j].get_xPosition(), outportArray[j].get_yPosition())){
-                        object.endPoint.set_port(outportArray[j]);
-                        object.endPoint.updatePosition();
-                        var command:Command = new MoveCommand(object,outportArray[j].get_xPosition(), outportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
-                        commandManager.execute(command);
-                        redrawCanvas();
+                    if(outportArray[i] != port){//exclude the same port
+                        if(circuitDiagramUtil.isInCircle(coordinate, outportArray[j].get_xPosition(), outportArray[j].get_yPosition())){
+                            object.endPoint.set_port(outportArray[j]);
+                            object.endPoint.updatePosition();
+                            var command:Command = new MoveCommand(object,outportArray[j].get_xPosition(), outportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+                            commandManager.execute(command);
+                            redrawCanvas();
+                        }else{
+                            object.endPoint.set_port(null);
+                        }
                     }
                 }
             }
-
         }
     }
 

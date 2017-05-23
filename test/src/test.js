@@ -1309,7 +1309,6 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 		while(_g11 < _g2) {
 			var i1 = _g11++;
 			var drawComponent1 = new com_mun_view_drawComponents_DrawLink(this.circuit.get_linkArray()[i1],this.drawingAdapter);
-			haxe_Log.trace(this.circuit.get_linkArray()[i1],{ fileName : "UpdateCanvas.hx", lineNumber : 53, className : "com.mun.controller.componentUpdate.UpdateCanvas", methodName : "update"});
 			if(object != null && object.link != null && object.link == this.circuit.get_linkArray()[i1]) {
 				drawComponent1.drawCorrespondingComponent("red");
 			} else {
@@ -1364,6 +1363,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			var rightEndpoint = new com_mun_model_component_Endpoint(object.port.get_xPosition(),object.port.get_yPosition());
 			var link = new com_mun_model_component_Link(leftEndpoint,rightEndpoint);
 			link.get_leftEndpoint().set_port(object.port);
+			link.get_rightEndpoint().set_port(null);
 			object.link = link;
 			object.endPoint = null;
 		} else {
@@ -1416,6 +1416,8 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 							var command1 = new com_mun_controller_command_MoveCommand(object,inportArray[j].get_xPosition(),inportArray[j].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 							this.commandManager.execute(command1);
 							this.redrawCanvas();
+						} else {
+							object.endPoint.set_port(null);
 						}
 					}
 				}
@@ -1424,12 +1426,16 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 				var _g22 = outportArray.length;
 				while(_g31 < _g22) {
 					var j1 = _g31++;
-					if(this.circuitDiagramUtil.isInCircle(coordinate,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition())) {
-						object.endPoint.set_port(outportArray[j1]);
-						object.endPoint.updatePosition();
-						var command2 = new com_mun_controller_command_MoveCommand(object,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
-						this.commandManager.execute(command2);
-						this.redrawCanvas();
+					if(outportArray[i1] != port) {
+						if(this.circuitDiagramUtil.isInCircle(coordinate,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition())) {
+							object.endPoint.set_port(outportArray[j1]);
+							object.endPoint.updatePosition();
+							var command2 = new com_mun_controller_command_MoveCommand(object,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+							this.commandManager.execute(command2);
+							this.redrawCanvas();
+						} else {
+							object.endPoint.set_port(null);
+						}
 					}
 				}
 			}
@@ -1958,7 +1964,6 @@ com_mun_model_component_Endpoint.prototype = {
 		return this.port = value;
 	}
 	,updatePosition: function() {
-		haxe_Log.trace(this.port,{ fileName : "Endpoint.hx", lineNumber : 49, className : "com.mun.model.component.Endpoint", methodName : "updatePosition"});
 		if(this.port != null) {
 			this.xPosition = this.port.get_xPosition();
 			this.yPosition = this.port.get_yPosition();
@@ -5450,15 +5455,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;
