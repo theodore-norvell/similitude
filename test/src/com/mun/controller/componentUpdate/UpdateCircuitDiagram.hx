@@ -57,31 +57,30 @@ class UpdateCircuitDiagram {
         updateToolBar.update(object);
         hightLightObject(object);
     }
-    public function moveComponent(object:Object, coordinate:Coordinate){
-        if(object.component != null){
-            var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
-            commandManager.execute(command);
-            //those wires which link to this component should move either, which automactilly completed while move endpoint
+    public function moveComponent(component:Component, coordinate:Coordinate){
+        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
+        var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
+        commandManager.execute(command);
+        //those wires which link to this component should move either, which automactilly completed while move endpoint
+        redrawCanvas(object);
+    }
 
-            redrawCanvas(object);
-        }else {
-            if(object.endPoint != null){
+    public function moveLink(link:Link, coordinate:Coordinate){
+        var intersectionPoint:Coordinate = circuitDiagramUtil.getPointOnTheIntersectionOfLine(link, coordinate);
 
-            }else if(object.link != null){
-
-            }
-        }
-
+        var xDispacement:Float = coordinate.xPosition - intersectionPoint.xPosition;
+        var yDispacement:Float = coordinate.yPosition - intersectionPoint.yPosition;
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
         var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
-        object = portAction(coordinateFrom);
+        object = isOnPort(coordinateFrom);
         if(object.port != null){
             var leftEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
             var rightEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
             var link:Link = new Link(leftEndpoint,rightEndpoint);
             link.get_leftEndpoint().set_port(object.port);
+            link.get_rightEndpoint().set_port(null);
             object.link = link;
             object.endPoint = null;
         }else{
@@ -150,15 +149,23 @@ class UpdateCircuitDiagram {
         }
     }
 
-    public function getComponent(coordinate:Coordinate):Object{
+    public function getEndpoint(coordinate:Coordinate):Endpoint{
+        return circuitDiagramUtil.pointOnEndpoint(coordinate);
+    }
+
+    public function getComponent(coordinate:Coordinate):Component{
         return circuitDiagramUtil.isInComponent(coordinate);
+    }
+
+    public function getLink(coordinate:Coordinate):Link{
+        return circuitDiagramUtil.isOnLink(coordinate);
     }
 
     public function hightLightObject(object:Object){
         redrawCanvas(object);
     }
 
-    public function portAction(coordinate:Coordinate):Object{
+    public function isOnPort(coordinate:Coordinate):Object{
         return circuitDiagramUtil.isOnPort(coordinate);
     }
 

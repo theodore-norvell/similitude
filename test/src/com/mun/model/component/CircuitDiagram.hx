@@ -106,8 +106,8 @@ class CircuitDiagram {
         }
     }
 
-    public function updateComponent(component:Component, index:Int){
-        componentArray[index] = component;
+    public function updateComponent(component:Component){
+        componentArray[componentArray.indexOf(component)] = component;
     }
 
     /**

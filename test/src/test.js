@@ -1022,7 +1022,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
 			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.newXPosition);
 			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.newYPosition);
-			this.circuitDiagram.updateComponent(this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition),index);
+			this.circuitDiagram.updateComponent(this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition));
 			var _g1 = 0;
 			var _g = this.circuitDiagram.get_linkArray().length;
 			while(_g1 < _g) {
@@ -1116,17 +1116,94 @@ $hxClasses["com.mun.controller.componentUpdate.CircuitDiagramUtil"] = com_mun_co
 com_mun_controller_componentUpdate_CircuitDiagramUtil.__name__ = ["com","mun","controller","componentUpdate","CircuitDiagramUtil"];
 com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 	circuitDiagram: null
-	,isInComponent: function(cooridnate) {
+	,isInComponent: function(coordinate) {
+		var component = null;
 		var i = this.circuitDiagram.get_componentArray().length - 1;
-		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 		while(i >= 0) {
-			if(this.isInScope(this.circuitDiagram.get_componentArray()[i].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_yPosition(),cooridnate.xPosition,cooridnate.yPosition,this.circuitDiagram.get_componentArray()[i].get_height(),this.circuitDiagram.get_componentArray()[i].get_width()) == true) {
-				object.component = this.circuitDiagram.get_componentArray()[i];
-				return object;
+			if(this.isInScope(this.circuitDiagram.get_componentArray()[i].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_yPosition(),coordinate.xPosition,coordinate.yPosition,this.circuitDiagram.get_componentArray()[i].get_height(),this.circuitDiagram.get_componentArray()[i].get_width()) == true) {
+				return this.circuitDiagram.get_componentArray()[i];
 			}
 			--i;
 		}
-		return object;
+		return component;
+	}
+	,isOnLink: function(coordinate) {
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_linkArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var leftEndpoint = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
+			var rightEndpoint = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+			if(this.pointToLine(leftEndpoint.get_xPosition(),leftEndpoint.get_yPosition(),rightEndpoint.get_xPosition(),rightEndpoint.get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
+				var theDistanaceToLeftEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition()),2));
+				var theDistanceToRightEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition()),2));
+				if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint) {
+					if(theDistanceToRightEndpoint >= 5) {
+						return this.circuitDiagram.get_linkArray()[i];
+					}
+				} else if(theDistanaceToLeftEndpoint >= 5) {
+					return this.circuitDiagram.get_linkArray()[i];
+				}
+			}
+		}
+		return null;
+	}
+	,pointToLine: function(x1,y1,x2,y2,x0,y0) {
+		var space = 0;
+		var a;
+		var b;
+		var c;
+		a = this.pointsDistance(x1,y1,x2,y2);
+		b = this.pointsDistance(x1,y1,x0,y0);
+		c = this.pointsDistance(x2,y2,x0,y0);
+		if(c + b == a) {
+			space = 0;
+			return space;
+		}
+		if(a <= 0.00001) {
+			space = b;
+			return space;
+		}
+		if(c * c > a * a + b * b) {
+			space = b;
+			return space;
+		}
+		if(b * b >= a * a + c * c) {
+			space = c;
+			return space;
+		}
+		var p = (a + b + c) / 2;
+		var s = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+		space = 2 * s / a;
+		return space;
+	}
+	,pointsDistance: function(x1,y1,x2,y2) {
+		var lineLength = 0;
+		lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+		return lineLength;
+	}
+	,getPointOnTheIntersectionOfLine: function(link,coordinate) {
+		var a = (link.get_leftEndpoint().get_yPosition() - link.get_rightEndpoint().get_yPosition()) / (link.get_leftEndpoint().get_xPosition() - link.get_rightEndpoint().get_xPosition());
+		var b = link.get_leftEndpoint().get_yPosition() - a * link.get_leftEndpoint().get_yPosition();
+		var m = coordinate.xPosition + a * coordinate.yPosition;
+		var coordinate_new = { "xPosition" : 0, "yPosition" : 0};
+		coordinate_new.xPosition = (m - a * b) / (a * a + 1);
+		coordinate_new.yPosition = a * coordinate.xPosition + b;
+		return coordinate_new;
+	}
+	,pointOnEndpoint: function(coordinate) {
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_linkArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
+				return this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
+			}
+			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
+				return this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+			}
+		}
+		return null;
 	}
 	,isOnPort: function(cooridnate) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
@@ -1232,6 +1309,7 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 		while(_g11 < _g2) {
 			var i1 = _g11++;
 			var drawComponent1 = new com_mun_view_drawComponents_DrawLink(this.circuit.get_linkArray()[i1],this.drawingAdapter);
+			haxe_Log.trace(this.circuit.get_linkArray()[i1],{ fileName : "UpdateCanvas.hx", lineNumber : 53, className : "com.mun.controller.componentUpdate.UpdateCanvas", methodName : "update"});
 			if(object != null && object.link != null && object.link == this.circuit.get_linkArray()[i1]) {
 				drawComponent1.drawCorrespondingComponent("red");
 			} else {
@@ -1267,18 +1345,20 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.updateToolBar.update(object);
 		this.hightLightObject(object);
 	}
-	,moveComponent: function(object,coordinate) {
-		if(object.component != null) {
-			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
-			this.commandManager.execute(command);
-			this.redrawCanvas(object);
-		} else if(object.endPoint == null) {
-			var tmp = object.link != null;
-		}
+	,moveComponent: function(component,coordinate) {
+		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
+		var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
+		this.commandManager.execute(command);
+		this.redrawCanvas(object);
+	}
+	,moveLink: function(link,coordinate) {
+		var intersectionPoint = this.circuitDiagramUtil.getPointOnTheIntersectionOfLine(link,coordinate);
+		var xDispacement = coordinate.xPosition - intersectionPoint.xPosition;
+		var yDispacement = coordinate.yPosition - intersectionPoint.yPosition;
 	}
 	,addLink: function(coordinateFrom,coordinateTo) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
-		object = this.portAction(coordinateFrom);
+		object = this.isOnPort(coordinateFrom);
 		if(object.port != null) {
 			var leftEndpoint = new com_mun_model_component_Endpoint(object.port.get_xPosition(),object.port.get_yPosition());
 			var rightEndpoint = new com_mun_model_component_Endpoint(object.port.get_xPosition(),object.port.get_yPosition());
@@ -1319,7 +1399,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 					}
 				}
 			}
-			haxe_Log.trace(port,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 122, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "moveEndpoint"});
 			var componentArray = this.circuitDiagram.get_componentArray();
 			var _g11 = 0;
 			var _g2 = componentArray.length;
@@ -1356,13 +1435,19 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			}
 		}
 	}
+	,getEndpoint: function(coordinate) {
+		return this.circuitDiagramUtil.pointOnEndpoint(coordinate);
+	}
 	,getComponent: function(coordinate) {
 		return this.circuitDiagramUtil.isInComponent(coordinate);
+	}
+	,getLink: function(coordinate) {
+		return this.circuitDiagramUtil.isOnLink(coordinate);
 	}
 	,hightLightObject: function(object) {
 		this.redrawCanvas(object);
 	}
-	,portAction: function(coordinate) {
+	,isOnPort: function(coordinate) {
 		return this.circuitDiagramUtil.isOnPort(coordinate);
 	}
 	,redrawCanvas: function(object) {
@@ -1526,7 +1611,6 @@ var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircui
 	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
-	canvas.addEventListener("click",$bind(this,this.doClick),false);
 };
 $hxClasses["com.mun.controller.mouseAction.CanvasListener"] = com_mun_controller_mouseAction_CanvasListener;
 com_mun_controller_mouseAction_CanvasListener.__name__ = ["com","mun","controller","mouseAction","CanvasListener"];
@@ -1539,6 +1623,9 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,link: null
 	,createLinkFlag: null
 	,object: null
+	,component: null
+	,endpoint: null
+	,port: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
@@ -1546,26 +1633,30 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		coordinate.yPosition = (y - bbox.top) * (canvas.height / bbox.height);
 		return coordinate;
 	}
-	,doClick: function(event) {
+	,doMouseDown: function(event) {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		this.doMouseUp(event);
 		var x = event.clientX;
 		var y = event.clientY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
-		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
+		this.mouseDownFlag = true;
+		this.link = this.updateCircuitDiagram.getLink(this.mouseDownLocation);
+		this.object.link = this.link;
+		if(this.link == null) {
+			this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
+			this.object.component = this.component;
+		}
 		this.updateCircuitDiagram.hightLightObject(this.object);
-		if(this.object.component != null) {
+		if(this.object.component != null || this.object.link != null) {
 			this.updateToolBar.update(this.object);
 		} else {
 			this.updateToolBar.hidden();
 		}
-		this.doMouseUp(event);
-	}
-	,doMouseDown: function(event) {
-		var x = event.clientX;
-		var y = event.clientY;
-		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
-		this.object = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
-		this.mouseDownFlag = true;
-		if(this.updateCircuitDiagram.portAction(this.mouseDownLocation).port != null) {
+		if(this.object.link != null) {
+			this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
+			return;
+		}
+		if(this.link == null && this.updateCircuitDiagram.isOnPort(this.mouseDownLocation).port != null) {
 			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
 			this.createLinkFlag = true;
 		}
@@ -1578,15 +1669,17 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 			if(this.createLinkFlag) {
 				this.updateCircuitDiagram.moveEndpoint(loc,this.link.get_rightEndpoint());
 			} else {
-				this.updateCircuitDiagram.moveComponent(this.object,loc);
+				this.updateCircuitDiagram.moveComponent(this.component,loc);
 			}
 		}
 	}
 	,doMouseUp: function(event) {
 		this.mouseDownFlag = false;
 		this.link = null;
+		this.component = null;
+		this.endpoint = null;
+		this.port = null;
 		this.createLinkFlag = false;
-		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 	}
 	,__class__: com_mun_controller_mouseAction_CanvasListener
 };
@@ -1689,8 +1782,8 @@ com_mun_model_component_CircuitDiagram.prototype = {
 			}
 		}
 	}
-	,updateComponent: function(component,index) {
-		this.componentArray[index] = component;
+	,updateComponent: function(component) {
+		this.componentArray[this.componentArray.indexOf(component)] = component;
 	}
 	,linkArraySelfUpdate: function() {
 		var _g1 = 0;
@@ -1865,6 +1958,7 @@ com_mun_model_component_Endpoint.prototype = {
 		return this.port = value;
 	}
 	,updatePosition: function() {
+		haxe_Log.trace(this.port,{ fileName : "Endpoint.hx", lineNumber : 49, className : "com.mun.model.component.Endpoint", methodName : "updatePosition"});
 		if(this.port != null) {
 			this.xPosition = this.port.get_xPosition();
 			this.yPosition = this.port.get_yPosition();
@@ -3471,6 +3565,22 @@ com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 	}
 	,__class__: com_mun_model_gates_XOR
 });
+var com_mun_view_drawComponents_Constant = function() {
+	this.portRadius = 4;
+};
+$hxClasses["com.mun.view.drawComponents.Constant"] = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_Constant.__name__ = ["com","mun","view","drawComponents","Constant"];
+com_mun_view_drawComponents_Constant.prototype = {
+	portRadius: null
+	,get_portRadius: function() {
+		return this.portRadius;
+	}
+	,set_portRadius: function(value) {
+		return this.portRadius = value;
+	}
+	,__class__: com_mun_view_drawComponents_Constant
+	,__properties__: {set_portRadius:"set_portRadius",get_portRadius:"get_portRadius"}
+};
 var com_mun_view_drawComponents_DrawComponent = function() { };
 $hxClasses["com.mun.view.drawComponents.DrawComponent"] = com_mun_view_drawComponents_DrawComponent;
 com_mun_view_drawComponents_DrawComponent.__name__ = ["com","mun","view","drawComponents","DrawComponent"];
@@ -3479,13 +3589,15 @@ com_mun_view_drawComponents_DrawComponent.prototype = {
 	,__class__: com_mun_view_drawComponents_DrawComponent
 };
 var com_mun_view_drawComponents_DrawAND = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawAND"] = com_mun_view_drawComponents_DrawAND;
 com_mun_view_drawComponents_DrawAND.__name__ = ["com","mun","view","drawComponents","DrawAND"];
 com_mun_view_drawComponents_DrawAND.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawAND.prototype = {
+com_mun_view_drawComponents_DrawAND.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawAND.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3501,7 +3613,7 @@ com_mun_view_drawComponents_DrawAND.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		var outportArray = this.component.get_outportArray();
 		var _g11 = 0;
@@ -3510,20 +3622,22 @@ com_mun_view_drawComponents_DrawAND.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawAND
-};
+});
 var com_mun_view_drawComponents_DrawFlipFlop = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawFlipFlop"] = com_mun_view_drawComponents_DrawFlipFlop;
 com_mun_view_drawComponents_DrawFlipFlop.__name__ = ["com","mun","view","drawComponents","DrawFlipFlop"];
 com_mun_view_drawComponents_DrawFlipFlop.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawFlipFlop.prototype = {
+com_mun_view_drawComponents_DrawFlipFlop.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawFlipFlop.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3540,7 +3654,7 @@ com_mun_view_drawComponents_DrawFlipFlop.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 			var _g2 = this.component.get_orientation();
 			switch(_g2[1]) {
 			case 0:
@@ -3580,7 +3694,7 @@ com_mun_view_drawComponents_DrawFlipFlop.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 			var _g21 = this.component.get_orientation();
 			switch(_g21[1]) {
 			case 0:
@@ -3616,15 +3730,17 @@ com_mun_view_drawComponents_DrawFlipFlop.prototype = {
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawFlipFlop
-};
+});
 var com_mun_view_drawComponents_DrawInput = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawInput"] = com_mun_view_drawComponents_DrawInput;
 com_mun_view_drawComponents_DrawInput.__name__ = ["com","mun","view","drawComponents","DrawInput"];
 com_mun_view_drawComponents_DrawInput.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawInput.prototype = {
+com_mun_view_drawComponents_DrawInput.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawInput.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3642,20 +3758,22 @@ com_mun_view_drawComponents_DrawInput.prototype = {
 			var i = _g1++;
 			var port = outportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawInput
-};
+});
 var com_mun_view_drawComponents_DrawLink = function(link,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.link = link;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawLink"] = com_mun_view_drawComponents_DrawLink;
 com_mun_view_drawComponents_DrawLink.__name__ = ["com","mun","view","drawComponents","DrawLink"];
 com_mun_view_drawComponents_DrawLink.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawLink.prototype = {
+com_mun_view_drawComponents_DrawLink.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawLink.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,link: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3666,15 +3784,17 @@ com_mun_view_drawComponents_DrawLink.prototype = {
 		this.drawingAdapter.drawLine(this.link.get_leftEndpoint().get_xPosition(),this.link.get_leftEndpoint().get_yPosition(),this.link.get_rightEndpoint().get_xPosition(),this.link.get_rightEndpoint().get_yPosition());
 	}
 	,__class__: com_mun_view_drawComponents_DrawLink
-};
+});
 var com_mun_view_drawComponents_DrawMUX = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawMUX"] = com_mun_view_drawComponents_DrawMUX;
 com_mun_view_drawComponents_DrawMUX.__name__ = ["com","mun","view","drawComponents","DrawMUX"];
 com_mun_view_drawComponents_DrawMUX.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawMUX.prototype = {
+com_mun_view_drawComponents_DrawMUX.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawMUX.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3692,7 +3812,7 @@ com_mun_view_drawComponents_DrawMUX.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 			this.drawingAdapter.setTextColor("black");
 			var _g2 = this.component.get_orientation();
 			switch(_g2[1]) {
@@ -3733,19 +3853,22 @@ com_mun_view_drawComponents_DrawMUX.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawMUX
-};
+});
 var com_mun_view_drawComponents_DrawNAND = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawNAND"] = com_mun_view_drawComponents_DrawNAND;
 com_mun_view_drawComponents_DrawNAND.__name__ = ["com","mun","view","drawComponents","DrawNAND"];
-com_mun_view_drawComponents_DrawNAND.prototype = {
+com_mun_view_drawComponents_DrawNAND.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawNAND.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawNAND.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3761,7 +3884,7 @@ com_mun_view_drawComponents_DrawNAND.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		var outportArray = this.component.get_outportArray();
 		var _g11 = 0;
@@ -3770,20 +3893,22 @@ com_mun_view_drawComponents_DrawNAND.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawNAND
-};
+});
 var com_mun_view_drawComponents_DrawNOR = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawNOR"] = com_mun_view_drawComponents_DrawNOR;
 com_mun_view_drawComponents_DrawNOR.__name__ = ["com","mun","view","drawComponents","DrawNOR"];
 com_mun_view_drawComponents_DrawNOR.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawNOR.prototype = {
+com_mun_view_drawComponents_DrawNOR.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawNOR.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3799,7 +3924,7 @@ com_mun_view_drawComponents_DrawNOR.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		var outportArray = this.component.get_outportArray();
 		var _g11 = 0;
@@ -3808,20 +3933,22 @@ com_mun_view_drawComponents_DrawNOR.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawNOR
-};
+});
 var com_mun_view_drawComponents_DrawNOT = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawNOT"] = com_mun_view_drawComponents_DrawNOT;
 com_mun_view_drawComponents_DrawNOT.__name__ = ["com","mun","view","drawComponents","DrawNOT"];
 com_mun_view_drawComponents_DrawNOT.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawNOT.prototype = {
+com_mun_view_drawComponents_DrawNOT.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawNOT.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3837,7 +3964,7 @@ com_mun_view_drawComponents_DrawNOT.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		var outportArray = this.component.get_outportArray();
 		var _g11 = 0;
@@ -3846,20 +3973,22 @@ com_mun_view_drawComponents_DrawNOT.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawNOT
-};
+});
 var com_mun_view_drawComponents_DrawOR = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawOR"] = com_mun_view_drawComponents_DrawOR;
 com_mun_view_drawComponents_DrawOR.__name__ = ["com","mun","view","drawComponents","DrawOR"];
 com_mun_view_drawComponents_DrawOR.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawOR.prototype = {
+com_mun_view_drawComponents_DrawOR.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawOR.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3875,7 +4004,7 @@ com_mun_view_drawComponents_DrawOR.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		var outportArray = this.component.get_outportArray();
 		var _g11 = 0;
@@ -3884,20 +4013,22 @@ com_mun_view_drawComponents_DrawOR.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawOR
-};
+});
 var com_mun_view_drawComponents_DrawOutput = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawOutput"] = com_mun_view_drawComponents_DrawOutput;
 com_mun_view_drawComponents_DrawOutput.__name__ = ["com","mun","view","drawComponents","DrawOutput"];
 com_mun_view_drawComponents_DrawOutput.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawOutput.prototype = {
+com_mun_view_drawComponents_DrawOutput.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawOutput.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3915,20 +4046,22 @@ com_mun_view_drawComponents_DrawOutput.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawOutput
-};
+});
 var com_mun_view_drawComponents_DrawXOR = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 };
 $hxClasses["com.mun.view.drawComponents.DrawXOR"] = com_mun_view_drawComponents_DrawXOR;
 com_mun_view_drawComponents_DrawXOR.__name__ = ["com","mun","view","drawComponents","DrawXOR"];
 com_mun_view_drawComponents_DrawXOR.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
-com_mun_view_drawComponents_DrawXOR.prototype = {
+com_mun_view_drawComponents_DrawXOR.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawXOR.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
 	drawingAdapter: null
 	,component: null
 	,drawCorrespondingComponent: function(strokeColor) {
@@ -3944,7 +4077,7 @@ com_mun_view_drawComponents_DrawXOR.prototype = {
 			var i = _g1++;
 			var port = inportArray[i];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
 		var outportArray = this.component.get_outportArray();
 		var _g11 = 0;
@@ -3953,12 +4086,12 @@ com_mun_view_drawComponents_DrawXOR.prototype = {
 			var i1 = _g11++;
 			var port1 = outportArray[i1];
 			this.drawingAdapter.setFillColor("black");
-			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),2);
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawXOR
-};
+});
 var com_mun_view_drawingImpl_Box = function(x_position,y_position,width,height,orientation,worldToView) {
 	var x0 = worldToView.convertX(x_position - width / 2);
 	var y0 = worldToView.convertY(y_position - height / 2);

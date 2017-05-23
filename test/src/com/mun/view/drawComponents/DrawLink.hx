@@ -5,11 +5,12 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 /**
 * draw link
 **/
-class DrawLink implements DrawComponent{
+class DrawLink implements DrawComponent extends Constant{
     var drawingAdapter:DrawingAdapterI;
     var link:Link;
 
     public function new(link:Link, drawingAdapter:DrawingAdapterI) {
+        super();
         this.link = link;
         this.drawingAdapter = drawingAdapter;
     }
