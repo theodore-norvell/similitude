@@ -45,8 +45,8 @@ class MoveCommand implements Command {
             var yDifference:Float = newYPosition - oldYPosition;
 
             var index = circuitDiagram.get_linkArray().indexOf(link);
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_xPosition(link.get_leftEndpoint().get_xPosition() - xDifference);
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_yPosition(link.get_leftEndpoint().get_yPosition() - yDifference);
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_xPosition(link.get_leftEndpoint().get_xPosition());
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_yPosition(link.get_leftEndpoint().get_yPosition());
             circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_xPosition(link.get_rightEndpoint().get_xPosition() - xDifference);
             circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_yPosition(link.get_rightEndpoint().get_yPosition() - yDifference);
         }
@@ -91,13 +91,9 @@ class MoveCommand implements Command {
                 }
                 for(j in 0...component.get_outportArray().length){
                     if(component.get_outportArray()[j] == circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()){
-//                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
-//                        circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
                         circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
                     }
                     if(component.get_outportArray()[j] == circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()){
-//                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(component.get_outportArray()[j].get_xPosition());
-//                        circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(component.get_outportArray()[j].get_yPosition());
                         circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
                     }
                 }
@@ -105,14 +101,17 @@ class MoveCommand implements Command {
         }
 
         if (link != null) {
-            var xDifference:Float = newXPosition - oldXPosition;
-            var yDifference:Float = newYPosition - oldYPosition;
 
             var index = circuitDiagram.get_linkArray().indexOf(link);
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_xPosition(link.get_leftEndpoint().get_xPosition() + xDifference);
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_yPosition(link.get_leftEndpoint().get_yPosition() + yDifference);
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_xPosition(link.get_rightEndpoint().get_xPosition() + xDifference);
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_yPosition(link.get_rightEndpoint().get_yPosition() + yDifference);
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_xPosition(newXPosition);
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_yPosition(newYPosition);
+
+            var xDisplacement:Float = newXPosition - oldXPosition;
+            var yDisplacement:Float = newYPosition - oldYPosition;
+//            trace(xDisplacement + "              " + yDisplacement);
+
+            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_xPosition(link.get_rightEndpoint().get_xPosition() + xDisplacement);
+            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_yPosition(link.get_rightEndpoint().get_yPosition() + yDisplacement);
         }
 
         if (endpoint != null) {

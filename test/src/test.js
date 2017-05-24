@@ -991,8 +991,8 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var xDifference = this.newXPosition - this.oldXPosition;
 			var yDifference = this.newYPosition - this.oldYPosition;
 			var index1 = this.circuitDiagram.get_linkArray().indexOf(this.link);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition() - xDifference);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.link.get_leftEndpoint().get_yPosition() - yDifference);
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition());
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.link.get_leftEndpoint().get_yPosition());
 			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() - xDifference);
 			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() - yDifference);
 		}
@@ -1054,13 +1054,13 @@ com_mun_controller_command_MoveCommand.prototype = {
 			}
 		}
 		if(this.link != null) {
-			var xDifference = this.newXPosition - this.oldXPosition;
-			var yDifference = this.newYPosition - this.oldYPosition;
 			var index1 = this.circuitDiagram.get_linkArray().indexOf(this.link);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition() + xDifference);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.link.get_leftEndpoint().get_yPosition() + yDifference);
-			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() + xDifference);
-			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() + yDifference);
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.newXPosition);
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.newYPosition);
+			var xDisplacement = this.newXPosition - this.oldXPosition;
+			var yDisplacement = this.newYPosition - this.oldYPosition;
+			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() + xDisplacement);
+			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() + yDisplacement);
 		}
 		if(this.endpoint != null) {
 			var _g11 = 0;
@@ -1181,15 +1181,6 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		var lineLength = 0;
 		lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 		return lineLength;
-	}
-	,getPointOnTheIntersectionOfLine: function(link,coordinate) {
-		var a = (link.get_leftEndpoint().get_yPosition() - link.get_rightEndpoint().get_yPosition()) / (link.get_leftEndpoint().get_xPosition() - link.get_rightEndpoint().get_xPosition());
-		var b = link.get_leftEndpoint().get_yPosition() - a * link.get_leftEndpoint().get_yPosition();
-		var m = coordinate.xPosition + a * coordinate.yPosition;
-		var coordinate_new = { "xPosition" : 0, "yPosition" : 0};
-		coordinate_new.xPosition = (m - a * b) / (a * a + 1);
-		coordinate_new.yPosition = a * coordinate.xPosition + b;
-		return coordinate_new;
 	}
 	,pointOnEndpoint: function(coordinate) {
 		var _g1 = 0;
@@ -1344,16 +1335,42 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.updateToolBar.update(object);
 		this.hightLightObject(object);
 	}
-	,moveComponent: function(component,coordinate) {
+	,moveComponent: function(component,coordinate,mouseDownLocation) {
 		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
-		var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
+		var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
+		var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
+		var command = new com_mun_controller_command_MoveCommand(object,object.component.get_xPosition() + xMoveDistance,object.component.get_yPosition() + yMoveDistance,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
 		this.commandManager.execute(command);
 		this.redrawCanvas(object);
 	}
-	,moveLink: function(link,coordinate) {
-		var intersectionPoint = this.circuitDiagramUtil.getPointOnTheIntersectionOfLine(link,coordinate);
-		var xDispacement = coordinate.xPosition - intersectionPoint.xPosition;
-		var yDispacement = coordinate.yPosition - intersectionPoint.yPosition;
+	,moveLink: function(link,coordinate,mouseDownLocation) {
+		var object = { "link" : link, "component" : null, "endPoint" : null, "port" : null};
+		var xDisplacement = mouseDownLocation.xPosition - coordinate.xPosition;
+		var yDisplacement = mouseDownLocation.yPosition - coordinate.yPosition;
+		var command = new com_mun_controller_command_MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement,link.get_leftEndpoint().get_yPosition() - yDisplacement,link.get_leftEndpoint().get_xPosition(),link.get_leftEndpoint().get_yPosition(),this.circuitDiagram);
+		this.commandManager.execute(command);
+		var index = this.circuitDiagram.get_linkArray().indexOf(link);
+		var leftEndpointCoordinate = { "xPosition" : this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(), "yPosition" : this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
+		var port_temp = this.isOnPort(leftEndpointCoordinate).port;
+		var leftEndpointPort = this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
+		if(port_temp != null && leftEndpointPort != port_temp) {
+			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(port_temp);
+			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().updatePosition();
+		} else if(port_temp == null) {
+			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(null);
+		}
+		var rightEndpointCoordinate = { "xPosition" : this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(), "yPosition" : this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
+		port_temp = this.isOnPort(rightEndpointCoordinate).port;
+		var rightEndpointPort = this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
+		if(port_temp != null && rightEndpointPort != port_temp) {
+			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(port_temp);
+			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().updatePosition();
+		} else if(port_temp == null) {
+			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(null);
+		}
+		this.redrawCanvas();
+		this.updateToolBar.update(object);
+		this.hightLightObject(object);
 	}
 	,addLink: function(coordinateFrom,coordinateTo) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
@@ -1675,9 +1692,15 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 			if(this.createLinkFlag) {
 				this.updateCircuitDiagram.moveEndpoint(loc,this.link.get_rightEndpoint());
 			} else {
-				this.updateCircuitDiagram.moveComponent(this.component,loc);
+				if(this.component != null) {
+					this.updateCircuitDiagram.moveComponent(this.component,loc,this.mouseDownLocation);
+				}
+				if(this.link != null) {
+					this.updateCircuitDiagram.moveLink(this.link,loc,this.mouseDownLocation);
+				}
 			}
 		}
+		this.mouseDownLocation = loc;
 	}
 	,doMouseUp: function(event) {
 		this.mouseDownFlag = false;

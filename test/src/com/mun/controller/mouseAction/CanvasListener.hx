@@ -91,11 +91,18 @@ class CanvasListener {
                 //if the mouse position have a endpoint
                 updateCircuitDiagram.moveEndpoint(loc, link.get_rightEndpoint());
             }else{
-                //move component
-                updateCircuitDiagram.moveComponent(component,loc);
+                if(component != null){
+                    //move component
+                    updateCircuitDiagram.moveComponent(component,loc, mouseDownLocation);
+                }
+
+                if(link != null){
+                    updateCircuitDiagram.moveLink(link,loc, mouseDownLocation);
+                }
             }
 
         }
+        mouseDownLocation = loc;
     }
     public function doMouseUp(event:MouseEvent){
         mouseDownFlag = false;

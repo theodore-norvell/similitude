@@ -57,19 +57,56 @@ class UpdateCircuitDiagram {
         updateToolBar.update(object);
         hightLightObject(object);
     }
-    public function moveComponent(component:Component, coordinate:Coordinate){
+    public function moveComponent(component:Component, coordinate:Coordinate, mouseDownLocation:Coordinate){
         var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
-        var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
+
+        var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
+        var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
+
+        var command:Command = new MoveCommand(object,object.component.get_xPosition() + xMoveDistance , object.component.get_yPosition() + yMoveDistance, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
         commandManager.execute(command);
         //those wires which link to this component should move either, which automactilly completed while move endpoint
         redrawCanvas(object);
     }
 
-    public function moveLink(link:Link, coordinate:Coordinate){
-        var intersectionPoint:Coordinate = circuitDiagramUtil.getPointOnTheIntersectionOfLine(link, coordinate);
+    public function moveLink(link:Link, coordinate:Coordinate, mouseDownLocation:Coordinate){
+        var object:Object = {"link":link,"component":null,"endPoint":null, "port":null};
 
-        var xDispacement:Float = coordinate.xPosition - intersectionPoint.xPosition;
-        var yDispacement:Float = coordinate.yPosition - intersectionPoint.yPosition;
+        var xDisplacement:Float = mouseDownLocation.xPosition - coordinate.xPosition;
+        var yDisplacement:Float = mouseDownLocation.yPosition - coordinate.yPosition;
+
+        var command:Command = new MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement, link.get_leftEndpoint().get_yPosition() - yDisplacement, link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition(), circuitDiagram);
+        commandManager.execute(command);
+
+        //verfy the endpoint of this link connect to a port or not while moving
+        var index:Int = circuitDiagram.get_linkArray().indexOf(link);
+        //left endpoint
+        var leftEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(),
+                                                    "yPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
+        var port_temp:Port = isOnPort(leftEndpointCoordinate).port;
+        var leftEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
+        if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(port_temp);
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().updatePosition();
+        }else if(port_temp == null){
+            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(null);
+        }
+
+        var rightEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(),
+                                                    "yPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
+        port_temp = isOnPort(rightEndpointCoordinate).port;
+        var rightEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
+
+        if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
+            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(port_temp);
+            circuitDiagram.get_linkArray()[index].get_rightEndpoint().updatePosition();
+        }else if(port_temp == null){
+            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(null);
+        }
+
+        redrawCanvas();
+        updateToolBar.update(object);
+        hightLightObject(object);
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
