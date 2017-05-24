@@ -121,13 +121,13 @@ class CircuitDiagramUtil {
         for(i in 0...circuitDiagram.get_linkArray().length){
             if(pointsDistance(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),
                             circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),
-                            coordinate.xPosition, coordinate.yPosition) <= 3){
+                            coordinate.xPosition, coordinate.yPosition) <= 4){
                 return circuitDiagram.get_linkArray()[i].get_leftEndpoint();
             }
 
             if(pointsDistance(circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),
                                 circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),
-                                coordinate.xPosition, coordinate.yPosition) <= 3){
+                                coordinate.xPosition, coordinate.yPosition) <= 4){
                 return circuitDiagram.get_linkArray()[i].get_rightEndpoint();
             }
         }

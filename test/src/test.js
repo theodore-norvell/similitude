@@ -1187,10 +1187,10 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		var _g = this.circuitDiagram.get_linkArray().length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
+			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
 				return this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
 			}
-			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
+			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
 				return this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
 			}
 		}
@@ -1394,10 +1394,12 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.redrawCanvas(object);
 		return object.link;
 	}
-	,moveEndpoint: function(coordinate,endpoint) {
+	,moveEndpoint: function(endpoint,coordinate,mouseDownLocation) {
 		var object = { "link" : null, "component" : null, "endPoint" : endpoint, "port" : null};
 		if(object.endPoint != null) {
-			var command = new com_mun_controller_command_MoveCommand(object,coordinate.xPosition,coordinate.yPosition,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+			var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
+			var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
+			var command = new com_mun_controller_command_MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance,object.endPoint.get_yPosition() + yMoveDistance,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
 			this.commandManager.execute(command);
 			this.redrawCanvas();
 			var port = null;
@@ -1626,7 +1628,9 @@ com_mun_controller_mouseAction_ButtonClick.prototype = {
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
 var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
+	this.endpointSelected = false;
 	this.createLinkFlag = false;
+	this.linkHighLight = false;
 	this.mouseDownFlag = false;
 	this.canvas = canvas;
 	this.updateCircuitDiagram = updateCircuitDiagram;
@@ -1644,10 +1648,12 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,mouseDownLocation: null
 	,updateToolBar: null
 	,link: null
+	,linkHighLight: null
 	,createLinkFlag: null
 	,object: null
 	,component: null
 	,endpoint: null
+	,endpointSelected: null
 	,port: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
@@ -1663,11 +1669,21 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var y = event.clientY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.mouseDownFlag = true;
-		this.link = this.updateCircuitDiagram.getLink(this.mouseDownLocation);
-		this.object.link = this.link;
-		if(this.link == null) {
-			this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
-			this.object.component = this.component;
+		this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
+		this.object.endPoint = this.endpoint;
+		if(this.endpoint != null) {
+			this.endpointSelected = true;
+		} else {
+			this.endpointSelected = false;
+		}
+		if(this.endpoint == null) {
+			this.link = this.updateCircuitDiagram.getLink(this.mouseDownLocation);
+			this.object.link = this.link;
+			this.linkHighLight = true;
+			if(this.link == null) {
+				this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
+				this.object.component = this.component;
+			}
 		}
 		this.updateCircuitDiagram.hightLightObject(this.object);
 		if(this.object.component != null || this.object.link != null) {
@@ -1675,9 +1691,13 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		} else {
 			this.updateToolBar.hidden();
 		}
-		if(this.object.link != null) {
-			this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
+		if(this.linkHighLight && this.endpointSelected) {
+			this.linkHighLight = false;
+			this.endpointSelected = false;
 			return;
+		}
+		if(this.link == null) {
+			this.linkHighLight = false;
 		}
 		if(this.link == null && this.updateCircuitDiagram.isOnPort(this.mouseDownLocation).port != null) {
 			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
@@ -1690,13 +1710,16 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var loc = this.getPointOnCanvas(this.canvas,x,y);
 		if(this.mouseDownFlag == true) {
 			if(this.createLinkFlag) {
-				this.updateCircuitDiagram.moveEndpoint(loc,this.link.get_rightEndpoint());
+				this.updateCircuitDiagram.moveEndpoint(this.link.get_rightEndpoint(),loc,this.mouseDownLocation);
 			} else {
-				if(this.component != null) {
-					this.updateCircuitDiagram.moveComponent(this.component,loc,this.mouseDownLocation);
+				if(this.endpoint != null) {
+					this.updateCircuitDiagram.moveEndpoint(this.endpoint,loc,this.mouseDownLocation);
 				}
 				if(this.link != null) {
 					this.updateCircuitDiagram.moveLink(this.link,loc,this.mouseDownLocation);
+				}
+				if(this.component != null) {
+					this.updateCircuitDiagram.moveComponent(this.component,loc,this.mouseDownLocation);
 				}
 			}
 		}

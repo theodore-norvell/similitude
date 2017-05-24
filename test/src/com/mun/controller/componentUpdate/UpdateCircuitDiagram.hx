@@ -132,11 +132,14 @@ class UpdateCircuitDiagram {
         return object.link;
     }
 
-    public function moveEndpoint(coordinate:Coordinate, endpoint:Endpoint){
+    public function moveEndpoint(endpoint:Endpoint,coordinate:Coordinate, mouseDownLocation:Coordinate){
         var object:Object = {"link":null,"component":null,"endPoint":endpoint, "port":null};
         if(object.endPoint != null){
 
-            var command:Command = new MoveCommand(object,coordinate.xPosition, coordinate.yPosition, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+            var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
+            var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
+
+            var command:Command = new MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance, object.endPoint.get_yPosition() + yMoveDistance, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
             commandManager.execute(command);
             redrawCanvas();
 

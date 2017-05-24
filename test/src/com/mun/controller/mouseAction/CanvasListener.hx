@@ -19,10 +19,12 @@ class CanvasListener {
     var updateToolBar:UpdateToolBar;
     //local varible
     var link:Link;
+    var linkHighLight:Bool = false;
     var createLinkFlag:Bool = false;
     var object:Object;
     var component:Component;
     var endpoint:Endpoint;
+    var endpointSelected:Bool = false;
     var port:Port;
 
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram, updateToolBar:UpdateToolBar) {
@@ -55,12 +57,24 @@ class CanvasListener {
         mouseDownLocation = getPointOnCanvas(canvas,x,y);
         mouseDownFlag = true;//mouse down flag
 
-        //get the component or link on this mouse location
-        link = updateCircuitDiagram.getLink(mouseDownLocation);
-        object.link = link;
-        if(link == null){//if this mouse location on the link, should be select link first
-            component = updateCircuitDiagram.getComponent(mouseDownLocation);
-            object.component = component;
+        //get the endpoint or link or component on this mouse location
+        //priority: endpint -> link -> component
+        endpoint = updateCircuitDiagram.getEndpoint(mouseDownLocation);
+        object.endPoint = endpoint;
+        if(endpoint != null){
+            endpointSelected = true;
+        }else{
+            endpointSelected = false;
+        }
+
+        if(endpoint == null){
+            link = updateCircuitDiagram.getLink(mouseDownLocation);
+            object.link = link;
+            linkHighLight = true;
+            if(link == null){//if this mouse location on the link, should be select link first
+                component = updateCircuitDiagram.getComponent(mouseDownLocation);
+                object.component = component;
+            }
         }
 
         updateCircuitDiagram.hightLightObject(object);
@@ -69,12 +83,17 @@ class CanvasListener {
         }else{
             updateToolBar.hidden();
         }
-
-        //if link has been selected, then prepare the endpoint
-        if(object.link != null){
-            endpoint = updateCircuitDiagram.getEndpoint(mouseDownLocation);
+        if(linkHighLight && endpointSelected){
+            //if link has been selected and this time endpoint has been selected. then move endpoint, do not create a new link
+            linkHighLight = false;
+            endpointSelected = false;
             return;
         }
+
+        if(link == null){
+            linkHighLight = false;
+        }
+
         if(link == null && updateCircuitDiagram.isOnPort(mouseDownLocation).port != null){
             link = updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
             createLinkFlag = true;
@@ -89,15 +108,18 @@ class CanvasListener {
 
             if(createLinkFlag){//link has been created, so move this endpoint
                 //if the mouse position have a endpoint
-                updateCircuitDiagram.moveEndpoint(loc, link.get_rightEndpoint());
+                updateCircuitDiagram.moveEndpoint(link.get_rightEndpoint(), loc, mouseDownLocation);
             }else{
+                if(endpoint != null){
+                    updateCircuitDiagram.moveEndpoint(endpoint, loc, mouseDownLocation);
+                }
+                if(link != null){
+                    updateCircuitDiagram.moveLink(link,loc, mouseDownLocation);
+                }
+
                 if(component != null){
                     //move component
                     updateCircuitDiagram.moveComponent(component,loc, mouseDownLocation);
-                }
-
-                if(link != null){
-                    updateCircuitDiagram.moveLink(link,loc, mouseDownLocation);
                 }
             }
 
