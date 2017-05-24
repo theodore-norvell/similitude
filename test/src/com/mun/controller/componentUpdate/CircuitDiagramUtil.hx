@@ -117,23 +117,6 @@ class CircuitDiagramUtil {
         return lineLength;
     }
 
-    //得到点到直线的垂直交点
-    public function getPointOnTheIntersectionOfLine(link:Link, coordinate:Coordinate):Coordinate{
-        //得到点到直线的垂直点的交点
-        var a:Float = (link.get_leftEndpoint().get_yPosition() - link.get_rightEndpoint().get_yPosition())/(link.get_leftEndpoint().get_xPosition() - link.get_rightEndpoint().get_xPosition());
-
-        var b:Float = (link.get_leftEndpoint().get_yPosition() - a * link.get_leftEndpoint().get_yPosition());
-        // > 0 = ax +b -y;  对应垂线方程为 -x -ay + m = 0;(mm为系数)
-        // > A = a; B = b;
-        var m:Float = coordinate.xPosition + a * coordinate.yPosition;
-
-        //得到交点坐标
-        var coordinate_new:Coordinate = {"xPosition":0, "yPosition":0};
-        coordinate_new.xPosition =(m-a * b)/(a * a + 1);
-        coordinate_new.yPosition = a * coordinate.xPosition + b;
-        return coordinate_new;
-    }
-
     public function pointOnEndpoint(coordinate:Coordinate):Endpoint{
         for(i in 0...circuitDiagram.get_linkArray().length){
             if(pointsDistance(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),
