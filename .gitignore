@@ -1,3 +1,7 @@
 docs/.vpprefdata
 .lock
 circuit.vux
+profiles_settings.xml
+compiler.xml
+vcs.xml
+test/.idea
