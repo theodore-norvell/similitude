@@ -1,6 +1,7 @@
 package com.mun.controller.componentUpdate;
 
 import com.mun.model.component.Port;
+import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
 import com.mun.controller.command.MoveCommand;
@@ -143,54 +144,39 @@ class UpdateCircuitDiagram {
             commandManager.execute(command);
             redrawCanvas();
 
-            //find the link which contains this endpoint
+            //find the link which contains this endpoint and find the port
             var port:Port = null;
+            var linkIndex:Int = -1;
             for(i in 0...circuitDiagram.get_linkArray().length){
                 if(circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint){
-                    if(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null){//find the port
-                        port = circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
-                    }
-                }
-
-                if(circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint){
+                    linkIndex = i;
                     if(circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null){//find the port
                         port = circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
                     }
                 }
-            }
-            //verify the right endpoint step into another component port or not
-            var componentArray:Array<Component> = circuitDiagram.get_componentArray();
-            for(i in 0...componentArray.length){
-                var inportArray:Array<Port> = componentArray[i].get_inportArray();
-                for(j in 0...inportArray.length){
-                    if(inportArray[i] != port){//exclude the same port
-                        if(circuitDiagramUtil.isInCircle(coordinate, inportArray[j].get_xPosition(), inportArray[j].get_yPosition())){
-                            object.endPoint.set_port(inportArray[j]);
-                            object.endPoint.updatePosition();
-                            var command:Command = new MoveCommand(object,inportArray[j].get_xPosition(), inportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
-                            commandManager.execute(command);
-                            redrawCanvas();
-                        }else{
-                            object.endPoint.set_port(null);
-                        }
+
+                if(circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint){
+                    linkIndex = i;
+                    if(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null){//find the port
+                        port = circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
                     }
+                }
+            }
+            //verify the endpoint step into another component port or not
+            var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).port;
+            if(newPort != port){
+                if(circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint){
+                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
+                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
                 }
 
-                var outportArray:Array<Port> = componentArray[i].get_outportArray();
-                for(j in 0...outportArray.length){
-                    if(outportArray[i] != port){//exclude the same port
-                        if(circuitDiagramUtil.isInCircle(coordinate, outportArray[j].get_xPosition(), outportArray[j].get_yPosition())){
-                            object.endPoint.set_port(outportArray[j]);
-                            object.endPoint.updatePosition();
-                            var command:Command = new MoveCommand(object,outportArray[j].get_xPosition(), outportArray[j].get_yPosition(), object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
-                            commandManager.execute(command);
-                            redrawCanvas();
-                        }else{
-                            object.endPoint.set_port(null);
-                        }
-                    }
+                if(circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint){
+                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
+                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
                 }
             }
+
+            redrawCanvas();
         }
     }
 

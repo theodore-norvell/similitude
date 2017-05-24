@@ -1022,35 +1022,14 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
 			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.newXPosition);
 			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.newYPosition);
-			this.circuitDiagram.updateComponent(this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition));
+			var updatedComponent = this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
+			this.circuitDiagram.updateComponent(updatedComponent);
 			var _g1 = 0;
 			var _g = this.circuitDiagram.get_linkArray().length;
 			while(_g1 < _g) {
 				var i = _g1++;
-				var _g3 = 0;
-				var _g2 = this.component.get_inportArray().length;
-				while(_g3 < _g2) {
-					var j = _g3++;
-					if(this.component.get_inportArray()[j] == this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()) {
-						this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(this.component.get_inportArray()[j].get_xPosition());
-						this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(this.component.get_inportArray()[j].get_yPosition());
-					}
-					if(this.component.get_inportArray()[j] == this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()) {
-						this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(this.component.get_inportArray()[j].get_xPosition());
-						this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(this.component.get_inportArray()[j].get_yPosition());
-					}
-				}
-				var _g31 = 0;
-				var _g21 = this.component.get_outportArray().length;
-				while(_g31 < _g21) {
-					var j1 = _g31++;
-					if(this.component.get_outportArray()[j1] == this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port()) {
-						this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
-					}
-					if(this.component.get_outportArray()[j1] == this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port()) {
-						this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
-					}
-				}
+				this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
+				this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
 			}
 		}
 		if(this.link != null) {
@@ -1064,8 +1043,8 @@ com_mun_controller_command_MoveCommand.prototype = {
 		}
 		if(this.endpoint != null) {
 			var _g11 = 0;
-			var _g4 = this.circuitDiagram.get_linkArray().length;
-			while(_g11 < _g4) {
+			var _g2 = this.circuitDiagram.get_linkArray().length;
+			while(_g11 < _g2) {
 				var i1 = _g11++;
 				if(this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint() == this.endpoint) {
 					this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint().set_xPosition(this.newXPosition);
@@ -1403,61 +1382,36 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			this.commandManager.execute(command);
 			this.redrawCanvas();
 			var port = null;
+			var linkIndex = -1;
 			var _g1 = 0;
 			var _g = this.circuitDiagram.get_linkArray().length;
 			while(_g1 < _g) {
 				var i = _g1++;
 				if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint) {
-					if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null) {
-						port = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
-					}
-				}
-				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
+					linkIndex = i;
 					if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null) {
 						port = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
 					}
 				}
-			}
-			var componentArray = this.circuitDiagram.get_componentArray();
-			var _g11 = 0;
-			var _g2 = componentArray.length;
-			while(_g11 < _g2) {
-				var i1 = _g11++;
-				var inportArray = componentArray[i1].get_inportArray();
-				var _g3 = 0;
-				var _g21 = inportArray.length;
-				while(_g3 < _g21) {
-					var j = _g3++;
-					if(inportArray[i1] != port) {
-						if(this.circuitDiagramUtil.isInCircle(coordinate,inportArray[j].get_xPosition(),inportArray[j].get_yPosition())) {
-							object.endPoint.set_port(inportArray[j]);
-							object.endPoint.updatePosition();
-							var command1 = new com_mun_controller_command_MoveCommand(object,inportArray[j].get_xPosition(),inportArray[j].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
-							this.commandManager.execute(command1);
-							this.redrawCanvas();
-						} else {
-							object.endPoint.set_port(null);
-						}
-					}
-				}
-				var outportArray = componentArray[i1].get_outportArray();
-				var _g31 = 0;
-				var _g22 = outportArray.length;
-				while(_g31 < _g22) {
-					var j1 = _g31++;
-					if(outportArray[i1] != port) {
-						if(this.circuitDiagramUtil.isInCircle(coordinate,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition())) {
-							object.endPoint.set_port(outportArray[j1]);
-							object.endPoint.updatePosition();
-							var command2 = new com_mun_controller_command_MoveCommand(object,outportArray[j1].get_xPosition(),outportArray[j1].get_yPosition(),object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
-							this.commandManager.execute(command2);
-							this.redrawCanvas();
-						} else {
-							object.endPoint.set_port(null);
-						}
+				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
+					linkIndex = i;
+					if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null) {
+						port = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
 					}
 				}
 			}
+			var newPort = this.circuitDiagramUtil.isOnPort(coordinate).port;
+			if(newPort != port) {
+				if(this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint) {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
+					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
+				}
+				if(this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint) {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
+					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
+				}
+			}
+			this.redrawCanvas();
 		}
 	}
 	,getEndpoint: function(coordinate) {
