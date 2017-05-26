@@ -1,5 +1,7 @@
 package com.mun.model.gates;
 
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.model.component.Component;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -62,4 +64,11 @@ interface ComponentKind {
     *  @return the array of the updated ports
     **/
     public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>;
+
+    /**
+    * draw this componentkind
+     * @param component
+     * @param drawingAdapter
+    **/
+    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, hightLight:Bool):Void;
 }

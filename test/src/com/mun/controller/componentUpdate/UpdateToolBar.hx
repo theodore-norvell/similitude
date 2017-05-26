@@ -6,6 +6,9 @@ import com.mun.model.component.CircuitDiagram;
 import com.mun.type.Type.Object;
 import js.html.DOMElement;
 import js.Browser;
+/**
+* update the tool bar
+**/
 class UpdateToolBar {
     var circuitDiagram:CircuitDiagram;
     var updateCanvas:UpdateCanvas;

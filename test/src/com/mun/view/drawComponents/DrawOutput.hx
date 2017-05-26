@@ -23,9 +23,9 @@ class DrawOutput implements DrawComponent extends Constant{
         drawingAdapter.setStrokeColor(strokeColor);
 
         //set the radius equal to 7
-        drawingAdapter.setFillColor("red");
+        drawingAdapter.setFillColor("black");
         drawingAdapter.drawCricle(component.get_xPosition(), component.get_yPosition(), 7);
-        drawingAdapter.setTextColor("black");
+        drawingAdapter.setTextColor("white");
         //drawingAdapter.drawText("Output", component.get_yPosition, component.get_yPosition(), component.get_width() - 2);
         //output gate shouldn't have output port
         //draw inport

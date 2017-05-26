@@ -1,5 +1,7 @@
 package com.mun.model.component;
 
+import com.mun.view.drawingImpl.DrawingAdapter;
+import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.gates.ComponentKind;
@@ -170,5 +172,9 @@ class Component {
         inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
         outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
         return this;
+    }
+
+    public function drawComponent(component:Component, drawingAdpater:DrawingAdapterI, highLight:Bool){
+        componentKind.drawComponent(component, drawingAdpater, highLight);
     }
 }

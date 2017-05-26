@@ -1267,22 +1267,21 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 		var _g = this.circuit.get_componentArray().length;
 		while(_g1 < _g) {
 			var i = _g1++;
-			var drawComponent = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.Draw" + this.circuit.get_componentArray()[i].getNameOfTheComponentKind()),[this.circuit.get_componentArray()[i],this.drawingAdapter]);
 			if(object != null && object.component != null && object.component == this.circuit.get_componentArray()[i]) {
-				drawComponent.drawCorrespondingComponent("red");
+				this.circuit.get_componentArray()[i].drawComponent(this.circuit.get_componentArray()[i],this.drawingAdapter,true);
 			} else {
-				drawComponent.drawCorrespondingComponent("black");
+				this.circuit.get_componentArray()[i].drawComponent(this.circuit.get_componentArray()[i],this.drawingAdapter,false);
 			}
 		}
 		var _g11 = 0;
 		var _g2 = this.circuit.get_linkArray().length;
 		while(_g11 < _g2) {
 			var i1 = _g11++;
-			var drawComponent1 = new com_mun_view_drawComponents_DrawLink(this.circuit.get_linkArray()[i1],this.drawingAdapter);
+			var drawComponent = new com_mun_view_drawComponents_DrawLink(this.circuit.get_linkArray()[i1],this.drawingAdapter);
 			if(object != null && object.link != null && object.link == this.circuit.get_linkArray()[i1]) {
-				drawComponent1.drawCorrespondingComponent("red");
+				drawComponent.drawCorrespondingComponent("red");
 			} else {
-				drawComponent1.drawCorrespondingComponent("black");
+				drawComponent.drawCorrespondingComponent("black");
 			}
 		}
 	}
@@ -1401,14 +1400,20 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 				}
 			}
 			var newPort = this.circuitDiagramUtil.isOnPort(coordinate).port;
-			if(newPort != port) {
-				if(this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint) {
+			if(this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint) {
+				if(newPort != port) {
 					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
 					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
+				} else {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(null);
 				}
-				if(this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint) {
+			}
+			if(this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint) {
+				if(newPort != port) {
 					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
 					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
+				} else {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(null);
 				}
 			}
 			this.redrawCanvas();
@@ -1933,6 +1938,9 @@ com_mun_model_component_Component.prototype = {
 		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
 		return this;
 	}
+	,drawComponent: function(component,drawingAdpater,highLight) {
+		this.componentKind.drawComponent(component,drawingAdpater,highLight);
+	}
 	,__class__: com_mun_model_component_Component
 };
 var com_mun_model_component_Endpoint = function(xPosition,yPosition) {
@@ -2299,6 +2307,7 @@ com_mun_model_gates_ComponentKind.prototype = {
 	,addInPort: null
 	,updateInPortPosition: null
 	,updateOutPortPosition: null
+	,drawComponent: null
 	,__class__: com_mun_model_gates_ComponentKind
 };
 var com_mun_model_gates_AND = function() {
@@ -2390,6 +2399,14 @@ com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 			break;
 		}
 		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawAND(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
 	}
 	,__class__: com_mun_model_gates_AND
 });
@@ -2638,6 +2655,14 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 		}
 		return portArray;
 	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawFlipFlop(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
 	,__class__: com_mun_model_gates_FlipFlop
 });
 var com_mun_model_gates_Input = function() {
@@ -2766,6 +2791,14 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 			break;
 		}
 		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawInput(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
 	}
 	,__class__: com_mun_model_gates_Input
 });
@@ -2967,6 +3000,14 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawMUX(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
 	,__class__: com_mun_model_gates_MUX
 });
 var com_mun_model_gates_NAND = function() {
@@ -3062,6 +3103,14 @@ com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.pr
 		}
 		return portArray;
 	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawNAND(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
 	,__class__: com_mun_model_gates_NAND
 });
 var com_mun_model_gates_NOR = function() {
@@ -3156,6 +3205,14 @@ com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 			break;
 		}
 		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawNOR(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
 	}
 	,__class__: com_mun_model_gates_NOR
 });
@@ -3254,6 +3311,14 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawNOT(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
 	,__class__: com_mun_model_gates_NOT
 });
 var com_mun_model_gates_OR = function() {
@@ -3348,6 +3413,14 @@ com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prot
 			break;
 		}
 		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawOR(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
 	}
 	,__class__: com_mun_model_gates_OR
 });
@@ -3468,6 +3541,14 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 		}
 		return portArray;
 	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawOutput(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
 	,__class__: com_mun_model_gates_Output
 });
 var com_mun_model_gates_XOR = function() {
@@ -3567,6 +3648,14 @@ com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 			break;
 		}
 		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawXOR(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
 	}
 	,__class__: com_mun_model_gates_XOR
 });
@@ -4041,9 +4130,9 @@ com_mun_view_drawComponents_DrawOutput.prototype = $extend(com_mun_view_drawComp
 			strokeColor = "black";
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
-		this.drawingAdapter.setFillColor("red");
+		this.drawingAdapter.setFillColor("black");
 		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
-		this.drawingAdapter.setTextColor("black");
+		this.drawingAdapter.setTextColor("white");
 		var inportArray = this.component.get_inportArray();
 		var _g1 = 0;
 		var _g = inportArray.length;

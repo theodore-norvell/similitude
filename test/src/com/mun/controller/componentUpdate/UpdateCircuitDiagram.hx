@@ -1,7 +1,6 @@
 package com.mun.controller.componentUpdate;
 
 import com.mun.model.component.Port;
-import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
 import com.mun.controller.command.MoveCommand;
@@ -29,7 +28,10 @@ import com.mun.model.gates.OR;
 import com.mun.model.gates.Output;
 import com.mun.model.gates.XOR;
 //the above imports shouldn't be deleted
-
+/**
+* update the  circuit diagram. All the changes from the canvas will be send to here, and
+* update the circuit diagram by using other functions
+**/
 class UpdateCircuitDiagram {
     var circuitDiagram:CircuitDiagram;
     var updateCanvas:UpdateCanvas;
@@ -83,7 +85,7 @@ class UpdateCircuitDiagram {
         var index:Int = circuitDiagram.get_linkArray().indexOf(link);
         //left endpoint
         var leftEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(),
-                                                    "yPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
+            "yPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
         var port_temp:Port = isOnPort(leftEndpointCoordinate).port;
         var leftEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
         if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
@@ -94,7 +96,7 @@ class UpdateCircuitDiagram {
         }
 
         var rightEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(),
-                                                    "yPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
+            "yPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
         port_temp = isOnPort(rightEndpointCoordinate).port;
         var rightEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
 
@@ -164,15 +166,23 @@ class UpdateCircuitDiagram {
             }
             //verify the endpoint step into another component port or not
             var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).port;
-            if(newPort != port){
-                if(circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint){
+
+            if(circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint){
+                if(newPort != port){
                     circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
                     circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
+                }else{
+                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(null);
                 }
 
-                if(circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint){
+            }
+
+            if(circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint){
+                if(newPort != port){
                     circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
                     circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
+                }else{
+                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(null);
                 }
             }
 

@@ -7,7 +7,9 @@ import com.mun.model.component.Endpoint;
 import com.mun.type.Type.Coordinate;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.type.Type.Object;
-
+/**
+* utility for processing the update from canvas
+**/
 class CircuitDiagramUtil {
     var circuitDiagram:CircuitDiagram;
 
@@ -15,6 +17,12 @@ class CircuitDiagramUtil {
         this.circuitDiagram = circuitDiagram;
     }
 
+    /**
+    * verify this coordinate in component or not
+    * @param coordinate
+    * @return if the coordinate in a component then return the component
+    *           or  return null;
+    **/
     public function isInComponent(coordinate:Coordinate):Component{
         var component:Component = null;
         var i = circuitDiagram.get_componentArray().length - 1;
@@ -31,6 +39,12 @@ class CircuitDiagramUtil {
         return component;
     }
 
+    /**
+    * verify this coordinate on link or not
+    * @param coordinate
+    * @return if the coordinate on the link then return the link
+    *           or  return null;
+    **/
     public function isOnLink(coordinate:Coordinate):Link{
         for(i in 0...circuitDiagram.get_linkArray().length){
             var leftEndpoint:Endpoint = circuitDiagram.get_linkArray()[i].get_leftEndpoint();
@@ -117,6 +131,12 @@ class CircuitDiagramUtil {
         return lineLength;
     }
 
+    /**
+    * verify this coordinate on endpoint or not
+    * @param coordinate
+    * @return if the coordinate on the endpoint then return the endpoint
+    *           or  return null;
+    **/
     public function pointOnEndpoint(coordinate:Coordinate):Endpoint{
         for(i in 0...circuitDiagram.get_linkArray().length){
             if(pointsDistance(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),
@@ -134,6 +154,12 @@ class CircuitDiagramUtil {
         return null;
     }
 
+    /**
+    * verify this coordinate on port or not
+    * @param coordinate
+    * @return if the coordinate on the port then return the port
+    *           or  return null;
+    **/
     public function isOnPort(cooridnate:Coordinate):Object{
         var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
         for(i in 0...circuitDiagram.get_componentArray().length){
@@ -165,6 +191,13 @@ class CircuitDiagramUtil {
         return object;
     }
 
+    /**
+    * verify the link on the port or not
+     * @param link
+     * @param port
+     * @return endpoint   if one of the endpoint on the port, then return this endpoint
+     *                          or return null
+    **/
     function isLinkOnPort(link:Link, port:Port):Endpoint{
         var endpoint:Endpoint = null;
         //if this port has a endpoint (left)
@@ -178,6 +211,12 @@ class CircuitDiagramUtil {
         return endpoint;
     }
 
+    /**
+    * verify the endpoint on the port or not
+     * @param endpoint
+     * @param port
+     * @return Bool   if the endpoint on the port, return true; otherwise, return false;
+    **/
     function isEndpointOnPort(endpoint:Endpoint, port:Port):Bool{
         if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()){
             return true;
@@ -185,15 +224,33 @@ class CircuitDiagramUtil {
             return false;
         }
     }
-    public function isInCircle(cooridnate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
+
+    /**
+    * verify a point is in a circuit or not
+     * @param coordinate     the point need to be verified
+     * @param orignalXPosition   the circuit x position
+     * @param orignalYPosition   the circuit y position
+     * @return if in the circle, return true; otherwise, return false;
+    **/
+    public function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
         //the radius is 3
-        if(Math.abs(cooridnate.xPosition - orignalXPosition) <= 3 && Math.abs(cooridnate.yPosition - orignalYPosition) <= 3){
+        if(Math.abs(coordinate.xPosition - orignalXPosition) <= 3 && Math.abs(coordinate.yPosition - orignalYPosition) <= 3){
             return true;
         }else{
             return false;
         }
     }
 
+    /**
+    * verify a mouse position is in a scope or not
+     * @param orignalXposition   xposition of the component
+     * @param orignalYposition   yposition of the component
+     * @param mouseXPosition
+     * @param mouseYposition
+     * @param heigh
+     * @param width
+     * @reutrn if in the scope, return true; otherwise, return false;
+    **/
     function isInScope(orignalXposition:Float, orignalYposition:Float, mouseXPosition:Float, mouseYposition:Float, heigh:Float, width:Float):Bool{
         if((mouseXPosition >= Math.abs(orignalXposition - width/2) && orignalXposition <= orignalXposition + width/2)&&(mouseYposition >= Math.abs(orignalYposition - heigh/2) && mouseYposition <= orignalYposition + heigh/2)){
             return true;
