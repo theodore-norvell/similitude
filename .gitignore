@@ -5,3 +5,5 @@ profiles_settings.xml
 compiler.xml
 vcs.xml
 test/.idea
+simulation/.idea
+SimilitudeClient.iml
