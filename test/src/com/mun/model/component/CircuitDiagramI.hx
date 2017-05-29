@@ -75,7 +75,7 @@ interface CircuitDiagramI {
     /**
     * set new orientation for one component
     **/
-    public function SetNewOirentation(component:Component, newOrientation:Orientation):Void;
+    public function setNewOirentation(component:Component, newOrientation:Orientation):Void;
 
     /**
     * delete one link
@@ -96,4 +96,9 @@ interface CircuitDiagramI {
     * link need to update the enpdoint position by itself
     **/
     public function linkArraySelfUpdate():Void;
+
+    /**
+    * set name for component
+    **/
+    public function componentSetName(component:Component, name:String):Void;
 }

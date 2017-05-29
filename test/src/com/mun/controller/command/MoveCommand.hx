@@ -18,6 +18,7 @@ class MoveCommand implements Command {
     var oldXPosition:Float;
     var oldYPosition:Float;
     var circuitDiagram:CircuitDiagramI;
+    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
 
 
     public function new(object:Object, newXPosition:Float, newYPosition:Float, oldXPosition:Float, oldYPosition:Float, circuitDiagram:CircuitDiagramI) {
@@ -31,13 +32,15 @@ class MoveCommand implements Command {
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():Void {
+    public function undo():Object {
+        object = {"link":null,"component":null,"endPoint":null, "port":null};
         if (component != null) {
 
             var index = circuitDiagram.get_componentArray().indexOf(component);
             circuitDiagram.get_componentArray()[index].set_xPosition(oldXPosition);
             circuitDiagram.get_componentArray()[index].set_yPosition(oldYPosition);
             circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(oldXPosition, oldYPosition);
+            object.component = component;
         }
 
         if (link != null) {
@@ -49,31 +52,38 @@ class MoveCommand implements Command {
             circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_yPosition(link.get_leftEndpoint().get_yPosition());
             circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_xPosition(link.get_rightEndpoint().get_xPosition() - xDifference);
             circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_yPosition(link.get_rightEndpoint().get_yPosition() - yDifference);
+            object.link = link;
         }
 
         if (endpoint != null) {
             for (i in 0...circuitDiagram.get_linkArray().length) {
                 if (circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint) {
+                    object.link = link;
                     circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(oldXPosition);
                     circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(oldYPosition);
                     break;
                 }
 
                 if (circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
+                    object.link = link;
                     circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(oldXPosition);
                     circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(oldYPosition);
                     break;
                 }
             }
         }
+        return object;
     }
 
-    public function redo():Void {
+    public function redo():Object {
+        object = {"link":null,"component":null,"endPoint":null, "port":null};
         execute();
+        return object;
     }
 
     public function execute():Void {
         if (component != null) {
+            object.component = component;
             var index = circuitDiagram.get_componentArray().indexOf(component);
             circuitDiagram.get_componentArray()[index].set_xPosition(newXPosition);
             circuitDiagram.get_componentArray()[index].set_yPosition(newYPosition);
@@ -87,6 +97,7 @@ class MoveCommand implements Command {
         }
 
         if (link != null) {
+            object.link = link;
 
             var index = circuitDiagram.get_linkArray().indexOf(link);
             circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_xPosition(newXPosition);
@@ -102,12 +113,14 @@ class MoveCommand implements Command {
         if (endpoint != null) {
             for (i in 0...circuitDiagram.get_linkArray().length) {
                 if (circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint) {
+                    object.link = link;
                     circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(newXPosition);
                     circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(newYPosition);
                     break;
                 }
 
                 if (circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
+                    object.link = link;
                     circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(newXPosition);
                     circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(newYPosition);
                     break;

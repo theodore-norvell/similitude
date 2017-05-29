@@ -65,10 +65,13 @@ class CircuitDiagram implements CircuitDiagramI{
         copyStack.pushComponent(component);
     }
 
-    public function SetNewOirentation(component:Component, newOrientation:Orientation):Void{
+    public function setNewOirentation(component:Component, newOrientation:Orientation):Void{
         for (i in 0...componentArray.length) {
             if (component == componentArray[i]) {
                 componentArray[i].set_orientation(newOrientation);
+                componentArray[i].updateMoveComponentPortPosition(componentArray[i].get_xPosition(),componentArray[i].get_yPosition());
+                linkArraySelfUpdate();
+                break;
             }
         }
     }
@@ -119,5 +122,9 @@ class CircuitDiagram implements CircuitDiagramI{
             linkArray[i].get_leftEndpoint().updatePosition();
             linkArray[i].get_rightEndpoint().updatePosition();
         }
+    }
+
+    public function componentSetName(component:Component, name:String):Void{
+        componentArray[componentArray.indexOf(component)].set_name(name);
     }
 }

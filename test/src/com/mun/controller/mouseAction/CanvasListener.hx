@@ -51,6 +51,9 @@ class CanvasListener {
         object =  {"link":null,"component":null,"endPoint":null, "port":null};
         doMouseUp(event);
         //initial end
+        //reset commandMananger Flag
+        updateCircuitDiagram.resetCommandManagerRecordFlag();
+        //end
 
         var x:Float = event.clientX;
         var y:Float = event.clientY;
@@ -133,5 +136,6 @@ class CanvasListener {
         endpoint = null;
         port = null;
         createLinkFlag = false;
+        updateCircuitDiagram.resetCommandManagerRecordFlag();
     }
 }

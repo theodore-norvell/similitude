@@ -12,6 +12,7 @@ class AddCommand implements Command {
     var link:Link;
     var component:Component;
     var circuitDiagram:CircuitDiagramI;
+    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
 
     public function new(object:Object, circuitDiagram:CircuitDiagramI) {
         this.link = object.link;
@@ -19,7 +20,8 @@ class AddCommand implements Command {
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():Void {
+    public function undo():Object {
+        object = {"link":null,"component":null,"endPoint":null, "port":null};
         if (link != null) {
             circuitDiagram.removeLink(link);
         }
@@ -27,10 +29,14 @@ class AddCommand implements Command {
         if (component != null) {
             circuitDiagram.removeComponent(component);
         }
+
+        return object;
     }
 
-    public function redo():Void {
+    public function redo():Object {
         execute();
+        object = {"link":link,"component":component,"endPoint":null, "port":null};
+        return object;
     }
 
     public function execute():Void {

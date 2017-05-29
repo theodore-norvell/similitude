@@ -11,6 +11,7 @@ class CopyCommand implements Command {
     var linkArray:Array<Link>;
     var componentArray:Array<Component>;
     var circuitDiagram:CircuitDiagramI;
+    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
 
     public function new(objectArray:ObjectArray, circuitDiagram:CircuitDiagramI) {
         this.linkArray = objectArray.linkArray;
@@ -18,12 +19,14 @@ class CopyCommand implements Command {
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():Void {
+    public function undo():Object {
         circuitDiagram.clearCopyStack();
+        return object;
     }
 
-    public function redo():Void {
+    public function redo():Object {
         execute();
+        return object;
     }
 
     public function execute():Void {
