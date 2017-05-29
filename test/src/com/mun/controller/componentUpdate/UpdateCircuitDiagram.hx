@@ -11,7 +11,7 @@ import com.mun.controller.command.CommandManager;
 import com.mun.model.gates.ComponentKind;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.type.Type.Coordinate;
 
@@ -33,19 +33,25 @@ import com.mun.model.gates.XOR;
 * update the circuit diagram by using other functions
 **/
 class UpdateCircuitDiagram {
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
     var updateCanvas:UpdateCanvas;
     var commandManager:CommandManager;
     var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
 
-    public function new(circuitDiagram:CircuitDiagram,updateCanvas:UpdateCanvas, updateToolBar:UpdateToolBar) {
+    public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
-        this.updateCanvas = updateCanvas;
-        this.updateToolBar = updateToolBar;
 
         commandManager = new CommandManager(circuitDiagram);
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
+    }
+
+    public function setUpdateCanvas(updateCanvas:UpdateCanvas){
+        this.updateCanvas = updateCanvas;
+    }
+
+    public function setUpdateToolBar(updateToolBar:UpdateToolBar){
+        this.updateToolBar = updateToolBar;
     }
 
     public function createComponentByButton(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, inportNum:Int, drawingAdapter:DrawingAdapterI){
@@ -56,9 +62,8 @@ class UpdateCircuitDiagram {
         var object:Object = {"link":null,"component":component_,"endPoint":null, "port":null};
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
-        redrawCanvas();
+        redrawCanvas(object);
         updateToolBar.update(object);
-        hightLightObject(object);
     }
     public function moveComponent(component:Component, coordinate:Coordinate, mouseDownLocation:Coordinate){
         var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
@@ -190,6 +195,20 @@ class UpdateCircuitDiagram {
         }
     }
 
+    public function changeOrientation(component:Component, orientation:Orientation){
+        circuitDiagram.setNewOirentation(component, orientation);
+        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
+        redrawCanvas(object);
+    }
+
+    public function deleteComponent(component:Component){
+        circuitDiagram.deleteComponent(component);
+    }
+
+    public function deleteLink(link:Link){
+        circuitDiagram.deleteLink(link);
+    }
+
     public function getEndpoint(coordinate:Coordinate):Endpoint{
         return circuitDiagramUtil.pointOnEndpoint(coordinate);
     }
@@ -210,7 +229,35 @@ class UpdateCircuitDiagram {
         return circuitDiagramUtil.isOnPort(coordinate);
     }
 
-    function redrawCanvas(?object:Object){
+    public function resetCommandManagerRecordFlag(){
+        commandManager.recordFlagRest();
+    }
+
+    public function setComponentName(component:Component, name:String){
+        circuitDiagram.componentSetName(component, name);
+    }
+
+    public function undo(){
+        var object:Object = commandManager.undo();
+        redrawCanvas(object);
+        if(object.component == null && object.link == null){
+            updateToolBar.hidden();
+        }else{
+            updateToolBar.visible();
+        }
+    }
+
+    public function redo(){
+        var object:Object = commandManager.redo();
+        redrawCanvas(object);
+        if(object.component == null && object.link == null){
+            updateToolBar.hidden();
+        }else{
+            updateToolBar.visible();
+        }
+    }
+
+    public function redrawCanvas(?object:Object){
         updateCanvas.update(object);
     }
 }

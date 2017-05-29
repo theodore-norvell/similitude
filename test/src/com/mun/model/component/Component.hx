@@ -1,6 +1,5 @@
 package com.mun.model.component;
 
-import com.mun.view.drawingImpl.DrawingAdapter;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
