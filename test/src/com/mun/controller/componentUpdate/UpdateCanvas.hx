@@ -4,22 +4,22 @@ import com.mun.view.drawComponents.DrawLink;
 import com.mun.type.Type.Object;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import js.html.CanvasElement;
 /**
 * update the canvas
 **/
 class UpdateCanvas {
     var canvas:CanvasElement;
-    var circuit:CircuitDiagram;
+    var circuit:CircuitDiagramI;
     var drawingAdapter:DrawingAdapterI;
 
-    public function new(canvas:CanvasElement,circuitDiagram:CircuitDiagram,drawingAdapter:DrawingAdapterI) {
+    public function new(canvas:CanvasElement,circuitDiagram:CircuitDiagramI,drawingAdapter:DrawingAdapterI) {
         this.canvas = canvas;
         this.circuit = circuitDiagram;
         this.drawingAdapter = drawingAdapter;
     }
-    public function getcircuit():CircuitDiagram{
+    public function getcircuit():CircuitDiagramI{
         return circuit;
     }
 

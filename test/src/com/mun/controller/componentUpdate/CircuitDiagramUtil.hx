@@ -5,15 +5,15 @@ import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
 import com.mun.type.Type.Coordinate;
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.type.Type.Object;
 /**
 * utility for processing the update from canvas
 **/
 class CircuitDiagramUtil {
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
 
-    public function new(circuitDiagram:CircuitDiagram) {
+    public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
     }
 

@@ -11,7 +11,7 @@ import com.mun.controller.command.CommandManager;
 import com.mun.model.gates.ComponentKind;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.type.Type.Coordinate;
 
@@ -33,13 +33,13 @@ import com.mun.model.gates.XOR;
 * update the circuit diagram by using other functions
 **/
 class UpdateCircuitDiagram {
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
     var updateCanvas:UpdateCanvas;
     var commandManager:CommandManager;
     var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
 
-    public function new(circuitDiagram:CircuitDiagram,updateCanvas:UpdateCanvas, updateToolBar:UpdateToolBar) {
+    public function new(circuitDiagram:CircuitDiagramI,updateCanvas:UpdateCanvas, updateToolBar:UpdateToolBar) {
         this.circuitDiagram = circuitDiagram;
         this.updateCanvas = updateCanvas;
         this.updateToolBar = updateToolBar;

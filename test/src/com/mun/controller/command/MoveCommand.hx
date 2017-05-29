@@ -1,6 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
@@ -17,10 +17,10 @@ class MoveCommand implements Command {
     var newYPosition:Float;
     var oldXPosition:Float;
     var oldYPosition:Float;
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
 
 
-    public function new(object:Object, newXPosition:Float, newYPosition:Float, oldXPosition:Float, oldYPosition:Float, circuitDiagram:CircuitDiagram) {
+    public function new(object:Object, newXPosition:Float, newYPosition:Float, oldXPosition:Float, oldYPosition:Float, circuitDiagram:CircuitDiagramI) {
         this.component = object.component;
         this.link = object.link;
         this.endpoint = object.endPoint;

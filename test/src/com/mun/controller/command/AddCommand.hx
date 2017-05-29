@@ -1,6 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.type.Type.Object;
@@ -11,9 +11,9 @@ import com.mun.type.Type.Object;
 class AddCommand implements Command {
     var link:Link;
     var component:Component;
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
 
-    public function new(object:Object, circuitDiagram:CircuitDiagram) {
+    public function new(object:Object, circuitDiagram:CircuitDiagramI) {
         this.link = object.link;
         this.component = object.component;
         this.circuitDiagram = circuitDiagram;

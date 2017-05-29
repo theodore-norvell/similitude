@@ -1,6 +1,5 @@
 package com.mun.controller.command;
-import com.mun.controller.circuitDiagram.StaticCircuitDiagram;
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
@@ -13,9 +12,9 @@ class PasteCommand implements Command {
     var xPosition:Int;
     var yPosition:Int;
     var pasteStack:Stack;
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
 
-    public function new(copyStack:Stack, xPosition:Float, yPosition:Float, circuitDiagram:CircuitDiagram) {
+    public function new(copyStack:Stack, xPosition:Float, yPosition:Float, circuitDiagram:CircuitDiagramI) {
         this.copyStack = copyStack;
         this.xPosition = xPosition;
         this.yPosition = yPosition;

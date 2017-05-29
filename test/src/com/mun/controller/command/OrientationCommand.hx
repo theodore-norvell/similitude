@@ -1,6 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -9,11 +9,11 @@ import com.mun.model.enumeration.Orientation;
 **/
 class OrientationCommand implements Command {
     var component:Component;
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
     var newOrientation:Orientation;
     var oldOrientation:Orientation;
 
-    public function new(component:Component, oldOrientation:Orientation, newOrientation:Orientation, circuitDiagram:CircuitDiagram) {
+    public function new(component:Component, oldOrientation:Orientation, newOrientation:Orientation, circuitDiagram:CircuitDiagramI) {
         this.component = component;
         this.circuitDiagram = circuitDiagram;
         this.oldOrientation = oldOrientation;

@@ -1231,8 +1231,8 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 			return false;
 		}
 	}
-	,isInCircle: function(cooridnate,orignalXPosition,orignalYPosition) {
-		if(Math.abs(cooridnate.xPosition - orignalXPosition) <= 3 && Math.abs(cooridnate.yPosition - orignalYPosition) <= 3) {
+	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
+		if(Math.abs(coordinate.xPosition - orignalXPosition) <= 3 && Math.abs(coordinate.yPosition - orignalYPosition) <= 3) {
 			return true;
 		} else {
 			return false;
@@ -1446,6 +1446,8 @@ var com_mun_controller_componentUpdate_UpdateToolBar = function(circuitDiagram,u
 	this.orientation = window.document.getElementById("orientation");
 	this.toolBar = window.document.getElementById("toolbar_div");
 	this.deleteButton = window.document.getElementById("delete");
+	this.orientation_div = window.document.getElementById("orientation_div");
+	this.component_name_div = window.document.getElementById("component_name_div");
 	this.nameInput.addEventListener("keyup",$bind(this,this.inputChange),false);
 	this.deleteButton.onclick = $bind(this,this.deleteObject);
 	window.document.getElementById("north").onclick = $bind(this,this.changeToNorth);
@@ -1461,13 +1463,20 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,object: null
 	,nameInput: null
 	,orientation: null
+	,orientation_div: null
 	,toolBar: null
 	,deleteButton: null
+	,component_name_div: null
 	,update: function(object) {
 		this.object = object;
 		if(object.component != null) {
-			this.setAttribute();
 			this.visible();
+			this.setAttribute();
+		}
+		if(object.link != null) {
+			this.visible();
+			this.component_name_div.style.visibility = "hidden";
+			this.orientation_div.style.visibility = "hidden";
 		}
 	}
 	,setAttribute: function() {
@@ -1527,9 +1536,15 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,visible: function() {
 		this.toolBar.style.visibility = "visible";
+		this.deleteButton.style.visibility = "visible";
+		this.orientation_div.style.visibility = "visible";
+		this.component_name_div.style.visibility = "visible";
 	}
 	,hidden: function() {
 		this.toolBar.style.visibility = "hidden";
+		this.deleteButton.style.visibility = "hidden";
+		this.orientation_div.style.visibility = "hidden";
+		this.component_name_div.style.visibility = "hidden";
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
@@ -1694,6 +1709,30 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	}
 	,__class__: com_mun_controller_mouseAction_CanvasListener
 };
+var com_mun_model_component_CircuitDiagramI = function() { };
+$hxClasses["com.mun.model.component.CircuitDiagramI"] = com_mun_model_component_CircuitDiagramI;
+com_mun_model_component_CircuitDiagramI.__name__ = ["com","mun","model","component","CircuitDiagramI"];
+com_mun_model_component_CircuitDiagramI.prototype = {
+	get_componentArray: null
+	,set_componentArray: null
+	,get_linkArray: null
+	,set_linkArray: null
+	,get_name: null
+	,set_name: null
+	,addLink: null
+	,addComponent: null
+	,removeLink: null
+	,removeComponent: null
+	,clearCopyStack: null
+	,pushLinkToCopyStack: null
+	,pushComponentToCopyStack: null
+	,SetNewOirentation: null
+	,deleteLink: null
+	,deleteComponent: null
+	,updateComponent: null
+	,linkArraySelfUpdate: null
+	,__class__: com_mun_model_component_CircuitDiagramI
+};
 var com_mun_model_component_CircuitDiagram = function() {
 	this.linkArray = [];
 	this.componentArray = [];
@@ -1701,6 +1740,7 @@ var com_mun_model_component_CircuitDiagram = function() {
 };
 $hxClasses["com.mun.model.component.CircuitDiagram"] = com_mun_model_component_CircuitDiagram;
 com_mun_model_component_CircuitDiagram.__name__ = ["com","mun","model","component","CircuitDiagram"];
+com_mun_model_component_CircuitDiagram.__interfaces__ = [com_mun_model_component_CircuitDiagramI];
 com_mun_model_component_CircuitDiagram.prototype = {
 	componentArray: null
 	,linkArray: null
@@ -1710,19 +1750,19 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		return this.componentArray;
 	}
 	,set_componentArray: function(value) {
-		return this.componentArray = value;
+		this.componentArray = value;
 	}
 	,get_linkArray: function() {
 		return this.linkArray;
 	}
 	,set_linkArray: function(value) {
-		return this.linkArray = value;
+		this.linkArray = value;
 	}
 	,get_name: function() {
 		return this.name;
 	}
 	,set_name: function(value) {
-		return this.name = value;
+		this.name = value;
 	}
 	,addLink: function(link) {
 		this.linkArray.push(link);

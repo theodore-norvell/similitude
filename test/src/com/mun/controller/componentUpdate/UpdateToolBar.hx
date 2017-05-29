@@ -2,7 +2,7 @@ package com.mun.controller.componentUpdate;
 
 import js.jquery.JQuery;
 import com.mun.model.enumeration.Orientation;
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.type.Type.Object;
 import js.html.DOMElement;
 import js.Browser;
@@ -10,15 +10,17 @@ import js.Browser;
 * update the tool bar
 **/
 class UpdateToolBar {
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
     var updateCanvas:UpdateCanvas;
     var object:Object;
     var nameInput:DOMElement;
     var orientation:DOMElement;
+    var orientation_div:DOMElement;
     var toolBar:DOMElement;
     var deleteButton:DOMElement;
+    var component_name_div:DOMElement;
 
-    public function new(circuitDiagram:CircuitDiagram, updateCanvas:UpdateCanvas) {
+    public function new(circuitDiagram:CircuitDiagramI, updateCanvas:UpdateCanvas) {
         this.circuitDiagram = circuitDiagram;
         this.updateCanvas = updateCanvas;
 
@@ -26,6 +28,8 @@ class UpdateToolBar {
         orientation = Browser.document.getElementById("orientation");
         toolBar = Browser.document.getElementById("toolbar_div");
         deleteButton = Browser.document.getElementById("delete");
+        orientation_div = Browser.document.getElementById("orientation_div");
+        component_name_div = Browser.document.getElementById("component_name_div");
 
         nameInput.addEventListener("keyup",inputChange,false);
         deleteButton.onclick = deleteObject;
@@ -38,8 +42,16 @@ class UpdateToolBar {
     public function update(object:Object){
         this.object = object;
         if(object.component != null){
-            setAttribute();
             visible();
+            setAttribute();
+
+        }
+
+        if(object.link != null){
+            visible();
+            component_name_div.style.visibility = "hidden";
+            orientation_div.style.visibility = "hidden";
+
         }
     }
 
@@ -106,9 +118,15 @@ class UpdateToolBar {
 
     public function visible(){
         toolBar.style.visibility = "visible";
+        deleteButton.style.visibility = "visible";
+        orientation_div.style.visibility = "visible";
+        component_name_div.style.visibility = "visible";
     }
 
     public function hidden(){
         toolBar.style.visibility = "hidden";
+        deleteButton.style.visibility = "hidden";
+        orientation_div.style.visibility = "hidden";
+        component_name_div.style.visibility = "hidden";
     }
 }

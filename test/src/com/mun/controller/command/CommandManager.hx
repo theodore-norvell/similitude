@@ -1,6 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 /**
 * command manager used to manage those command
 * @author wanhui
@@ -8,9 +8,9 @@ import com.mun.model.component.CircuitDiagram;
 class CommandManager {
     var undoStack:Array<Command> = new Array<Command>();
     var redoStack:Array<Command> = new Array<Command>();
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
 
-    public function new(circuitDiagram:CircuitDiagram) {
+    public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
     }
 

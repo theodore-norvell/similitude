@@ -21,3 +21,5 @@ typedef ObjectArray = {
     var componentArray:Array<Component>;
     var endPointArray:Array<Endpoint>;
 }
+
+
