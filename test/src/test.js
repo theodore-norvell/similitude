@@ -632,10 +632,22 @@ Test.main = function() {
 	}
 	var backingStoreRatio = backingStoreRatioDynamic == null ? 1.0 : js_Boot.__cast(backingStoreRatioDynamic , Float);
 	var pixelRatio = window.devicePixelRatio / backingStoreRatio;
-	haxe_Log.trace(pixelRatio,{ fileName : "Test.hx", lineNumber : 32, className : "Test", methodName : "main"});
+	var oldWidth = window.innerWidth * 0.9;
+	var oldHeight = window.innerHeight * 0.9;
+	Test.canvas.width = oldWidth * pixelRatio;
+	Test.canvas.height = oldHeight * pixelRatio;
+	Test.canvas.style.width = oldWidth + "px";
+	Test.canvas.style.height = oldHeight + "px";
+	Test.cxt.scale(pixelRatio,pixelRatio);
 	var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(Test.cxt);
 	var circuitDiagram = new com_mun_model_component_CircuitDiagram();
-	new com_mun_controller_buttonClick_ButtonClick(drawingAdapter);
+	var updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(circuitDiagram);
+	var updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(updateCircuitDiagram);
+	updateCircuitDiagram.setUpdateToolBar(updateToolBar);
+	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,drawingAdapter);
+	updateCircuitDiagram.setUpdateCanvas(updateCanvas);
+	new com_mun_controller_mouseAction_ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
+	new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -863,54 +875,231 @@ Type.enumIndex = function(e) {
 Type.allEnums = function(e) {
 	return e.__empty_constructs__;
 };
-var com_mun_controller_buttonClick_ButtonClick = function(drawingAdapter) {
-	this.drawingAdapter = drawingAdapter;
-	window.document.getElementById("AND").onclick = $bind(this,this.andOnClick);
-	window.document.getElementById("FlipFlop").onclick = $bind(this,this.flipFlopOnClick);
-	window.document.getElementById("INPUT").onclick = $bind(this,this.inputOnClick);
-	window.document.getElementById("MUX").onclick = $bind(this,this.muxOnClick);
-	window.document.getElementById("NAND").onclick = $bind(this,this.nandOnClick);
-	window.document.getElementById("NOR").onclick = $bind(this,this.norOnClick);
-	window.document.getElementById("NOT").onclick = $bind(this,this.notOnClick);
-	window.document.getElementById("OR").onclick = $bind(this,this.orOnClick);
-	window.document.getElementById("OUTPUT").onclick = $bind(this,this.outputOnClick);
-	window.document.getElementById("XOR").onclick = $bind(this,this.xorOnClick);
+var com_mun_controller_command_Command = function() { };
+$hxClasses["com.mun.controller.command.Command"] = com_mun_controller_command_Command;
+com_mun_controller_command_Command.__name__ = ["com","mun","controller","command","Command"];
+com_mun_controller_command_Command.prototype = {
+	undo: null
+	,redo: null
+	,execute: null
+	,__class__: com_mun_controller_command_Command
 };
-$hxClasses["com.mun.controller.buttonClick.ButtonClick"] = com_mun_controller_buttonClick_ButtonClick;
-com_mun_controller_buttonClick_ButtonClick.__name__ = ["com","mun","controller","buttonClick","ButtonClick"];
-com_mun_controller_buttonClick_ButtonClick.prototype = {
-	drawingAdapter: null
-	,andOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("AND",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+var com_mun_controller_command_AddCommand = function(object,circuitDiagram) {
+	this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+	this.link = object.link;
+	this.component = object.component;
+	this.circuitDiagram = circuitDiagram;
+};
+$hxClasses["com.mun.controller.command.AddCommand"] = com_mun_controller_command_AddCommand;
+com_mun_controller_command_AddCommand.__name__ = ["com","mun","controller","command","AddCommand"];
+com_mun_controller_command_AddCommand.__interfaces__ = [com_mun_controller_command_Command];
+com_mun_controller_command_AddCommand.prototype = {
+	link: null
+	,component: null
+	,circuitDiagram: null
+	,object: null
+	,undo: function() {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		if(this.link != null) {
+			this.circuitDiagram.removeLink(this.link);
+		}
+		if(this.component != null) {
+			this.circuitDiagram.removeComponent(this.component);
+		}
+		return this.object;
 	}
-	,flipFlopOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("FlipFlop",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,redo: function() {
+		this.execute();
+		this.object = { "link" : this.link, "component" : this.component, "endPoint" : null, "port" : null};
+		return this.object;
 	}
-	,inputOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("Input",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,execute: function() {
+		if(this.link != null) {
+			this.circuitDiagram.addLink(this.link);
+		}
+		if(this.component != null) {
+			this.circuitDiagram.addComponent(this.component);
+		}
 	}
-	,muxOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("MUX",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,__class__: com_mun_controller_command_AddCommand
+};
+var com_mun_controller_command_CommandManager = function(circuitDiagram) {
+	this.recordFlag = false;
+	this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+	this.redoStack = [];
+	this.undoStack = [];
+	this.circuitDiagram = circuitDiagram;
+};
+$hxClasses["com.mun.controller.command.CommandManager"] = com_mun_controller_command_CommandManager;
+com_mun_controller_command_CommandManager.__name__ = ["com","mun","controller","command","CommandManager"];
+com_mun_controller_command_CommandManager.prototype = {
+	undoStack: null
+	,redoStack: null
+	,circuitDiagram: null
+	,object: null
+	,recordFlag: null
+	,execute: function(command) {
+		command.execute();
+		if(!this.recordFlag) {
+			this.undoStack.push(command);
+		}
+		this.recordFlag = true;
+		if(this.redoStack.length != 0) {
+			var _g1 = 0;
+			var _g = this.redoStack.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.redoStack.pop();
+			}
+		}
 	}
-	,nandOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("NAND",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,undo: function() {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		if(this.undoStack.length == 0) {
+			return this.object;
+		}
+		var command = this.undoStack.pop();
+		this.object = command.undo();
+		this.redoStack.push(command);
+		return this.object;
 	}
-	,norOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("NOR",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,redo: function() {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		if(this.redoStack.length == 0) {
+			return this.object;
+		}
+		var command = this.redoStack.pop();
+		this.object = command.redo();
+		this.undoStack.push(command);
+		return this.object;
 	}
-	,notOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("NOT",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,recordFlagRest: function() {
+		this.recordFlag = false;
 	}
-	,orOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("OR",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,getUndoStackSize: function() {
+		return this.undoStack.length;
 	}
-	,outputOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("Output",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,getRedoStackSize: function() {
+		return this.redoStack.length;
 	}
-	,xorOnClick: function() {
-		new com_mun_controller_createComponent_CreateAndDraw("XOR",250,50,40,40,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	,__class__: com_mun_controller_command_CommandManager
+};
+var com_mun_controller_command_MoveCommand = function(object,newXPosition,newYPosition,oldXPosition,oldYPosition,circuitDiagram) {
+	this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+	this.component = object.component;
+	this.link = object.link;
+	this.endpoint = object.endPoint;
+	this.newXPosition = newXPosition;
+	this.newYPosition = newYPosition;
+	this.oldXPosition = oldXPosition;
+	this.oldYPosition = oldYPosition;
+	this.circuitDiagram = circuitDiagram;
+};
+$hxClasses["com.mun.controller.command.MoveCommand"] = com_mun_controller_command_MoveCommand;
+com_mun_controller_command_MoveCommand.__name__ = ["com","mun","controller","command","MoveCommand"];
+com_mun_controller_command_MoveCommand.__interfaces__ = [com_mun_controller_command_Command];
+com_mun_controller_command_MoveCommand.prototype = {
+	component: null
+	,link: null
+	,endpoint: null
+	,newXPosition: null
+	,newYPosition: null
+	,oldXPosition: null
+	,oldYPosition: null
+	,circuitDiagram: null
+	,object: null
+	,undo: function() {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		if(this.component != null) {
+			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
+			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.oldXPosition);
+			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.oldYPosition);
+			this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.oldXPosition,this.oldYPosition);
+			this.object.component = this.component;
+		}
+		if(this.link != null) {
+			var xDifference = this.newXPosition - this.oldXPosition;
+			var yDifference = this.newYPosition - this.oldYPosition;
+			var index1 = this.circuitDiagram.get_linkArray().indexOf(this.link);
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition());
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.link.get_leftEndpoint().get_yPosition());
+			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() - xDifference);
+			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() - yDifference);
+			this.object.link = this.link;
+		}
+		if(this.endpoint != null) {
+			var _g1 = 0;
+			var _g = this.circuitDiagram.get_linkArray().length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint() == this.endpoint) {
+					this.object.link = this.link;
+					this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(this.oldXPosition);
+					this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(this.oldYPosition);
+					break;
+				}
+				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == this.endpoint) {
+					this.object.link = this.link;
+					this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(this.oldXPosition);
+					this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(this.oldYPosition);
+					break;
+				}
+			}
+		}
+		return this.object;
 	}
-	,__class__: com_mun_controller_buttonClick_ButtonClick
+	,redo: function() {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		this.execute();
+		return this.object;
+	}
+	,execute: function() {
+		if(this.component != null) {
+			this.object.component = this.component;
+			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
+			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.newXPosition);
+			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.newYPosition);
+			var updatedComponent = this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
+			this.circuitDiagram.updateComponent(updatedComponent);
+			var _g1 = 0;
+			var _g = this.circuitDiagram.get_linkArray().length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
+				this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
+			}
+		}
+		if(this.link != null) {
+			this.object.link = this.link;
+			var index1 = this.circuitDiagram.get_linkArray().indexOf(this.link);
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.newXPosition);
+			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.newYPosition);
+			var xDisplacement = this.newXPosition - this.oldXPosition;
+			var yDisplacement = this.newYPosition - this.oldYPosition;
+			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() + xDisplacement);
+			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() + yDisplacement);
+		}
+		if(this.endpoint != null) {
+			var _g11 = 0;
+			var _g2 = this.circuitDiagram.get_linkArray().length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint() == this.endpoint) {
+					this.object.link = this.link;
+					this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint().set_xPosition(this.newXPosition);
+					this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint().set_yPosition(this.newYPosition);
+					break;
+				}
+				if(this.circuitDiagram.get_linkArray()[i1].get_rightEndpoint() == this.endpoint) {
+					this.object.link = this.link;
+					this.circuitDiagram.get_linkArray()[i1].get_rightEndpoint().set_xPosition(this.newXPosition);
+					this.circuitDiagram.get_linkArray()[i1].get_rightEndpoint().set_yPosition(this.newYPosition);
+					break;
+				}
+			}
+		}
+	}
+	,__class__: com_mun_controller_command_MoveCommand
 };
 var com_mun_controller_command_Stack = function() {
 	this.linkArray = [];
@@ -939,31 +1128,716 @@ com_mun_controller_command_Stack.prototype = {
 	}
 	,__class__: com_mun_controller_command_Stack
 };
-var com_mun_controller_createComponent_CreateAndDraw = function(name,xPosition,yPosition,width,height,orientation,inportNum,drawingAdapter) {
-	this.drawingAdapter = drawingAdapter;
-	this.componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
-	this.component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,this.get_componentkind_(),inportNum);
-	this.draw = Type.createInstance(Type.resolveClass("com.mun.view.drawComponents.Draw" + name),[this.get_component_(),drawingAdapter]);
-	this.draw.drawCorrespondingComponent();
+var com_mun_controller_componentUpdate_CircuitDiagramUtil = function(circuitDiagram) {
+	this.circuitDiagram = circuitDiagram;
 };
-$hxClasses["com.mun.controller.createComponent.CreateAndDraw"] = com_mun_controller_createComponent_CreateAndDraw;
-com_mun_controller_createComponent_CreateAndDraw.__name__ = ["com","mun","controller","createComponent","CreateAndDraw"];
-com_mun_controller_createComponent_CreateAndDraw.prototype = {
-	componentkind_: null
-	,component_: null
-	,draw: null
+$hxClasses["com.mun.controller.componentUpdate.CircuitDiagramUtil"] = com_mun_controller_componentUpdate_CircuitDiagramUtil;
+com_mun_controller_componentUpdate_CircuitDiagramUtil.__name__ = ["com","mun","controller","componentUpdate","CircuitDiagramUtil"];
+com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
+	circuitDiagram: null
+	,isInComponent: function(coordinate) {
+		var component = null;
+		var i = this.circuitDiagram.get_componentArray().length - 1;
+		while(i >= 0) {
+			if(this.isInScope(this.circuitDiagram.get_componentArray()[i].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_yPosition(),coordinate.xPosition,coordinate.yPosition,this.circuitDiagram.get_componentArray()[i].get_height(),this.circuitDiagram.get_componentArray()[i].get_width()) == true) {
+				return this.circuitDiagram.get_componentArray()[i];
+			}
+			--i;
+		}
+		return component;
+	}
+	,isOnLink: function(coordinate) {
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_linkArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var leftEndpoint = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
+			var rightEndpoint = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+			if(this.pointToLine(leftEndpoint.get_xPosition(),leftEndpoint.get_yPosition(),rightEndpoint.get_xPosition(),rightEndpoint.get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
+				var theDistanaceToLeftEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition()),2));
+				var theDistanceToRightEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition()),2));
+				if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint) {
+					if(theDistanceToRightEndpoint >= 5) {
+						return this.circuitDiagram.get_linkArray()[i];
+					}
+				} else if(theDistanaceToLeftEndpoint >= 5) {
+					return this.circuitDiagram.get_linkArray()[i];
+				}
+			}
+		}
+		return null;
+	}
+	,pointToLine: function(x1,y1,x2,y2,x0,y0) {
+		var space = 0;
+		var a;
+		var b;
+		var c;
+		a = this.pointsDistance(x1,y1,x2,y2);
+		b = this.pointsDistance(x1,y1,x0,y0);
+		c = this.pointsDistance(x2,y2,x0,y0);
+		if(c + b == a) {
+			space = 0;
+			return space;
+		}
+		if(a <= 0.00001) {
+			space = b;
+			return space;
+		}
+		if(c * c > a * a + b * b) {
+			space = b;
+			return space;
+		}
+		if(b * b >= a * a + c * c) {
+			space = c;
+			return space;
+		}
+		var p = (a + b + c) / 2;
+		var s = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+		space = 2 * s / a;
+		return space;
+	}
+	,pointsDistance: function(x1,y1,x2,y2) {
+		var lineLength = 0;
+		lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+		return lineLength;
+	}
+	,pointOnEndpoint: function(coordinate) {
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_linkArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
+				return this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
+			}
+			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
+				return this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+			}
+		}
+		return null;
+	}
+	,isOnPort: function(cooridnate) {
+		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_componentArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var _g3 = 0;
+			var _g2 = this.circuitDiagram.get_componentArray()[i].get_inportArray().length;
+			while(_g3 < _g2) {
+				var j = _g3++;
+				if(this.isInCircle(cooridnate,this.circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_yPosition())) {
+					object.port = this.circuitDiagram.get_componentArray()[i].get_inportArray()[j];
+					var _g5 = 0;
+					var _g4 = this.circuitDiagram.get_linkArray().length;
+					while(_g5 < _g4) {
+						var k = _g5++;
+						object.endPoint = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k],this.circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+						return object;
+					}
+				}
+			}
+			var _g31 = 0;
+			var _g21 = this.circuitDiagram.get_componentArray()[i].get_outportArray().length;
+			while(_g31 < _g21) {
+				var j1 = _g31++;
+				if(this.isInCircle(cooridnate,this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1].get_yPosition())) {
+					object.port = this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1];
+					var _g51 = 0;
+					var _g41 = this.circuitDiagram.get_linkArray().length;
+					while(_g51 < _g41) {
+						var k1 = _g51++;
+						object.endPoint = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k1],this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1]);
+						return object;
+					}
+				}
+			}
+		}
+		return object;
+	}
+	,isLinkOnPort: function(link,port) {
+		var endpoint = null;
+		if(this.isEndpointOnPort(link.get_leftEndpoint(),port)) {
+			endpoint = link.get_leftEndpoint();
+		}
+		if(this.isEndpointOnPort(link.get_rightEndpoint(),port)) {
+			endpoint = link.get_rightEndpoint();
+		}
+		return endpoint;
+	}
+	,isEndpointOnPort: function(endpoint,port) {
+		if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
+		if(Math.abs(coordinate.xPosition - orignalXPosition) <= 3 && Math.abs(coordinate.yPosition - orignalYPosition) <= 3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
+		if(mouseXPosition >= Math.abs(orignalXposition - width / 2) && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= Math.abs(orignalYposition - heigh / 2) && mouseYposition <= orignalYposition + heigh / 2)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,__class__: com_mun_controller_componentUpdate_CircuitDiagramUtil
+};
+var com_mun_controller_componentUpdate_UpdateCanvas = function(canvas,circuitDiagram,drawingAdapter) {
+	this.canvas = canvas;
+	this.circuitDiagram = circuitDiagram;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.controller.componentUpdate.UpdateCanvas"] = com_mun_controller_componentUpdate_UpdateCanvas;
+com_mun_controller_componentUpdate_UpdateCanvas.__name__ = ["com","mun","controller","componentUpdate","UpdateCanvas"];
+com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
+	canvas: null
+	,circuitDiagram: null
 	,drawingAdapter: null
-	,get_componentkind_: function() {
-		return this.componentkind_;
+	,update: function(object) {
+		this.canvas.width = this.canvas.width;
+		var _g1 = 0;
+		var _g = this.circuitDiagram.get_componentArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(object != null && object.component != null && object.component == this.circuitDiagram.get_componentArray()[i]) {
+				this.circuitDiagram.get_componentArray()[i].drawComponent(this.circuitDiagram.get_componentArray()[i],this.drawingAdapter,true);
+			} else {
+				this.circuitDiagram.get_componentArray()[i].drawComponent(this.circuitDiagram.get_componentArray()[i],this.drawingAdapter,false);
+			}
+		}
+		var _g11 = 0;
+		var _g2 = this.circuitDiagram.get_linkArray().length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var drawComponent = new com_mun_view_drawComponents_DrawLink(this.circuitDiagram.get_linkArray()[i1],this.drawingAdapter);
+			if(object != null && object.link != null && object.link == this.circuitDiagram.get_linkArray()[i1]) {
+				drawComponent.drawCorrespondingComponent("red");
+			} else {
+				drawComponent.drawCorrespondingComponent("black");
+			}
+		}
 	}
-	,get_component_: function() {
-		return this.component_;
+	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
+};
+var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDiagram) {
+	this.circuitDiagram = circuitDiagram;
+	this.commandManager = new com_mun_controller_command_CommandManager(circuitDiagram);
+	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
+};
+$hxClasses["com.mun.controller.componentUpdate.UpdateCircuitDiagram"] = com_mun_controller_componentUpdate_UpdateCircuitDiagram;
+com_mun_controller_componentUpdate_UpdateCircuitDiagram.__name__ = ["com","mun","controller","componentUpdate","UpdateCircuitDiagram"];
+com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
+	circuitDiagram: null
+	,updateCanvas: null
+	,commandManager: null
+	,circuitDiagramUtil: null
+	,updateToolBar: null
+	,setUpdateCanvas: function(updateCanvas) {
+		this.updateCanvas = updateCanvas;
 	}
-	,get_drawingAdapter: function() {
-		return this.drawingAdapter;
+	,setUpdateToolBar: function(updateToolBar) {
+		this.updateToolBar = updateToolBar;
 	}
-	,__class__: com_mun_controller_createComponent_CreateAndDraw
-	,__properties__: {get_drawingAdapter:"get_drawingAdapter",get_component_:"get_component_",get_componentkind_:"get_componentkind_"}
+	,createComponentByButton: function(name,xPosition,yPosition,width,height,orientation,inportNum,drawingAdapter) {
+		var componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
+		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
+		component_.setNameOfTheComponentKind(name);
+		var object = { "link" : null, "component" : component_, "endPoint" : null, "port" : null};
+		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
+		this.commandManager.execute(command);
+		this.redrawCanvas(object);
+		this.updateToolBar.update(object);
+	}
+	,moveComponent: function(component,coordinate,mouseDownLocation) {
+		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
+		var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
+		var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
+		var command = new com_mun_controller_command_MoveCommand(object,object.component.get_xPosition() + xMoveDistance,object.component.get_yPosition() + yMoveDistance,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
+		this.commandManager.execute(command);
+		this.redrawCanvas(object);
+	}
+	,moveLink: function(link,coordinate,mouseDownLocation) {
+		var object = { "link" : link, "component" : null, "endPoint" : null, "port" : null};
+		var xDisplacement = mouseDownLocation.xPosition - coordinate.xPosition;
+		var yDisplacement = mouseDownLocation.yPosition - coordinate.yPosition;
+		var command = new com_mun_controller_command_MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement,link.get_leftEndpoint().get_yPosition() - yDisplacement,link.get_leftEndpoint().get_xPosition(),link.get_leftEndpoint().get_yPosition(),this.circuitDiagram);
+		this.commandManager.execute(command);
+		var index = this.circuitDiagram.get_linkArray().indexOf(link);
+		var leftEndpointCoordinate = { "xPosition" : this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(), "yPosition" : this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
+		var port_temp = this.isOnPort(leftEndpointCoordinate).port;
+		var leftEndpointPort = this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
+		if(port_temp != null && leftEndpointPort != port_temp) {
+			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(port_temp);
+			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().updatePosition();
+		} else if(port_temp == null) {
+			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(null);
+		}
+		var rightEndpointCoordinate = { "xPosition" : this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(), "yPosition" : this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
+		port_temp = this.isOnPort(rightEndpointCoordinate).port;
+		var rightEndpointPort = this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
+		if(port_temp != null && rightEndpointPort != port_temp) {
+			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(port_temp);
+			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().updatePosition();
+		} else if(port_temp == null) {
+			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(null);
+		}
+		this.redrawCanvas();
+		this.updateToolBar.update(object);
+		this.hightLightObject(object);
+	}
+	,addLink: function(coordinateFrom,coordinateTo) {
+		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		object = this.isOnPort(coordinateFrom);
+		if(object.port != null) {
+			var leftEndpoint = new com_mun_model_component_Endpoint(object.port.get_xPosition(),object.port.get_yPosition());
+			var rightEndpoint = new com_mun_model_component_Endpoint(object.port.get_xPosition(),object.port.get_yPosition());
+			var link = new com_mun_model_component_Link(leftEndpoint,rightEndpoint);
+			link.get_leftEndpoint().set_port(object.port);
+			link.get_rightEndpoint().set_port(null);
+			object.link = link;
+			object.endPoint = null;
+		} else {
+			var leftEndpoint1 = new com_mun_model_component_Endpoint(coordinateFrom.xPosition,coordinateFrom.yPosition);
+			var rightEndpoint1 = new com_mun_model_component_Endpoint(coordinateTo.xPosition + 100,coordinateTo.yPosition + 100);
+			var link1 = new com_mun_model_component_Link(leftEndpoint1,rightEndpoint1);
+			object.link = link1;
+		}
+		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
+		this.commandManager.execute(command);
+		this.redrawCanvas(object);
+		return object.link;
+	}
+	,moveEndpoint: function(endpoint,coordinate,mouseDownLocation) {
+		var object = { "link" : null, "component" : null, "endPoint" : endpoint, "port" : null};
+		if(object.endPoint != null) {
+			var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
+			var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
+			var command = new com_mun_controller_command_MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance,object.endPoint.get_yPosition() + yMoveDistance,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+			this.commandManager.execute(command);
+			this.redrawCanvas();
+			var port = null;
+			var linkIndex = -1;
+			var _g1 = 0;
+			var _g = this.circuitDiagram.get_linkArray().length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint) {
+					linkIndex = i;
+					if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null) {
+						port = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
+					}
+				}
+				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
+					linkIndex = i;
+					if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null) {
+						port = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
+					}
+				}
+			}
+			var newPort = this.circuitDiagramUtil.isOnPort(coordinate).port;
+			if(this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint) {
+				if(newPort != port) {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
+					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
+				} else {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(null);
+				}
+			}
+			if(this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint) {
+				if(newPort != port) {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
+					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
+				} else {
+					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(null);
+				}
+			}
+			this.redrawCanvas();
+		}
+	}
+	,changeOrientation: function(component,orientation) {
+		this.circuitDiagram.setNewOirentation(component,orientation);
+		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
+		this.redrawCanvas(object);
+	}
+	,deleteComponent: function(component) {
+		this.circuitDiagram.deleteComponent(component);
+	}
+	,deleteLink: function(link) {
+		this.circuitDiagram.deleteLink(link);
+	}
+	,getEndpoint: function(coordinate) {
+		return this.circuitDiagramUtil.pointOnEndpoint(coordinate);
+	}
+	,getComponent: function(coordinate) {
+		return this.circuitDiagramUtil.isInComponent(coordinate);
+	}
+	,getLink: function(coordinate) {
+		return this.circuitDiagramUtil.isOnLink(coordinate);
+	}
+	,hightLightObject: function(object) {
+		this.redrawCanvas(object);
+	}
+	,isOnPort: function(coordinate) {
+		return this.circuitDiagramUtil.isOnPort(coordinate);
+	}
+	,resetCommandManagerRecordFlag: function() {
+		this.commandManager.recordFlagRest();
+	}
+	,setComponentName: function(component,name) {
+		this.circuitDiagram.componentSetName(component,name);
+	}
+	,undo: function() {
+		var object = this.commandManager.undo();
+		this.redrawCanvas(object);
+		if(object.component == null && object.link == null) {
+			this.updateToolBar.hidden();
+		} else {
+			this.updateToolBar.visible();
+		}
+	}
+	,redo: function() {
+		var object = this.commandManager.redo();
+		this.redrawCanvas(object);
+		if(object.component == null && object.link == null) {
+			this.updateToolBar.hidden();
+		} else {
+			this.updateToolBar.visible();
+		}
+	}
+	,setRedoButton: function() {
+		if(this.commandManager.getUndoStackSize() == 0) {
+			this.updateToolBar.setUndoButtonDisability(true);
+		} else {
+			this.updateToolBar.setUndoButtonDisability(false);
+		}
+	}
+	,setUndoButton: function() {
+		if(this.commandManager.getRedoStackSize() == 0) {
+			this.updateToolBar.setRedoButtonDisability(true);
+		} else {
+			this.updateToolBar.setRedoButtonDisability(false);
+		}
+	}
+	,redrawCanvas: function(object) {
+		this.updateCanvas.update(object);
+		this.setRedoButton();
+		this.setUndoButton();
+	}
+	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
+};
+var com_mun_controller_componentUpdate_UpdateToolBar = function(updateCircuitDiagram) {
+	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.nameInput = window.document.getElementById("name_input");
+	this.orientation = window.document.getElementById("orientation");
+	this.toolBar = window.document.getElementById("toolbar_div");
+	this.deleteButton = window.document.getElementById("delete");
+	this.orientation_div = window.document.getElementById("orientation_div");
+	this.component_name_div = window.document.getElementById("component_name_div");
+	this.undo = window.document.getElementById("undo");
+	this.undo.style.visibility = "visible";
+	this.redo = window.document.getElementById("redo");
+	this.redo.style.visibility = "visible";
+	this.nameInput.addEventListener("keyup",$bind(this,this.inputChange),false);
+	this.deleteButton.onclick = $bind(this,this.deleteObject);
+	this.undo.onclick = $bind(this,this.undoCommand);
+	this.redo.onclick = $bind(this,this.redoCommand);
+	window.document.getElementById("north").onclick = $bind(this,this.changeToNorth);
+	window.document.getElementById("south").onclick = $bind(this,this.changeToSouth);
+	window.document.getElementById("west").onclick = $bind(this,this.changeToWest);
+	window.document.getElementById("east").onclick = $bind(this,this.chageToEast);
+};
+$hxClasses["com.mun.controller.componentUpdate.UpdateToolBar"] = com_mun_controller_componentUpdate_UpdateToolBar;
+com_mun_controller_componentUpdate_UpdateToolBar.__name__ = ["com","mun","controller","componentUpdate","UpdateToolBar"];
+com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
+	updateCircuitDiagram: null
+	,object: null
+	,nameInput: null
+	,orientation: null
+	,orientation_div: null
+	,toolBar: null
+	,deleteButton: null
+	,component_name_div: null
+	,undo: null
+	,redo: null
+	,update: function(object) {
+		this.object = object;
+		if(object.component != null) {
+			this.visible();
+			this.setAttribute();
+		}
+		if(object.link != null) {
+			this.visible();
+			this.component_name_div.style.visibility = "hidden";
+			this.orientation_div.style.visibility = "hidden";
+		}
+	}
+	,setAttribute: function() {
+		$(this.nameInput).val(this.object.component.get_name());
+		$(this.orientation).val(Std.string(this.object.component.get_orientation()) + "");
+	}
+	,changeToNorth: function() {
+		if(this.object.component != null) {
+			this.updateCircuitDiagram.changeOrientation(this.object.component,com_mun_model_enumeration_Orientation.NORTH);
+			this.setAttribute();
+		}
+	}
+	,changeToSouth: function() {
+		if(this.object.component != null) {
+			this.updateCircuitDiagram.changeOrientation(this.object.component,com_mun_model_enumeration_Orientation.SOUTH);
+			this.setAttribute();
+		}
+	}
+	,changeToWest: function() {
+		if(this.object.component != null) {
+			this.updateCircuitDiagram.changeOrientation(this.object.component,com_mun_model_enumeration_Orientation.WEST);
+			this.setAttribute();
+		}
+	}
+	,chageToEast: function() {
+		if(this.object.component != null) {
+			this.updateCircuitDiagram.changeOrientation(this.object.component,com_mun_model_enumeration_Orientation.EAST);
+			this.setAttribute();
+		}
+	}
+	,inputChange: function() {
+		if(this.object.component != null) {
+			var temp = $(this.nameInput).val();
+			this.updateCircuitDiagram.setComponentName(this.object.component,temp);
+		}
+	}
+	,deleteObject: function() {
+		if(this.object.component != null) {
+			this.updateCircuitDiagram.deleteComponent(this.object.component);
+		}
+		if(this.object.link != null) {
+			this.updateCircuitDiagram.deleteLink(this.object.link);
+		}
+		this.updateCircuitDiagram.redrawCanvas();
+	}
+	,undoCommand: function() {
+		this.updateCircuitDiagram.undo();
+	}
+	,redoCommand: function() {
+		this.updateCircuitDiagram.redo();
+	}
+	,visible: function() {
+		this.deleteButton.style.visibility = "visible";
+		this.orientation_div.style.visibility = "visible";
+		this.component_name_div.style.visibility = "visible";
+	}
+	,hidden: function() {
+		this.deleteButton.style.visibility = "hidden";
+		this.orientation_div.style.visibility = "hidden";
+		this.component_name_div.style.visibility = "hidden";
+	}
+	,setUndoButtonDisability: function(disable) {
+		if(disable) {
+			$(this.undo).attr("disabled");
+		} else {
+			$(this.undo).removeAttr("disabled");
+		}
+	}
+	,setRedoButtonDisability: function(disable) {
+		if(disable) {
+			$(this.redo).attr("disabled");
+		} else {
+			$(this.redo).removeAttr("disabled");
+		}
+	}
+	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
+};
+var com_mun_controller_mouseAction_ButtonClick = function(drawingAdapter,updateCircuitDiagram,pixelRatio) {
+	this.drawingAdapter = drawingAdapter;
+	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.pixelRatio = pixelRatio;
+	window.document.getElementById("AND").onclick = $bind(this,this.andOnClick);
+	window.document.getElementById("FlipFlop").onclick = $bind(this,this.flipFlopOnClick);
+	window.document.getElementById("INPUT").onclick = $bind(this,this.inputOnClick);
+	window.document.getElementById("MUX").onclick = $bind(this,this.muxOnClick);
+	window.document.getElementById("NAND").onclick = $bind(this,this.nandOnClick);
+	window.document.getElementById("NOR").onclick = $bind(this,this.norOnClick);
+	window.document.getElementById("NOT").onclick = $bind(this,this.notOnClick);
+	window.document.getElementById("OR").onclick = $bind(this,this.orOnClick);
+	window.document.getElementById("OUTPUT").onclick = $bind(this,this.outputOnClick);
+	window.document.getElementById("XOR").onclick = $bind(this,this.xorOnClick);
+};
+$hxClasses["com.mun.controller.mouseAction.ButtonClick"] = com_mun_controller_mouseAction_ButtonClick;
+com_mun_controller_mouseAction_ButtonClick.__name__ = ["com","mun","controller","mouseAction","ButtonClick"];
+com_mun_controller_mouseAction_ButtonClick.prototype = {
+	drawingAdapter: null
+	,updateCircuitDiagram: null
+	,pixelRatio: null
+	,andOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("AND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,flipFlopOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("FlipFlop",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,inputOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("Input",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,muxOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("MUX",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,nandOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("NAND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,norOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("NOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,notOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("NOT",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,orOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("OR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,outputOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("Output",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,xorOnClick: function() {
+		this.updateCircuitDiagram.createComponentByButton("XOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+	}
+	,__class__: com_mun_controller_mouseAction_ButtonClick
+};
+var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
+	this.endpointSelected = false;
+	this.createLinkFlag = false;
+	this.linkHighLight = false;
+	this.mouseDownFlag = false;
+	this.canvas = canvas;
+	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.updateToolBar = updateToolBar;
+	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
+	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
+	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
+};
+$hxClasses["com.mun.controller.mouseAction.CanvasListener"] = com_mun_controller_mouseAction_CanvasListener;
+com_mun_controller_mouseAction_CanvasListener.__name__ = ["com","mun","controller","mouseAction","CanvasListener"];
+com_mun_controller_mouseAction_CanvasListener.prototype = {
+	canvas: null
+	,mouseDownFlag: null
+	,updateCircuitDiagram: null
+	,mouseDownLocation: null
+	,updateToolBar: null
+	,link: null
+	,linkHighLight: null
+	,createLinkFlag: null
+	,object: null
+	,component: null
+	,endpoint: null
+	,endpointSelected: null
+	,port: null
+	,getPointOnCanvas: function(canvas,x,y) {
+		var bbox = canvas.getBoundingClientRect();
+		var coordinate = { "xPosition" : 0, "yPosition" : 0};
+		coordinate.xPosition = (x - bbox.left) * (canvas.width / bbox.width);
+		coordinate.yPosition = (y - bbox.top) * (canvas.height / bbox.height);
+		return coordinate;
+	}
+	,doMouseDown: function(event) {
+		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
+		this.doMouseUp(event);
+		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
+		var x = event.clientX;
+		var y = event.clientY;
+		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
+		this.mouseDownFlag = true;
+		this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
+		this.object.endPoint = this.endpoint;
+		if(this.endpoint != null) {
+			this.endpointSelected = true;
+		} else {
+			this.endpointSelected = false;
+		}
+		if(this.endpoint == null) {
+			this.link = this.updateCircuitDiagram.getLink(this.mouseDownLocation);
+			this.object.link = this.link;
+			this.linkHighLight = true;
+			if(this.link == null) {
+				this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
+				this.object.component = this.component;
+			}
+		}
+		this.updateCircuitDiagram.hightLightObject(this.object);
+		if(this.object.component != null || this.object.link != null) {
+			this.updateToolBar.update(this.object);
+		} else {
+			this.updateToolBar.hidden();
+		}
+		if(this.linkHighLight && this.endpointSelected) {
+			this.linkHighLight = false;
+			this.endpointSelected = false;
+			return;
+		}
+		if(this.link == null) {
+			this.linkHighLight = false;
+		}
+		if(this.link == null && this.updateCircuitDiagram.isOnPort(this.mouseDownLocation).port != null) {
+			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
+			this.createLinkFlag = true;
+		}
+	}
+	,doMouseMove: function(event) {
+		var x = event.clientX;
+		var y = event.clientY;
+		var loc = this.getPointOnCanvas(this.canvas,x,y);
+		if(this.mouseDownFlag == true) {
+			if(this.createLinkFlag) {
+				this.updateCircuitDiagram.moveEndpoint(this.link.get_rightEndpoint(),loc,this.mouseDownLocation);
+			} else {
+				if(this.endpoint != null) {
+					this.updateCircuitDiagram.moveEndpoint(this.endpoint,loc,this.mouseDownLocation);
+				}
+				if(this.link != null) {
+					this.updateCircuitDiagram.moveLink(this.link,loc,this.mouseDownLocation);
+				}
+				if(this.component != null) {
+					this.updateCircuitDiagram.moveComponent(this.component,loc,this.mouseDownLocation);
+				}
+			}
+		}
+		this.mouseDownLocation = loc;
+	}
+	,doMouseUp: function(event) {
+		this.mouseDownFlag = false;
+		this.link = null;
+		this.component = null;
+		this.endpoint = null;
+		this.port = null;
+		this.createLinkFlag = false;
+		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
+	}
+	,__class__: com_mun_controller_mouseAction_CanvasListener
+};
+var com_mun_model_component_CircuitDiagramI = function() { };
+$hxClasses["com.mun.model.component.CircuitDiagramI"] = com_mun_model_component_CircuitDiagramI;
+com_mun_model_component_CircuitDiagramI.__name__ = ["com","mun","model","component","CircuitDiagramI"];
+com_mun_model_component_CircuitDiagramI.prototype = {
+	get_componentArray: null
+	,set_componentArray: null
+	,get_linkArray: null
+	,set_linkArray: null
+	,get_name: null
+	,set_name: null
+	,addLink: null
+	,addComponent: null
+	,removeLink: null
+	,removeComponent: null
+	,clearCopyStack: null
+	,pushLinkToCopyStack: null
+	,pushComponentToCopyStack: null
+	,setNewOirentation: null
+	,deleteLink: null
+	,deleteComponent: null
+	,updateComponent: null
+	,linkArraySelfUpdate: null
+	,componentSetName: null
+	,__class__: com_mun_model_component_CircuitDiagramI
 };
 var com_mun_model_component_CircuitDiagram = function() {
 	this.linkArray = [];
@@ -972,6 +1846,7 @@ var com_mun_model_component_CircuitDiagram = function() {
 };
 $hxClasses["com.mun.model.component.CircuitDiagram"] = com_mun_model_component_CircuitDiagram;
 com_mun_model_component_CircuitDiagram.__name__ = ["com","mun","model","component","CircuitDiagram"];
+com_mun_model_component_CircuitDiagram.__interfaces__ = [com_mun_model_component_CircuitDiagramI];
 com_mun_model_component_CircuitDiagram.prototype = {
 	componentArray: null
 	,linkArray: null
@@ -981,19 +1856,19 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		return this.componentArray;
 	}
 	,set_componentArray: function(value) {
-		return this.componentArray = value;
+		this.componentArray = value;
 	}
 	,get_linkArray: function() {
 		return this.linkArray;
 	}
 	,set_linkArray: function(value) {
-		return this.linkArray = value;
+		this.linkArray = value;
 	}
 	,get_name: function() {
 		return this.name;
 	}
 	,set_name: function(value) {
-		return this.name = value;
+		this.name = value;
 	}
 	,addLink: function(link) {
 		this.linkArray.push(link);
@@ -1016,13 +1891,16 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,pushComponentToCopyStack: function(component) {
 		this.copyStack.pushComponent(component);
 	}
-	,SetNewOirentation: function(component,newOrientation) {
+	,setNewOirentation: function(component,newOrientation) {
 		var _g1 = 0;
 		var _g = this.componentArray.length;
 		while(_g1 < _g) {
 			var i = _g1++;
 			if(component == this.componentArray[i]) {
 				this.componentArray[i].set_orientation(newOrientation);
+				this.componentArray[i].updateMoveComponentPortPosition(this.componentArray[i].get_xPosition(),this.componentArray[i].get_yPosition());
+				this.linkArraySelfUpdate();
+				break;
 			}
 		}
 	}
@@ -1031,10 +1909,58 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	}
 	,deleteComponent: function(component) {
 		HxOverrides.remove(this.componentArray,component);
+		var _g1 = 0;
+		var _g = component.get_inportArray().length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var _g3 = 0;
+			var _g2 = this.linkArray.length;
+			while(_g3 < _g2) {
+				var j = _g3++;
+				if(component.get_inportArray()[i] == this.linkArray[j].get_leftEndpoint().get_port()) {
+					this.linkArray[j].get_leftEndpoint().set_port(null);
+				}
+				if(component.get_inportArray()[i] == this.linkArray[j].get_rightEndpoint().get_port()) {
+					this.linkArray[j].get_rightEndpoint().set_port(null);
+				}
+			}
+		}
+		var _g11 = 0;
+		var _g4 = component.get_outportArray().length;
+		while(_g11 < _g4) {
+			var i1 = _g11++;
+			var _g31 = 0;
+			var _g21 = this.linkArray.length;
+			while(_g31 < _g21) {
+				var j1 = _g31++;
+				if(component.get_outportArray()[i1] == this.linkArray[j1].get_leftEndpoint().get_port()) {
+					this.linkArray[j1].get_leftEndpoint().set_port(null);
+				}
+				if(component.get_outportArray()[i1] == this.linkArray[j1].get_rightEndpoint().get_port()) {
+					this.linkArray[j1].get_rightEndpoint().set_port(null);
+				}
+			}
+		}
+	}
+	,updateComponent: function(component) {
+		this.componentArray[this.componentArray.indexOf(component)] = component;
+	}
+	,linkArraySelfUpdate: function() {
+		var _g1 = 0;
+		var _g = this.linkArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.linkArray[i].get_leftEndpoint().updatePosition();
+			this.linkArray[i].get_rightEndpoint().updatePosition();
+		}
+	}
+	,componentSetName: function(component,name) {
+		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
 	,__class__: com_mun_model_component_CircuitDiagram
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
+	this.name = "component1";
 	this.outportArray = [];
 	this.inportArray = [];
 	this.xPosition = xPosition;
@@ -1073,6 +1999,7 @@ com_mun_model_component_Component.prototype = {
 	,name: null
 	,delay: null
 	,inportsNum: null
+	,nameOfTheComponentKind: null
 	,get_xPosition: function() {
 		return this.xPosition;
 	}
@@ -1136,6 +2063,12 @@ com_mun_model_component_Component.prototype = {
 	,get_inportsNum: function() {
 		return this.inportsNum;
 	}
+	,setNameOfTheComponentKind: function(name) {
+		this.nameOfTheComponentKind = name;
+	}
+	,getNameOfTheComponentKind: function() {
+		return this.nameOfTheComponentKind;
+	}
 	,set_inportsNum: function(value) {
 		if(value <= this.componentKind.getLeastInportNumber()) {
 			return false;
@@ -1146,11 +2079,19 @@ com_mun_model_component_Component.prototype = {
 		} else {
 			return false;
 		}
-		this.inportArray = this.componentKind.updatePortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
 		return true;
 	}
 	,removeInport: function(inport) {
 		return HxOverrides.remove(this.inportArray,inport);
+	}
+	,updateMoveComponentPortPosition: function(xPosition,yPosition) {
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		return this;
+	}
+	,drawComponent: function(component,drawingAdpater,highLight) {
+		this.componentKind.drawComponent(component,drawingAdpater,highLight);
 	}
 	,__class__: com_mun_model_component_Component
 };
@@ -1181,6 +2122,12 @@ com_mun_model_component_Endpoint.prototype = {
 	}
 	,set_port: function(value) {
 		return this.port = value;
+	}
+	,updatePosition: function() {
+		if(this.port != null) {
+			this.xPosition = this.port.get_xPosition();
+			this.yPosition = this.port.get_yPosition();
+		}
 	}
 	,__class__: com_mun_model_component_Endpoint
 };
@@ -1270,6 +2217,52 @@ com_mun_model_component_Link.prototype = {
 	}
 	,__class__: com_mun_model_component_Link
 };
+var com_mun_model_component_Outport = function(xPosition,yPosition) {
+	this.xPosition = xPosition;
+	this.yPosition = yPosition;
+	this.portDescription = com_mun_model_enumeration_IOTYPE.OUTPUT;
+};
+$hxClasses["com.mun.model.component.Outport"] = com_mun_model_component_Outport;
+com_mun_model_component_Outport.__name__ = ["com","mun","model","component","Outport"];
+com_mun_model_component_Outport.__interfaces__ = [com_mun_model_component_Port];
+com_mun_model_component_Outport.prototype = {
+	xPosition: null
+	,yPosition: null
+	,portDescription: null
+	,value: null
+	,sequence: null
+	,get_xPosition: function() {
+		return this.xPosition;
+	}
+	,get_yPosition: function() {
+		return this.yPosition;
+	}
+	,set_xPosition: function(xPosition) {
+		this.xPosition = xPosition;
+	}
+	,set_yPosition: function(yPosition) {
+		this.yPosition = yPosition;
+	}
+	,get_value: function() {
+		return this.value;
+	}
+	,set_value: function(value) {
+		this.value = value;
+	}
+	,get_portDescription: function() {
+		return this.portDescription;
+	}
+	,set_portDescription: function(value) {
+		this.portDescription = value;
+	}
+	,get_sequence: function() {
+		return this.sequence;
+	}
+	,set_sequence: function(sequence) {
+		this.sequence = sequence;
+	}
+	,__class__: com_mun_model_component_Outport
+};
 var com_mun_model_drawingInterface_DrawingAdapterI = function() { };
 $hxClasses["com.mun.model.drawingInterface.DrawingAdapterI"] = com_mun_model_drawingInterface_DrawingAdapterI;
 com_mun_model_drawingInterface_DrawingAdapterI.__name__ = ["com","mun","model","drawingInterface","DrawingAdapterI"];
@@ -1347,6 +2340,115 @@ com_mun_model_enumeration_ValueLogic.DOWN_EDGE = ["DOWN_EDGE",4];
 com_mun_model_enumeration_ValueLogic.DOWN_EDGE.toString = $estr;
 com_mun_model_enumeration_ValueLogic.DOWN_EDGE.__enum__ = com_mun_model_enumeration_ValueLogic;
 com_mun_model_enumeration_ValueLogic.__empty_constructs__ = [com_mun_model_enumeration_ValueLogic.FALSE,com_mun_model_enumeration_ValueLogic.TRUE,com_mun_model_enumeration_ValueLogic.UNDEFINED,com_mun_model_enumeration_ValueLogic.RISING_EDGE,com_mun_model_enumeration_ValueLogic.DOWN_EDGE];
+var com_mun_model_gates_GateAbstract = function(leastInportNum) {
+	this.leastInportNum = leastInportNum;
+};
+$hxClasses["com.mun.model.gates.GateAbstract"] = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_GateAbstract.__name__ = ["com","mun","model","gates","GateAbstract"];
+com_mun_model_gates_GateAbstract.prototype = {
+	leastInportNum: null
+	,getLeastInportNumber: function() {
+		return this.leastInportNum;
+	}
+	,addInPort: function() {
+		return new com_mun_model_component_Inport();
+	}
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
+				portArray[i].set_yPosition(yPosition + height / 2);
+				if(portArray[i].get_sequence() == -1) {
+					portArray[i].set_sequence(i);
+				}
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				portArray[i1].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i1 + 1));
+				portArray[i1].set_yPosition(yPosition - height / 2);
+				if(portArray[i1].get_sequence() == -1) {
+					portArray[i1].set_sequence(i1);
+				}
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				portArray[i2].set_xPosition(xPosition + width / 2);
+				portArray[i2].set_yPosition(height / (portArray.length + 1) * (i2 + 1) + (yPosition - height / 2));
+				if(portArray[i2].get_sequence() == -1) {
+					portArray[i2].set_sequence(i2);
+				}
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				portArray[i3].set_xPosition(xPosition - width / 2);
+				portArray[i3].set_yPosition(height / (portArray.length + 1) * (i3 + 1) + (yPosition - height / 2));
+				if(portArray[i3].get_sequence() == -1) {
+					portArray[i3].set_sequence(i3);
+				}
+			}
+			break;
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				portArray[i].set_xPosition(xPosition);
+				portArray[i].set_yPosition(yPosition - height / 2);
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				portArray[i1].set_xPosition(xPosition);
+				portArray[i1].set_yPosition(yPosition + height / 2);
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				portArray[i2].set_xPosition(xPosition - width / 2);
+				portArray[i2].set_yPosition(yPosition);
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				portArray[i3].set_xPosition(xPosition + width / 2);
+				portArray[i3].set_yPosition(yPosition);
+			}
+			break;
+		}
+		return portArray;
+	}
+	,__class__: com_mun_model_gates_GateAbstract
+};
 var com_mun_model_gates_ComponentKind = function() { };
 $hxClasses["com.mun.model.gates.ComponentKind"] = com_mun_model_gates_ComponentKind;
 com_mun_model_gates_ComponentKind.__name__ = ["com","mun","model","gates","ComponentKind"];
@@ -1355,8 +2457,1375 @@ com_mun_model_gates_ComponentKind.prototype = {
 	,algorithm: null
 	,createPorts: null
 	,addInPort: null
-	,updatePortPosition: null
+	,updateInPortPosition: null
+	,updateOutPortPosition: null
+	,drawComponent: null
 	,__class__: com_mun_model_gates_ComponentKind
+};
+var com_mun_model_gates_AND = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.AND"] = com_mun_model_gates_AND;
+com_mun_model_gates_AND.__name__ = ["com","mun","model","gates","AND"];
+com_mun_model_gates_AND.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_AND.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.FALSE) {
+				value = com_mun_model_enumeration_ValueLogic.FALSE;
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		switch(orientation[1]) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_sequence(counter);
+				inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_sequence(counter1);
+				inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_sequence(counter2);
+				inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_sequence(counter3);
+				inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawAND(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_AND
+});
+var com_mun_model_gates_FlipFlop = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.FlipFlop"] = com_mun_model_gates_FlipFlop;
+com_mun_model_gates_FlipFlop.__name__ = ["com","mun","model","gates","FlipFlop"];
+com_mun_model_gates_FlipFlop.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_FlipFlop.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+				if(port1.get_value() != com_mun_model_enumeration_ValueLogic.RISING_EDGE) {
+					return portArray;
+				}
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+				value = port2.get_value();
+			}
+		}
+		var _g2 = 0;
+		while(_g2 < portArray.length) {
+			var port3 = portArray[_g2];
+			++_g2;
+			if(port3.get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+				HxOverrides.remove(portArray,port3);
+				port3.set_value(value);
+				portArray.push(port3);
+			}
+			if(port3.get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+				HxOverrides.remove(portArray,port3);
+				if(value == com_mun_model_enumeration_ValueLogic.TRUE) {
+					port3.set_value(com_mun_model_enumeration_ValueLogic.FALSE);
+				} else if(value == com_mun_model_enumeration_ValueLogic.FALSE) {
+					port3.set_value(com_mun_model_enumeration_ValueLogic.TRUE);
+				}
+				portArray.push(port3);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		switch(orientation[1]) {
+		case 0:
+			var inport_D = new com_mun_model_component_Inport(xPosition - width / 2 + width / 3,yPosition + height / 2);
+			inport_D.set_portDescription(com_mun_model_enumeration_IOTYPE.D);
+			portArray.push(inport_D);
+			var inport_CLK = new com_mun_model_component_Inport(xPosition - width / 2 + width / 3 * 2,yPosition + height / 2);
+			inport_CLK.set_portDescription(com_mun_model_enumeration_IOTYPE.CLK);
+			portArray.push(inport_CLK);
+			var outport_Q = new com_mun_model_component_Outport(xPosition - width / 2 + width / 3,yPosition - height / 2);
+			outport_Q.set_portDescription(com_mun_model_enumeration_IOTYPE.Q);
+			portArray.push(outport_Q);
+			var outport_QN = new com_mun_model_component_Outport(xPosition - width / 2 + width / 3 * 2,yPosition - height / 2);
+			outport_QN.set_portDescription(com_mun_model_enumeration_IOTYPE.QN);
+			portArray.push(outport_QN);
+			break;
+		case 1:
+			var inport_D1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / 3,yPosition - height / 2);
+			inport_D1.set_portDescription(com_mun_model_enumeration_IOTYPE.D);
+			portArray.push(inport_D1);
+			var inport_CLK1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / 3 * 2,yPosition - height / 2);
+			inport_CLK1.set_portDescription(com_mun_model_enumeration_IOTYPE.CLK);
+			portArray.push(inport_CLK1);
+			var outport_Q1 = new com_mun_model_component_Outport(xPosition - width / 2 + width / 3,yPosition + height / 2);
+			outport_Q1.set_portDescription(com_mun_model_enumeration_IOTYPE.Q);
+			portArray.push(outport_Q1);
+			var outport_QN1 = new com_mun_model_component_Outport(xPosition - width / 2 + width / 3 * 2,yPosition + height / 2);
+			outport_QN1.set_portDescription(com_mun_model_enumeration_IOTYPE.QN);
+			portArray.push(outport_QN1);
+			break;
+		case 2:
+			var inport_D2 = new com_mun_model_component_Inport(xPosition + width / 2,height / 3 + (yPosition - height / 2));
+			inport_D2.set_portDescription(com_mun_model_enumeration_IOTYPE.D);
+			portArray.push(inport_D2);
+			var inport_CLK2 = new com_mun_model_component_Inport(xPosition + width / 2,height / 3 * 2 + (yPosition - height / 2));
+			inport_CLK2.set_portDescription(com_mun_model_enumeration_IOTYPE.CLK);
+			portArray.push(inport_CLK2);
+			var outport_Q2 = new com_mun_model_component_Outport(xPosition - width / 2,height / 3 + (yPosition - height / 2));
+			outport_Q2.set_portDescription(com_mun_model_enumeration_IOTYPE.Q);
+			portArray.push(outport_Q2);
+			var outport_QN2 = new com_mun_model_component_Outport(xPosition - width / 2,height / 3 * 2 + (yPosition - height / 2));
+			outport_QN2.set_portDescription(com_mun_model_enumeration_IOTYPE.QN);
+			portArray.push(outport_QN2);
+			break;
+		case 3:
+			var inport_D3 = new com_mun_model_component_Inport(xPosition - width / 2,height / 3 + (yPosition - height / 2));
+			inport_D3.set_portDescription(com_mun_model_enumeration_IOTYPE.D);
+			portArray.push(inport_D3);
+			var inport_CLK3 = new com_mun_model_component_Inport(xPosition - width / 2,height / 3 * 2 + (yPosition - height / 2));
+			inport_CLK3.set_portDescription(com_mun_model_enumeration_IOTYPE.CLK);
+			portArray.push(inport_CLK3);
+			var outport_Q3 = new com_mun_model_component_Outport(xPosition + width / 2,height / 3 + (yPosition - height / 2));
+			outport_Q3.set_portDescription(com_mun_model_enumeration_IOTYPE.Q);
+			portArray.push(outport_Q3);
+			var outport_QN3 = new com_mun_model_component_Outport(xPosition + width / 2,height / 3 * 2 + (yPosition - height / 2));
+			outport_QN3.set_portDescription(com_mun_model_enumeration_IOTYPE.QN);
+			portArray.push(outport_QN3);
+			break;
+		}
+		return portArray;
+	}
+	,addInPort: function() {
+		return null;
+	}
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i].set_yPosition(yPosition + height / 2);
+				}
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i].set_yPosition(yPosition + height / 2);
+				}
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i1].set_yPosition(yPosition - height / 2);
+				}
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i1].set_yPosition(yPosition - height / 2);
+				}
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i2].set_xPosition(xPosition + width / 2);
+					portArray[i2].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i2].set_xPosition(xPosition + width / 2);
+					portArray[i2].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					portArray[i3].set_xPosition(xPosition - width / 2);
+					portArray[i3].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					portArray[i3].set_xPosition(xPosition - width / 2);
+					portArray[i3].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i].set_yPosition(yPosition - height / 2);
+				}
+				if(portArray[i].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i].set_yPosition(yPosition - height / 2);
+				}
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3);
+					portArray[i1].set_yPosition(yPosition + height / 2);
+				}
+				if(portArray[i1].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+					portArray[i1].set_yPosition(yPosition + height / 2);
+				}
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i2].set_xPosition(xPosition - width / 2);
+					portArray[i2].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i2].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i2].set_xPosition(xPosition - width / 2);
+					portArray[i2].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					portArray[i3].set_xPosition(xPosition + width / 2);
+					portArray[i3].set_yPosition(height / 3 + (yPosition - height / 2));
+				}
+				if(portArray[i3].get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					portArray[i3].set_xPosition(xPosition + width / 2);
+					portArray[i3].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+				}
+			}
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawFlipFlop(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_FlipFlop
+});
+var com_mun_model_gates_Input = function() {
+	com_mun_model_gates_GateAbstract.call(this,1);
+};
+$hxClasses["com.mun.model.gates.Input"] = com_mun_model_gates_Input;
+com_mun_model_gates_Input.__name__ = ["com","mun","model","gates","Input"];
+com_mun_model_gates_Input.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_Input.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	sequence: null
+	,algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT) {
+				value = port1.get_value();
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		inportNum = 1;
+		switch(orientation[1]) {
+		case 0:
+			var inport = new com_mun_model_component_Inport(xPosition,yPosition + height / 2);
+			inport.set_sequence(1);
+			inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport);
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var inport1 = new com_mun_model_component_Inport(xPosition,yPosition - height / 2);
+			inport1.set_sequence(1);
+			inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport1);
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,yPosition);
+			inport2.set_sequence(1);
+			inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport2);
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,yPosition);
+			inport3.set_sequence(1);
+			inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport3);
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,get_sequence: function() {
+		return this.sequence;
+	}
+	,set_sequence: function(value) {
+		return this.sequence = value;
+	}
+	,addInPort: function() {
+		return null;
+	}
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawInput(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_Input
+});
+var com_mun_model_gates_MUX = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.MUX"] = com_mun_model_gates_MUX;
+com_mun_model_gates_MUX.__name__ = ["com","mun","model","gates","MUX"];
+com_mun_model_gates_MUX.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_MUX.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var selectValue = com_mun_model_enumeration_ValueLogic.FALSE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+				selectValue = port1.get_value();
+				break;
+			}
+		}
+		if(selectValue == com_mun_model_enumeration_ValueLogic.TRUE) {
+			var _g1 = 0;
+			while(_g1 < portArray.length) {
+				var port2 = portArray[_g1];
+				++_g1;
+				if(port2.get_sequence() == 1) {
+					value = port2.get_value();
+					break;
+				}
+			}
+		} else if(selectValue == com_mun_model_enumeration_ValueLogic.FALSE) {
+			var _g2 = 0;
+			while(_g2 < portArray.length) {
+				var port3 = portArray[_g2];
+				++_g2;
+				if(port3.get_sequence() == 0) {
+					value = port3.get_value();
+					break;
+				}
+			}
+		}
+		var _g3 = 0;
+		while(_g3 < portArray.length) {
+			var port4 = portArray[_g3];
+			++_g3;
+			if(port4.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port4);
+				port4.set_value(value);
+				portArray.push(port4);
+				break;
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		switch(orientation[1]) {
+		case 0:
+			var inport_S = new com_mun_model_component_Inport(xPosition + width / 2,yPosition);
+			inport_S.set_portDescription(com_mun_model_enumeration_IOTYPE.S);
+			portArray.push(inport_S);
+			var inport_1 = new com_mun_model_component_Inport(xPosition - width / 2 + height / 3 * 2,yPosition + height / 2);
+			inport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_1.set_sequence(0);
+			portArray.push(inport_1);
+			var inport_2 = new com_mun_model_component_Inport(xPosition - width / 2 + width / 3,yPosition + height / 2);
+			inport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_2.set_sequence(1);
+			portArray.push(inport_2);
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var inport_S1 = new com_mun_model_component_Inport(xPosition - width / 2,yPosition);
+			inport_S1.set_portDescription(com_mun_model_enumeration_IOTYPE.S);
+			portArray.push(inport_S1);
+			var inport_11 = new com_mun_model_component_Inport(xPosition - width / 2 + height / 3 * 2,yPosition - height / 2);
+			inport_11.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_11.set_sequence(0);
+			portArray.push(inport_11);
+			var inport_21 = new com_mun_model_component_Inport(xPosition - width / 2 + width / 3,yPosition - height / 2);
+			inport_21.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_21.set_sequence(1);
+			portArray.push(inport_21);
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var inport_S2 = new com_mun_model_component_Inport(xPosition,yPosition - height / 2);
+			inport_S2.set_portDescription(com_mun_model_enumeration_IOTYPE.S);
+			portArray.push(inport_S2);
+			var inport_12 = new com_mun_model_component_Inport(xPosition + width / 2,height / 3 + (yPosition - height / 2));
+			inport_12.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_12.set_sequence(0);
+			portArray.push(inport_12);
+			var inport_22 = new com_mun_model_component_Inport(xPosition + width / 2,height / 3 * 2 + (yPosition - height / 2));
+			inport_22.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_22.set_sequence(1);
+			portArray.push(inport_22);
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var inport_S3 = new com_mun_model_component_Inport(xPosition,yPosition - height / 2);
+			inport_S3.set_portDescription(com_mun_model_enumeration_IOTYPE.S);
+			portArray.push(inport_S3);
+			var inport_13 = new com_mun_model_component_Inport(xPosition - width / 2,height / 3 + (yPosition - height / 2));
+			inport_13.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_13.set_sequence(0);
+			portArray.push(inport_13);
+			var inport_23 = new com_mun_model_component_Inport(xPosition - width / 2,height / 3 * 2 + (yPosition - height / 2));
+			inport_23.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			inport_23.set_sequence(1);
+			portArray.push(inport_23);
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			var _g1 = 0;
+			var _g = portArray.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				if(portArray[i].get_portDescription() != com_mun_model_enumeration_IOTYPE.S) {
+					portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
+					portArray[i].set_yPosition(yPosition + height / 2);
+					if(portArray[i].get_sequence() == -1) {
+						portArray[i].set_sequence(i);
+					}
+				} else {
+					portArray[i].set_xPosition(xPosition - width / 2);
+					portArray[i].set_yPosition(yPosition);
+				}
+			}
+			break;
+		case 1:
+			var _g11 = 0;
+			var _g2 = portArray.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				if(portArray[i1].get_portDescription() != com_mun_model_enumeration_IOTYPE.S) {
+					portArray[i1].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i1 + 1));
+					portArray[i1].set_yPosition(yPosition - height / 2);
+					if(portArray[i1].get_sequence() == -1) {
+						portArray[i1].set_sequence(i1);
+					}
+				} else {
+					portArray[i1].set_xPosition(xPosition + width / 2);
+					portArray[i1].set_yPosition(yPosition);
+				}
+			}
+			break;
+		case 2:
+			var _g12 = 0;
+			var _g3 = portArray.length;
+			while(_g12 < _g3) {
+				var i2 = _g12++;
+				if(portArray[i2].get_portDescription() != com_mun_model_enumeration_IOTYPE.S) {
+					portArray[i2].set_xPosition(xPosition + width / 2);
+					portArray[i2].set_yPosition(height / (portArray.length + 1) * (i2 + 1) + (yPosition - height / 2));
+					if(portArray[i2].get_sequence() == -1) {
+						portArray[i2].set_sequence(i2);
+					}
+				} else {
+					portArray[i2].set_xPosition(xPosition);
+					portArray[i2].set_yPosition(yPosition - height / 2);
+				}
+			}
+			break;
+		case 3:
+			var _g13 = 0;
+			var _g4 = portArray.length;
+			while(_g13 < _g4) {
+				var i3 = _g13++;
+				if(portArray[i3].get_portDescription() != com_mun_model_enumeration_IOTYPE.S) {
+					portArray[i3].set_xPosition(xPosition - width / 2);
+					portArray[i3].set_yPosition(height / (portArray.length + 1) * (i3 + 1) + (yPosition - height / 2));
+					if(portArray[i3].get_sequence() == -1) {
+						portArray[i3].set_sequence(i3);
+					}
+				} else {
+					portArray[i3].set_xPosition(xPosition);
+					portArray[i3].set_yPosition(yPosition - height / 2);
+				}
+			}
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawMUX(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_MUX
+});
+var com_mun_model_gates_NAND = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.NAND"] = com_mun_model_gates_NAND;
+com_mun_model_gates_NAND.__name__ = ["com","mun","model","gates","NAND"];
+com_mun_model_gates_NAND.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_NAND.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.FALSE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.FALSE) {
+				value = com_mun_model_enumeration_ValueLogic.TRUE;
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 2) {
+			inportNum = 2;
+		}
+		switch(orientation[1]) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_sequence(counter + 1);
+				inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_sequence(counter1 + 1);
+				inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_sequence(counter2 + 1);
+				inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_sequence(counter3 + 1);
+				inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawNAND(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_NAND
+});
+var com_mun_model_gates_NOR = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.NOR"] = com_mun_model_gates_NOR;
+com_mun_model_gates_NOR.__name__ = ["com","mun","model","gates","NOR"];
+com_mun_model_gates_NOR.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_NOR.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.TRUE) {
+				value = com_mun_model_enumeration_ValueLogic.FALSE;
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 2) {
+			inportNum = 2;
+		}
+		switch(orientation[1]) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_sequence(counter + 1);
+				inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_sequence(counter1 + 1);
+				inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_sequence(counter2 + 1);
+				inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_sequence(counter3 + 1);
+				inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawNOR(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_NOR
+});
+var com_mun_model_gates_NOT = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.NOT"] = com_mun_model_gates_NOT;
+com_mun_model_gates_NOT.__name__ = ["com","mun","model","gates","NOT"];
+com_mun_model_gates_NOT.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_NOT.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT) {
+				value = port1.get_value();
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				if(value == com_mun_model_enumeration_ValueLogic.TRUE) {
+					port2.set_value(com_mun_model_enumeration_ValueLogic.FALSE);
+				} else if(value == com_mun_model_enumeration_ValueLogic.FALSE) {
+					port2.set_value(com_mun_model_enumeration_ValueLogic.TRUE);
+				}
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		inportNum = 1;
+		switch(orientation[1]) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_sequence(counter + 1);
+				inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_sequence(counter1 + 1);
+				inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_sequence(counter2 + 1);
+				inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_sequence(counter3 + 1);
+				inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawNOT(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_NOT
+});
+var com_mun_model_gates_OR = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.OR"] = com_mun_model_gates_OR;
+com_mun_model_gates_OR.__name__ = ["com","mun","model","gates","OR"];
+com_mun_model_gates_OR.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_OR.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.FALSE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.TRUE) {
+				value = com_mun_model_enumeration_ValueLogic.TRUE;
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 3) {
+			inportNum = 2;
+		}
+		switch(orientation[1]) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_sequence(counter + 1);
+				inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_sequence(counter1 + 1);
+				inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_sequence(counter2 + 1);
+				inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_sequence(counter3 + 1);
+				inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawOR(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_OR
+});
+var com_mun_model_gates_Output = function() {
+	com_mun_model_gates_GateAbstract.call(this,1);
+};
+$hxClasses["com.mun.model.gates.Output"] = com_mun_model_gates_Output;
+com_mun_model_gates_Output.__name__ = ["com","mun","model","gates","Output"];
+com_mun_model_gates_Output.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_Output.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT) {
+				value = port1.get_value();
+				break;
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		inportNum = 1;
+		switch(orientation[1]) {
+		case 0:
+			var inport = new com_mun_model_component_Inport(xPosition,yPosition + height / 2);
+			inport.set_sequence(1);
+			inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport);
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var inport1 = new com_mun_model_component_Inport(xPosition,yPosition - height / 2);
+			inport1.set_sequence(1);
+			inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport1);
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,yPosition);
+			inport2.set_sequence(1);
+			inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport2);
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,yPosition);
+			inport3.set_sequence(1);
+			inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+			portArray.push(inport3);
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation[1]) {
+		case 0:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition - height / 2);
+			break;
+		case 1:
+			portArray[0].set_xPosition(xPosition);
+			portArray[0].set_yPosition(yPosition + height / 2);
+			break;
+		case 2:
+			portArray[0].set_xPosition(xPosition - width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		case 3:
+			portArray[0].set_xPosition(xPosition + width / 2);
+			portArray[0].set_yPosition(yPosition);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawOutput(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_Output
+});
+var com_mun_model_gates_XOR = function() {
+	com_mun_model_gates_GateAbstract.call(this,2);
+};
+$hxClasses["com.mun.model.gates.XOR"] = com_mun_model_gates_XOR;
+com_mun_model_gates_XOR.__name__ = ["com","mun","model","gates","XOR"];
+com_mun_model_gates_XOR.__interfaces__ = [com_mun_model_gates_ComponentKind];
+com_mun_model_gates_XOR.__super__ = com_mun_model_gates_GateAbstract;
+com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+	algorithm: function(portArray) {
+		var port;
+		var value;
+		var counter = 0;
+		var _g = 0;
+		while(_g < portArray.length) {
+			var port1 = portArray[_g];
+			++_g;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.TRUE) {
+				++counter;
+			}
+		}
+		if(counter % 2 == 0) {
+			value = com_mun_model_enumeration_ValueLogic.FALSE;
+		} else {
+			value = com_mun_model_enumeration_ValueLogic.TRUE;
+		}
+		var _g1 = 0;
+		while(_g1 < portArray.length) {
+			var port2 = portArray[_g1];
+			++_g1;
+			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
+				HxOverrides.remove(portArray,port2);
+				port2.set_value(value);
+				portArray.push(port2);
+			}
+		}
+		return portArray;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 2) {
+			inportNum = 2;
+		}
+		switch(orientation[1]) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_sequence(counter + 1);
+				inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_sequence(counter1 + 1);
+				inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_sequence(counter2 + 1);
+				inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_sequence(counter3 + 1);
+				inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		}
+		return portArray;
+	}
+	,drawComponent: function(component,drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawXOR(component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: com_mun_model_gates_XOR
+});
+var com_mun_view_drawComponents_Constant = function() {
+	this.portRadius = 4;
+};
+$hxClasses["com.mun.view.drawComponents.Constant"] = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_Constant.__name__ = ["com","mun","view","drawComponents","Constant"];
+com_mun_view_drawComponents_Constant.prototype = {
+	portRadius: null
+	,get_portRadius: function() {
+		return this.portRadius;
+	}
+	,set_portRadius: function(value) {
+		return this.portRadius = value;
+	}
+	,__class__: com_mun_view_drawComponents_Constant
+	,__properties__: {set_portRadius:"set_portRadius",get_portRadius:"get_portRadius"}
 };
 var com_mun_view_drawComponents_DrawComponent = function() { };
 $hxClasses["com.mun.view.drawComponents.DrawComponent"] = com_mun_view_drawComponents_DrawComponent;
@@ -1365,6 +3834,510 @@ com_mun_view_drawComponents_DrawComponent.prototype = {
 	drawCorrespondingComponent: null
 	,__class__: com_mun_view_drawComponents_DrawComponent
 };
+var com_mun_view_drawComponents_DrawAND = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawAND"] = com_mun_view_drawComponents_DrawAND;
+com_mun_view_drawComponents_DrawAND.__name__ = ["com","mun","view","drawComponents","DrawAND"];
+com_mun_view_drawComponents_DrawAND.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawAND.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawAND.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g2 = outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawAND
+});
+var com_mun_view_drawComponents_DrawFlipFlop = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawFlipFlop"] = com_mun_view_drawComponents_DrawFlipFlop;
+com_mun_view_drawComponents_DrawFlipFlop.__name__ = ["com","mun","view","drawComponents","DrawFlipFlop"];
+com_mun_view_drawComponents_DrawFlipFlop.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawFlipFlop.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawFlipFlop.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
+		this.drawingAdapter.drawText("FF",this.component.get_xPosition() - 4,this.component.get_yPosition(),this.component.get_width());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+			var _g2 = this.component.get_orientation();
+			switch(_g2[1]) {
+			case 0:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					this.drawingAdapter.drawText("D",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 2);
+				} else if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					this.drawingAdapter.drawText("CLK",port.get_xPosition() - 6,port.get_yPosition() - 5,this.component.get_width() - 2);
+				}
+				break;
+			case 1:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					this.drawingAdapter.drawText("D",port.get_xPosition() - 3,port.get_yPosition() + 10,this.component.get_width() - 2);
+				} else if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					this.drawingAdapter.drawText("CLK",port.get_xPosition() - 3,port.get_yPosition() + 10,this.component.get_width() - 2);
+				}
+				break;
+			case 2:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					this.drawingAdapter.drawText("D",port.get_xPosition() - 10,port.get_yPosition() + 2,this.component.get_width() - 2);
+				} else if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					this.drawingAdapter.drawText("CLK",port.get_xPosition() - 20,port.get_yPosition() + 2,this.component.get_width() - 2);
+				}
+				break;
+			case 3:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
+					this.drawingAdapter.drawText("D",port.get_xPosition() + 3,port.get_yPosition() + 3,this.component.get_width() - 2);
+				} else if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
+					this.drawingAdapter.drawText("CLK",port.get_xPosition() + 3,port.get_yPosition() + 3,this.component.get_width() - 2);
+				}
+				break;
+			}
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g3 = outportArray.length;
+		while(_g11 < _g3) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+			var _g21 = this.component.get_orientation();
+			switch(_g21[1]) {
+			case 0:
+				if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					this.drawingAdapter.drawText("Q",port1.get_xPosition() - 2,port1.get_yPosition() + 10,this.component.get_width() - 2);
+				} else if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					this.drawingAdapter.drawText("QN",port1.get_xPosition() - 6,port1.get_yPosition() + 10,this.component.get_width() - 2);
+				}
+				break;
+			case 1:
+				if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					this.drawingAdapter.drawText("Q",port1.get_xPosition() - 3,port1.get_yPosition() - 7,this.component.get_width() - 2);
+				} else if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					this.drawingAdapter.drawText("QN",port1.get_xPosition() - 3,port1.get_yPosition() - 7,this.component.get_width() - 2);
+				}
+				break;
+			case 2:
+				if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					this.drawingAdapter.drawText("Q",port1.get_xPosition() + 3,port1.get_yPosition() + 2,this.component.get_width() - 2);
+				} else if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					this.drawingAdapter.drawText("QN",port1.get_xPosition() + 3,port1.get_yPosition() + 2,this.component.get_width() - 2);
+				}
+				break;
+			case 3:
+				if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
+					this.drawingAdapter.drawText("Q",port1.get_xPosition() - 10,port1.get_yPosition() + 3,this.component.get_width() - 2);
+				} else if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
+					this.drawingAdapter.drawText("QN",port1.get_xPosition() - 14,port1.get_yPosition() + 3,this.component.get_width() - 2);
+				}
+				break;
+			}
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawFlipFlop
+});
+var com_mun_view_drawComponents_DrawInput = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawInput"] = com_mun_view_drawComponents_DrawInput;
+com_mun_view_drawComponents_DrawInput.__name__ = ["com","mun","view","drawComponents","DrawInput"];
+com_mun_view_drawComponents_DrawInput.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawInput.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawInput.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.setFillColor("red");
+		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
+		this.drawingAdapter.setTextColor("black");
+		var outportArray = this.component.get_outportArray();
+		var _g1 = 0;
+		var _g = outportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = outportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawInput
+});
+var com_mun_view_drawComponents_DrawLink = function(link,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.link = link;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawLink"] = com_mun_view_drawComponents_DrawLink;
+com_mun_view_drawComponents_DrawLink.__name__ = ["com","mun","view","drawComponents","DrawLink"];
+com_mun_view_drawComponents_DrawLink.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawLink.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawLink.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,link: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawLine(this.link.get_leftEndpoint().get_xPosition(),this.link.get_leftEndpoint().get_yPosition(),this.link.get_rightEndpoint().get_xPosition(),this.link.get_rightEndpoint().get_yPosition());
+	}
+	,__class__: com_mun_view_drawComponents_DrawLink
+});
+var com_mun_view_drawComponents_DrawMUX = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawMUX"] = com_mun_view_drawComponents_DrawMUX;
+com_mun_view_drawComponents_DrawMUX.__name__ = ["com","mun","view","drawComponents","DrawMUX"];
+com_mun_view_drawComponents_DrawMUX.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawMUX.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawMUX.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
+		this.drawingAdapter.setTextColor("black");
+		this.drawingAdapter.drawText("MUX",this.component.get_xPosition() - 8,this.component.get_yPosition(),this.component.get_width() - 2);
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+			this.drawingAdapter.setTextColor("black");
+			var _g2 = this.component.get_orientation();
+			switch(_g2[1]) {
+			case 0:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+					this.drawingAdapter.drawText("S",port.get_xPosition() - 7,port.get_yPosition() + 2,this.component.get_width() - 4);
+				} else {
+					this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 4);
+				}
+				break;
+			case 1:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+					this.drawingAdapter.drawText("S",port.get_xPosition() + 3,port.get_yPosition(),this.component.get_width() - 4);
+				} else {
+					this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition(),port.get_yPosition() + 10,this.component.get_width() - 4);
+				}
+				break;
+			case 2:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+					this.drawingAdapter.drawText("S",port.get_xPosition() - 2,port.get_yPosition() + 10,this.component.get_width() - 4);
+				} else {
+					this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() - 8,port.get_yPosition(),this.component.get_width() - 4);
+				}
+				break;
+			case 3:
+				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+					this.drawingAdapter.drawText("S",port.get_xPosition() - 2,port.get_yPosition() + 10,this.component.get_width() - 4);
+				} else {
+					this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() + 3,port.get_yPosition() + 2,this.component.get_width() - 4);
+				}
+				break;
+			}
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g3 = outportArray.length;
+		while(_g11 < _g3) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawMUX
+});
+var com_mun_view_drawComponents_DrawNAND = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawNAND"] = com_mun_view_drawComponents_DrawNAND;
+com_mun_view_drawComponents_DrawNAND.__name__ = ["com","mun","view","drawComponents","DrawNAND"];
+com_mun_view_drawComponents_DrawNAND.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawNAND.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawNAND.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawNAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g2 = outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawNAND
+});
+var com_mun_view_drawComponents_DrawNOR = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawNOR"] = com_mun_view_drawComponents_DrawNOR;
+com_mun_view_drawComponents_DrawNOR.__name__ = ["com","mun","view","drawComponents","DrawNOR"];
+com_mun_view_drawComponents_DrawNOR.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawNOR.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawNOR.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawNOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g2 = outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawNOR
+});
+var com_mun_view_drawComponents_DrawNOT = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawNOT"] = com_mun_view_drawComponents_DrawNOT;
+com_mun_view_drawComponents_DrawNOT.__name__ = ["com","mun","view","drawComponents","DrawNOT"];
+com_mun_view_drawComponents_DrawNOT.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawNOT.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawNOT.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawNotShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g2 = outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawNOT
+});
+var com_mun_view_drawComponents_DrawOR = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawOR"] = com_mun_view_drawComponents_DrawOR;
+com_mun_view_drawComponents_DrawOR.__name__ = ["com","mun","view","drawComponents","DrawOR"];
+com_mun_view_drawComponents_DrawOR.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawOR.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawOR.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g2 = outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawOR
+});
+var com_mun_view_drawComponents_DrawOutput = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawOutput"] = com_mun_view_drawComponents_DrawOutput;
+com_mun_view_drawComponents_DrawOutput.__name__ = ["com","mun","view","drawComponents","DrawOutput"];
+com_mun_view_drawComponents_DrawOutput.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawOutput.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawOutput.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.setFillColor("black");
+		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
+		this.drawingAdapter.setTextColor("white");
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawOutput
+});
+var com_mun_view_drawComponents_DrawXOR = function(component,drawingAdapter) {
+	com_mun_view_drawComponents_Constant.call(this);
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawXOR"] = com_mun_view_drawComponents_DrawXOR;
+com_mun_view_drawComponents_DrawXOR.__name__ = ["com","mun","view","drawComponents","DrawXOR"];
+com_mun_view_drawComponents_DrawXOR.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawXOR.__super__ = com_mun_view_drawComponents_Constant;
+com_mun_view_drawComponents_DrawXOR.prototype = $extend(com_mun_view_drawComponents_Constant.prototype,{
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawXorShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var inportArray = this.component.get_inportArray();
+		var _g1 = 0;
+		var _g = inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var port = inportArray[i];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
+		}
+		var outportArray = this.component.get_outportArray();
+		var _g11 = 0;
+		var _g2 = outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var port1 = outportArray[i1];
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: com_mun_view_drawComponents_DrawXOR
+});
 var com_mun_view_drawingImpl_Box = function(x_position,y_position,width,height,orientation,worldToView) {
 	var x0 = worldToView.convertX(x_position - width / 2);
 	var y0 = worldToView.convertY(y_position - height / 2);
@@ -1518,6 +4491,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.lineTo(r.get_xd(),r.get_yd());
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -1554,6 +4528,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.closePath();
 		this.cxt.arc((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2,radius,0,2 * Math.PI,false);
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -1566,6 +4541,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -1590,6 +4566,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.lineTo((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
 		this.cxt.lineTo(r.get_xd(),r.get_yd());
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.closePath();
 		this.cxt.fill();
 		this.cxt.stroke();
@@ -1619,6 +4596,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 			break;
 		}
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -1631,6 +4609,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		switch(orientation[1]) {
 		case 0:
@@ -1659,12 +4638,14 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		var y1 = this.worldToView.convertY(y + height / 2);
 		this.cxt.rect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
 	,drawText: function(str,x,y,width) {
 		this.cxt.font = this.font;
 		this.cxt.fillStyle = this.textColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fillText(str,x,y,width);
 	}
 	,drawCricle: function(x,y,radius) {
@@ -1675,6 +4656,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.beginPath();
 		this.cxt.arc(Math.min(x0,x1),Math.min(y0,y1),radius,0,2 * Math.PI,false);
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -1689,6 +4671,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.closePath();
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
 		this.cxt.fill();
 		this.cxt.stroke();
 	}
@@ -2714,15 +5697,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 	}
 	return result;
 };
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
-};
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;
 haxe_io_FPHelper.__name__ = ["haxe","io","FPHelper"];
@@ -3335,6 +6309,40 @@ js_html_compat_Uint8Array._subarray = function(start,end) {
 	a.byteOffset = start;
 	return a;
 };
+var js_jquery_JqEltsIterator = function(j) {
+	this.i = 0;
+	this.j = j;
+};
+$hxClasses["js.jquery.JqEltsIterator"] = js_jquery_JqEltsIterator;
+js_jquery_JqEltsIterator.__name__ = ["js","jquery","JqEltsIterator"];
+js_jquery_JqEltsIterator.prototype = {
+	j: null
+	,i: null
+	,hasNext: function() {
+		return this.i < this.j.length;
+	}
+	,next: function() {
+		return $(this.j[this.i++]);
+	}
+	,__class__: js_jquery_JqEltsIterator
+};
+var js_jquery_JqIterator = function(j) {
+	this.i = 0;
+	this.j = j;
+};
+$hxClasses["js.jquery.JqIterator"] = js_jquery_JqIterator;
+js_jquery_JqIterator.__name__ = ["js","jquery","JqIterator"];
+js_jquery_JqIterator.prototype = {
+	j: null
+	,i: null
+	,hasNext: function() {
+		return this.i < this.j.length;
+	}
+	,next: function() {
+		return this.j[this.i++];
+	}
+	,__class__: js_jquery_JqIterator
+};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -3361,6 +6369,16 @@ if(ArrayBuffer.prototype.slice == null) {
 }
 var Float32Array = $global.Float32Array || js_html_compat_Float32Array._new;
 var Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
+if(typeof($) != "undefined" && $.fn != null) {
+	$.fn.elements = function() {
+		return new js_jquery_JqEltsIterator(this);
+	};
+}
+if(typeof($) != "undefined" && $.fn != null) {
+	$.fn.iterator = function() {
+		return new js_jquery_JqIterator(this);
+	};
+}
 StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;

@@ -1,28 +1,31 @@
 package com.mun.controller.command;
+
+import com.mun.type.Type.Object;
+import com.mun.model.component.CircuitDiagramI;
 /**
 * command manager used to manage those command
 * @author wanhui
 **/
-import com.mun.model.component.CircuitDiagram;
 class CommandManager {
     var undoStack:Array<Command> = new Array<Command>();
     var redoStack:Array<Command> = new Array<Command>();
-    var undoCounter:Int = -1;//set how many command can store
+    var circuitDiagram:CircuitDiagramI;
+    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+    //most of actions will result add lots of commands into stack. such as
+    //moveing component, link. therefore, need a flag to record the first step of moving
+    //this varible only controlled by mouse down and mouse up action, both of them will reset this flag
+    var recordFlag:Bool = false;
 
-    public function new(circuitDiagram:CircuitDiagram) {
-        this.undoCounter = 10;//undo 10 steps
+    public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
     }
 
     public function execute(command:Command):Void {
         command.execute();
-        undoStack.push(command);
-
-        //make sure only 10 steps stores in the stack
-        if (undoCounter != -1 && undoStack.length > undoCounter) {
-            undoStack.remove(0);
+        if(!recordFlag){//if record falg == false, means has not push anything.
+            undoStack.push(command);
         }
-
+        recordFlag = true;
         //set the redo stack empty
         if (redoStack.length != 0) {
             for (i in 0...redoStack.length) {
@@ -31,25 +34,38 @@ class CommandManager {
         }
     }
 
-    public function undo():Bool {
+    public function undo():Object {
+        object = {"link":null,"component":null,"endPoint":null, "port":null};
         if (undoStack.length == 0) {
-            return false;
+            return object;
         }
-
         var command:Command = undoStack.pop();
-        command.undo();
+        object = command.undo();
         redoStack.push(command);
-        return true;
+        return object;
     }
 
-    public function redo():Bool {
+    public function redo():Object {
+        object = {"link":null,"component":null,"endPoint":null, "port":null};
         if (redoStack.length == 0) {
-            return false;
+            return object;
         }
 
         var command:Command = redoStack.pop();
-        command.redo();
+        object = command.redo();
         undoStack.push(command);
-        return true;
+        return object;
+    }
+
+    public function recordFlagRest(){
+        recordFlag = false;
+    }
+
+    public function getUndoStackSize():Int{
+        return undoStack.length;
+    }
+
+    public function getRedoStackSize():Int{
+        return redoStack.length;
     }
 }

@@ -1,6 +1,10 @@
 package com.mun.model.gates;
 
 
+import com.mun.view.drawComponents.DrawComponent;
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.model.component.Component;
+import com.mun.view.drawComponents.DrawInput;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
@@ -107,8 +111,67 @@ class Input implements ComponentKind extends GateAbstract {
     override public function addInPort():Port {
         return null;//intput should only have one inport
     }
+    /**
+    * different from others, this function used in move command when the componenet has been re-located
+    **/
+    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+        switch (orientation){
+            case Orientation.EAST : {
+                portArray[0].set_xPosition(xPosition - width / 2);
+                portArray[0].set_yPosition(yPosition);
+            };
+            case Orientation.NORTH : {
+                portArray[0].set_xPosition(xPosition);
+                portArray[0].set_yPosition(yPosition + height / 2);
+            };
+            case Orientation.SOUTH : {
+                portArray[0].set_xPosition(xPosition);
+                portArray[0].set_yPosition(yPosition - height / 2);
+            };
+            case Orientation.WEST : {
+                portArray[0].set_xPosition(xPosition + width / 2);
+                portArray[0].set_yPosition(yPosition);
+            };
+            default : {
+                //do nothing
+            }
+        }
+        return portArray;
+    }
+    /**
+    * different from others, this function used in move command when the componenet has been re-located
+    **/
+    override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>{
+        switch (orientation){
+            case Orientation.EAST : {
+                portArray[0].set_xPosition(xPosition + width / 2);
+                portArray[0].set_yPosition(yPosition);
+            };
+            case Orientation.NORTH : {
+                portArray[0].set_xPosition(xPosition);
+                portArray[0].set_yPosition(yPosition - height / 2);
+            };
+            case Orientation.SOUTH : {
+                portArray[0].set_xPosition(xPosition);
+                portArray[0].set_yPosition(yPosition + height / 2);
+            };
+            case Orientation.WEST : {
+                portArray[0].set_xPosition(xPosition - width / 2);
+                portArray[0].set_yPosition(yPosition);
+            };
+            default : {
+                //do nothing
+            }
+        }
+        return portArray;
+    }
 
-    override public function updatePortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
-        return null;//cannot add any port or remove any port, therefore do not need to update the position
+    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+        var drawComponent:DrawComponent = new DrawInput(component, drawingAdapter);
+        if(highLight){
+            drawComponent.drawCorrespondingComponent("red");
+        }else{
+            drawComponent.drawCorrespondingComponent("black");
+        }
     }
 }

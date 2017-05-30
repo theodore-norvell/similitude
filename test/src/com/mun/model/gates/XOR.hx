@@ -1,5 +1,9 @@
 package com.mun.model.gates;
 
+import com.mun.view.drawComponents.DrawComponent;
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.model.component.Component;
+import com.mun.view.drawComponents.DrawXOR;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
@@ -122,6 +126,15 @@ class XOR implements ComponentKind extends GateAbstract {
             }
         }
         return portArray;
+    }
+
+    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+        var drawComponent:DrawComponent = new DrawXOR(component, drawingAdapter);
+        if(highLight){
+            drawComponent.drawCorrespondingComponent("red");
+        }else{
+            drawComponent.drawCorrespondingComponent("black");
+        }
     }
 
     public function new() {

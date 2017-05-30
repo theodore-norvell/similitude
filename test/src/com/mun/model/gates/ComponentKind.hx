@@ -1,5 +1,7 @@
 package com.mun.model.gates;
 
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.model.component.Component;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -40,14 +42,33 @@ interface ComponentKind {
     public function addInPort():Port;
 
     /**
-    * update all of the position of ports in portArray
+    * update all of the position of ports in inportArray
      * @param portArray
      * @param xPosition : x position
     *  @param yPosition : y position
     *  @param height : height
     *  @param width : width
     *  @param orientation : direction
-    *  @return the array of the created ports
+    *  @return the array of the updated ports
     **/
-    public function updatePortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>;
+    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>;
+
+    /**
+    * update all of the position of ports in in outportArray
+     * @param portArray
+     * @param xPosition : x position
+    *  @param yPosition : y position
+    *  @param height : height
+    *  @param width : width
+    *  @param orientation : direction
+    *  @return the array of the updated ports
+    **/
+    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>;
+
+    /**
+    * draw this componentkind
+     * @param component
+     * @param drawingAdapter
+    **/
+    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, hightLight:Bool):Void;
 }

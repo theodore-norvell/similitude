@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.gates.ComponentKind;
@@ -18,9 +19,10 @@ class Component {
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    var name:String;//the name of the component
+    var name:String = "component1";//the name of the component
     var delay:Int;//delay of the component
     var inportsNum:Int;//init
+    var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"
     /**
     *   create component
      *   @param xPosition: x position
@@ -140,7 +142,12 @@ class Component {
     public function get_inportsNum():Int {
         return inportsNum;
     }
-
+    public function setNameOfTheComponentKind(name:String){
+        this.nameOfTheComponentKind = name;
+    }
+    public function getNameOfTheComponentKind():String{
+        return this.nameOfTheComponentKind;
+    }
     public function set_inportsNum(value:Int):Bool {
         if (value <= componentKind.getLeastInportNumber()) {
             return false;
@@ -153,11 +160,20 @@ class Component {
                 return false;
             }
         }
-        this.inportArray = componentKind.updatePortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
         return true;
     }
 
     public function removeInport(inport:Inport):Bool {
         return inportArray.remove(inport);
+    }
+    public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{
+        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
+        return this;
+    }
+
+    public function drawComponent(component:Component, drawingAdpater:DrawingAdapterI, highLight:Bool){
+        componentKind.drawComponent(component, drawingAdpater, highLight);
     }
 }

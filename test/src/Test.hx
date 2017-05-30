@@ -1,6 +1,10 @@
 package ;
 
-import com.mun.controller.buttonClick.ButtonClick;
+import com.mun.controller.componentUpdate.UpdateToolBar;
+import com.mun.controller.componentUpdate.UpdateCanvas;
+import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
+import com.mun.controller.mouseAction.CanvasListener;
+import com.mun.controller.mouseAction.ButtonClick;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.view.drawingImpl.DrawingAdapter;
@@ -28,12 +32,37 @@ class Test {
         if( backingStoreRatioDynamic == null ) 1.0
         else cast( backingStoreRatioDynamic, Float ) ;
 
-        var pixelRatio = Browser.window.devicePixelRatio/backingStoreRatio;
-        trace(pixelRatio);
+        var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
+        var oldWidth:Int = cast Browser.window.innerWidth * 0.9;
+        var oldHeight:Int =cast Browser.window.innerHeight * 0.9;
+        canvas.width = oldWidth * pixelRatio;
+        canvas.height = oldHeight * pixelRatio;
+        canvas.style.width = oldWidth + 'px';
+        canvas.style.height = oldHeight + 'px';
+        // now scale the context to counter
+        // the fact that we've manually scaled
+        // our canvas element
+        cxt.scale(pixelRatio, pixelRatio);
 
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
 
         var circuitDiagram:CircuitDiagram = new CircuitDiagram();
-        new ButtonClick(drawingAdapter);
+
+
+        var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
+
+        var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
+        updateCircuitDiagram.setUpdateToolBar(updateToolBar);
+
+        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
+        updateCircuitDiagram.setUpdateCanvas(updateCanvas);
+
+        //add button click listener
+        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
+        //add canvas listener
+        new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
+
     }
+
+
 }

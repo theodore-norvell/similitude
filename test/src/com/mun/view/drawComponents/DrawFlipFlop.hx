@@ -8,16 +8,22 @@ import com.mun.model.enumeration.Orientation;
 * draw flip flop
 * @author wanhui
 **/
-class DrawFlipFlop implements DrawComponent {
+class DrawFlipFlop implements DrawComponent extends Constant{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
     public function new(component:Component, drawingAdapter:DrawingAdapterI) {
+        super();
         this.component = component;
         this.drawingAdapter = drawingAdapter;
     }
 
-    public function drawCorrespondingComponent():Void {
+    public function drawCorrespondingComponent(strokeColor:String):Void {
+        if(strokeColor == null || strokeColor == ""){
+            strokeColor = "black";
+        }
+        drawingAdapter.setStrokeColor(strokeColor);
+
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.drawText("FF", component.get_xPosition() - 4, component.get_yPosition(), component.get_width());
         //draw inport
@@ -26,7 +32,7 @@ class DrawFlipFlop implements DrawComponent {
             var port:Port = inportArray[i];
             //init set the radius is 2
             drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), 2);
+            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
             switch(component.get_orientation()){
                 case Orientation.NORTH : {
                     if (port.get_portDescription() == IOTYPE.D) {
@@ -68,7 +74,7 @@ class DrawFlipFlop implements DrawComponent {
             var port:Port = outportArray[i];
             //init set the radius is 2
             drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), 2);
+            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
             switch(component.get_orientation()){
                 case Orientation.NORTH : {
                     if (port.get_portDescription() == IOTYPE.Q) {

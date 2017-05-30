@@ -20,7 +20,7 @@
     <div class="row-fluid">
         <div class="row">
             <div class="col-sm-1 col-md-1 col-lg-1" id="leftDIV">
-                <div class="btn-group-vertical btn-group-sm" role="group" aria-label="...">
+                <div class="btn-group-vertical btn-group-sm" role="group" aria-label="..." style="border: 1px solid">
                     <!--add initial gate button-->
                     <button id="AND" type="button" class="btn btn-default">AND Gate</button>
                     <button id="OR" type="button" class="btn btn-default">OR Gate</button>
@@ -34,10 +34,49 @@
                     <button id="OUTPUT" type="button" class="btn btn-default">OUTPUT</button>
                 </div>
             </div>
+            <!-- canvas -->
             <div class="col-sm-11 col-md-11 col-lg-11" id="rightDIV">
-                <canvas id="canvas" style="border: 1px solid;height: 100%;width: 100%;" ></canvas>
-
+                <canvas id="canvas" style="border: 1px solid;">update your browser to enjoy canvas</canvas>
             </div>
+            <div class="col-sm-1 col-md-1 col-lg-1">
+                <!-- nothing -->
+            </div>
+            <!-- tool bar start -->
+            <div class="col-sm-11 col-md-11 col-lg-11" style="border: 1px solid; visibility: hidden" id="toolbar_div">
+                <div class="col-md-2" id="component_name_div">
+                    <div class="input-group">
+                        <span class="input-group-addon" id="component_name">name</span>
+                        <input type="text" class="form-control" placeholder="Component Name" aria-describedby="basic-addon1" id="name_input">
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2" id="orientation_div">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <!-- Button and dropdown menu -->
+                            <div class="btn-group dropup">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orientation <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" id="north">NORTH</a></li>
+                                    <li><a href="#" id="south">SOUTH</a></li>
+                                    <li><a href="#" id="west">WEST</a></li>
+                                    <li><a href="#" id="east">EAST</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" aria-label="..." disabled="disabled" id="orientation">
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2">
+                    <button id="delete" type="button" class="btn btn-default">Delete</button>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2">
+                    <button id="undo" type="button" class="btn btn-default" disabled="disabled">undo</button>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2">
+                    <button id="redo" type="button" class="btn btn-default" disabled="disabled">redo</button>
+                </div>
+            </div>
+            <!-- tool bar end -->
         </div>
     </div>
 </div>

@@ -1,6 +1,10 @@
 package com.mun.model.gates;
 
 
+import com.mun.view.drawComponents.DrawComponent;
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.model.component.Component;
+import com.mun.view.drawComponents.DrawFlipFlop;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
@@ -143,8 +147,140 @@ class FlipFlop implements ComponentKind extends GateAbstract {
         return null;//because flip-flop can't add any ports
     }
 
-    override public function updatePortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
-        return null;//because flip-flop can't add or remove any ports
+    /**
+    * different from others, this function used in move command when the componenet has been re-located
+    **/
+    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+        switch (orientation){
+            case Orientation.EAST : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.D){
+                        portArray[i].set_xPosition(xPosition - width / 2);
+                        portArray[i].set_yPosition(height / 3 * 1 + (yPosition - height / 2));
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.CLK){
+                        portArray[i].set_xPosition(xPosition - width / 2);
+                        portArray[i].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+                    }
+                }
+            };
+            case Orientation.WEST : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.D){
+                        portArray[i].set_xPosition(xPosition + width / 2);
+                        portArray[i].set_yPosition(height / 3 * 1 + (yPosition - height / 2));
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.CLK){
+                        portArray[i].set_xPosition(xPosition + width / 2);
+                        portArray[i].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+                    }
+                }
+            };
+            case Orientation.SOUTH : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.D){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
+                        portArray[i].set_yPosition(yPosition - height / 2);
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.CLK){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+                        portArray[i].set_yPosition(yPosition - height / 2);
+                    }
+                }
+            };
+            case Orientation.NORTH : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.D){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
+                        portArray[i].set_yPosition(yPosition + height / 2);
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.CLK){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+                        portArray[i].set_yPosition(yPosition + height / 2);
+                    }
+                }
+            };
+            default : {
+                //do nothing
+            }
+        }
+        return portArray;
+    }
+    /**
+    * different from others, this function used in move command when the componenet has been re-located
+    **/
+    override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>{
+        switch (orientation){
+            case Orientation.EAST : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.Q){
+                        portArray[i].set_xPosition(xPosition + width / 2);
+                        portArray[i].set_yPosition(height / 3 * 1 + (yPosition - height / 2));
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.QN){
+                        portArray[i].set_xPosition(xPosition + width / 2);
+                        portArray[i].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+                    }
+                }
+            };
+            case Orientation.WEST : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.Q){
+                        portArray[i].set_xPosition(xPosition - width / 2);
+                        portArray[i].set_yPosition(height / 3 * 1 + (yPosition - height / 2));
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.QN){
+                        portArray[i].set_xPosition(xPosition - width / 2);
+                        portArray[i].set_yPosition(height / 3 * 2 + (yPosition - height / 2));
+                    }
+                }
+            };
+            case Orientation.SOUTH : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.Q){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
+                        portArray[i].set_yPosition(yPosition + height / 2);
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.QN){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+                        portArray[i].set_yPosition(yPosition + height / 2);
+                    }
+                }
+            };
+            case Orientation.NORTH : {
+                for(i in 0...portArray.length){
+                    if(portArray[i].get_portDescription() == IOTYPE.Q){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
+                        portArray[i].set_yPosition(yPosition - height / 2);
+                    }
+
+                    if(portArray[i].get_portDescription() == IOTYPE.QN){
+                        portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 2);
+                        portArray[i].set_yPosition(yPosition - height / 2);
+                    }
+                }
+            };
+            default : {
+                //do nothing
+            }
+        }
+        return portArray;
+    }
+
+    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+        var drawComponent:DrawComponent = new DrawFlipFlop(component, drawingAdapter);
+        if(highLight){
+            drawComponent.drawCorrespondingComponent("red");
+        }else{
+            drawComponent.drawCorrespondingComponent("black");
+        }
     }
 
     public function new() {

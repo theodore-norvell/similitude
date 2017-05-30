@@ -1,6 +1,6 @@
 package com.mun.controller.command;
-import com.mun.controller.circuitDiagram.StaticCircuitDiagram;
-import com.mun.model.component.CircuitDiagram;
+
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.type.Type.Object;
@@ -11,15 +11,17 @@ import com.mun.type.Type.Object;
 class AddCommand implements Command {
     var link:Link;
     var component:Component;
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
+    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
 
-    public function new(object:Object, circuitDiagram:CircuitDiagram) {
+    public function new(object:Object, circuitDiagram:CircuitDiagramI) {
         this.link = object.link;
         this.component = object.component;
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():Void {
+    public function undo():Object {
+        object = {"link":null,"component":null,"endPoint":null, "port":null};
         if (link != null) {
             circuitDiagram.removeLink(link);
         }
@@ -27,10 +29,14 @@ class AddCommand implements Command {
         if (component != null) {
             circuitDiagram.removeComponent(component);
         }
+
+        return object;
     }
 
-    public function redo():Void {
+    public function redo():Object {
         execute();
+        object = {"link":link,"component":component,"endPoint":null, "port":null};
+        return object;
     }
 
     public function execute():Void {
@@ -42,9 +48,4 @@ class AddCommand implements Command {
             circuitDiagram.addComponent(component);
         }
     }
-
-    public function setCommandManager(commandManager:CommandManager):Void {
-        this.commandManager = commandManager;
-    }
-
 }
