@@ -257,7 +257,25 @@ class UpdateCircuitDiagram {
         }
     }
 
+    public function setRedoButton(){
+        if(commandManager.getUndoStackSize() == 0){
+            updateToolBar.setUndoButtonDisability(true);
+        }else{
+            updateToolBar.setUndoButtonDisability(false);
+        }
+    }
+
+    public function setUndoButton(){
+        if(commandManager.getRedoStackSize() == 0){
+            updateToolBar.setRedoButtonDisability(true);
+        }else{
+            updateToolBar.setRedoButtonDisability(false);
+        }
+    }
+
     public function redrawCanvas(?object:Object){
         updateCanvas.update(object);
+        setRedoButton();
+        setUndoButton();
     }
 }

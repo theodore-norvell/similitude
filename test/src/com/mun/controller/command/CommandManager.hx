@@ -60,4 +60,12 @@ class CommandManager {
     public function recordFlagRest(){
         recordFlag = false;
     }
+
+    public function getUndoStackSize():Int{
+        return undoStack.length;
+    }
+
+    public function getRedoStackSize():Int{
+        return redoStack.length;
+    }
 }

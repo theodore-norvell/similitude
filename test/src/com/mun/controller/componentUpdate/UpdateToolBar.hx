@@ -127,4 +127,20 @@ class UpdateToolBar {
         orientation_div.style.visibility = "hidden";
         component_name_div.style.visibility = "hidden";
     }
+
+    public function setUndoButtonDisability(disable:Bool){
+        if(disable){
+            new JQuery(undo).attr("disabled");
+        }else{
+            new JQuery(undo).removeAttr("disabled");
+        }
+    }
+
+    public function setRedoButtonDisability(disable:Bool){
+        if(disable){
+            new JQuery(redo).attr("disabled");
+        }else{
+            new JQuery(redo).removeAttr("disabled");
+        }
+    }
 }

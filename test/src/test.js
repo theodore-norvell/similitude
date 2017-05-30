@@ -976,6 +976,12 @@ com_mun_controller_command_CommandManager.prototype = {
 	,recordFlagRest: function() {
 		this.recordFlag = false;
 	}
+	,getUndoStackSize: function() {
+		return this.undoStack.length;
+	}
+	,getRedoStackSize: function() {
+		return this.redoStack.length;
+	}
 	,__class__: com_mun_controller_command_CommandManager
 };
 var com_mun_controller_command_MoveCommand = function(object,newXPosition,newYPosition,oldXPosition,oldYPosition,circuitDiagram) {
@@ -1503,8 +1509,24 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			this.updateToolBar.visible();
 		}
 	}
+	,setRedoButton: function() {
+		if(this.commandManager.getUndoStackSize() == 0) {
+			this.updateToolBar.setUndoButtonDisability(true);
+		} else {
+			this.updateToolBar.setUndoButtonDisability(false);
+		}
+	}
+	,setUndoButton: function() {
+		if(this.commandManager.getRedoStackSize() == 0) {
+			this.updateToolBar.setRedoButtonDisability(true);
+		} else {
+			this.updateToolBar.setRedoButtonDisability(false);
+		}
+	}
 	,redrawCanvas: function(object) {
 		this.updateCanvas.update(object);
+		this.setRedoButton();
+		this.setUndoButton();
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
 };
@@ -1612,6 +1634,20 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		this.deleteButton.style.visibility = "hidden";
 		this.orientation_div.style.visibility = "hidden";
 		this.component_name_div.style.visibility = "hidden";
+	}
+	,setUndoButtonDisability: function(disable) {
+		if(disable) {
+			$(this.undo).attr("disabled");
+		} else {
+			$(this.undo).removeAttr("disabled");
+		}
+	}
+	,setRedoButtonDisability: function(disable) {
+		if(disable) {
+			$(this.redo).attr("disabled");
+		} else {
+			$(this.redo).removeAttr("disabled");
+		}
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
