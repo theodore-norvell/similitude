@@ -25,16 +25,14 @@ class CircuitDiagramUtil {
     **/
     public function isInComponent(coordinate:Coordinate):Component{
         var component:Component = null;
-        var i = circuitDiagram.get_componentArray().length - 1;
-        while(i >= 0){
-            if(isInScope(circuitDiagram.get_componentArray()[i].get_xPosition(),
-                            circuitDiagram.get_componentArray()[i].get_yPosition(),
+        for(i in circuitDiagram.get_componentIterator()){
+            if(isInScope(i.get_xPosition(),
+                            i.get_yPosition(),
                             coordinate.xPosition, coordinate.yPosition,
-                            circuitDiagram.get_componentArray()[i].get_height(),
-                            circuitDiagram.get_componentArray()[i].get_width()) == true){
-                return circuitDiagram.get_componentArray()[i];
+                            i.get_height(),
+                            i.get_width()) == true){
+                return i;
             }
-            i--;
         }
         return component;
     }
@@ -46,9 +44,9 @@ class CircuitDiagramUtil {
     *           or  return null;
     **/
     public function isOnLink(coordinate:Coordinate):Link{
-        for(i in 0...circuitDiagram.get_linkArray().length){
-            var leftEndpoint:Endpoint = circuitDiagram.get_linkArray()[i].get_leftEndpoint();
-            var rightEndpoint:Endpoint = circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+        for(i in circuitDiagram.get_linkIterator()){
+            var leftEndpoint:Endpoint = i.get_leftEndpoint();
+            var rightEndpoint:Endpoint = i.get_rightEndpoint();
             if(pointToLine(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
                             rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
                             coordinate.xPosition, coordinate.yPosition) <= 3){
@@ -58,21 +56,21 @@ class CircuitDiagramUtil {
                 //the mouse location should be a little away from the endpoint
                 //because in case of it confuse about select endpoint or link
                 var theDistanaceToLeftEndpoint = Math.sqrt(
-                    Math.pow(Math.abs(coordinate.xPosition - circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition()), 2) +
-                    Math.pow(Math.abs(coordinate.yPosition - circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition()), 2)
+                    Math.pow(Math.abs(coordinate.xPosition - i.get_leftEndpoint().get_xPosition()), 2) +
+                    Math.pow(Math.abs(coordinate.yPosition - i.get_leftEndpoint().get_yPosition()), 2)
                 );
 
                 var theDistanceToRightEndpoint = Math.sqrt(
-                    Math.pow(Math.abs(coordinate.xPosition - circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition()), 2) +
-                    Math.pow(Math.abs(coordinate.yPosition - circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition()), 2)
+                    Math.pow(Math.abs(coordinate.xPosition - i.get_rightEndpoint().get_xPosition()), 2) +
+                    Math.pow(Math.abs(coordinate.yPosition - i.get_rightEndpoint().get_yPosition()), 2)
                 );
                 if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
                     if(theDistanceToRightEndpoint >= 5){
-                        return circuitDiagram.get_linkArray()[i];
+                        return i;
                     }
                 }else{
                     if(theDistanaceToLeftEndpoint >= 5){
-                        return circuitDiagram.get_linkArray()[i];
+                        return i;
                     }
                 }
 
@@ -138,17 +136,17 @@ class CircuitDiagramUtil {
     *           or  return null;
     **/
     public function pointOnEndpoint(coordinate:Coordinate):Endpoint{
-        for(i in 0...circuitDiagram.get_linkArray().length){
-            if(pointsDistance(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),
-                            circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),
+        for(i in circuitDiagram.get_linkIterator()){
+            if(pointsDistance(i.get_leftEndpoint().get_xPosition(),
+                            i.get_leftEndpoint().get_yPosition(),
                             coordinate.xPosition, coordinate.yPosition) <= 4){
-                return circuitDiagram.get_linkArray()[i].get_leftEndpoint();
+                return i.get_leftEndpoint();
             }
 
-            if(pointsDistance(circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),
-                                circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),
+            if(pointsDistance(i.get_rightEndpoint().get_xPosition(),
+                                i.get_rightEndpoint().get_yPosition(),
                                 coordinate.xPosition, coordinate.yPosition) <= 4){
-                return circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+                return i.get_rightEndpoint();
             }
         }
         return null;
@@ -162,27 +160,25 @@ class CircuitDiagramUtil {
     **/
     public function isOnPort(cooridnate:Coordinate):Object{
         var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
-        for(i in 0...circuitDiagram.get_componentArray().length){
-            for(j in 0...circuitDiagram.get_componentArray()[i].get_inportArray().length){
-                if(isInCircle(cooridnate, circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_xPosition(),
-                circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_yPosition())){
+        for(i in circuitDiagram.get_componentIterator()){
+            for(j in i.get_inportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
-                    object.port = circuitDiagram.get_componentArray()[i].get_inportArray()[j];
-                    for(k in 0...circuitDiagram.get_linkArray().length){
-                        object.endPoint = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+                    object.port = j;
+                    for(k in circuitDiagram.get_linkIterator()){
+                        object.endPoint = isLinkOnPort(k,j);
                         return object;
                     }
                 }
             }
-            for(j in 0...circuitDiagram.get_componentArray()[i].get_outportArray().length){
-                if(isInCircle(cooridnate, circuitDiagram.get_componentArray()[i].get_outportArray()[j].get_xPosition(),
-                circuitDiagram.get_componentArray()[i].get_outportArray()[j].get_yPosition())){
+            for(j in i.get_outportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
-                    object.port = circuitDiagram.get_componentArray()[i].get_outportArray()[j];
-                    for(k in 0...circuitDiagram.get_linkArray().length){
-                        object.endPoint = isLinkOnPort(circuitDiagram.get_linkArray()[k],circuitDiagram.get_componentArray()[i].get_outportArray()[j]);
+                    object.port = j;
+                    for(k in circuitDiagram.get_linkIterator()){
+                        object.endPoint = isLinkOnPort(k,j);
                         return object;
                     }
                 }

@@ -1,30 +1,41 @@
 package com.mun.model.component;
+import com.mun.controller.command.CommandManager;
 import com.mun.model.enumeration.Orientation;
 /**
 * interface for CicuitDiagram
 **/
 interface CircuitDiagramI {
     /**
+    * @@:getter get command manager
+    **/
+    public function get_commandManager():CommandManager;
+
+    /**
+    * @@:setter set command manager
+    **/
+    public function set_commandManager(value:CommandManager):Void;
+
+    /**
     * @:getter component array from the circuit diagram
      * @return the iterator
     **/
-    public function get_componentArray():Array<Component>;
+    public function get_componentIterator():Iterator<Component>;
 
     /**
-    * @:setter the componentArray
+    * reverse iterator for componenent array
     **/
-    public function set_componentArray(value:Array<Component>):Void;
+    public function get_componentReverseIterator():Iterator<Component>;
+
+    /**
+    * reverse iterator for link array
+    **/
+    public function get_linkReverseIterator():Iterator<Link>;
 
     /**
     * @:getter link array from the circuit diagram
      * @return the iterator
     **/
-    public function get_linkArray():Array<Link>;
-
-    /**
-    * @:setter the link array
-    **/
-    public function set_linkArray(value:Array<Link>):Void;
+    public function get_linkIterator():Iterator<Link>;
 
     /**
     * @:getter the name of the circuit diagram

@@ -642,6 +642,7 @@ Test.main = function() {
 	var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(Test.cxt);
 	var circuitDiagram = new com_mun_model_component_CircuitDiagram();
 	var updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(circuitDiagram);
+	circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
 	var updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(updateCircuitDiagram);
 	updateCircuitDiagram.setUpdateToolBar(updateToolBar);
 	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,drawingAdapter);
@@ -923,19 +924,17 @@ com_mun_controller_command_AddCommand.prototype = {
 	}
 	,__class__: com_mun_controller_command_AddCommand
 };
-var com_mun_controller_command_CommandManager = function(circuitDiagram) {
+var com_mun_controller_command_CommandManager = function() {
 	this.recordFlag = false;
 	this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 	this.redoStack = [];
 	this.undoStack = [];
-	this.circuitDiagram = circuitDiagram;
 };
 $hxClasses["com.mun.controller.command.CommandManager"] = com_mun_controller_command_CommandManager;
 com_mun_controller_command_CommandManager.__name__ = ["com","mun","controller","command","CommandManager"];
 com_mun_controller_command_CommandManager.prototype = {
 	undoStack: null
 	,redoStack: null
-	,circuitDiagram: null
 	,object: null
 	,recordFlag: null
 	,execute: function(command) {
@@ -1011,40 +1010,24 @@ com_mun_controller_command_MoveCommand.prototype = {
 	,undo: function() {
 		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 		if(this.component != null) {
-			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
-			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.oldXPosition);
-			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.oldYPosition);
-			this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.oldXPosition,this.oldYPosition);
+			this.component.set_xPosition(this.oldXPosition);
+			this.component.set_yPosition(this.oldYPosition);
+			this.component.updateMoveComponentPortPosition(this.oldXPosition,this.oldYPosition);
 			this.object.component = this.component;
 		}
 		if(this.link != null) {
 			var xDifference = this.newXPosition - this.oldXPosition;
 			var yDifference = this.newYPosition - this.oldYPosition;
-			var index1 = this.circuitDiagram.get_linkArray().indexOf(this.link);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition());
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.link.get_leftEndpoint().get_yPosition());
-			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() - xDifference);
-			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() - yDifference);
+			this.link.get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition());
+			this.link.get_leftEndpoint().set_yPosition(this.link.get_leftEndpoint().get_yPosition());
+			this.link.get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() - xDifference);
+			this.link.get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() - yDifference);
 			this.object.link = this.link;
 		}
 		if(this.endpoint != null) {
-			var _g1 = 0;
-			var _g = this.circuitDiagram.get_linkArray().length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint() == this.endpoint) {
-					this.object.link = this.link;
-					this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_xPosition(this.oldXPosition);
-					this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().set_yPosition(this.oldYPosition);
-					break;
-				}
-				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == this.endpoint) {
-					this.object.link = this.link;
-					this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_xPosition(this.oldXPosition);
-					this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().set_yPosition(this.oldYPosition);
-					break;
-				}
-			}
+			this.getLink();
+			this.endpoint.set_xPosition(this.oldXPosition);
+			this.endpoint.set_yPosition(this.oldYPosition);
 		}
 		return this.object;
 	}
@@ -1056,46 +1039,42 @@ com_mun_controller_command_MoveCommand.prototype = {
 	,execute: function() {
 		if(this.component != null) {
 			this.object.component = this.component;
-			var index = this.circuitDiagram.get_componentArray().indexOf(this.component);
-			this.circuitDiagram.get_componentArray()[index].set_xPosition(this.newXPosition);
-			this.circuitDiagram.get_componentArray()[index].set_yPosition(this.newYPosition);
-			var updatedComponent = this.circuitDiagram.get_componentArray()[index].updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
-			this.circuitDiagram.updateComponent(updatedComponent);
-			var _g1 = 0;
-			var _g = this.circuitDiagram.get_linkArray().length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().updatePosition();
-				this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().updatePosition();
+			this.component.set_xPosition(this.newXPosition);
+			this.component.set_yPosition(this.newYPosition);
+			this.component.updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
+			var i = this.circuitDiagram.get_linkIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				i1.get_leftEndpoint().updatePosition();
+				i1.get_rightEndpoint().updatePosition();
 			}
 		}
 		if(this.link != null) {
 			this.object.link = this.link;
-			var index1 = this.circuitDiagram.get_linkArray().indexOf(this.link);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_xPosition(this.newXPosition);
-			this.circuitDiagram.get_linkArray()[index1].get_leftEndpoint().set_yPosition(this.newYPosition);
+			this.link.get_leftEndpoint().set_xPosition(this.newXPosition);
+			this.link.get_leftEndpoint().set_yPosition(this.newYPosition);
 			var xDisplacement = this.newXPosition - this.oldXPosition;
 			var yDisplacement = this.newYPosition - this.oldYPosition;
-			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() + xDisplacement);
-			this.circuitDiagram.get_linkArray()[index1].get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() + yDisplacement);
+			this.link.get_rightEndpoint().set_xPosition(this.link.get_rightEndpoint().get_xPosition() + xDisplacement);
+			this.link.get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() + yDisplacement);
 		}
 		if(this.endpoint != null) {
-			var _g11 = 0;
-			var _g2 = this.circuitDiagram.get_linkArray().length;
-			while(_g11 < _g2) {
-				var i1 = _g11++;
-				if(this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint() == this.endpoint) {
-					this.object.link = this.link;
-					this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint().set_xPosition(this.newXPosition);
-					this.circuitDiagram.get_linkArray()[i1].get_leftEndpoint().set_yPosition(this.newYPosition);
-					break;
-				}
-				if(this.circuitDiagram.get_linkArray()[i1].get_rightEndpoint() == this.endpoint) {
-					this.object.link = this.link;
-					this.circuitDiagram.get_linkArray()[i1].get_rightEndpoint().set_xPosition(this.newXPosition);
-					this.circuitDiagram.get_linkArray()[i1].get_rightEndpoint().set_yPosition(this.newYPosition);
-					break;
-				}
+			this.getLink();
+			this.endpoint.set_xPosition(this.newXPosition);
+			this.endpoint.set_yPosition(this.newYPosition);
+		}
+	}
+	,getLink: function() {
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(i1.get_leftEndpoint() == this.endpoint) {
+				this.object.link = this.link;
+				break;
+			}
+			if(i1.get_rightEndpoint() == this.endpoint) {
+				this.object.link = this.link;
+				break;
 			}
 		}
 	}
@@ -1137,31 +1116,30 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 	circuitDiagram: null
 	,isInComponent: function(coordinate) {
 		var component = null;
-		var i = this.circuitDiagram.get_componentArray().length - 1;
-		while(i >= 0) {
-			if(this.isInScope(this.circuitDiagram.get_componentArray()[i].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_yPosition(),coordinate.xPosition,coordinate.yPosition,this.circuitDiagram.get_componentArray()[i].get_height(),this.circuitDiagram.get_componentArray()[i].get_width()) == true) {
-				return this.circuitDiagram.get_componentArray()[i];
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(this.isInScope(i1.get_xPosition(),i1.get_yPosition(),coordinate.xPosition,coordinate.yPosition,i1.get_height(),i1.get_width()) == true) {
+				return i1;
 			}
-			--i;
 		}
 		return component;
 	}
 	,isOnLink: function(coordinate) {
-		var _g1 = 0;
-		var _g = this.circuitDiagram.get_linkArray().length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var leftEndpoint = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
-			var rightEndpoint = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var leftEndpoint = i1.get_leftEndpoint();
+			var rightEndpoint = i1.get_rightEndpoint();
 			if(this.pointToLine(leftEndpoint.get_xPosition(),leftEndpoint.get_yPosition(),rightEndpoint.get_xPosition(),rightEndpoint.get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 3) {
-				var theDistanaceToLeftEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition()),2));
-				var theDistanceToRightEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition()),2));
+				var theDistanaceToLeftEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - i1.get_leftEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - i1.get_leftEndpoint().get_yPosition()),2));
+				var theDistanceToRightEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.xPosition - i1.get_rightEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.yPosition - i1.get_rightEndpoint().get_yPosition()),2));
 				if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint) {
 					if(theDistanceToRightEndpoint >= 5) {
-						return this.circuitDiagram.get_linkArray()[i];
+						return i1;
 					}
 				} else if(theDistanaceToLeftEndpoint >= 5) {
-					return this.circuitDiagram.get_linkArray()[i];
+					return i1;
 				}
 			}
 		}
@@ -1202,51 +1180,45 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		return lineLength;
 	}
 	,pointOnEndpoint: function(coordinate) {
-		var _g1 = 0;
-		var _g = this.circuitDiagram.get_linkArray().length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
-				return this.circuitDiagram.get_linkArray()[i].get_leftEndpoint();
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(this.pointsDistance(i1.get_leftEndpoint().get_xPosition(),i1.get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
+				return i1.get_leftEndpoint();
 			}
-			if(this.pointsDistance(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_xPosition(),this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
-				return this.circuitDiagram.get_linkArray()[i].get_rightEndpoint();
+			if(this.pointsDistance(i1.get_rightEndpoint().get_xPosition(),i1.get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
+				return i1.get_rightEndpoint();
 			}
 		}
 		return null;
 	}
 	,isOnPort: function(cooridnate) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
-		var _g1 = 0;
-		var _g = this.circuitDiagram.get_componentArray().length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var _g3 = 0;
-			var _g2 = this.circuitDiagram.get_componentArray()[i].get_inportArray().length;
-			while(_g3 < _g2) {
-				var j = _g3++;
-				if(this.isInCircle(cooridnate,this.circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_inportArray()[j].get_yPosition())) {
-					object.port = this.circuitDiagram.get_componentArray()[i].get_inportArray()[j];
-					var _g5 = 0;
-					var _g4 = this.circuitDiagram.get_linkArray().length;
-					while(_g5 < _g4) {
-						var k = _g5++;
-						object.endPoint = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k],this.circuitDiagram.get_componentArray()[i].get_inportArray()[j]);
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var j = i1.get_inportIterator();
+			while(j.hasNext()) {
+				var j1 = j.next();
+				if(this.isInCircle(cooridnate,j1.get_xPosition(),j1.get_yPosition())) {
+					object.port = j1;
+					var k = this.circuitDiagram.get_linkIterator();
+					while(k.hasNext()) {
+						var k1 = k.next();
+						object.endPoint = this.isLinkOnPort(k1,j1);
 						return object;
 					}
 				}
 			}
-			var _g31 = 0;
-			var _g21 = this.circuitDiagram.get_componentArray()[i].get_outportArray().length;
-			while(_g31 < _g21) {
-				var j1 = _g31++;
-				if(this.isInCircle(cooridnate,this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1].get_xPosition(),this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1].get_yPosition())) {
-					object.port = this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1];
-					var _g51 = 0;
-					var _g41 = this.circuitDiagram.get_linkArray().length;
-					while(_g51 < _g41) {
-						var k1 = _g51++;
-						object.endPoint = this.isLinkOnPort(this.circuitDiagram.get_linkArray()[k1],this.circuitDiagram.get_componentArray()[i].get_outportArray()[j1]);
+			var j2 = i1.get_outportIterator();
+			while(j2.hasNext()) {
+				var j3 = j2.next();
+				if(this.isInCircle(cooridnate,j3.get_xPosition(),j3.get_yPosition())) {
+					object.port = j3;
+					var k2 = this.circuitDiagram.get_linkIterator();
+					while(k2.hasNext()) {
+						var k3 = k2.next();
+						object.endPoint = this.isLinkOnPort(k3,j3);
 						return object;
 					}
 				}
@@ -1300,22 +1272,20 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	,drawingAdapter: null
 	,update: function(object) {
 		this.canvas.width = this.canvas.width;
-		var _g1 = 0;
-		var _g = this.circuitDiagram.get_componentArray().length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(object != null && object.component != null && object.component == this.circuitDiagram.get_componentArray()[i]) {
-				this.circuitDiagram.get_componentArray()[i].drawComponent(this.circuitDiagram.get_componentArray()[i],this.drawingAdapter,true);
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(object != null && object.component != null && object.component == i1) {
+				i1.drawComponent(i1,this.drawingAdapter,true);
 			} else {
-				this.circuitDiagram.get_componentArray()[i].drawComponent(this.circuitDiagram.get_componentArray()[i],this.drawingAdapter,false);
+				i1.drawComponent(i1,this.drawingAdapter,false);
 			}
 		}
-		var _g11 = 0;
-		var _g2 = this.circuitDiagram.get_linkArray().length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var drawComponent = new com_mun_view_drawComponents_DrawLink(this.circuitDiagram.get_linkArray()[i1],this.drawingAdapter);
-			if(object != null && object.link != null && object.link == this.circuitDiagram.get_linkArray()[i1]) {
+		var i2 = this.circuitDiagram.get_linkIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var drawComponent = new com_mun_view_drawComponents_DrawLink(i3,this.drawingAdapter);
+			if(object != null && object.link != null && object.link == i3) {
 				drawComponent.drawCorrespondingComponent("red");
 			} else {
 				drawComponent.drawCorrespondingComponent("black");
@@ -1326,7 +1296,7 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 };
 var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDiagram) {
 	this.circuitDiagram = circuitDiagram;
-	this.commandManager = new com_mun_controller_command_CommandManager(circuitDiagram);
+	this.commandManager = new com_mun_controller_command_CommandManager();
 	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCircuitDiagram"] = com_mun_controller_componentUpdate_UpdateCircuitDiagram;
@@ -1337,6 +1307,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,commandManager: null
 	,circuitDiagramUtil: null
 	,updateToolBar: null
+	,get_commandManager: function() {
+		return this.commandManager;
+	}
 	,setUpdateCanvas: function(updateCanvas) {
 		this.updateCanvas = updateCanvas;
 	}
@@ -1349,7 +1322,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		component_.setNameOfTheComponentKind(name);
 		var object = { "link" : null, "component" : component_, "endPoint" : null, "port" : null};
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
-		this.commandManager.execute(command);
+		this.get_commandManager().execute(command);
 		this.redrawCanvas(object);
 		this.updateToolBar.update(object);
 	}
@@ -1358,7 +1331,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
 		var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
 		var command = new com_mun_controller_command_MoveCommand(object,object.component.get_xPosition() + xMoveDistance,object.component.get_yPosition() + yMoveDistance,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
-		this.commandManager.execute(command);
+		this.get_commandManager().execute(command);
 		this.redrawCanvas(object);
 	}
 	,moveLink: function(link,coordinate,mouseDownLocation) {
@@ -1366,25 +1339,24 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var xDisplacement = mouseDownLocation.xPosition - coordinate.xPosition;
 		var yDisplacement = mouseDownLocation.yPosition - coordinate.yPosition;
 		var command = new com_mun_controller_command_MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement,link.get_leftEndpoint().get_yPosition() - yDisplacement,link.get_leftEndpoint().get_xPosition(),link.get_leftEndpoint().get_yPosition(),this.circuitDiagram);
-		this.commandManager.execute(command);
-		var index = this.circuitDiagram.get_linkArray().indexOf(link);
-		var leftEndpointCoordinate = { "xPosition" : this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(), "yPosition" : this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
+		this.get_commandManager().execute(command);
+		var leftEndpointCoordinate = { "xPosition" : link.get_leftEndpoint().get_xPosition(), "yPosition" : link.get_leftEndpoint().get_yPosition()};
 		var port_temp = this.isOnPort(leftEndpointCoordinate).port;
-		var leftEndpointPort = this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
+		var leftEndpointPort = link.get_leftEndpoint().get_port();
 		if(port_temp != null && leftEndpointPort != port_temp) {
-			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(port_temp);
-			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().updatePosition();
+			link.get_leftEndpoint().set_port(port_temp);
+			link.get_leftEndpoint().updatePosition();
 		} else if(port_temp == null) {
-			this.circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(null);
+			link.get_leftEndpoint().set_port(null);
 		}
-		var rightEndpointCoordinate = { "xPosition" : this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(), "yPosition" : this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
+		var rightEndpointCoordinate = { "xPosition" : link.get_rightEndpoint().get_xPosition(), "yPosition" : link.get_rightEndpoint().get_yPosition()};
 		port_temp = this.isOnPort(rightEndpointCoordinate).port;
-		var rightEndpointPort = this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
+		var rightEndpointPort = link.get_rightEndpoint().get_port();
 		if(port_temp != null && rightEndpointPort != port_temp) {
-			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(port_temp);
-			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().updatePosition();
+			link.get_rightEndpoint().set_port(port_temp);
+			link.get_rightEndpoint().updatePosition();
 		} else if(port_temp == null) {
-			this.circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(null);
+			link.get_rightEndpoint().set_port(null);
 		}
 		this.redrawCanvas();
 		this.updateToolBar.update(object);
@@ -1408,7 +1380,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			object.link = link1;
 		}
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
-		this.commandManager.execute(command);
+		this.get_commandManager().execute(command);
 		this.redrawCanvas(object);
 		return object.link;
 	}
@@ -1418,42 +1390,36 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
 			var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
 			var command = new com_mun_controller_command_MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance,object.endPoint.get_yPosition() + yMoveDistance,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
-			this.commandManager.execute(command);
+			this.get_commandManager().execute(command);
 			this.redrawCanvas();
 			var port = null;
-			var linkIndex = -1;
-			var _g1 = 0;
-			var _g = this.circuitDiagram.get_linkArray().length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint) {
-					linkIndex = i;
-					if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null) {
-						port = this.circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
-					}
-				}
-				if(this.circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint) {
-					linkIndex = i;
-					if(this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null) {
-						port = this.circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
-					}
-				}
-			}
 			var newPort = this.circuitDiagramUtil.isOnPort(coordinate).port;
-			if(this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint) {
-				if(newPort != port) {
-					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
-					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
-				} else {
-					this.circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(null);
+			var i = this.circuitDiagram.get_linkIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				if(i1.get_leftEndpoint() == endpoint) {
+					if(i1.get_rightEndpoint().get_port() != null) {
+						port = i1.get_rightEndpoint().get_port();
+					}
+					if(newPort != port) {
+						i1.get_leftEndpoint().set_port(newPort);
+						i1.get_leftEndpoint().updatePosition();
+					} else {
+						i1.get_leftEndpoint().set_port(null);
+					}
+					break;
 				}
-			}
-			if(this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint) {
-				if(newPort != port) {
-					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
-					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
-				} else {
-					this.circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(null);
+				if(i1.get_rightEndpoint() == endpoint) {
+					if(i1.get_leftEndpoint().get_port() != null) {
+						port = i1.get_leftEndpoint().get_port();
+					}
+					if(newPort != port) {
+						i1.get_rightEndpoint().set_port(newPort);
+						i1.get_rightEndpoint().updatePosition();
+					} else {
+						i1.get_rightEndpoint().set_port(null);
+					}
+					break;
 				}
 			}
 			this.redrawCanvas();
@@ -1486,13 +1452,13 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		return this.circuitDiagramUtil.isOnPort(coordinate);
 	}
 	,resetCommandManagerRecordFlag: function() {
-		this.commandManager.recordFlagRest();
+		this.get_commandManager().recordFlagRest();
 	}
 	,setComponentName: function(component,name) {
 		this.circuitDiagram.componentSetName(component,name);
 	}
 	,undo: function() {
-		var object = this.commandManager.undo();
+		var object = this.get_commandManager().undo();
 		this.redrawCanvas(object);
 		if(object.component == null && object.link == null) {
 			this.updateToolBar.hidden();
@@ -1501,7 +1467,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		}
 	}
 	,redo: function() {
-		var object = this.commandManager.redo();
+		var object = this.get_commandManager().redo();
 		this.redrawCanvas(object);
 		if(object.component == null && object.link == null) {
 			this.updateToolBar.hidden();
@@ -1510,14 +1476,14 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		}
 	}
 	,setRedoButton: function() {
-		if(this.commandManager.getUndoStackSize() == 0) {
+		if(this.get_commandManager().getUndoStackSize() == 0) {
 			this.updateToolBar.setUndoButtonDisability(true);
 		} else {
 			this.updateToolBar.setUndoButtonDisability(false);
 		}
 	}
 	,setUndoButton: function() {
-		if(this.commandManager.getRedoStackSize() == 0) {
+		if(this.get_commandManager().getRedoStackSize() == 0) {
 			this.updateToolBar.setRedoButtonDisability(true);
 		} else {
 			this.updateToolBar.setRedoButtonDisability(false);
@@ -1529,6 +1495,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.setUndoButton();
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
+	,__properties__: {get_commandManager:"get_commandManager"}
 };
 var com_mun_controller_componentUpdate_UpdateToolBar = function(updateCircuitDiagram) {
 	this.updateCircuitDiagram = updateCircuitDiagram;
@@ -1818,10 +1785,12 @@ var com_mun_model_component_CircuitDiagramI = function() { };
 $hxClasses["com.mun.model.component.CircuitDiagramI"] = com_mun_model_component_CircuitDiagramI;
 com_mun_model_component_CircuitDiagramI.__name__ = ["com","mun","model","component","CircuitDiagramI"];
 com_mun_model_component_CircuitDiagramI.prototype = {
-	get_componentArray: null
-	,set_componentArray: null
-	,get_linkArray: null
-	,set_linkArray: null
+	get_commandManager: null
+	,set_commandManager: null
+	,get_componentIterator: null
+	,get_componentReverseIterator: null
+	,get_linkReverseIterator: null
+	,get_linkIterator: null
 	,get_name: null
 	,set_name: null
 	,addLink: null
@@ -1840,6 +1809,8 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,__class__: com_mun_model_component_CircuitDiagramI
 };
 var com_mun_model_component_CircuitDiagram = function() {
+	this.linkArrayReverseFlag = false;
+	this.componentArrayReverseFlag = false;
 	this.linkArray = [];
 	this.componentArray = [];
 	this.copyStack = new com_mun_controller_command_Stack();
@@ -1852,17 +1823,42 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,linkArray: null
 	,name: null
 	,copyStack: null
-	,get_componentArray: function() {
-		return this.componentArray;
+	,commandManager: null
+	,componentArrayReverseFlag: null
+	,linkArrayReverseFlag: null
+	,get_commandManager: function() {
+		return this.commandManager;
 	}
-	,set_componentArray: function(value) {
-		this.componentArray = value;
+	,set_commandManager: function(value) {
+		this.commandManager = value;
 	}
-	,get_linkArray: function() {
-		return this.linkArray;
+	,get_componentIterator: function() {
+		if(this.componentArrayReverseFlag) {
+			this.componentArrayReverse();
+		}
+		return HxOverrides.iter(this.componentArray);
 	}
-	,set_linkArray: function(value) {
-		this.linkArray = value;
+	,get_componentReverseIterator: function() {
+		this.componentArrayReverse();
+		return HxOverrides.iter(this.componentArray);
+	}
+	,componentArrayReverse: function() {
+		this.componentArrayReverseFlag = !this.componentArrayReverseFlag;
+		this.componentArray.reverse();
+	}
+	,get_linkIterator: function() {
+		if(this.linkArrayReverseFlag) {
+			this.linkArrayReverse();
+		}
+		return HxOverrides.iter(this.linkArray);
+	}
+	,get_linkReverseIterator: function() {
+		this.linkArrayReverse();
+		return HxOverrides.iter(this.linkArray);
+	}
+	,linkArrayReverse: function() {
+		this.linkArrayReverseFlag = !this.linkArrayReverseFlag;
+		this.linkArray.reverse();
 	}
 	,get_name: function() {
 		return this.name;
@@ -1909,34 +1905,32 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	}
 	,deleteComponent: function(component) {
 		HxOverrides.remove(this.componentArray,component);
-		var _g1 = 0;
-		var _g = component.get_inportArray().length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var _g3 = 0;
-			var _g2 = this.linkArray.length;
-			while(_g3 < _g2) {
-				var j = _g3++;
-				if(component.get_inportArray()[i] == this.linkArray[j].get_leftEndpoint().get_port()) {
+		var i = component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var _g1 = 0;
+			var _g = this.linkArray.length;
+			while(_g1 < _g) {
+				var j = _g1++;
+				if(i1 == this.linkArray[j].get_leftEndpoint().get_port()) {
 					this.linkArray[j].get_leftEndpoint().set_port(null);
 				}
-				if(component.get_inportArray()[i] == this.linkArray[j].get_rightEndpoint().get_port()) {
+				if(i1 == this.linkArray[j].get_rightEndpoint().get_port()) {
 					this.linkArray[j].get_rightEndpoint().set_port(null);
 				}
 			}
 		}
-		var _g11 = 0;
-		var _g4 = component.get_outportArray().length;
-		while(_g11 < _g4) {
-			var i1 = _g11++;
-			var _g31 = 0;
-			var _g21 = this.linkArray.length;
-			while(_g31 < _g21) {
-				var j1 = _g31++;
-				if(component.get_outportArray()[i1] == this.linkArray[j1].get_leftEndpoint().get_port()) {
+		var i2 = component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var _g11 = 0;
+			var _g2 = this.linkArray.length;
+			while(_g11 < _g2) {
+				var j1 = _g11++;
+				if(i3 == this.linkArray[j1].get_leftEndpoint().get_port()) {
 					this.linkArray[j1].get_leftEndpoint().set_port(null);
 				}
-				if(component.get_outportArray()[i1] == this.linkArray[j1].get_rightEndpoint().get_port()) {
+				if(i3 == this.linkArray[j1].get_rightEndpoint().get_port()) {
 					this.linkArray[j1].get_rightEndpoint().set_port(null);
 				}
 			}
@@ -2024,17 +2018,11 @@ com_mun_model_component_Component.prototype = {
 	,set_componentKind: function(value) {
 		return this.componentKind = value;
 	}
-	,get_inportArray: function() {
-		return this.inportArray;
+	,get_inportIterator: function() {
+		return HxOverrides.iter(this.inportArray);
 	}
-	,set_inportArray: function(value) {
-		return this.inportArray = value;
-	}
-	,get_outportArray: function() {
-		return this.outportArray;
-	}
-	,set_outportArray: function(value) {
-		return this.outportArray = value;
+	,get_outportIterator: function() {
+		return HxOverrides.iter(this.outportArray);
 	}
 	,get_name: function() {
 		return this.name;
@@ -3852,21 +3840,17 @@ com_mun_view_drawComponents_DrawAND.prototype = $extend(com_mun_view_drawCompone
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g2 = outportArray.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
@@ -3893,16 +3877,14 @@ com_mun_view_drawComponents_DrawFlipFlop.prototype = $extend(com_mun_view_drawCo
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		this.drawingAdapter.drawText("FF",this.component.get_xPosition() - 4,this.component.get_yPosition(),this.component.get_width());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
-			var _g2 = this.component.get_orientation();
-			switch(_g2[1]) {
+			var _g = this.component.get_orientation();
+			switch(_g[1]) {
 			case 0:
 				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D) {
 					this.drawingAdapter.drawText("D",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 2);
@@ -3933,16 +3915,14 @@ com_mun_view_drawComponents_DrawFlipFlop.prototype = $extend(com_mun_view_drawCo
 				break;
 			}
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g3 = outportArray.length;
-		while(_g11 < _g3) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
-			var _g21 = this.component.get_orientation();
-			switch(_g21[1]) {
+			var _g1 = this.component.get_orientation();
+			switch(_g1[1]) {
 			case 0:
 				if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.Q) {
 					this.drawingAdapter.drawText("Q",port1.get_xPosition() - 2,port1.get_yPosition() + 10,this.component.get_width() - 2);
@@ -3997,12 +3977,10 @@ com_mun_view_drawComponents_DrawInput.prototype = $extend(com_mun_view_drawCompo
 		this.drawingAdapter.setFillColor("red");
 		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
 		this.drawingAdapter.setTextColor("black");
-		var outportArray = this.component.get_outportArray();
-		var _g1 = 0;
-		var _g = outportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = outportArray[i];
+		var i = this.component.get_outportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
@@ -4051,17 +4029,15 @@ com_mun_view_drawComponents_DrawMUX.prototype = $extend(com_mun_view_drawCompone
 		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		this.drawingAdapter.setTextColor("black");
 		this.drawingAdapter.drawText("MUX",this.component.get_xPosition() - 8,this.component.get_yPosition(),this.component.get_width() - 2);
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 			this.drawingAdapter.setTextColor("black");
-			var _g2 = this.component.get_orientation();
-			switch(_g2[1]) {
+			var _g = this.component.get_orientation();
+			switch(_g[1]) {
 			case 0:
 				if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
 					this.drawingAdapter.drawText("S",port.get_xPosition() - 7,port.get_yPosition() + 2,this.component.get_width() - 4);
@@ -4092,12 +4068,10 @@ com_mun_view_drawComponents_DrawMUX.prototype = $extend(com_mun_view_drawCompone
 				break;
 			}
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g3 = outportArray.length;
-		while(_g11 < _g3) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
@@ -4123,21 +4097,17 @@ com_mun_view_drawComponents_DrawNAND.prototype = $extend(com_mun_view_drawCompon
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawNAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g2 = outportArray.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
@@ -4163,21 +4133,17 @@ com_mun_view_drawComponents_DrawNOR.prototype = $extend(com_mun_view_drawCompone
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawNOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g2 = outportArray.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
@@ -4203,21 +4169,17 @@ com_mun_view_drawComponents_DrawNOT.prototype = $extend(com_mun_view_drawCompone
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawNotShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g2 = outportArray.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
@@ -4243,21 +4205,17 @@ com_mun_view_drawComponents_DrawOR.prototype = $extend(com_mun_view_drawComponen
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g2 = outportArray.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}
@@ -4285,12 +4243,10 @@ com_mun_view_drawComponents_DrawOutput.prototype = $extend(com_mun_view_drawComp
 		this.drawingAdapter.setFillColor("black");
 		this.drawingAdapter.drawCricle(this.component.get_xPosition(),this.component.get_yPosition(),7);
 		this.drawingAdapter.setTextColor("white");
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
@@ -4316,21 +4272,17 @@ com_mun_view_drawComponents_DrawXOR.prototype = $extend(com_mun_view_drawCompone
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawXorShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
-		var inportArray = this.component.get_inportArray();
-		var _g1 = 0;
-		var _g = inportArray.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var port = inportArray[i];
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),this.get_portRadius());
 		}
-		var outportArray = this.component.get_outportArray();
-		var _g11 = 0;
-		var _g2 = outportArray.length;
-		while(_g11 < _g2) {
-			var i1 = _g11++;
-			var port1 = outportArray[i1];
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),this.get_portRadius());
 		}

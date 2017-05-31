@@ -1,7 +1,6 @@
 package com.mun.controller.command;
 
 import com.mun.type.Type.Object;
-import com.mun.model.component.CircuitDiagramI;
 /**
 * command manager used to manage those command
 * @author wanhui
@@ -9,15 +8,13 @@ import com.mun.model.component.CircuitDiagramI;
 class CommandManager {
     var undoStack:Array<Command> = new Array<Command>();
     var redoStack:Array<Command> = new Array<Command>();
-    var circuitDiagram:CircuitDiagramI;
     var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
     //most of actions will result add lots of commands into stack. such as
     //moveing component, link. therefore, need a flag to record the first step of moving
     //this varible only controlled by mouse down and mouse up action, both of them will reset this flag
     var recordFlag:Bool = false;
 
-    public function new(circuitDiagram:CircuitDiagramI) {
-        this.circuitDiagram = circuitDiagram;
+    public function new() {
     }
 
     public function execute(command:Command):Void {
