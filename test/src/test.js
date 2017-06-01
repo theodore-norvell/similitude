@@ -1006,16 +1006,27 @@ com_mun_controller_command_MoveCommand.prototype = {
 	,oldXPosition: null
 	,oldYPosition: null
 	,circuitDiagram: null
+	,recordXpositionBeforeUndo: null
+	,recordYpositionBefoerUndo: null
+	,recordRightEndpointXpositionBeforeUndo: null
+	,recordRightEndpointYpositionBeforeUndo: null
 	,object: null
 	,undo: function() {
 		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 		if(this.component != null) {
+			this.recordXpositionBeforeUndo = this.component.get_xPosition();
+			this.recordYpositionBefoerUndo = this.component.get_yPosition();
 			this.component.set_xPosition(this.oldXPosition);
 			this.component.set_yPosition(this.oldYPosition);
 			this.component.updateMoveComponentPortPosition(this.oldXPosition,this.oldYPosition);
+			this.linkPositionUpdate();
 			this.object.component = this.component;
 		}
 		if(this.link != null) {
+			this.recordXpositionBeforeUndo = this.link.get_leftEndpoint().get_xPosition();
+			this.recordYpositionBefoerUndo = this.link.get_leftEndpoint().get_yPosition();
+			this.recordRightEndpointXpositionBeforeUndo = this.link.get_rightEndpoint().get_xPosition();
+			this.recordRightEndpointYpositionBeforeUndo = this.link.get_rightEndpoint().get_yPosition();
 			var xDifference = this.newXPosition - this.oldXPosition;
 			var yDifference = this.newYPosition - this.oldYPosition;
 			this.link.get_leftEndpoint().set_xPosition(this.link.get_leftEndpoint().get_xPosition());
@@ -1025,6 +1036,8 @@ com_mun_controller_command_MoveCommand.prototype = {
 			this.object.link = this.link;
 		}
 		if(this.endpoint != null) {
+			this.recordXpositionBeforeUndo = this.endpoint.get_xPosition();
+			this.recordYpositionBefoerUndo = this.endpoint.get_yPosition();
 			this.getLink();
 			this.endpoint.set_xPosition(this.oldXPosition);
 			this.endpoint.set_yPosition(this.oldYPosition);
@@ -1033,24 +1046,35 @@ com_mun_controller_command_MoveCommand.prototype = {
 	}
 	,redo: function() {
 		this.object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
-		this.execute();
+		if(this.component != null) {
+			this.object.component = this.component;
+			this.component.set_xPosition(this.recordXpositionBeforeUndo);
+			this.component.set_yPosition(this.recordYpositionBefoerUndo);
+			this.component.updateMoveComponentPortPosition(this.recordXpositionBeforeUndo,this.recordYpositionBefoerUndo);
+			this.linkPositionUpdate();
+		}
+		if(this.link != null) {
+			this.object.link = this.link;
+			this.link.get_leftEndpoint().set_xPosition(this.recordXpositionBeforeUndo);
+			this.link.get_leftEndpoint().set_yPosition(this.recordYpositionBefoerUndo);
+			this.link.get_rightEndpoint().set_xPosition(this.recordRightEndpointXpositionBeforeUndo);
+			this.link.get_rightEndpoint().set_yPosition(this.recordRightEndpointYpositionBeforeUndo);
+		}
+		if(this.endpoint != null) {
+			this.getLink();
+			this.endpoint.set_xPosition(this.recordXpositionBeforeUndo);
+			this.endpoint.set_yPosition(this.recordYpositionBefoerUndo);
+		}
 		return this.object;
 	}
 	,execute: function() {
 		if(this.component != null) {
-			this.object.component = this.component;
 			this.component.set_xPosition(this.newXPosition);
 			this.component.set_yPosition(this.newYPosition);
 			this.component.updateMoveComponentPortPosition(this.newXPosition,this.newYPosition);
-			var i = this.circuitDiagram.get_linkIterator();
-			while(i.hasNext()) {
-				var i1 = i.next();
-				i1.get_leftEndpoint().updatePosition();
-				i1.get_rightEndpoint().updatePosition();
-			}
+			this.linkPositionUpdate();
 		}
 		if(this.link != null) {
-			this.object.link = this.link;
 			this.link.get_leftEndpoint().set_xPosition(this.newXPosition);
 			this.link.get_leftEndpoint().set_yPosition(this.newYPosition);
 			var xDisplacement = this.newXPosition - this.oldXPosition;
@@ -1059,9 +1083,16 @@ com_mun_controller_command_MoveCommand.prototype = {
 			this.link.get_rightEndpoint().set_yPosition(this.link.get_rightEndpoint().get_yPosition() + yDisplacement);
 		}
 		if(this.endpoint != null) {
-			this.getLink();
 			this.endpoint.set_xPosition(this.newXPosition);
 			this.endpoint.set_yPosition(this.newYPosition);
+		}
+	}
+	,linkPositionUpdate: function() {
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			i1.get_leftEndpoint().updatePosition();
+			i1.get_rightEndpoint().updatePosition();
 		}
 	}
 	,getLink: function() {
@@ -1326,42 +1357,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.redrawCanvas(object);
 		this.updateToolBar.update(object);
 	}
-	,moveComponent: function(component,coordinate,mouseDownLocation) {
-		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
-		var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
-		var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
-		var command = new com_mun_controller_command_MoveCommand(object,object.component.get_xPosition() + xMoveDistance,object.component.get_yPosition() + yMoveDistance,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
-		this.get_commandManager().execute(command);
-		this.redrawCanvas(object);
-	}
-	,moveLink: function(link,coordinate,mouseDownLocation) {
-		var object = { "link" : link, "component" : null, "endPoint" : null, "port" : null};
-		var xDisplacement = mouseDownLocation.xPosition - coordinate.xPosition;
-		var yDisplacement = mouseDownLocation.yPosition - coordinate.yPosition;
-		var command = new com_mun_controller_command_MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement,link.get_leftEndpoint().get_yPosition() - yDisplacement,link.get_leftEndpoint().get_xPosition(),link.get_leftEndpoint().get_yPosition(),this.circuitDiagram);
-		this.get_commandManager().execute(command);
-		var leftEndpointCoordinate = { "xPosition" : link.get_leftEndpoint().get_xPosition(), "yPosition" : link.get_leftEndpoint().get_yPosition()};
-		var port_temp = this.isOnPort(leftEndpointCoordinate).port;
-		var leftEndpointPort = link.get_leftEndpoint().get_port();
-		if(port_temp != null && leftEndpointPort != port_temp) {
-			link.get_leftEndpoint().set_port(port_temp);
-			link.get_leftEndpoint().updatePosition();
-		} else if(port_temp == null) {
-			link.get_leftEndpoint().set_port(null);
-		}
-		var rightEndpointCoordinate = { "xPosition" : link.get_rightEndpoint().get_xPosition(), "yPosition" : link.get_rightEndpoint().get_yPosition()};
-		port_temp = this.isOnPort(rightEndpointCoordinate).port;
-		var rightEndpointPort = link.get_rightEndpoint().get_port();
-		if(port_temp != null && rightEndpointPort != port_temp) {
-			link.get_rightEndpoint().set_port(port_temp);
-			link.get_rightEndpoint().updatePosition();
-		} else if(port_temp == null) {
-			link.get_rightEndpoint().set_port(null);
-		}
-		this.redrawCanvas();
-		this.updateToolBar.update(object);
-		this.hightLightObject(object);
-	}
 	,addLink: function(coordinateFrom,coordinateTo) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
 		object = this.isOnPort(coordinateFrom);
@@ -1384,14 +1379,51 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.redrawCanvas(object);
 		return object.link;
 	}
+	,moveComponent: function(component,coordinate,mouseDownLocation) {
+		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
+		var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
+		var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
+		var command = new com_mun_controller_command_MoveCommand(object,object.component.get_xPosition() + xMoveDistance,object.component.get_yPosition() + yMoveDistance,object.component.get_xPosition(),object.component.get_yPosition(),this.circuitDiagram);
+		this.get_commandManager().execute(command);
+		this.redrawCanvas(object);
+	}
+	,moveLink: function(link,coordinate,mouseDownLocation) {
+		var object = { "link" : link, "component" : null, "endPoint" : null, "port" : null};
+		var xDisplacement = mouseDownLocation.xPosition - coordinate.xPosition;
+		var yDisplacement = mouseDownLocation.yPosition - coordinate.yPosition;
+		var oldxPosition = object.endPoint.get_xPosition();
+		var oldyPosition = object.endPoint.get_yPosition();
+		var leftEndpointCoordinate = { "xPosition" : link.get_leftEndpoint().get_xPosition(), "yPosition" : link.get_leftEndpoint().get_yPosition()};
+		var port_temp = this.isOnPort(leftEndpointCoordinate).port;
+		var leftEndpointPort = link.get_leftEndpoint().get_port();
+		if(port_temp != null && leftEndpointPort != port_temp) {
+			link.get_leftEndpoint().set_port(port_temp);
+			link.get_leftEndpoint().updatePosition();
+		} else if(port_temp == null) {
+			link.get_leftEndpoint().set_port(null);
+		}
+		var rightEndpointCoordinate = { "xPosition" : link.get_rightEndpoint().get_xPosition(), "yPosition" : link.get_rightEndpoint().get_yPosition()};
+		port_temp = this.isOnPort(rightEndpointCoordinate).port;
+		var rightEndpointPort = link.get_rightEndpoint().get_port();
+		if(port_temp != null && rightEndpointPort != port_temp) {
+			link.get_rightEndpoint().set_port(port_temp);
+			link.get_rightEndpoint().updatePosition();
+		} else if(port_temp == null) {
+			link.get_rightEndpoint().set_port(null);
+		}
+		var command = new com_mun_controller_command_MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement,link.get_leftEndpoint().get_yPosition() - yDisplacement,oldxPosition,oldyPosition,this.circuitDiagram);
+		this.get_commandManager().execute(command);
+		this.redrawCanvas();
+		this.updateToolBar.update(object);
+		this.hightLightObject(object);
+	}
 	,moveEndpoint: function(endpoint,coordinate,mouseDownLocation) {
 		var object = { "link" : null, "component" : null, "endPoint" : endpoint, "port" : null};
 		if(object.endPoint != null) {
 			var xMoveDistance = coordinate.xPosition - mouseDownLocation.xPosition;
 			var yMoveDistance = coordinate.yPosition - mouseDownLocation.yPosition;
-			var command = new com_mun_controller_command_MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance,object.endPoint.get_yPosition() + yMoveDistance,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
-			this.get_commandManager().execute(command);
-			this.redrawCanvas();
+			var oldxPosition = object.endPoint.get_xPosition();
+			var oldyPosition = object.endPoint.get_yPosition();
 			var port = null;
 			var newPort = this.circuitDiagramUtil.isOnPort(coordinate).port;
 			var i = this.circuitDiagram.get_linkIterator();
@@ -1422,6 +1454,8 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 					break;
 				}
 			}
+			var command = new com_mun_controller_command_MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance,object.endPoint.get_yPosition() + yMoveDistance,object.endPoint.get_xPosition(),object.endPoint.get_yPosition(),this.circuitDiagram);
+			this.get_commandManager().execute(command);
 			this.redrawCanvas();
 		}
 	}
@@ -1476,17 +1510,17 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		}
 	}
 	,setRedoButton: function() {
-		if(this.get_commandManager().getUndoStackSize() == 0) {
-			this.updateToolBar.setUndoButtonDisability(true);
-		} else {
-			this.updateToolBar.setUndoButtonDisability(false);
-		}
-	}
-	,setUndoButton: function() {
 		if(this.get_commandManager().getRedoStackSize() == 0) {
 			this.updateToolBar.setRedoButtonDisability(true);
 		} else {
 			this.updateToolBar.setRedoButtonDisability(false);
+		}
+	}
+	,setUndoButton: function() {
+		if(this.get_commandManager().getUndoStackSize() == 0) {
+			this.updateToolBar.setUndoButtonDisability(true);
+		} else {
+			this.updateToolBar.setUndoButtonDisability(false);
 		}
 	}
 	,redrawCanvas: function(object) {
@@ -1604,14 +1638,14 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,setUndoButtonDisability: function(disable) {
 		if(disable) {
-			$(this.undo).attr("disabled");
+			this.undo.setAttribute("disabled","disabled");
 		} else {
 			$(this.undo).removeAttr("disabled");
 		}
 	}
 	,setRedoButtonDisability: function(disable) {
 		if(disable) {
-			$(this.redo).attr("disabled");
+			this.redo.setAttribute("disabled","disabled");
 		} else {
 			$(this.redo).removeAttr("disabled");
 		}

@@ -69,6 +69,30 @@ class UpdateCircuitDiagram {
         redrawCanvas(object);
         updateToolBar.update(object);
     }
+
+    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
+        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+        object = isOnPort(coordinateFrom);
+        if(object.port != null){
+            var leftEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
+            var rightEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
+            var link:Link = new Link(leftEndpoint,rightEndpoint);
+            link.get_leftEndpoint().set_port(object.port);
+            link.get_rightEndpoint().set_port(null);
+            object.link = link;
+            object.endPoint = null;
+        }else{
+            var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.xPosition, coordinateFrom.yPosition);
+            var rightEndpoint:Endpoint = new Endpoint(coordinateTo.xPosition+100, coordinateTo.yPosition+100);
+            var link:Link = new Link(leftEndpoint,rightEndpoint);
+            object.link = link;
+        }
+        var command:Command = new AddCommand(object,circuitDiagram);
+        commandManager.execute(command);
+        redrawCanvas(object);
+        return object.link;
+    }
+
     public function moveComponent(component:Component, coordinate:Coordinate, mouseDownLocation:Coordinate){
         var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
 
@@ -87,8 +111,8 @@ class UpdateCircuitDiagram {
         var xDisplacement:Float = mouseDownLocation.xPosition - coordinate.xPosition;
         var yDisplacement:Float = mouseDownLocation.yPosition - coordinate.yPosition;
 
-        var command:Command = new MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement, link.get_leftEndpoint().get_yPosition() - yDisplacement, link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition(), circuitDiagram);
-        commandManager.execute(command);
+        var oldxPosition:Float = object.endPoint.get_xPosition();
+        var oldyPosition:Float = object.endPoint.get_yPosition();
 
         //verfy the endpoint of this link connect to a port or not while moving
 
@@ -114,32 +138,11 @@ class UpdateCircuitDiagram {
             link.get_rightEndpoint().set_port(null);
         }
 
+        var command:Command = new MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement, link.get_leftEndpoint().get_yPosition() - yDisplacement, oldxPosition, oldyPosition, circuitDiagram);
+        commandManager.execute(command);
         redrawCanvas();
         updateToolBar.update(object);
         hightLightObject(object);
-    }
-
-    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
-        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
-        object = isOnPort(coordinateFrom);
-        if(object.port != null){
-            var leftEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
-            var rightEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
-            var link:Link = new Link(leftEndpoint,rightEndpoint);
-            link.get_leftEndpoint().set_port(object.port);
-            link.get_rightEndpoint().set_port(null);
-            object.link = link;
-            object.endPoint = null;
-        }else{
-            var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.xPosition, coordinateFrom.yPosition);
-            var rightEndpoint:Endpoint = new Endpoint(coordinateTo.xPosition+100, coordinateTo.yPosition+100);
-            var link:Link = new Link(leftEndpoint,rightEndpoint);
-            object.link = link;
-        }
-        var command:Command = new AddCommand(object,circuitDiagram);
-        commandManager.execute(command);
-        redrawCanvas(object);
-        return object.link;
     }
 
     public function moveEndpoint(endpoint:Endpoint,coordinate:Coordinate, mouseDownLocation:Coordinate){
@@ -149,9 +152,8 @@ class UpdateCircuitDiagram {
             var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
             var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
 
-            var command:Command = new MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance, object.endPoint.get_yPosition() + yMoveDistance, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
-            commandManager.execute(command);
-            redrawCanvas();
+            var oldxPosition:Float = object.endPoint.get_xPosition();
+            var oldyPosition:Float = object.endPoint.get_yPosition();
 
             //find the link which contains this endpoint and find the port
             var port:Port = null;
@@ -186,6 +188,8 @@ class UpdateCircuitDiagram {
                     break;
                 }
             }
+            var command:Command = new MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance, object.endPoint.get_yPosition() + yMoveDistance, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+            commandManager.execute(command);
             redrawCanvas();
         }
     }
@@ -253,18 +257,18 @@ class UpdateCircuitDiagram {
     }
 
     public function setRedoButton(){
-        if(commandManager.getUndoStackSize() == 0){
-            updateToolBar.setUndoButtonDisability(true);
-        }else{
-            updateToolBar.setUndoButtonDisability(false);
-        }
-    }
-
-    public function setUndoButton(){
         if(commandManager.getRedoStackSize() == 0){
             updateToolBar.setRedoButtonDisability(true);
         }else{
             updateToolBar.setRedoButtonDisability(false);
+        }
+    }
+
+    public function setUndoButton(){
+        if(commandManager.getUndoStackSize() == 0){
+            updateToolBar.setUndoButtonDisability(true);
+        }else{
+            updateToolBar.setUndoButtonDisability(false);
         }
     }
 

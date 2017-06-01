@@ -47,7 +47,6 @@ class CommandManager {
         if (redoStack.length == 0) {
             return object;
         }
-
         var command:Command = redoStack.pop();
         object = command.redo();
         undoStack.push(command);
