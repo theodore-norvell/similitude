@@ -49,9 +49,9 @@ class PasteCommand implements Command {
         var linkArray = copyStack.getLinkArray();
         if (linkArray != null) {
             for (i in 0...linkArray.length) {
-                pasteStack.pushLink(linkArray[i]);
-                circuitDiagram.addLink(calculateNewLinkCoordinate(linkArray[i], xPosition, yPosition));
-                object.link = linkArray[i];
+                object.link = calculateNewLinkCoordinate(linkArray[i], xPosition, yPosition);
+                var command:Command = new AddCommand(object,circuitDiagram);
+                circuitDiagram.get_commandManager().execute(command);
             }
         }
 
@@ -60,9 +60,10 @@ class PasteCommand implements Command {
             for (i in 0...componentArray.length) {
                 var component:Component = componentArray[i];
                 var newComponent:Component = new Component(xPosition, yPosition, component.get_height(), component.get_width(), component.get_orientation(), component.get_componentKind(), component.get_inportsNum());
+                object.component = component;
+                var command:Command = new AddCommand(object,circuitDiagram);
+                circuitDiagram.get_commandManager().execute(command);
                 pasteStack.pushComponent(newComponent);
-                circuitDiagram.addComponent(newComponent);
-                object.link = component;
             }
         }
 

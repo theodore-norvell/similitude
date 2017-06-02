@@ -1,11 +1,12 @@
 package ;
 
+import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.controller.mouseAction.ButtonClick;
-import com.mun.model.component.CircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.view.drawingImpl.DrawingAdapter;
 import js.Browser;
@@ -46,10 +47,11 @@ class Test {
 
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
 
-        var circuitDiagram:CircuitDiagram = new CircuitDiagram();
+        var circuitDiagram:CircuitDiagramI = new CircuitDiagram();
 
 
         var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
+        circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
 
         var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
         updateCircuitDiagram.setUpdateToolBar(updateToolBar);

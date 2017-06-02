@@ -23,17 +23,17 @@ class UpdateCanvas {
         //clear the canvas
         canvas.width = canvas.width;
         //update component array
-        for(i in 0...circuitDiagram.get_componentArray().length){
-            if(object != null && object.component != null && object.component == circuitDiagram.get_componentArray()[i]){
-                circuitDiagram.get_componentArray()[i].drawComponent(circuitDiagram.get_componentArray()[i], drawingAdapter, true);
+        for(i in circuitDiagram.get_componentIterator()){
+            if(object != null && object.component != null && object.component == i){
+                i.drawComponent(i, drawingAdapter, true);
             }else{
-                circuitDiagram.get_componentArray()[i].drawComponent(circuitDiagram.get_componentArray()[i], drawingAdapter, false);
+                i.drawComponent(i, drawingAdapter, false);
             }
         }
         //update link array
-        for(i in 0...circuitDiagram.get_linkArray().length){
-            var drawComponent:DrawComponent = new DrawLink(circuitDiagram.get_linkArray()[i], drawingAdapter);
-            if(object != null && object.link != null && object.link == circuitDiagram.get_linkArray()[i]){
+        for(i in circuitDiagram.get_linkIterator()){
+            var drawComponent:DrawComponent = new DrawLink(i, drawingAdapter);
+            if(object != null && object.link != null && object.link == i){
                 drawComponent.drawCorrespondingComponent("red");
             }else{
                 drawComponent.drawCorrespondingComponent("black");

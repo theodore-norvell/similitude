@@ -35,15 +35,19 @@ import com.mun.model.gates.XOR;
 class UpdateCircuitDiagram {
     var circuitDiagram:CircuitDiagramI;
     var updateCanvas:UpdateCanvas;
-    var commandManager:CommandManager;
+    @:isVar var commandManager(get, null):CommandManager;
     var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
 
     public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
 
-        commandManager = new CommandManager(circuitDiagram);
+        commandManager = new CommandManager();
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
+    }
+
+    public function get_commandManager():CommandManager {
+        return commandManager;
     }
 
     public function setUpdateCanvas(updateCanvas:UpdateCanvas){
@@ -64,57 +68,6 @@ class UpdateCircuitDiagram {
         commandManager.execute(command);
         redrawCanvas(object);
         updateToolBar.update(object);
-    }
-    public function moveComponent(component:Component, coordinate:Coordinate, mouseDownLocation:Coordinate){
-        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
-
-        var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
-        var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
-
-        var command:Command = new MoveCommand(object,object.component.get_xPosition() + xMoveDistance , object.component.get_yPosition() + yMoveDistance, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
-        commandManager.execute(command);
-        //those wires which link to this component should move either, which automactilly completed while move endpoint
-        redrawCanvas(object);
-    }
-
-    public function moveLink(link:Link, coordinate:Coordinate, mouseDownLocation:Coordinate){
-        var object:Object = {"link":link,"component":null,"endPoint":null, "port":null};
-
-        var xDisplacement:Float = mouseDownLocation.xPosition - coordinate.xPosition;
-        var yDisplacement:Float = mouseDownLocation.yPosition - coordinate.yPosition;
-
-        var command:Command = new MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement, link.get_leftEndpoint().get_yPosition() - yDisplacement, link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition(), circuitDiagram);
-        commandManager.execute(command);
-
-        //verfy the endpoint of this link connect to a port or not while moving
-        var index:Int = circuitDiagram.get_linkArray().indexOf(link);
-        //left endpoint
-        var leftEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(),
-            "yPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
-        var port_temp:Port = isOnPort(leftEndpointCoordinate).port;
-        var leftEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
-        if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(port_temp);
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().updatePosition();
-        }else if(port_temp == null){
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(null);
-        }
-
-        var rightEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(),
-            "yPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
-        port_temp = isOnPort(rightEndpointCoordinate).port;
-        var rightEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
-
-        if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(port_temp);
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().updatePosition();
-        }else if(port_temp == null){
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(null);
-        }
-
-        redrawCanvas();
-        updateToolBar.update(object);
-        hightLightObject(object);
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
@@ -140,6 +93,58 @@ class UpdateCircuitDiagram {
         return object.link;
     }
 
+    public function moveComponent(component:Component, coordinate:Coordinate, mouseDownLocation:Coordinate){
+        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
+
+        var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
+        var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
+
+        var command:Command = new MoveCommand(object,object.component.get_xPosition() + xMoveDistance , object.component.get_yPosition() + yMoveDistance, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
+        commandManager.execute(command);
+        //those wires which link to this component should move either, which automactilly completed while move endpoint
+        redrawCanvas(object);
+    }
+
+    public function moveLink(link:Link, coordinate:Coordinate, mouseDownLocation:Coordinate){
+        var object:Object = {"link":link,"component":null,"endPoint":null, "port":null};
+
+        var xDisplacement:Float = mouseDownLocation.xPosition - coordinate.xPosition;
+        var yDisplacement:Float = mouseDownLocation.yPosition - coordinate.yPosition;
+
+        var oldxPosition:Float = object.endPoint.get_xPosition();
+        var oldyPosition:Float = object.endPoint.get_yPosition();
+
+        //verfy the endpoint of this link connect to a port or not while moving
+
+        //left endpoint
+        var leftEndpointCoordinate:Coordinate = {"xPosition":link.get_leftEndpoint().get_xPosition(), "yPosition":link.get_leftEndpoint().get_yPosition()};
+        var port_temp:Port = isOnPort(leftEndpointCoordinate).port;
+        var leftEndpointPort:Port = link.get_leftEndpoint().get_port();
+        if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
+            link.get_leftEndpoint().set_port(port_temp);
+            link.get_leftEndpoint().updatePosition();
+        }else if(port_temp == null){
+            link.get_leftEndpoint().set_port(null);
+        }
+
+        var rightEndpointCoordinate:Coordinate = {"xPosition":link.get_rightEndpoint().get_xPosition(), "yPosition":link.get_rightEndpoint().get_yPosition()};
+        port_temp = isOnPort(rightEndpointCoordinate).port;
+        var rightEndpointPort:Port = link.get_rightEndpoint().get_port();
+
+        if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
+            link.get_rightEndpoint().set_port(port_temp);
+            link.get_rightEndpoint().updatePosition();
+        }else if(port_temp == null){
+            link.get_rightEndpoint().set_port(null);
+        }
+
+        var command:Command = new MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement, link.get_leftEndpoint().get_yPosition() - yDisplacement, oldxPosition, oldyPosition, circuitDiagram);
+        commandManager.execute(command);
+        redrawCanvas();
+        updateToolBar.update(object);
+        hightLightObject(object);
+    }
+
     public function moveEndpoint(endpoint:Endpoint,coordinate:Coordinate, mouseDownLocation:Coordinate){
         var object:Object = {"link":null,"component":null,"endPoint":endpoint, "port":null};
         if(object.endPoint != null){
@@ -147,50 +152,44 @@ class UpdateCircuitDiagram {
             var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
             var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
 
-            var command:Command = new MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance, object.endPoint.get_yPosition() + yMoveDistance, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
-            commandManager.execute(command);
-            redrawCanvas();
+            var oldxPosition:Float = object.endPoint.get_xPosition();
+            var oldyPosition:Float = object.endPoint.get_yPosition();
 
             //find the link which contains this endpoint and find the port
             var port:Port = null;
-            var linkIndex:Int = -1;
-            for(i in 0...circuitDiagram.get_linkArray().length){
-                if(circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint){
-                    linkIndex = i;
-                    if(circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null){//find the port
-                        port = circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
-                    }
-                }
 
-                if(circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint){
-                    linkIndex = i;
-                    if(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null){//find the port
-                        port = circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
-                    }
-                }
-            }
-            //verify the endpoint step into another component port or not
             var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).port;
-
-            if(circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint){
-                if(newPort != port){
-                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
-                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
-                }else{
-                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(null);
+            for(i in circuitDiagram.get_linkIterator()){
+                if(i.get_leftEndpoint() == endpoint){
+                    if(i.get_rightEndpoint().get_port() != null){//find the port
+                        port = i.get_rightEndpoint().get_port();
+                    }
+                    //verify the endpoint step into another component port or not
+                    if(newPort != port){
+                        i.get_leftEndpoint().set_port(newPort);
+                        i.get_leftEndpoint().updatePosition();
+                    }else{
+                        i.get_leftEndpoint().set_port(null);
+                    }
+                    break;
                 }
 
-            }
+                if(i.get_rightEndpoint() == endpoint){
+                    if(i.get_leftEndpoint().get_port() != null){//find the port
+                        port = i.get_leftEndpoint().get_port();
+                    }
 
-            if(circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint){
-                if(newPort != port){
-                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
-                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
-                }else{
-                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(null);
+                    if(newPort != port){
+                        i.get_rightEndpoint().set_port(newPort);
+                        i.get_rightEndpoint().updatePosition();
+                    }else{
+                        i.get_rightEndpoint().set_port(null);
+                    }
+                    break;
                 }
             }
-
+            var command:Command = new MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance, object.endPoint.get_yPosition() + yMoveDistance, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
+            commandManager.execute(command);
             redrawCanvas();
         }
     }
@@ -258,18 +257,18 @@ class UpdateCircuitDiagram {
     }
 
     public function setRedoButton(){
-        if(commandManager.getUndoStackSize() == 0){
-            updateToolBar.setUndoButtonDisability(true);
-        }else{
-            updateToolBar.setUndoButtonDisability(false);
-        }
-    }
-
-    public function setUndoButton(){
         if(commandManager.getRedoStackSize() == 0){
             updateToolBar.setRedoButtonDisability(true);
         }else{
             updateToolBar.setRedoButtonDisability(false);
+        }
+    }
+
+    public function setUndoButton(){
+        if(commandManager.getUndoStackSize() == 0){
+            updateToolBar.setUndoButtonDisability(true);
+        }else{
+            updateToolBar.setUndoButtonDisability(false);
         }
     }
 

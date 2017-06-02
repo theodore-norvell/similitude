@@ -130,7 +130,7 @@ class UpdateToolBar {
 
     public function setUndoButtonDisability(disable:Bool){
         if(disable){
-            new JQuery(undo).attr("disabled");
+            undo.setAttribute("disabled", "disabled");
         }else{
             new JQuery(undo).removeAttr("disabled");
         }
@@ -138,7 +138,7 @@ class UpdateToolBar {
 
     public function setRedoButtonDisability(disable:Bool){
         if(disable){
-            new JQuery(redo).attr("disabled");
+            redo.setAttribute("disabled", "disabled");
         }else{
             new JQuery(redo).removeAttr("disabled");
         }
