@@ -132,27 +132,17 @@ class CanvasListener {
             if(createLinkFlag){//link has been created, so move this endpoint
                 //if the mouse position have a endpoint
                 linkAndComponentAndEndpointArray.endpointArray.push(link.get_rightEndpoint());
-//                updateCircuitDiagram.moveEndpoint(link.get_rightEndpoint()get_rightEndpointΩ, loc, mouseDownLocation);
                 updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation);
             }else{
                 if(endpoint != null){
                     linkAndComponentAndEndpointArray.endpointArray.push(endpoint);
                     updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation);
-//                    updateCircuitDiagram.moveEndpoint(endpoint, loc, mouseDownLocation);
                 }else if((linkAndComponentArray.linkArray != null && linkAndComponentArray.linkArray.length != 0) ||
                             (linkAndComponentArray.componentArray != null && linkAndComponentArray.componentArray.length != 0)){
                     linkAndComponentAndEndpointArray.componentArray = linkAndComponentArray.componentArray;
                     linkAndComponentAndEndpointArray.linkArray = linkAndComponentArray.linkArray;
                     updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation);
                 }
-//                if(link != null){
-//                    updateCircuitDiagram.moveLink(link,loc, mouseDownLocation);
-//                }
-//
-//                if(component != null){
-//                    //move component
-//                    updateCircuitDiagram.moveComponent(component,loc, mouseDownLocation);
-//                }
             }
 
         }
