@@ -1,16 +1,20 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.Component;
+import com.mun.model.component.Link;
 import js.jquery.JQuery;
 import com.mun.model.enumeration.Orientation;
 import com.mun.type.Type.Object;
 import js.html.DOMElement;
 import js.Browser;
+import com.mun.type.Type.LinkAndComponentArray;
 /**
 * update the tool bar
 **/
 class UpdateToolBar {
     var updateCircuitDiagram:UpdateCircuitDiagram;
-    var object:Object;
+    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":null};
     var nameInput:DOMElement;
     var orientation:DOMElement;
     var orientation_div:DOMElement;
@@ -42,70 +46,97 @@ class UpdateToolBar {
         Browser.document.getElementById("south").onclick = changeToSouth;
         Browser.document.getElementById("west").onclick = changeToWest;
         Browser.document.getElementById("east").onclick = chageToEast;
+
+        toolBar.onfocus = onfocus;
     }
 
-    public function update(object:Object){
-        this.object = object;
-        if(object.component != null){
-            visible();
-            setAttribute();
+    public function onfocus(){
+        updateCircuitDiagram.get_commandManager().recordFlagRest();
+    }
 
+    public function update(linkAndComponentArray:LinkAndComponentArray){
+
+        linkAndComponentArrayReset();
+
+        if(linkAndComponentArray.componentArray != null){
+            for(i in linkAndComponentArray.componentArray){
+                this.linkAndComponentArray.componentArray.push(i);
+            }
         }
 
-        if(object.link != null){
+        if(linkAndComponentArray.linkArray != null){
+            for(i in linkAndComponentArray.linkArray){
+                this.linkAndComponentArray.linkArray.push(i);
+            }
+        }
+
+        //linkAndComponentArray may contains link and component, so when link and component both exists, then only show those things both have
+
+        if(linkAndComponentArray.componentArray.length != 0 && (linkAndComponentArray.linkArray == null || linkAndComponentArray.linkArray.length == 0)){
+            visible();
+            setOrientation();
+            if(linkAndComponentArray.componentArray.length > 1){
+                setNameInput();
+            }else{
+                component_name_div.style.visibility = "hidden";
+            }
+        }else{
             visible();
             component_name_div.style.visibility = "hidden";
             orientation_div.style.visibility = "hidden";
         }
     }
 
-    public function setAttribute(){
-        new JQuery(nameInput).val(object.component.get_name());
-        new JQuery(orientation).val(object.component.get_orientation() + "");
+    public function setOrientation(){
+        if(linkAndComponentArray.componentArray != null && linkAndComponentArray.componentArray.length == 1){
+            new JQuery(orientation).val(linkAndComponentArray.componentArray[0].get_orientation() + "");
+        }else{
+            new JQuery(orientation).val(Orientation.UNKNOW + "");
+        }
+
+    }
+
+    public function setNameInput(){
+        new JQuery(nameInput).val(linkAndComponentArray.componentArray[0].get_name());
     }
 
     public function changeToNorth(){
-        if(object.component != null){
-            updateCircuitDiagram.changeOrientation(object.component,Orientation.NORTH);
-            setAttribute();
+        if(linkAndComponentArray.componentArray.length != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.componentArray,Orientation.NORTH);
+            setOrientation();
         }
     }
     public function changeToSouth(){
-        if(object.component != null){
-            updateCircuitDiagram.changeOrientation(object.component,Orientation.SOUTH);
-            setAttribute();
+        if(linkAndComponentArray.componentArray.length != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.componentArray,Orientation.SOUTH);
+            setOrientation();
         }
     }
     public function changeToWest(){
-        if(object.component != null){
-            updateCircuitDiagram.changeOrientation(object.component,Orientation.WEST);
-            setAttribute();
+        if(linkAndComponentArray.componentArray.length != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.componentArray,Orientation.WEST);
+            setOrientation();
         }
     }
     public function chageToEast(){
-        if(object.component != null){
-            updateCircuitDiagram.changeOrientation(object.component,Orientation.EAST);
-            setAttribute();
+        if(linkAndComponentArray.componentArray.length != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.componentArray,Orientation.EAST);
+            setOrientation();
         }
     }
 
     public function inputChange(){
 
-        if(object.component != null){
+        if(linkAndComponentArray.componentArray != null && linkAndComponentArray.componentArray.length == 1){
             var temp:Dynamic = new JQuery(nameInput).val();
-            updateCircuitDiagram.setComponentName(object.component,temp);
+            updateCircuitDiagram.setComponentName(linkAndComponentArray.componentArray[0],temp);
         }
     }
 
     public function deleteObject(){
-        if(object.component != null){
-            updateCircuitDiagram.deleteComponent(object.component);
+        if(linkAndComponentArray.componentArray != null || linkAndComponentArray.linkArray != null){
+            updateCircuitDiagram.deleteObject(linkAndComponentArray);
         }
-
-        if(object.link != null){
-            updateCircuitDiagram.deleteLink(object.link);
-        }
-        updateCircuitDiagram.redrawCanvas();
     }
 
     public function undoCommand(){
@@ -142,5 +173,10 @@ class UpdateToolBar {
         }else{
             new JQuery(redo).removeAttr("disabled");
         }
+    }
+
+    public function linkAndComponentArrayReset(){
+        linkAndComponentArray.linkArray = new Array<Link>();
+        linkAndComponentArray.componentArray = new Array<Component>();
     }
 }
