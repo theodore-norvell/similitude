@@ -1813,7 +1813,6 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,undo: null
 	,redo: null
 	,onfocus: function() {
-		haxe_Log.trace(1,{ fileName : "UpdateToolBar.hx", lineNumber : 54, className : "com.mun.controller.componentUpdate.UpdateToolBar", methodName : "onfocus"});
 		this.updateCircuitDiagram.get_commandManager().recordFlagRest();
 	}
 	,update: function(linkAndComponentArray) {
@@ -1839,7 +1838,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		if(linkAndComponentArray.componentArray.length != 0 && (linkAndComponentArray.linkArray == null || linkAndComponentArray.linkArray.length == 0)) {
 			this.visible();
 			this.setOrientation();
-			if(linkAndComponentArray.componentArray.length > 1) {
+			if(linkAndComponentArray.componentArray.length == 1) {
 				this.setNameInput();
 			} else {
 				this.component_name_div.style.visibility = "hidden";
@@ -1985,7 +1984,7 @@ com_mun_controller_mouseAction_ButtonClick.prototype = {
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
 var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
-	this.controlKeyFlag = false;
+	this.altKeyFlag = false;
 	this.linkAndComponentAndEndpointArray = { "linkArray" : null, "componentArray" : null, "endpointArray" : null};
 	this.linkAndComponentArray = { "linkArray" : null, "componentArray" : null};
 	this.endpointSelected = false;
@@ -1998,8 +1997,8 @@ var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircui
 	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
-	canvas.addEventListener("keydown",$bind(this,this.keyDown),false);
-	canvas.addEventListener("keyup",$bind(this,this.keyUp),false);
+	window.document.addEventListener("keydown",$bind(this,this.keyDown),false);
+	window.document.addEventListener("keyup",$bind(this,this.keyUp),false);
 	this.linkAndComponentArrayReset();
 };
 $hxClasses["com.mun.controller.mouseAction.CanvasListener"] = com_mun_controller_mouseAction_CanvasListener;
@@ -2019,7 +2018,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,port: null
 	,linkAndComponentArray: null
 	,linkAndComponentAndEndpointArray: null
-	,controlKeyFlag: null
+	,altKeyFlag: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
@@ -2037,7 +2036,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
 		if(this.endpoint != null) {
 			this.endpointSelected = true;
-			haxe_Log.trace("endpoint selected",{ fileName : "CanvasListener.hx", lineNumber : 77, className : "com.mun.controller.mouseAction.CanvasListener", methodName : "doMouseDown"});
+			haxe_Log.trace("endpoint selected",{ fileName : "CanvasListener.hx", lineNumber : 79, className : "com.mun.controller.mouseAction.CanvasListener", methodName : "doMouseDown"});
 		} else {
 			this.endpointSelected = false;
 		}
@@ -2046,14 +2045,18 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 			this.linkHighLight = true;
 			if(this.link == null) {
 				this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
-				if(this.component != null && this.controlKeyFlag) {
-					this.linkAndComponentArray.componentArray.push(this.component);
+				if(this.component != null && this.altKeyFlag) {
+					if(this.linkAndComponentArray.componentArray.indexOf(this.component) == -1) {
+						this.linkAndComponentArray.componentArray.push(this.component);
+					}
 				} else if(this.component != null) {
 					this.linkAndComponentArrayReset();
 					this.linkAndComponentArray.componentArray.push(this.component);
 				}
-			} else if(this.controlKeyFlag) {
-				this.linkAndComponentArray.linkArray.push(this.link);
+			} else if(this.altKeyFlag) {
+				if(this.linkAndComponentArray.componentArray.indexOf(this.component) == -1) {
+					this.linkAndComponentArray.linkArray.push(this.link);
+				}
 			} else {
 				this.linkAndComponentArrayReset();
 				this.linkAndComponentArray.linkArray.push(this.link);
@@ -2106,19 +2109,18 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.port = null;
 		this.createLinkFlag = false;
 		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
-		this.linkAndComponentArrayReset();
+		if(!this.altKeyFlag) {
+			this.linkAndComponentArrayReset();
+		}
 	}
 	,keyDown: function(event) {
-		var keyName = event.key;
-		if(keyName == "Control") {
-			this.controlKeyFlag = true;
+		if(event.altKey) {
+			this.linkAndComponentArrayReset();
+			this.altKeyFlag = true;
 		}
 	}
 	,keyUp: function(event) {
-		var keyName = event.key;
-		if(keyName == "Control") {
-			this.controlKeyFlag = false;
-		}
+		this.altKeyFlag = false;
 	}
 	,linkAndComponentArrayReset: function() {
 		this.linkAndComponentArray.linkArray = [];

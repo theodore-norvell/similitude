@@ -112,7 +112,6 @@ class UpdateCircuitDiagram {
 
         var xMoveDistance:Float = currentMouseLocation.xPosition - mouseDownLocation.xPosition;
         var yMoveDistance:Float = currentMouseLocation.yPosition - mouseDownLocation.yPosition;
-
         var command:Command = new MoveCommand(linkAndComponentAndEndpointArray, xMoveDistance, yMoveDistance, circuitDiagram);
         commandManager.execute(command);
         //those wires which link to this component should move either, which automactilly completed while move endpoint

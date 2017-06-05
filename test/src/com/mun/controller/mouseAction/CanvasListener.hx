@@ -1,5 +1,6 @@
 package com.mun.controller.mouseAction;
 
+import js.Browser;
 import js.html.KeyboardEvent;
 import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
@@ -32,7 +33,7 @@ class CanvasListener {
     var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":null};
     var  linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray = {"linkArray":null, "componentArray":null, "endpointArray":null};
     //key
-    var controlKeyFlag:Bool = false;
+    var altKeyFlag:Bool = false;
 
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram, updateToolBar:UpdateToolBar) {
         this.canvas = canvas;
@@ -42,8 +43,9 @@ class CanvasListener {
         canvas.addEventListener("mousedown", doMouseDown,false);
         canvas.addEventListener("mousemove", doMouseMove,false);
         canvas.addEventListener("mouseup", doMouseUp,false);
-        canvas.addEventListener("keydown", keyDown, false);
-        canvas.addEventListener("keyup", keyUp, false);
+
+        Browser.document.addEventListener("keydown", keyDown, false);
+        Browser.document.addEventListener("keyup", keyUp, false);
 
         linkAndComponentArrayReset();
     }
@@ -84,16 +86,19 @@ class CanvasListener {
             linkHighLight = true;
             if(link == null){//if this mouse location on the link, should be select link first
                 component = updateCircuitDiagram.getComponent(mouseDownLocation);
-
-                if(component != null && controlKeyFlag){
-                    linkAndComponentArray.componentArray.push(component);
+                if(component != null && altKeyFlag){
+                    if(linkAndComponentArray.componentArray.indexOf(component) == -1){
+                        linkAndComponentArray.componentArray.push(component);
+                    }
                 }else if(component != null){
                     linkAndComponentArrayReset();
                     linkAndComponentArray.componentArray.push(component);
                 }
             }else{
-                if(controlKeyFlag){
-                    linkAndComponentArray.linkArray.push(link);
+                if(altKeyFlag){
+                    if(linkAndComponentArray.componentArray.indexOf(component) == -1){
+                        linkAndComponentArray.linkArray.push(link);
+                    }
                 }else{
                     linkAndComponentArrayReset();
                     linkAndComponentArray.linkArray.push(link);
@@ -156,23 +161,20 @@ class CanvasListener {
         port = null;
         createLinkFlag = false;
         updateCircuitDiagram.resetCommandManagerRecordFlag();
-        linkAndComponentArrayReset();
+        if(!altKeyFlag){
+            linkAndComponentArrayReset();
+        }
     }
 
     public function keyDown(event:KeyboardEvent){
-        var keyName:String = event.key;
-
-        if(keyName == "Control"){
-            controlKeyFlag = true;
+        if(event.altKey){
+            linkAndComponentArrayReset();
+            altKeyFlag = true;
         }
     }
 
     public function keyUp(event:KeyboardEvent){
-        var keyName:String = event.key;
-
-        if(keyName == "Control"){
-            controlKeyFlag = false;
-        }
+        altKeyFlag = false;
     }
 
     public function linkAndComponentArrayReset(){

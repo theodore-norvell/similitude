@@ -75,7 +75,7 @@ class UpdateToolBar {
         if(linkAndComponentArray.componentArray.length != 0 && (linkAndComponentArray.linkArray == null || linkAndComponentArray.linkArray.length == 0)){
             visible();
             setOrientation();
-            if(linkAndComponentArray.componentArray.length > 1){
+            if(linkAndComponentArray.componentArray.length == 1){
                 setNameInput();
             }else{
                 component_name_div.style.visibility = "hidden";
