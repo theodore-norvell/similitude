@@ -1,7 +1,8 @@
 package com.mun.controller.command;
 
+import com.mun.model.component.Link;
 import com.mun.type.Type.Object;
-import com.mun.model.component.CircuitDiagramI;
+import com.mun.type.Type.LinkAndComponentArray;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -9,33 +10,42 @@ import com.mun.model.enumeration.Orientation;
 * @author wanhui
 **/
 class OrientationCommand implements Command {
-    var component:Component;
-    var circuitDiagram:CircuitDiagramI;
+    var componentArray:Array<Component> = new Array<Component>();
     var newOrientation:Orientation;
-    var oldOrientation:Orientation;
-    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+    var oldOrientationArray:Array<Orientation> = new Array<Orientation>();
+    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
 
-    public function new(component:Component, oldOrientation:Orientation, newOrientation:Orientation, circuitDiagram:CircuitDiagramI) {
-        this.component = component;
-        this.circuitDiagram = circuitDiagram;
-        this.oldOrientation = oldOrientation;
+    public function new(componentArray:Array<Component>, newOrientation:Orientation) {
+        for(i in componentArray){
+            this.componentArray.push(i);
+        }
+
+        this.newOrientation = newOrientation;
+
+        linkAndComponentArray.componentArray = this.componentArray;
+
+        for(i in 0...componentArray.length){
+            oldOrientationArray[i] = componentArray[i].get_orientation();
+        }
     }
 
-    public function undo():Object {
-        object = {"link":null,"component":null,"endPoint":null, "port":null};
-        object.component = component;
-        circuitDiagram.setNewOirentation(component, oldOrientation);
-        return object;
+    public function undo():LinkAndComponentArray {
+        for(i in 0...componentArray.length){
+            componentArray[i].set_orientation(oldOrientationArray[i]);
+            componentArray[i].updateMoveComponentPortPosition(componentArray[i].get_xPosition(), componentArray[i].get_yPosition());
+        }
+        return linkAndComponentArray;
     }
 
-    public function redo():Object {
-        object = {"link":null,"component":null,"endPoint":null, "port":null};
+    public function redo():LinkAndComponentArray {
         execute();
-        object.component = component;
-        return object;
+        return linkAndComponentArray;
     }
 
     public function execute():Void {
-        circuitDiagram.setNewOirentation(component, newOrientation);
+        for(i in componentArray){
+            i.set_orientation(newOrientation);
+            i.updateMoveComponentPortPosition(i.get_xPosition(), i.get_yPosition());
+        }
     }
 }

@@ -5,4 +5,5 @@ enum Orientation {
     SOUTH;
     WEST;
     EAST;
+    UNKNOW;
 }

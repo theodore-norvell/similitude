@@ -1,52 +1,41 @@
 package com.mun.controller.command;
-import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
-import com.mun.type.Type.ObjectArray;
+import com.mun.model.component.CircuitDiagramI;
+import com.mun.type.Type.LinkAndComponentArray;
 /**
 * Copy command
 * @author wanhui
 **/
 class CopyCommand implements Command {
-    var linkArray:Array<Link>;
-    var componentArray:Array<Component>;
     var circuitDiagram:CircuitDiagramI;
-    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
 
-    public function new(objectArray:ObjectArray, circuitDiagram:CircuitDiagramI) {
-        this.linkArray = objectArray.linkArray;
-        this.componentArray = objectArray.componentArray;
-        this.circuitDiagram = circuitDiagram;
+    public function new(linkAndComponentArray:LinkAndComponentArray, circuitDiagram:CircuitDiagramI) {
+        this.linkAndComponentArray = linkAndComponentArray;
     }
 
-    public function undo():Object {
+    public function undo():LinkAndComponentArray {
         circuitDiagram.clearCopyStack();
-        return object;
+        return linkAndComponentArray;
     }
 
-    public function redo():Object {
+    public function redo():LinkAndComponentArray {
         execute();
-        return object;
+        return linkAndComponentArray;
     }
 
     public function execute():Void {
-        if (linkArray != null) {
-            for (i in 0...linkArray) {
-                var link:Link = linkArray[i];
-                circuitDiagram.pushLinkToCopyStack(link);
+        if (linkAndComponentArray.linkArray != null) {
+            for (i in linkAndComponentArray.linkArray) {
+                circuitDiagram.pushLinkToCopyStack(i);
             }
         }
 
-        if (componentArray != null) {
-            for (i in 0...componentArray) {
-                var component:Component = componentArray[i];
-                circuitDiagram.pushComponentToCopyStack(component);
+        if (linkAndComponentArray.componentArray != null) {
+            for (i in linkAndComponentArray.componentArray) {
+                circuitDiagram.pushComponentToCopyStack(i);
             }
         }
     }
-
-    public function setCommandManager(commandManager:CommandManager):Void {
-        this.commandManager = commandManager;
-    }
-
 }
