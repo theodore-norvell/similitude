@@ -647,8 +647,8 @@ Test.main = function() {
 	updateCircuitDiagram.setUpdateToolBar(updateToolBar);
 	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,drawingAdapter);
 	updateCircuitDiagram.setUpdateCanvas(updateCanvas);
-	new com_mun_controller_mouseAction_ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
-	new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
+	var canvasListener = new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
+	new com_mun_controller_mouseAction_ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio,canvasListener);
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -1638,18 +1638,17 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,setUpdateToolBar: function(updateToolBar) {
 		this.updateToolBar = updateToolBar;
 	}
-	,createComponentByButton: function(name,xPosition,yPosition,width,height,orientation,inportNum,drawingAdapter) {
-		var componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
-		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
-		component_.setNameOfTheComponentKind(name);
-		var object = { "link" : null, "component" : component_, "endPoint" : null, "port" : null};
+	,createComponentByCommand: function(component) {
+		var object = { "link" : null, "component" : component, "endPoint" : null, "port" : null};
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
 		this.get_commandManager().execute(command);
 		this.linkAndComponentArrayReset();
-		this.linkAndComponentArray.componentArray = [];
-		this.linkAndComponentArray.componentArray.push(object.component);
-		this.updateToolBar.update(this.linkAndComponentArray);
-		this.hightLightObject(this.linkAndComponentArray);
+	}
+	,createComponent: function(name,xPosition,yPosition,width,height,orientation,inportNum) {
+		var componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
+		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
+		component_.setNameOfTheComponentKind(name);
+		return component_;
 	}
 	,addLink: function(coordinateFrom,coordinateTo) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
@@ -1676,9 +1675,13 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.hightLightObject(this.linkAndComponentArray);
 		return object.link;
 	}
-	,moveSelectedObjects: function(linkAndComponentAndEndpointArray,currentMouseLocation,mouseDownLocation) {
+	,moveSelectedObjects: function(linkAndComponentAndEndpointArray,currentMouseLocation,mouseDownLocation,mouseLocationFlag) {
 		var xMoveDistance = currentMouseLocation.xPosition - mouseDownLocation.xPosition;
 		var yMoveDistance = currentMouseLocation.yPosition - mouseDownLocation.yPosition;
+		if(mouseLocationFlag) {
+			linkAndComponentAndEndpointArray.componentArray[0].set_xPosition(currentMouseLocation.xPosition);
+			linkAndComponentAndEndpointArray.componentArray[0].set_yPosition(currentMouseLocation.yPosition);
+		}
 		var command = new com_mun_controller_command_MoveCommand(linkAndComponentAndEndpointArray,xMoveDistance,yMoveDistance,this.circuitDiagram);
 		this.get_commandManager().execute(command);
 		this.linkAndComponentArray.linkArray = linkAndComponentAndEndpointArray.linkArray;
@@ -1930,10 +1933,11 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
-var com_mun_controller_mouseAction_ButtonClick = function(drawingAdapter,updateCircuitDiagram,pixelRatio) {
+var com_mun_controller_mouseAction_ButtonClick = function(drawingAdapter,updateCircuitDiagram,pixelRatio,canvasListener) {
 	this.drawingAdapter = drawingAdapter;
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.pixelRatio = pixelRatio;
+	this.canvasListener = canvasListener;
 	window.document.getElementById("AND").onclick = $bind(this,this.andOnClick);
 	window.document.getElementById("FlipFlop").onclick = $bind(this,this.flipFlopOnClick);
 	window.document.getElementById("INPUT").onclick = $bind(this,this.inputOnClick);
@@ -1951,39 +1955,55 @@ com_mun_controller_mouseAction_ButtonClick.prototype = {
 	drawingAdapter: null
 	,updateCircuitDiagram: null
 	,pixelRatio: null
+	,canvasListener: null
+	,component: null
 	,andOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("AND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("AND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,flipFlopOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("FlipFlop",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("FlipFlop",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,inputOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("Input",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("Input",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,muxOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("MUX",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("MUX",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,nandOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("NAND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("NAND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,norOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("NOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("NOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,notOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("NOT",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("NOT",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,orOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("OR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("OR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,outputOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("Output",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("Output",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
 	}
 	,xorOnClick: function() {
-		this.updateCircuitDiagram.createComponentByButton("XOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2,this.drawingAdapter);
+		this.component = this.updateCircuitDiagram.createComponent("XOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
+		this.canvasListener.setButtonClick(this.component);
+	}
+	,getComponemt: function() {
+		return this.component;
 	}
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
 var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
+	this.buttonClickFlag = false;
 	this.altKeyFlag = false;
 	this.linkAndComponentAndEndpointArray = { "linkArray" : null, "componentArray" : null, "endpointArray" : null};
 	this.linkAndComponentArray = { "linkArray" : null, "componentArray" : null};
@@ -2019,6 +2039,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,linkAndComponentArray: null
 	,linkAndComponentAndEndpointArray: null
 	,altKeyFlag: null
+	,buttonClickFlag: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
@@ -2027,7 +2048,10 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		return coordinate;
 	}
 	,doMouseDown: function(event) {
-		this.doMouseUp(event);
+		this.setButtonClickFlagFlase();
+		if(!this.altKeyFlag) {
+			this.linkAndComponentArrayReset();
+		}
 		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
 		var x = event.clientX;
 		var y = event.clientY;
@@ -2036,7 +2060,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
 		if(this.endpoint != null) {
 			this.endpointSelected = true;
-			haxe_Log.trace("endpoint selected",{ fileName : "CanvasListener.hx", lineNumber : 79, className : "com.mun.controller.mouseAction.CanvasListener", methodName : "doMouseDown"});
+			haxe_Log.trace("endpoint selected",{ fileName : "CanvasListener.hx", lineNumber : 85, className : "com.mun.controller.mouseAction.CanvasListener", methodName : "doMouseDown"});
 		} else {
 			this.endpointSelected = false;
 		}
@@ -2050,7 +2074,6 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 						this.linkAndComponentArray.componentArray.push(this.component);
 					}
 				} else if(this.component != null) {
-					this.linkAndComponentArrayReset();
 					this.linkAndComponentArray.componentArray.push(this.component);
 				}
 			} else if(this.altKeyFlag) {
@@ -2058,7 +2081,6 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 					this.linkAndComponentArray.linkArray.push(this.link);
 				}
 			} else {
-				this.linkAndComponentArrayReset();
 				this.linkAndComponentArray.linkArray.push(this.link);
 			}
 		}
@@ -2082,21 +2104,24 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		}
 	}
 	,doMouseMove: function(event) {
-		this.linkAndComponentAndEndpointArrayReset();
 		var x = event.clientX;
 		var y = event.clientY;
 		var loc = this.getPointOnCanvas(this.canvas,x,y);
-		if(this.mouseDownFlag == true) {
+		if(this.buttonClickFlag) {
+			this.mouseDownLocation = loc;
+			this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,true);
+		} else if(this.mouseDownFlag == true) {
+			this.linkAndComponentAndEndpointArrayReset();
 			if(this.createLinkFlag) {
 				this.linkAndComponentAndEndpointArray.endpointArray.push(this.link.get_rightEndpoint());
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation);
+				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,true);
 			} else if(this.endpoint != null) {
 				this.linkAndComponentAndEndpointArray.endpointArray.push(this.endpoint);
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation);
+				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
 			} else if(this.linkAndComponentArray.linkArray != null && this.linkAndComponentArray.linkArray.length != 0 || this.linkAndComponentArray.componentArray != null && this.linkAndComponentArray.componentArray.length != 0) {
 				this.linkAndComponentAndEndpointArray.componentArray = this.linkAndComponentArray.componentArray;
 				this.linkAndComponentAndEndpointArray.linkArray = this.linkAndComponentArray.linkArray;
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation);
+				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
 			}
 		}
 		this.mouseDownLocation = loc;
@@ -2109,13 +2134,9 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.port = null;
 		this.createLinkFlag = false;
 		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
-		if(!this.altKeyFlag) {
-			this.linkAndComponentArrayReset();
-		}
 	}
 	,keyDown: function(event) {
 		if(event.altKey) {
-			this.linkAndComponentArrayReset();
 			this.altKeyFlag = true;
 		}
 	}
@@ -2130,6 +2151,15 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.linkAndComponentAndEndpointArray.componentArray = [];
 		this.linkAndComponentAndEndpointArray.linkArray = [];
 		this.linkAndComponentAndEndpointArray.endpointArray = [];
+	}
+	,setButtonClick: function(component) {
+		this.linkAndComponentAndEndpointArrayReset();
+		this.buttonClickFlag = true;
+		this.linkAndComponentAndEndpointArray.componentArray.push(component);
+		this.updateCircuitDiagram.createComponentByCommand(this.linkAndComponentAndEndpointArray.componentArray[0]);
+	}
+	,setButtonClickFlagFlase: function() {
+		this.buttonClickFlag = false;
 	}
 	,__class__: com_mun_controller_mouseAction_CanvasListener
 };

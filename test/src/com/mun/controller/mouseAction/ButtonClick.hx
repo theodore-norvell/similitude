@@ -1,18 +1,22 @@
 package com.mun.controller.mouseAction;
 
+import com.mun.model.component.Component;
+import js.Browser;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.Orientation;
-import js.Browser;
 class ButtonClick {
     var drawingAdapter:DrawingAdapterI;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var pixelRatio:Int;
+    var canvasListener:CanvasListener;
+    var component:Component;
 
-    public function new(drawingAdapter:DrawingAdapterI,updateCircuitDiagram:UpdateCircuitDiagram, pixelRatio:Int) {
+    public function new(drawingAdapter:DrawingAdapterI,updateCircuitDiagram:UpdateCircuitDiagram, pixelRatio:Int, canvasListener:CanvasListener) {
         this.drawingAdapter = drawingAdapter;
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.pixelRatio = pixelRatio;
+        this.canvasListener = canvasListener;
 
         Browser.document.getElementById("AND").onclick = andOnClick;
         Browser.document.getElementById("FlipFlop").onclick = flipFlopOnClick;
@@ -27,33 +31,47 @@ class ButtonClick {
     }
 
     public function andOnClick(){
-        updateCircuitDiagram.createComponentByButton("AND",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("AND",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function flipFlopOnClick(){
-        updateCircuitDiagram.createComponentByButton("FlipFlop",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("FlipFlop",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function inputOnClick(){
-        updateCircuitDiagram.createComponentByButton("Input",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("Input",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function muxOnClick(){
-        updateCircuitDiagram.createComponentByButton("MUX",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("MUX",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function nandOnClick(){
-        updateCircuitDiagram.createComponentByButton("NAND",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("NAND",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function norOnClick(){
-        updateCircuitDiagram.createComponentByButton("NOR",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("NOR",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function notOnClick(){
-        updateCircuitDiagram.createComponentByButton("NOT",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("NOT",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function orOnClick(){
-        updateCircuitDiagram.createComponentByButton("OR",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("OR",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function outputOnClick(){
-        updateCircuitDiagram.createComponentByButton("Output",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("Output",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
     }
     public function xorOnClick(){
-        updateCircuitDiagram.createComponentByButton("XOR",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2, drawingAdapter);
+        component = updateCircuitDiagram.createComponent("XOR",250, 50, 40 * pixelRatio, 40 * pixelRatio, Orientation.EAST, 2);
+        canvasListener.setButtonClick(component);
+    }
+    
+    public function getComponemt():Component{
+        return component;
     }
 }

@@ -1,5 +1,6 @@
 package ;
 
+import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
@@ -59,10 +60,11 @@ class Test {
         var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
-        //add button click listener
-        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
         //add canvas listener
-        new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
+        var canvasListener:CanvasListener = new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
+        //add button click listener
+        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio, canvasListener);
+
 
     }
 
