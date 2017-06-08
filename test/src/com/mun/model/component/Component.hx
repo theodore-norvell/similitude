@@ -165,7 +165,7 @@ class Component {
         return this;
     }
 
-    public function drawComponent(component:Component, drawingAdpater:DrawingAdapterI, highLight:Bool){
-        componentKind.drawComponent(component, drawingAdpater, highLight);
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool){
+        componentKind.drawComponent(this, drawingAdpater, highLight);
     }
 }

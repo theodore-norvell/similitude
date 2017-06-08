@@ -135,21 +135,22 @@ class CircuitDiagramUtil {
     * @return if the coordinate on the endpoint then return the endpoint
     *           or  return null;
     **/
-    public function pointOnEndpoint(coordinate:Coordinate):Endpoint{
+    public function pointOnEndpoint(coordinate:Coordinate):Array<Endpoint>{
+        var endpointArray:Array<Endpoint> = new Array<Endpoint>();
         for(i in circuitDiagram.get_linkIterator()){
             if(pointsDistance(i.get_leftEndpoint().get_xPosition(),
                             i.get_leftEndpoint().get_yPosition(),
                             coordinate.xPosition, coordinate.yPosition) <= 4){
-                return i.get_leftEndpoint();
+                endpointArray.push(i.get_leftEndpoint());
             }
 
             if(pointsDistance(i.get_rightEndpoint().get_xPosition(),
                                 i.get_rightEndpoint().get_yPosition(),
                                 coordinate.xPosition, coordinate.yPosition) <= 4){
-                return i.get_rightEndpoint();
+                endpointArray.push(i.get_rightEndpoint());
             }
         }
-        return null;
+        return endpointArray;
     }
 
     /**
@@ -230,7 +231,7 @@ class CircuitDiagramUtil {
     **/
     public function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
         //the radius is 3
-        if(Math.abs(coordinate.xPosition - orignalXPosition) <= 3 && Math.abs(coordinate.yPosition - orignalYPosition) <= 3){
+        if(Math.abs(coordinate.xPosition - orignalXPosition) <= 4 && Math.abs(coordinate.yPosition - orignalYPosition) <= 4){
             return true;
         }else{
             return false;

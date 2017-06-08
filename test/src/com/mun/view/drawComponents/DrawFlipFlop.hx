@@ -29,7 +29,6 @@ class DrawFlipFlop implements DrawComponent extends Constant{
         //draw inport
         for (i in component.get_inportIterator()) {
             var port:Port = i;
-            //init set the radius is 2
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
             switch(component.get_orientation()){

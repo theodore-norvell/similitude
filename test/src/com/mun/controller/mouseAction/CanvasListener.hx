@@ -1,6 +1,5 @@
 package com.mun.controller.mouseAction;
 
-import com.mun.model.enumeration.Orientation;
 import js.Browser;
 import js.html.KeyboardEvent;
 import com.mun.model.component.Port;
@@ -24,6 +23,7 @@ class CanvasListener {
     var updateToolBar:UpdateToolBar;
     //local varible
     var link:Link;
+    var hightLightLink:Link;
     var linkHighLight:Bool = false;
     var createLinkFlag:Bool = false;
     var component:Component;
@@ -79,17 +79,29 @@ class CanvasListener {
 
         //get the endpoint or link or component on this mouse location
         //priority: endpint -> link -> component
-        endpoint = updateCircuitDiagram.getEndpoint(mouseDownLocation);
+        var endpointArray:Array<Endpoint> = updateCircuitDiagram.getEndpoint(mouseDownLocation);
+
+        if(hightLightLink != null){
+            for(i in endpointArray){
+                if(i == hightLightLink.get_leftEndpoint()){
+                    endpoint = i;
+                }
+
+                if(i == hightLightLink.get_rightEndpoint()){
+                    endpoint = i;
+                }
+            }
+        }
+
+
         if(endpoint != null){
             endpointSelected = true;
-            trace("endpoint selected");
         }else{
             endpointSelected = false;
         }
 
         if(endpoint == null){
             link = updateCircuitDiagram.getLink(mouseDownLocation);
-            linkHighLight = true;
             if(link == null){//if this mouse location on the link, should be select link first
                 component = updateCircuitDiagram.getComponent(mouseDownLocation);
                 if(component != null && altKeyFlag){
@@ -100,6 +112,8 @@ class CanvasListener {
                     linkAndComponentArray.componentArray.push(component);
                 }
             }else{
+                linkHighLight = true;
+                hightLightLink = link;
                 if(altKeyFlag){
                     if(linkAndComponentArray.componentArray.indexOf(component) == -1){
                         linkAndComponentArray.linkArray.push(link);
@@ -128,6 +142,8 @@ class CanvasListener {
         }
         if(link == null && updateCircuitDiagram.isOnPort(mouseDownLocation).port != null){
             link = updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
+            hightLightLink = link;
+            linkHighLight = true;
             createLinkFlag = true;
         }
     }
@@ -144,7 +160,7 @@ class CanvasListener {
             if(createLinkFlag){//link has been created, so move this endpoint
                 //if the mouse position have a endpoint
                 linkAndComponentAndEndpointArray.endpointArray.push(link.get_rightEndpoint());
-                updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation, true);
+                updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation, false);
             }else{
                 if(endpoint != null){
                     linkAndComponentAndEndpointArray.endpointArray.push(endpoint);
@@ -162,12 +178,14 @@ class CanvasListener {
     }
     public function doMouseUp(event:MouseEvent){
         mouseDownFlag = false;
-        link = null;
         component = null;
         endpoint = null;
+        link = null;
         port = null;
         createLinkFlag = false;
         updateCircuitDiagram.resetCommandManagerRecordFlag();
+
+        updateCircuitDiagram.update();
     }
 
     public function keyDown(event:KeyboardEvent){

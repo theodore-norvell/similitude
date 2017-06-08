@@ -1147,7 +1147,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 	,linkAndComponentAndEndpointArray: null
 	,linkAndComponentArray: null
 	,undo: function() {
-		haxe_Log.trace(this.linkAndComponentAndEndpointArray.componentArray.length,{ fileName : "MoveCommand.hx", lineNumber : 96, className : "com.mun.controller.command.MoveCommand", methodName : "undo"});
 		if(this.linkAndComponentAndEndpointArray.componentArray.length != 0) {
 			var _g1 = 0;
 			var _g = this.linkAndComponentAndEndpointArray.componentArray.length;
@@ -1159,6 +1158,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 				this.linkAndComponentAndEndpointArray.componentArray[i].set_yPosition(this.oldComponentYpositionArray[i]);
 				this.linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(this.oldComponentXpositionArray[i],this.oldComponentYpositionArray[i]);
 			}
+			this.linkPositionUpdate();
 		}
 		if(this.linkAndComponentAndEndpointArray.linkArray.length != 0) {
 			var _g11 = 0;
@@ -1188,7 +1188,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 				this.endpointMeetPort(this.linkAndComponentAndEndpointArray.endpointArray[i2]);
 			}
 		}
-		this.linkPositionUpdate();
 		return this.linkAndComponentArray;
 	}
 	,redo: function() {
@@ -1201,6 +1200,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 				this.linkAndComponentAndEndpointArray.componentArray[i].set_yPosition(this.recordComponentYpositionBeforeUndoArray[i]);
 				this.linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(this.recordComponentXpositionBeforeUndoArray[i],this.recordComponentYpositionBeforeUndoArray[i]);
 			}
+			this.linkPositionUpdate();
 		}
 		if(this.linkAndComponentAndEndpointArray.linkArray.length != 0) {
 			var _g11 = 0;
@@ -1224,7 +1224,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 				this.endpointMeetPort(this.linkAndComponentAndEndpointArray.endpointArray[i2]);
 			}
 		}
-		this.linkPositionUpdate();
 		return this.linkAndComponentArray;
 	}
 	,execute: function() {
@@ -1238,6 +1237,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 				i.set_yPosition(i.get_yPosition() + this.yDisplacement);
 				i.updateMoveComponentPortPosition(i.get_xPosition(),i.get_yPosition());
 			}
+			this.linkPositionUpdate();
 		}
 		if(this.linkAndComponentAndEndpointArray.linkArray.length != 0) {
 			var _g2 = 0;
@@ -1263,7 +1263,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 				this.endpointMeetPort(i2);
 			}
 		}
-		this.linkPositionUpdate();
 	}
 	,linkMeetPortUpdate: function(link) {
 		var leftEndpointCoordinate = { "xPosition" : link.get_leftEndpoint().get_xPosition(), "yPosition" : link.get_leftEndpoint().get_yPosition()};
@@ -1271,7 +1270,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 		var leftEndpointPort = link.get_leftEndpoint().get_port();
 		if(port_temp != null && leftEndpointPort != port_temp) {
 			link.get_leftEndpoint().set_port(port_temp);
-			link.get_leftEndpoint().updatePosition();
 		} else if(port_temp == null) {
 			link.get_leftEndpoint().set_port(null);
 		}
@@ -1280,42 +1278,39 @@ com_mun_controller_command_MoveCommand.prototype = {
 		var rightEndpointPort = link.get_rightEndpoint().get_port();
 		if(port_temp != null && rightEndpointPort != port_temp) {
 			link.get_rightEndpoint().set_port(port_temp);
-			link.get_rightEndpoint().updatePosition();
 		} else if(port_temp == null) {
 			link.get_rightEndpoint().set_port(null);
 		}
 	}
 	,endpointMeetPort: function(endpoint) {
-		var port = null;
 		var coordinate = { "xPosition" : endpoint.get_xPosition(), "yPosition" : endpoint.get_yPosition()};
 		var newPort = this.circuitDiagramUtil.isOnPort(coordinate).port;
-		var i = this.circuitDiagram.get_linkIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			if(i1.get_leftEndpoint() == endpoint) {
-				if(i1.get_rightEndpoint().get_port() != null) {
+		if(newPort != null) {
+			var i = this.circuitDiagram.get_linkIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				var port = null;
+				if(i1.get_leftEndpoint() == endpoint) {
 					port = i1.get_rightEndpoint().get_port();
+					if(newPort != port) {
+						i1.get_leftEndpoint().set_port(newPort);
+					} else {
+						i1.get_leftEndpoint().set_port(null);
+					}
+					break;
 				}
-				if(newPort != port) {
-					i1.get_leftEndpoint().set_port(newPort);
-					i1.get_leftEndpoint().updatePosition();
-				} else {
-					i1.get_leftEndpoint().set_port(null);
-				}
-				break;
-			}
-			if(i1.get_rightEndpoint() == endpoint) {
-				if(i1.get_leftEndpoint().get_port() != null) {
+				if(i1.get_rightEndpoint() == endpoint) {
 					port = i1.get_leftEndpoint().get_port();
+					if(newPort != port) {
+						i1.get_rightEndpoint().set_port(newPort);
+					} else {
+						i1.get_rightEndpoint().set_port(null);
+					}
+					break;
 				}
-				if(newPort != port) {
-					i1.get_rightEndpoint().set_port(newPort);
-					i1.get_rightEndpoint().updatePosition();
-				} else {
-					i1.get_rightEndpoint().set_port(null);
-				}
-				break;
 			}
+		} else {
+			endpoint.set_port(null);
 		}
 	}
 	,linkPositionUpdate: function() {
@@ -1481,17 +1476,18 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		return lineLength;
 	}
 	,pointOnEndpoint: function(coordinate) {
+		var endpointArray = [];
 		var i = this.circuitDiagram.get_linkIterator();
 		while(i.hasNext()) {
 			var i1 = i.next();
 			if(this.pointsDistance(i1.get_leftEndpoint().get_xPosition(),i1.get_leftEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
-				return i1.get_leftEndpoint();
+				endpointArray.push(i1.get_leftEndpoint());
 			}
 			if(this.pointsDistance(i1.get_rightEndpoint().get_xPosition(),i1.get_rightEndpoint().get_yPosition(),coordinate.xPosition,coordinate.yPosition) <= 4) {
-				return i1.get_rightEndpoint();
+				endpointArray.push(i1.get_rightEndpoint());
 			}
 		}
-		return null;
+		return endpointArray;
 	}
 	,isOnPort: function(cooridnate) {
 		var object = { "link" : null, "component" : null, "endPoint" : null, "port" : null};
@@ -1545,7 +1541,7 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 		}
 	}
 	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
-		if(Math.abs(coordinate.xPosition - orignalXPosition) <= 3 && Math.abs(coordinate.yPosition - orignalYPosition) <= 3) {
+		if(Math.abs(coordinate.xPosition - orignalXPosition) <= 4 && Math.abs(coordinate.yPosition - orignalYPosition) <= 4) {
 			return true;
 		} else {
 			return false;
@@ -1572,45 +1568,8 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	,circuitDiagram: null
 	,drawingAdapter: null
 	,update: function(linkAndComponentArray) {
-		var drawFlag = false;
 		this.canvas.width = this.canvas.width;
-		var i = this.circuitDiagram.get_componentIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			var _g = 0;
-			var _g1 = linkAndComponentArray.componentArray;
-			while(_g < _g1.length) {
-				var j = _g1[_g];
-				++_g;
-				if(j == i1) {
-					i1.drawComponent(i1,this.drawingAdapter,true);
-					drawFlag = true;
-				}
-			}
-			if(!drawFlag) {
-				i1.drawComponent(i1,this.drawingAdapter,false);
-			}
-			drawFlag = false;
-		}
-		drawFlag = false;
-		var i2 = this.circuitDiagram.get_linkIterator();
-		while(i2.hasNext()) {
-			var i3 = i2.next();
-			var drawComponent = new com_mun_view_drawComponents_DrawLink(i3,this.drawingAdapter);
-			var _g2 = 0;
-			var _g11 = linkAndComponentArray.linkArray;
-			while(_g2 < _g11.length) {
-				var j1 = _g11[_g2];
-				++_g2;
-				if(j1 == i3) {
-					drawComponent.drawCorrespondingComponent("red");
-					drawFlag = true;
-				}
-			}
-			if(!drawFlag) {
-				drawComponent.drawCorrespondingComponent("black");
-			}
-		}
+		this.circuitDiagram.draw(linkAndComponentArray,this.drawingAdapter);
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
@@ -1643,6 +1602,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
 		this.get_commandManager().execute(command);
 		this.linkAndComponentArrayReset();
+		this.circuitDiagram.computeDiagramSize();
 	}
 	,createComponent: function(name,xPosition,yPosition,width,height,orientation,inportNum) {
 		var componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
@@ -1673,6 +1633,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.linkAndComponentArray.linkArray.push(object.link);
 		this.updateToolBar.update(this.linkAndComponentArray);
 		this.hightLightObject(this.linkAndComponentArray);
+		this.circuitDiagram.computeDiagramSize();
 		return object.link;
 	}
 	,moveSelectedObjects: function(linkAndComponentAndEndpointArray,currentMouseLocation,mouseDownLocation,mouseLocationFlag) {
@@ -1698,6 +1659,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		}
 		this.updateToolBar.update(this.linkAndComponentArray);
 		this.hightLightObject(this.linkAndComponentArray);
+		this.circuitDiagram.computeDiagramSize();
 	}
 	,changeOrientation: function(componentArray,orientation) {
 		var orientationCommand = new com_mun_controller_command_OrientationCommand(componentArray,orientation);
@@ -1710,9 +1672,11 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var deleteCommand = new com_mun_controller_command_DeleteCommand(linkAndComponentArray,this.circuitDiagram);
 		this.get_commandManager().execute(deleteCommand);
 		this.redrawCanvas(linkAndComponentArray);
+		this.circuitDiagram.computeDiagramSize();
 	}
 	,deleteLink: function(link) {
 		this.circuitDiagram.deleteLink(link);
+		this.circuitDiagram.computeDiagramSize();
 	}
 	,getEndpoint: function(coordinate) {
 		return this.circuitDiagramUtil.pointOnEndpoint(coordinate);
@@ -1743,6 +1707,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		} else {
 			this.updateToolBar.visible();
 		}
+		this.circuitDiagram.computeDiagramSize();
 	}
 	,redo: function() {
 		var linkAndComponentArray = this.get_commandManager().redo();
@@ -1752,6 +1717,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		} else {
 			this.updateToolBar.visible();
 		}
+		this.circuitDiagram.computeDiagramSize();
 	}
 	,setRedoButton: function() {
 		if(this.get_commandManager().getRedoStackSize() == 0) {
@@ -1775,6 +1741,14 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,linkAndComponentArrayReset: function() {
 		this.linkAndComponentArray.linkArray = [];
 		this.linkAndComponentArray.componentArray = [];
+	}
+	,update: function() {
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			i1.get_leftEndpoint().updatePosition();
+			i1.get_rightEndpoint().updatePosition();
+		}
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
 	,__properties__: {get_commandManager:"get_commandManager"}
@@ -2030,6 +2004,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,mouseDownLocation: null
 	,updateToolBar: null
 	,link: null
+	,hightLightLink: null
 	,linkHighLight: null
 	,createLinkFlag: null
 	,component: null
@@ -2057,16 +2032,27 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		var y = event.clientY;
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.mouseDownFlag = true;
-		this.endpoint = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
+		var endpointArray = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
+		if(this.hightLightLink != null) {
+			var _g = 0;
+			while(_g < endpointArray.length) {
+				var i = endpointArray[_g];
+				++_g;
+				if(i == this.hightLightLink.get_leftEndpoint()) {
+					this.endpoint = i;
+				}
+				if(i == this.hightLightLink.get_rightEndpoint()) {
+					this.endpoint = i;
+				}
+			}
+		}
 		if(this.endpoint != null) {
 			this.endpointSelected = true;
-			haxe_Log.trace("endpoint selected",{ fileName : "CanvasListener.hx", lineNumber : 85, className : "com.mun.controller.mouseAction.CanvasListener", methodName : "doMouseDown"});
 		} else {
 			this.endpointSelected = false;
 		}
 		if(this.endpoint == null) {
 			this.link = this.updateCircuitDiagram.getLink(this.mouseDownLocation);
-			this.linkHighLight = true;
 			if(this.link == null) {
 				this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
 				if(this.component != null && this.altKeyFlag) {
@@ -2076,12 +2062,16 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 				} else if(this.component != null) {
 					this.linkAndComponentArray.componentArray.push(this.component);
 				}
-			} else if(this.altKeyFlag) {
-				if(this.linkAndComponentArray.componentArray.indexOf(this.component) == -1) {
+			} else {
+				this.linkHighLight = true;
+				this.hightLightLink = this.link;
+				if(this.altKeyFlag) {
+					if(this.linkAndComponentArray.componentArray.indexOf(this.component) == -1) {
+						this.linkAndComponentArray.linkArray.push(this.link);
+					}
+				} else {
 					this.linkAndComponentArray.linkArray.push(this.link);
 				}
-			} else {
-				this.linkAndComponentArray.linkArray.push(this.link);
 			}
 		}
 		this.updateCircuitDiagram.hightLightObject(this.linkAndComponentArray);
@@ -2100,6 +2090,8 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		}
 		if(this.link == null && this.updateCircuitDiagram.isOnPort(this.mouseDownLocation).port != null) {
 			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
+			this.hightLightLink = this.link;
+			this.linkHighLight = true;
 			this.createLinkFlag = true;
 		}
 	}
@@ -2114,7 +2106,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 			this.linkAndComponentAndEndpointArrayReset();
 			if(this.createLinkFlag) {
 				this.linkAndComponentAndEndpointArray.endpointArray.push(this.link.get_rightEndpoint());
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,true);
+				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
 			} else if(this.endpoint != null) {
 				this.linkAndComponentAndEndpointArray.endpointArray.push(this.endpoint);
 				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
@@ -2128,12 +2120,13 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	}
 	,doMouseUp: function(event) {
 		this.mouseDownFlag = false;
-		this.link = null;
 		this.component = null;
 		this.endpoint = null;
+		this.link = null;
 		this.port = null;
 		this.createLinkFlag = false;
 		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
+		this.updateCircuitDiagram.update();
 	}
 	,keyDown: function(event) {
 		if(event.altKey) {
@@ -2185,12 +2178,20 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,setNewOirentation: null
 	,deleteLink: null
 	,deleteComponent: null
-	,updateComponent: null
 	,linkArraySelfUpdate: null
 	,componentSetName: null
+	,computeDiagramSize: null
+	,get_diagramWidth: null
+	,get_diagramHeight: null
+	,draw: null
 	,__class__: com_mun_model_component_CircuitDiagramI
 };
 var com_mun_model_component_CircuitDiagram = function() {
+	this.yMax = 0;
+	this.xMax = 0;
+	this.yMin = 0;
+	this.xMin = 0;
+	this.margin = 50;
 	this.linkArrayReverseFlag = false;
 	this.componentArrayReverseFlag = false;
 	this.linkArray = [];
@@ -2208,6 +2209,75 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,commandManager: null
 	,componentArrayReverseFlag: null
 	,linkArrayReverseFlag: null
+	,diagramWidth: null
+	,diagramHeight: null
+	,margin: null
+	,xMin: null
+	,yMin: null
+	,xMax: null
+	,yMax: null
+	,computeDiagramSize: function() {
+		this.xMin = 99999999;
+		this.yMin = 99999999;
+		this.xMax = 0;
+		this.yMax = 0;
+		var _g = 0;
+		var _g1 = this.componentArray;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(i.get_xPosition() < this.xMin) {
+				this.xMin = i.get_xPosition() - i.get_width() / 2;
+			}
+			if(i.get_xPosition() > this.xMax) {
+				this.xMax = i.get_xPosition() + i.get_width() / 2;
+			}
+			if(i.get_yPosition() < this.yMin) {
+				this.yMin = i.get_yPosition() - i.get_height() / 2;
+			}
+			if(i.get_yPosition() > this.yMax) {
+				this.yMax = i.get_yPosition() + i.get_height() / 2;
+			}
+		}
+		var _g2 = 0;
+		var _g11 = this.linkArray;
+		while(_g2 < _g11.length) {
+			var i1 = _g11[_g2];
+			++_g2;
+			if(i1.get_leftEndpoint().get_xPosition() < this.xMin) {
+				this.xMin = i1.get_leftEndpoint().get_xPosition();
+			}
+			if(i1.get_leftEndpoint().get_xPosition() > this.xMax) {
+				this.xMax = i1.get_leftEndpoint().get_xPosition();
+			}
+			if(i1.get_leftEndpoint().get_yPosition() < this.yMin) {
+				this.yMin = i1.get_leftEndpoint().get_yPosition();
+			}
+			if(i1.get_leftEndpoint().get_yPosition() > this.yMax) {
+				this.yMax = i1.get_leftEndpoint().get_yPosition();
+			}
+			if(i1.get_rightEndpoint().get_xPosition() < this.xMin) {
+				this.xMin = i1.get_rightEndpoint().get_xPosition();
+			}
+			if(i1.get_rightEndpoint().get_xPosition() > this.xMax) {
+				this.xMax = i1.get_leftEndpoint().get_xPosition();
+			}
+			if(i1.get_rightEndpoint().get_yPosition() < this.yMin) {
+				this.yMin = i1.get_rightEndpoint().get_yPosition();
+			}
+			if(i1.get_rightEndpoint().get_yPosition() > this.yMax) {
+				this.yMax = i1.get_rightEndpoint().get_yPosition();
+			}
+		}
+		this.diagramWidth = this.xMax - this.xMin + this.margin;
+		this.diagramHeight = this.yMax - this.yMin + this.margin;
+	}
+	,get_diagramWidth: function() {
+		return this.diagramWidth;
+	}
+	,get_diagramHeight: function() {
+		return this.diagramHeight;
+	}
 	,get_commandManager: function() {
 		return this.commandManager;
 	}
@@ -2318,9 +2388,6 @@ com_mun_model_component_CircuitDiagram.prototype = {
 			}
 		}
 	}
-	,updateComponent: function(component) {
-		this.componentArray[this.componentArray.indexOf(component)] = component;
-	}
 	,linkArraySelfUpdate: function() {
 		var _g1 = 0;
 		var _g = this.linkArray.length;
@@ -2333,7 +2400,52 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,componentSetName: function(component,name) {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
+	,draw: function(linkAndComponentArray,drawingAdapter) {
+		var drawFlag = false;
+		var _g = 0;
+		var _g1 = this.componentArray;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			var _g3 = linkAndComponentArray.componentArray;
+			while(_g2 < _g3.length) {
+				var j = _g3[_g2];
+				++_g2;
+				if(j == i) {
+					i.drawComponent(drawingAdapter,true);
+					drawFlag = true;
+				}
+			}
+			if(!drawFlag) {
+				i.drawComponent(drawingAdapter,false);
+			}
+			drawFlag = false;
+		}
+		drawFlag = false;
+		var _g4 = 0;
+		var _g11 = this.linkArray;
+		while(_g4 < _g11.length) {
+			var i1 = _g11[_g4];
+			++_g4;
+			var _g21 = 0;
+			var _g31 = linkAndComponentArray.linkArray;
+			while(_g21 < _g31.length) {
+				var j1 = _g31[_g21];
+				++_g21;
+				if(j1 == i1) {
+					i1.drawLink(drawingAdapter,true);
+					drawFlag = true;
+				}
+			}
+			if(!drawFlag) {
+				i1.drawLink(drawingAdapter,false);
+			}
+			drawFlag = false;
+		}
+	}
 	,__class__: com_mun_model_component_CircuitDiagram
+	,__properties__: {get_diagramHeight:"get_diagramHeight",get_diagramWidth:"get_diagramWidth"}
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
 	this.name = "component1";
@@ -2460,8 +2572,8 @@ com_mun_model_component_Component.prototype = {
 		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
 		return this;
 	}
-	,drawComponent: function(component,drawingAdpater,highLight) {
-		this.componentKind.drawComponent(component,drawingAdpater,highLight);
+	,drawComponent: function(drawingAdpater,highLight) {
+		this.componentKind.drawComponent(this,drawingAdpater,highLight);
 	}
 	,__class__: com_mun_model_component_Component
 };
@@ -2584,6 +2696,14 @@ com_mun_model_component_Link.prototype = {
 	}
 	,set_rightEndpoint: function(value) {
 		return this.rightEndpoint = value;
+	}
+	,drawLink: function(drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawLink(this,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
 	}
 	,__class__: com_mun_model_component_Link
 };
@@ -6060,15 +6180,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;

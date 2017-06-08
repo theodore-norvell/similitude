@@ -5,6 +5,9 @@ package com.mun.model.component;
  * @author wanhui
  *
  */
+import com.mun.view.drawComponents.DrawComponent;
+import com.mun.view.drawComponents.DrawLink;
+import com.mun.model.drawingInterface.DrawingAdapterI;
 class Link {
     var leftEndpoint:Endpoint;
     var rightEndpoint:Endpoint;
@@ -30,4 +33,12 @@ class Link {
         return this.rightEndpoint = value;
     }
 
+    public function drawLink(drawingAdapter:DrawingAdapterI, highLight:Bool){
+        var drawComponent:DrawComponent = new DrawLink(this, drawingAdapter);
+        if(highLight){
+            drawComponent.drawCorrespondingComponent("red");
+        }else{
+            drawComponent.drawCorrespondingComponent("black");
+        }
+    }
 }
