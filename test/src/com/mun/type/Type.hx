@@ -16,10 +16,15 @@ typedef Object = {
     var port:Port;
 }
 
-typedef ObjectArray = {
+typedef LinkAndComponentArray = {
     var linkArray:Array<Link>;
     var componentArray:Array<Component>;
-    var endPointArray:Array<Endpoint>;
+}
+
+typedef LinkAndComponentAndEndpointArray = {
+    var linkArray:Array<Link>;
+    var componentArray:Array<Component>;
+    var endpointArray:Array<Endpoint>;
 }
 
 

@@ -1,52 +1,53 @@
 package com.mun.controller.command;
-import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
-import com.mun.type.Type.Object;
+import com.mun.model.component.CircuitDiagramI;
+import com.mun.type.Type.LinkAndComponentArray;
 /**
 * delete command
 * @author wanhui
 **/
 class DeleteCommand implements Command {
-    var link:Link;
-    var component:Component;
     var circuitDiagram:CircuitDiagramI;
-    var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
 
-    public function new(object:Object, circuitDiagram:CircuitDiagramI) {
-        this.link = object.link;
-        this.component = object.component;
+    public function new(linkAndComponentArray:LinkAndComponentArray, circuitDiagram:CircuitDiagramI) {
+        this.linkAndComponentArray = linkAndComponentArray;
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():Object {
-        object = {"link":null,"component":null,"endPoint":null, "port":null};
-        if (link != null) {
-            circuitDiagram.addLink(link);
-            object.link = link;
+    public function undo():LinkAndComponentArray {
+        if (linkAndComponentArray.linkArray != null) {
+            for(i in linkAndComponentArray.linkArray){
+                circuitDiagram.addLink(i);
+            }
         }
 
-        if (component != null) {
-            circuitDiagram.addComponent(component);
-            object.component = component;
+        if (linkAndComponentArray.componentArray != null) {
+            for(i in linkAndComponentArray.componentArray){
+                circuitDiagram.addComponent(i);
+            }
         }
 
-        return object;
+        return linkAndComponentArray;
     }
 
-    public function redo():Object {
+    public function redo():LinkAndComponentArray {
         execute();
-        object = {"link":null,"component":null,"endPoint":null, "port":null};
-        return object;
+        return linkAndComponentArray;
     }
 
     public function execute():Void {
-        if (link != null) {
-            circuitDiagram.deleteLink(link);
+        if (linkAndComponentArray.linkArray != null) {
+            for(i in linkAndComponentArray.linkArray){
+                circuitDiagram.deleteLink(i);
+            }
         }
 
-        if (component != null) {
-            circuitDiagram.deleteComponent(component);
+        if (linkAndComponentArray.componentArray != null) {
+            for(i in linkAndComponentArray.componentArray){
+                circuitDiagram.deleteComponent(i);
+            }
         }
     }
 }

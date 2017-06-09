@@ -1,11 +1,13 @@
 package ;
 
+import com.mun.controller.mouseAction.CanvasListener;
+import com.mun.model.component.CircuitDiagram;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.controller.mouseAction.ButtonClick;
-import com.mun.model.component.CircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.view.drawingImpl.DrawingAdapter;
 import js.Browser;
@@ -46,10 +48,11 @@ class Test {
 
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
 
-        var circuitDiagram:CircuitDiagram = new CircuitDiagram();
+        var circuitDiagram:CircuitDiagramI = new CircuitDiagram();
 
 
         var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
+        circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
 
         var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
         updateCircuitDiagram.setUpdateToolBar(updateToolBar);
@@ -57,10 +60,11 @@ class Test {
         var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
-        //add button click listener
-        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio);
         //add canvas listener
-        new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
+        var canvasListener:CanvasListener = new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
+        //add button click listener
+        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio, canvasListener);
+
 
     }
 

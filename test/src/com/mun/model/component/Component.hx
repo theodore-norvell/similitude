@@ -91,20 +91,12 @@ class Component {
         return this.componentKind = value;
     }
 
-    public function get_inportArray():Array<Port> {
-        return inportArray;
+    public function get_inportIterator():Iterator<Port> {
+        return inportArray.iterator();
     }
 
-    public function set_inportArray(value:Array<Port>) {
-        return this.inportArray = value;
-    }
-
-    public function get_outportArray():Array<Port> {
-        return outportArray;
-    }
-
-    public function set_outportArray(value:Array<Port>) {
-        return this.outportArray = value;
+    public function get_outportIterator():Iterator<Port> {
+        return outportArray.iterator();
     }
 
     public function get_name():String {
@@ -173,7 +165,7 @@ class Component {
         return this;
     }
 
-    public function drawComponent(component:Component, drawingAdpater:DrawingAdapterI, highLight:Bool){
-        componentKind.drawComponent(component, drawingAdpater, highLight);
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool){
+        componentKind.drawComponent(this, drawingAdpater, highLight);
     }
 }

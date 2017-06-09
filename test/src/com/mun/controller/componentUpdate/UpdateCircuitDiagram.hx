@@ -1,6 +1,7 @@
 package com.mun.controller.componentUpdate;
 
-import com.mun.model.component.Port;
+import com.mun.controller.command.DeleteCommand;
+import com.mun.controller.command.OrientationCommand;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
 import com.mun.controller.command.MoveCommand;
@@ -14,6 +15,8 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.type.Type.Coordinate;
+import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.Type.LinkAndComponentAndEndpointArray;
 
 //all of those imports below can not be deleted, because of using Type.resolveClass
 //include all of the class under com.mun.model.gates
@@ -35,15 +38,21 @@ import com.mun.model.gates.XOR;
 class UpdateCircuitDiagram {
     var circuitDiagram:CircuitDiagramI;
     var updateCanvas:UpdateCanvas;
-    var commandManager:CommandManager;
+    @:isVar var commandManager(get, null):CommandManager;
     var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
+
+    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":null};
 
     public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
 
-        commandManager = new CommandManager(circuitDiagram);
+        commandManager = new CommandManager();
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
+    }
+
+    public function get_commandManager():CommandManager {
+        return commandManager;
     }
 
     public function setUpdateCanvas(updateCanvas:UpdateCanvas){
@@ -54,67 +63,21 @@ class UpdateCircuitDiagram {
         this.updateToolBar = updateToolBar;
     }
 
-    public function createComponentByButton(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, inportNum:Int, drawingAdapter:DrawingAdapterI){
+    public function createComponentByCommand(component:Component){
+        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
+        var command:Command = new AddCommand(object,circuitDiagram);
+        commandManager.execute(command);
+        linkAndComponentArrayReset();
+
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
+    }
+
+    public function createComponent(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, inportNum:Int):Component{
         var componentkind_:ComponentKind = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
         component_.setNameOfTheComponentKind(name);
-
-        var object:Object = {"link":null,"component":component_,"endPoint":null, "port":null};
-        var command:Command = new AddCommand(object,circuitDiagram);
-        commandManager.execute(command);
-        redrawCanvas(object);
-        updateToolBar.update(object);
-    }
-    public function moveComponent(component:Component, coordinate:Coordinate, mouseDownLocation:Coordinate){
-        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
-
-        var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
-        var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
-
-        var command:Command = new MoveCommand(object,object.component.get_xPosition() + xMoveDistance , object.component.get_yPosition() + yMoveDistance, object.component.get_xPosition(),object.component.get_yPosition(), circuitDiagram);
-        commandManager.execute(command);
-        //those wires which link to this component should move either, which automactilly completed while move endpoint
-        redrawCanvas(object);
-    }
-
-    public function moveLink(link:Link, coordinate:Coordinate, mouseDownLocation:Coordinate){
-        var object:Object = {"link":link,"component":null,"endPoint":null, "port":null};
-
-        var xDisplacement:Float = mouseDownLocation.xPosition - coordinate.xPosition;
-        var yDisplacement:Float = mouseDownLocation.yPosition - coordinate.yPosition;
-
-        var command:Command = new MoveCommand(object,link.get_leftEndpoint().get_xPosition() - xDisplacement, link.get_leftEndpoint().get_yPosition() - yDisplacement, link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition(), circuitDiagram);
-        commandManager.execute(command);
-
-        //verfy the endpoint of this link connect to a port or not while moving
-        var index:Int = circuitDiagram.get_linkArray().indexOf(link);
-        //left endpoint
-        var leftEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_xPosition(),
-            "yPosition":circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_yPosition()};
-        var port_temp:Port = isOnPort(leftEndpointCoordinate).port;
-        var leftEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_leftEndpoint().get_port();
-        if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(port_temp);
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().updatePosition();
-        }else if(port_temp == null){
-            circuitDiagram.get_linkArray()[index].get_leftEndpoint().set_port(null);
-        }
-
-        var rightEndpointCoordinate:Coordinate = {"xPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_xPosition(),
-            "yPosition":circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_yPosition()};
-        port_temp = isOnPort(rightEndpointCoordinate).port;
-        var rightEndpointPort:Port = circuitDiagram.get_linkArray()[index].get_rightEndpoint().get_port();
-
-        if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(port_temp);
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().updatePosition();
-        }else if(port_temp == null){
-            circuitDiagram.get_linkArray()[index].get_rightEndpoint().set_port(null);
-        }
-
-        redrawCanvas();
-        updateToolBar.update(object);
-        hightLightObject(object);
+        return component_;
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
@@ -136,80 +99,74 @@ class UpdateCircuitDiagram {
         }
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
-        redrawCanvas(object);
+
+        linkAndComponentArrayReset();
+        linkAndComponentArray.linkArray.push(object.link);
+
+        updateToolBar.update(linkAndComponentArray);
+        hightLightObject(linkAndComponentArray);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
         return object.link;
     }
 
-    public function moveEndpoint(endpoint:Endpoint,coordinate:Coordinate, mouseDownLocation:Coordinate){
-        var object:Object = {"link":null,"component":null,"endPoint":endpoint, "port":null};
-        if(object.endPoint != null){
+    public function moveSelectedObjects(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray, currentMouseLocation:Coordinate, mouseDownLocation:Coordinate, mouseLocationFlag:Bool){
 
-            var xMoveDistance:Float = coordinate.xPosition - mouseDownLocation.xPosition;
-            var yMoveDistance:Float = coordinate.yPosition - mouseDownLocation.yPosition;
+        var xMoveDistance:Float = currentMouseLocation.xPosition - mouseDownLocation.xPosition;
+        var yMoveDistance:Float = currentMouseLocation.yPosition - mouseDownLocation.yPosition;
 
-            var command:Command = new MoveCommand(object,object.endPoint.get_xPosition() + xMoveDistance, object.endPoint.get_yPosition() + yMoveDistance, object.endPoint.get_xPosition(),object.endPoint.get_yPosition(), circuitDiagram);
-            commandManager.execute(command);
-            redrawCanvas();
-
-            //find the link which contains this endpoint and find the port
-            var port:Port = null;
-            var linkIndex:Int = -1;
-            for(i in 0...circuitDiagram.get_linkArray().length){
-                if(circuitDiagram.get_linkArray()[i].get_leftEndpoint() == endpoint){
-                    linkIndex = i;
-                    if(circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port() != null){//find the port
-                        port = circuitDiagram.get_linkArray()[i].get_rightEndpoint().get_port();
-                    }
-                }
-
-                if(circuitDiagram.get_linkArray()[i].get_rightEndpoint() == endpoint){
-                    linkIndex = i;
-                    if(circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port() != null){//find the port
-                        port = circuitDiagram.get_linkArray()[i].get_leftEndpoint().get_port();
-                    }
-                }
-            }
-            //verify the endpoint step into another component port or not
-            var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).port;
-
-            if(circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint() == endpoint){
-                if(newPort != port){
-                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(newPort);
-                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().updatePosition();
-                }else{
-                    circuitDiagram.get_linkArray()[linkIndex].get_leftEndpoint().set_port(null);
-                }
-
-            }
-
-            if(circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint() == endpoint){
-                if(newPort != port){
-                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(newPort);
-                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().updatePosition();
-                }else{
-                    circuitDiagram.get_linkArray()[linkIndex].get_rightEndpoint().set_port(null);
-                }
-            }
-
-            redrawCanvas();
+        if(mouseLocationFlag){
+            linkAndComponentAndEndpointArray.componentArray[0].set_xPosition(currentMouseLocation.xPosition);
+            linkAndComponentAndEndpointArray.componentArray[0].set_yPosition(currentMouseLocation.yPosition);
         }
+
+        var command:Command = new MoveCommand(linkAndComponentAndEndpointArray, xMoveDistance, yMoveDistance, circuitDiagram);
+        commandManager.execute(command);
+        //those wires which link to this component should move either, which automactilly completed while move endpoint
+        linkAndComponentArray.linkArray = linkAndComponentAndEndpointArray.linkArray;
+        linkAndComponentArray.componentArray = linkAndComponentAndEndpointArray.componentArray;
+
+        if(linkAndComponentAndEndpointArray.endpointArray.length != 0){
+            //find the corresponding link
+            for(i in circuitDiagram.get_linkIterator()){
+                //every time only one endpoint can be move, so the array only have one element
+                if(i.get_leftEndpoint() == linkAndComponentAndEndpointArray.endpointArray[0]
+                    || i.get_rightEndpoint() == linkAndComponentAndEndpointArray.endpointArray[0]){
+                    linkAndComponentArray.linkArray.push(i);
+                    break;//one endpoint only belongs to 1 link
+                }
+            }
+        }
+        updateToolBar.update(linkAndComponentArray);
+        hightLightObject(linkAndComponentArray);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
-    public function changeOrientation(component:Component, orientation:Orientation){
-        circuitDiagram.setNewOirentation(component, orientation);
-        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
-        redrawCanvas(object);
+    public function changeOrientation(componentArray:Array<Component>, orientation:Orientation){
+        var orientationCommand:Command = new OrientationCommand(componentArray, orientation);
+        commandManager.execute(orientationCommand);
+        var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":componentArray};
+        updateToolBar.update(linkAndComponentArray);
+        hightLightObject(linkAndComponentArray);
     }
 
-    public function deleteComponent(component:Component){
-        circuitDiagram.deleteComponent(component);
+    public function deleteObject(linkAndComponentArray:LinkAndComponentArray){
+        var deleteCommand:Command = new DeleteCommand(linkAndComponentArray, circuitDiagram);
+        commandManager.execute(deleteCommand);
+
+        redrawCanvas(linkAndComponentArray);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
     public function deleteLink(link:Link){
         circuitDiagram.deleteLink(link);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
-    public function getEndpoint(coordinate:Coordinate):Endpoint{
+    public function getEndpoint(coordinate:Coordinate):Array<Endpoint>{
         return circuitDiagramUtil.pointOnEndpoint(coordinate);
     }
 
@@ -221,8 +178,8 @@ class UpdateCircuitDiagram {
         return circuitDiagramUtil.isOnLink(coordinate);
     }
 
-    public function hightLightObject(object:Object){
-        redrawCanvas(object);
+    public function hightLightObject(linkAndComponentArray:LinkAndComponentArray){
+        redrawCanvas(linkAndComponentArray);
     }
 
     public function isOnPort(coordinate:Coordinate):Object{
@@ -238,26 +195,63 @@ class UpdateCircuitDiagram {
     }
 
     public function undo(){
-        var object:Object = commandManager.undo();
-        redrawCanvas(object);
-        if(object.component == null && object.link == null){
+        var linkAndComponentArray:LinkAndComponentArray = commandManager.undo();
+        redrawCanvas(linkAndComponentArray);
+        if(linkAndComponentArray.componentArray == null && linkAndComponentArray.linkArray == null){
             updateToolBar.hidden();
         }else{
             updateToolBar.visible();
         }
+
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
     public function redo(){
-        var object:Object = commandManager.redo();
-        redrawCanvas(object);
-        if(object.component == null && object.link == null){
+        var linkAndComponentArray:LinkAndComponentArray = commandManager.redo();
+        redrawCanvas(linkAndComponentArray);
+        if(linkAndComponentArray.componentArray == null && linkAndComponentArray.linkArray == null){
             updateToolBar.hidden();
         }else{
             updateToolBar.visible();
         }
+
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
-    public function redrawCanvas(?object:Object){
-        updateCanvas.update(object);
+    public function setRedoButton(){
+        if(commandManager.getRedoStackSize() == 0){
+            updateToolBar.setRedoButtonDisability(true);
+        }else{
+            updateToolBar.setRedoButtonDisability(false);
+        }
+    }
+
+    public function setUndoButton(){
+        if(commandManager.getUndoStackSize() == 0){
+            updateToolBar.setUndoButtonDisability(true);
+        }else{
+            updateToolBar.setUndoButtonDisability(false);
+        }
+    }
+
+    public function redrawCanvas(?linkAndComponentArray:LinkAndComponentArray){
+        updateCanvas.update(linkAndComponentArray);
+        setRedoButton();
+        setUndoButton();
+    }
+
+    public function linkAndComponentArrayReset(){
+        linkAndComponentArray.linkArray = new Array<Link>();
+        linkAndComponentArray.componentArray = new Array<Component>();
+    }
+
+    public function update(){
+
+        for(i in circuitDiagram.get_linkIterator()){
+            i.get_leftEndpoint().updatePosition();
+            i.get_rightEndpoint().updatePosition();
+        }
     }
 }

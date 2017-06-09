@@ -1,5 +1,8 @@
 package com.mun.model.component;
 
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.controller.command.CommandManager;
 import com.mun.controller.command.Stack;
 import com.mun.model.enumeration.Orientation;
 
@@ -8,25 +11,137 @@ class CircuitDiagram implements CircuitDiagramI{
     var linkArray:Array<Link> = new Array<Link>();
     var name:String;//the name of this circuit diagram
     var copyStack:Stack;
+    var commandManager:CommandManager;
+    var componentArrayReverseFlag:Bool = false;
+    var linkArrayReverseFlag:Bool = false;
+
+    //circuit diagram has its width height
+    @:isVar var diagramWidth(get, null):Float;
+    @:isVar var diagramHeight(get, null):Float;
+    var margin:Float = 50;//initial the margin
+    var xMin:Float = 0;
+    var yMin:Float = 0;
+    var xMax:Float = 0;
+    var yMax:Float = 0;
+
 
     public function new() {
         copyStack = new Stack();
     }
 
-    public function get_componentArray():Array<Component>{
-        return componentArray;
+    public function computeDiagramSize():Void{
+        xMin = 99999999 ;
+        yMin = 99999999 ;
+        xMax = 0 ;
+        yMax = 0 ;
+
+        for(i in componentArray){
+            if(i.get_xPosition() < xMin){
+                xMin = i.get_xPosition() - i.get_width()/2;
+            }
+
+            if(i.get_xPosition() > xMax){
+                xMax = i.get_xPosition() + i.get_width()/2;
+            }
+
+            if(i.get_yPosition() < yMin){
+                yMin = i.get_yPosition() - i.get_height()/2;
+            }
+
+            if(i.get_yPosition() > yMax){
+                yMax = i.get_yPosition() + i.get_height()/2;
+            }
+        }
+
+        for(i in linkArray){
+            //left endpoint
+            if(i.get_leftEndpoint().get_xPosition() < xMin){
+                xMin = i.get_leftEndpoint().get_xPosition();
+            }
+
+            if(i.get_leftEndpoint().get_xPosition() > xMax){
+                xMax = i.get_leftEndpoint().get_xPosition();
+            }
+
+            if(i.get_leftEndpoint().get_yPosition() < yMin){
+                yMin = i.get_leftEndpoint().get_yPosition();
+            }
+
+            if(i.get_leftEndpoint().get_yPosition() > yMax){
+                yMax = i.get_leftEndpoint().get_yPosition();
+            }
+            //right endpoint
+            if(i.get_rightEndpoint().get_xPosition() < xMin){
+                xMin = i.get_rightEndpoint().get_xPosition();
+            }
+
+            if(i.get_rightEndpoint().get_xPosition() > xMax){
+                xMax = i.get_leftEndpoint().get_xPosition();
+            }
+
+            if(i.get_rightEndpoint().get_yPosition() < yMin){
+                yMin = i.get_rightEndpoint().get_yPosition();
+            }
+
+            if(i.get_rightEndpoint().get_yPosition() > yMax){
+                yMax = i.get_rightEndpoint().get_yPosition();
+            }
+        }
+
+        //$d.width() = d.xmax() - d.xmin() $
+        //$d.height() = d.ymax() - d.ymin() $
+        diagramWidth = xMax - xMin + margin;
+        diagramHeight = yMax - yMin + margin;
     }
 
-    public function set_componentArray(value:Array<Component>):Void{
-        this.componentArray = value;
+    public function get_diagramWidth():Float {
+        return diagramWidth;
     }
 
-    public function get_linkArray():Array<Link>{
-        return linkArray;
+    public function get_diagramHeight():Float {
+        return diagramHeight;
     }
 
-    public function set_linkArray(value:Array<Link>):Void{
-        this.linkArray = value;
+    public function get_commandManager():CommandManager {
+        return commandManager;
+    }
+
+    public function set_commandManager(value:CommandManager):Void{
+        this.commandManager = value;
+    }
+
+    public function get_componentIterator():Iterator<Component>{
+        if(componentArrayReverseFlag){
+            componentArrayReverse();
+        }
+        return componentArray.iterator();
+    }
+
+    public function get_componentReverseIterator():Iterator<Component>{
+        componentArrayReverse();
+        return componentArray.iterator();
+    }
+
+    function componentArrayReverse(){
+        componentArrayReverseFlag = !componentArrayReverseFlag;
+        componentArray.reverse();
+    }
+
+    public function get_linkIterator():Iterator<Link>{
+        if(linkArrayReverseFlag){
+            linkArrayReverse();
+        }
+        return linkArray.iterator();
+    }
+
+    public function get_linkReverseIterator():Iterator<Link>{
+        linkArrayReverse();
+        return linkArray.iterator();
+    }
+
+    function linkArrayReverse(){
+        linkArrayReverseFlag = !linkArrayReverseFlag;
+        linkArray.reverse();
     }
 
     public function get_name():String {
@@ -83,35 +198,31 @@ class CircuitDiagram implements CircuitDiagramI{
     public function deleteComponent(component:Component):Void{
         componentArray.remove(component);
         //delete port setted in the link
-        for(i in 0...component.get_inportArray().length){
+        for(i in component.get_inportIterator()){
             for(j in 0...linkArray.length){
-                if(component.get_inportArray()[i] == linkArray[j].get_leftEndpoint().get_port()){
+                if(i == linkArray[j].get_leftEndpoint().get_port()){
                     linkArray[j].get_leftEndpoint().set_port(null);
                 }
 
-                if(component.get_inportArray()[i] == linkArray[j].get_rightEndpoint().get_port()){
+                if(i == linkArray[j].get_rightEndpoint().get_port()){
                     linkArray[j].get_rightEndpoint().set_port(null);
                 }
 
             }
         }
         //
-        for(i in 0...component.get_outportArray().length){
+        for(i in component.get_outportIterator()){
             for(j in 0...linkArray.length){
-                if(component.get_outportArray()[i] == linkArray[j].get_leftEndpoint().get_port()){
+                if(i == linkArray[j].get_leftEndpoint().get_port()){
                     linkArray[j].get_leftEndpoint().set_port(null);
                 }
 
-                if(component.get_outportArray()[i] == linkArray[j].get_rightEndpoint().get_port()){
+                if(i == linkArray[j].get_rightEndpoint().get_port()){
                     linkArray[j].get_rightEndpoint().set_port(null);
                 }
 
             }
         }
-    }
-
-    public function updateComponent(component:Component):Void{
-        componentArray[componentArray.indexOf(component)] = component;
     }
 
     /**
@@ -126,5 +237,42 @@ class CircuitDiagram implements CircuitDiagramI{
 
     public function componentSetName(component:Component, name:String):Void{
         componentArray[componentArray.indexOf(component)].set_name(name);
+    }
+
+    public function draw(?linkAndComponentArray:LinkAndComponentArray, drawingAdapter:DrawingAdapterI):Void{
+        var drawFlag:Bool = false;
+        //update component array
+        for(i in componentArray){
+            for(j in linkAndComponentArray.componentArray){
+                if(j == i){
+                    i.drawComponent(drawingAdapter, true);
+                    drawFlag = true;
+                }
+            }
+
+            if(!drawFlag){
+                i.drawComponent(drawingAdapter, false);
+            }
+
+            drawFlag = false;
+        }
+
+        drawFlag = false;
+        //update link array
+        for(i in linkArray){
+
+            for(j in linkAndComponentArray.linkArray){
+                if(j == i){
+                    i.drawLink(drawingAdapter, true);
+                    drawFlag = true;
+                }
+            }
+
+            if(!drawFlag){
+                i.drawLink(drawingAdapter, false);
+            }
+
+            drawFlag = false;
+        }
     }
 }

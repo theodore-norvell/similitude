@@ -27,10 +27,8 @@ class DrawFlipFlop implements DrawComponent extends Constant{
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.drawText("FF", component.get_xPosition() - 4, component.get_yPosition(), component.get_width());
         //draw inport
-        var inportArray:Array<Port> = component.get_inportArray();
-        for (i in 0...inportArray.length) {
-            var port:Port = inportArray[i];
-            //init set the radius is 2
+        for (i in component.get_inportIterator()) {
+            var port:Port = i;
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
             switch(component.get_orientation()){
@@ -69,9 +67,8 @@ class DrawFlipFlop implements DrawComponent extends Constant{
 
         }
         //draw outport
-        var outportArray:Array<Port> = component.get_outportArray();
-        for (i in 0...outportArray.length) {
-            var port:Port = outportArray[i];
+        for (i in component.get_outportIterator()) {
+            var port:Port = i;
             //init set the radius is 2
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
