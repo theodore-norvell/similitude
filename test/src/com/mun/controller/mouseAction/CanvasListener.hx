@@ -80,19 +80,24 @@ class CanvasListener {
         //get the endpoint or link or component on this mouse location
         //priority: endpint -> link -> component
         var endpointArray:Array<Endpoint> = updateCircuitDiagram.getEndpoint(mouseDownLocation);
+        if(endpointArray != null){
+            if(hightLightLink != null){
+                for(i in endpointArray){
+                    if(i == hightLightLink.get_leftEndpoint()){
+                        endpoint = i;
+                    }
 
-        if(hightLightLink != null){
-            for(i in endpointArray){
-                if(i == hightLightLink.get_leftEndpoint()){
-                    endpoint = i;
+                    if(i == hightLightLink.get_rightEndpoint()){
+                        endpoint = i;
+                    }
                 }
-
-                if(i == hightLightLink.get_rightEndpoint()){
+            }
+            if(endpoint == null){
+                for(i in endpointArray){
                     endpoint = i;
                 }
             }
         }
-
 
         if(endpoint != null){
             endpointSelected = true;

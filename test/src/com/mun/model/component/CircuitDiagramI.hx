@@ -126,6 +126,26 @@ interface CircuitDiagramI {
     public function get_diagramHeight():Float;
 
     /**
+    * get min x
+    **/
+    public function get_xMin():Float;
+
+    /**
+    * get min y
+    **/
+    public function get_yMin():Float;
+
+    /**
+    * get x max
+    **/
+    public function get_xMax():Float;
+
+    /**
+    * get y max
+    **/
+    public function get_yMax():Float;
+
+    /**
     * draw the circuit diagram itself
     **/
     public function draw(?linkAndComponentArray:LinkAndComponentArray, drawingAdapter:DrawingAdapterI):Void;

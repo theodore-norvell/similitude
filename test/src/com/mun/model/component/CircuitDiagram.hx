@@ -1,10 +1,12 @@
 package com.mun.model.component;
 
+import com.mun.view.drawingImpl.WorldToViewI;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.type.Type.LinkAndComponentArray;
 import com.mun.controller.command.CommandManager;
 import com.mun.controller.command.Stack;
 import com.mun.model.enumeration.Orientation;
+import com.mun.type.Type.Coordinate;
 
 class CircuitDiagram implements CircuitDiagramI{
     var componentArray:Array<Component> = new Array<Component>();
@@ -18,12 +20,12 @@ class CircuitDiagram implements CircuitDiagramI{
     //circuit diagram has its width height
     @:isVar var diagramWidth(get, null):Float;
     @:isVar var diagramHeight(get, null):Float;
-    var margin:Float = 50;//initial the margin
-    var xMin:Float = 0;
-    var yMin:Float = 0;
-    var xMax:Float = 0;
-    var yMax:Float = 0;
-
+    var margin:Float = 50;
+    //initial the margin
+    @:isVar var xMin(get, null):Float;
+    @:isVar var yMin(get, null):Float;
+    @:isVar var xMax(get, null):Float;
+    @:isVar var yMax(get, null):Float;
 
     public function new() {
         copyStack = new Stack();
@@ -92,6 +94,12 @@ class CircuitDiagram implements CircuitDiagramI{
         //$d.height() = d.ymax() - d.ymin() $
         diagramWidth = xMax - xMin + margin;
         diagramHeight = yMax - yMin + margin;
+
+        xMax = xMax + margin/2;
+        xMin = xMin - margin/2;
+
+        yMax = yMax + margin/2;
+        yMin = yMin - margin/2;
     }
 
     public function get_diagramWidth():Float {
@@ -102,6 +110,21 @@ class CircuitDiagram implements CircuitDiagramI{
         return diagramHeight;
     }
 
+    public function get_xMin():Float {
+        return xMin;
+    }
+
+    public function get_yMin():Float {
+        return yMin;
+    }
+
+    public function get_xMax():Float {
+        return xMax;
+    }
+
+    public function get_yMax():Float {
+        return yMax;
+    }
     public function get_commandManager():CommandManager {
         return commandManager;
     }
@@ -243,10 +266,12 @@ class CircuitDiagram implements CircuitDiagramI{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
-            for(j in linkAndComponentArray.componentArray){
-                if(j == i){
-                    i.drawComponent(drawingAdapter, true);
-                    drawFlag = true;
+            if(linkAndComponentArray.componentArray != null){
+                for(j in linkAndComponentArray.componentArray){
+                    if(j == i){
+                        i.drawComponent(drawingAdapter, true);
+                        drawFlag = true;
+                    }
                 }
             }
 
@@ -260,11 +285,12 @@ class CircuitDiagram implements CircuitDiagramI{
         drawFlag = false;
         //update link array
         for(i in linkArray){
-
-            for(j in linkAndComponentArray.linkArray){
-                if(j == i){
-                    i.drawLink(drawingAdapter, true);
-                    drawFlag = true;
+            if(linkAndComponentArray.linkArray != null){
+                for(j in linkAndComponentArray.linkArray){
+                    if(j == i){
+                        i.drawLink(drawingAdapter, true);
+                        drawFlag = true;
+                    }
                 }
             }
 
@@ -274,5 +300,18 @@ class CircuitDiagram implements CircuitDiagramI{
 
             drawFlag = false;
         }
+    }
+
+    public function viewToWorld(w2v:WorldToViewI, viewCoordinate:Coordinate):Array<Float>{
+        return null;
+    }
+
+    public function world2worldCoordinateTransform(cx:Float, cy:Float, cw:Float, ch:Float):Coordinate{
+        /**
+        * [1 0 cx] [cw/dw , 0    , 0] [0, 0, -dxmin]   [0,0, cw/diagramWidth * (-xMin) + ch/diagramHeight * (-yMin) + 1]
+        * [1 1 cy]*[0     , ch/dh, 0]*[0, 0, -dymin] = [0,0, ch/diagramHeight * (-yMin) + 1                            ]
+        * [0 0 1 ] [0     , 0    , 2] [0, 0, 1     ]   [0,0, (-xMin) * (-yMin) + 1                                     ]
+        **/
+        return {"xPosition": cw/diagramWidth * (-xMin) + ch/diagramHeight * (-yMin) + 1, "yPosition": ch/diagramHeight * (-yMin) + 1};
     }
 }

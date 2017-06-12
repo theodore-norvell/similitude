@@ -37,12 +37,10 @@ class NOT implements ComponentKind extends GateAbstract {
         }
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.OUTPUT) {
-                portArray.remove(port);
                 if (value == ValueLogic.TRUE)
                     port.set_value(ValueLogic.FALSE);
                 else if (value == ValueLogic.FALSE)
                     port.set_value(ValueLogic.TRUE);
-                portArray.push(port);
             }
         }
 
