@@ -27,4 +27,14 @@ interface WorldToViewI {
 	 * @return
 	 */
     public function invertY(view_y:Float):Float;
+
+    /**
+    * get the base
+    **/
+    public function getBase():Float;
+
+    /**
+    * set the base
+    **/
+    public function setBase(base:Float):Void;
 }

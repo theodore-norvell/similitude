@@ -41,9 +41,7 @@ class NAND implements ComponentKind extends GateAbstract {
 
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.OUTPUT) {
-                portArray.remove(port);
                 port.set_value(value);
-                portArray.push(port);
             }
         }
         return portArray;

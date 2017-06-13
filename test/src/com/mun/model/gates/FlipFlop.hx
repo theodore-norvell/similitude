@@ -50,19 +50,15 @@ class FlipFlop implements ComponentKind extends GateAbstract {
 
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.Q) {
-                portArray.remove(port);
                 port.set_value(value);
-                portArray.push(port);
             }
 
             if (port.get_portDescription() == IOTYPE.QN) {
-                portArray.remove(port);
                 if (value == ValueLogic.TRUE) {
                     port.set_value(ValueLogic.FALSE);
                 } else if (value == ValueLogic.FALSE) {
                     port.set_value(ValueLogic.TRUE);
                 }
-                portArray.push(port);
             }
         }
         return portArray;
