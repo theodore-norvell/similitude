@@ -1,4 +1,6 @@
 package com.mun.model.component;
+import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.type.Type.LinkAndComponentArray;
 import com.mun.controller.command.CommandManager;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -99,11 +101,6 @@ interface CircuitDiagramI {
     public function deleteComponent(component:Component):Void;
 
     /**
-    * update one component
-    **/
-    public function updateComponent(component:Component):Void;
-
-    /**
     * link need to update the enpdoint position by itself
     **/
     public function linkArraySelfUpdate():Void;
@@ -112,4 +109,44 @@ interface CircuitDiagramI {
     * set name for component
     **/
     public function componentSetName(component:Component, name:String):Void;
+
+    /**
+    * compute the size of the circuitdiagram
+    **/
+    public function computeDiagramSize():Void;
+
+    /**
+    * get the width of this diagram
+    **/
+    public function get_diagramWidth():Float;
+
+    /**
+    * get the height of this diagram
+    **/
+    public function get_diagramHeight():Float;
+
+    /**
+    * get min x
+    **/
+    public function get_xMin():Float;
+
+    /**
+    * get min y
+    **/
+    public function get_yMin():Float;
+
+    /**
+    * get x max
+    **/
+    public function get_xMax():Float;
+
+    /**
+    * get y max
+    **/
+    public function get_yMax():Float;
+
+    /**
+    * draw the circuit diagram itself
+    **/
+    public function draw(?linkAndComponentArray:LinkAndComponentArray, drawingAdapter:DrawingAdapterI):Void;
 }

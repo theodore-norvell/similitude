@@ -93,7 +93,6 @@ class MoveCommand implements Command {
     }
 
     public function undo():LinkAndComponentArray {
-        trace(linkAndComponentAndEndpointArray.componentArray.length);
         if (linkAndComponentAndEndpointArray.componentArray.length != 0) {
             for(i in 0...linkAndComponentAndEndpointArray.componentArray.length){
 
@@ -105,6 +104,7 @@ class MoveCommand implements Command {
 
                 linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(oldComponentXpositionArray[i], oldComponentYpositionArray[i]);
             }
+            linkPositionUpdate();
         }
 
         if (linkAndComponentAndEndpointArray.linkArray.length != 0) {
@@ -122,7 +122,6 @@ class MoveCommand implements Command {
 
                 linkMeetPortUpdate(linkAndComponentAndEndpointArray.linkArray[i]);
             }
-
         }
 
         if (linkAndComponentAndEndpointArray.endpointArray.length != 0) {
@@ -136,7 +135,6 @@ class MoveCommand implements Command {
                 endpointMeetPort(linkAndComponentAndEndpointArray.endpointArray[i]);
             }
         }
-        linkPositionUpdate();
         return linkAndComponentArray;
     }
 
@@ -147,6 +145,7 @@ class MoveCommand implements Command {
                 linkAndComponentAndEndpointArray.componentArray[i].set_yPosition(recordComponentYpositionBeforeUndoArray[i]);
                 linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(recordComponentXpositionBeforeUndoArray[i], recordComponentYpositionBeforeUndoArray[i]);
             }
+            linkPositionUpdate();
         }
 
         if (linkAndComponentAndEndpointArray.linkArray.length != 0) {
@@ -168,7 +167,6 @@ class MoveCommand implements Command {
                 endpointMeetPort(linkAndComponentAndEndpointArray.endpointArray[i]);
             }
         }
-        linkPositionUpdate();
         return linkAndComponentArray;
     }
 
@@ -179,6 +177,7 @@ class MoveCommand implements Command {
                 i.set_yPosition(i.get_yPosition() + yDisplacement);
                 i.updateMoveComponentPortPosition(i.get_xPosition(), i.get_yPosition());
             }
+            linkPositionUpdate();
         }
 
         if (linkAndComponentAndEndpointArray.linkArray.length != 0) {
@@ -200,7 +199,6 @@ class MoveCommand implements Command {
                 endpointMeetPort(i);
             }
         }
-        linkPositionUpdate();
     }
 
     function linkMeetPortUpdate(link:Link){
@@ -211,7 +209,6 @@ class MoveCommand implements Command {
         var leftEndpointPort:Port = link.get_leftEndpoint().get_port();
         if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
             link.get_leftEndpoint().set_port(port_temp);
-            link.get_leftEndpoint().updatePosition();
         }else if(port_temp == null){
             link.get_leftEndpoint().set_port(null);
         }
@@ -222,50 +219,46 @@ class MoveCommand implements Command {
 
         if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
             link.get_rightEndpoint().set_port(port_temp);
-            link.get_rightEndpoint().updatePosition();
         }else if(port_temp == null){
             link.get_rightEndpoint().set_port(null);
         }
     }
 
     function endpointMeetPort(endpoint:Endpoint){
-        //find the link which contains this endpoint and find the port
-        var port:Port = null;
-
         var coordinate:Coordinate = {"xPosition":endpoint.get_xPosition(), "yPosition":endpoint.get_yPosition()};
         var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).port;
-        for(i in circuitDiagram.get_linkIterator()){
-            if(i.get_leftEndpoint() == endpoint){
-                if(i.get_rightEndpoint().get_port() != null){//find the port
+        if(newPort != null){
+            for(i in circuitDiagram.get_linkIterator()){
+                var port:Port = null;
+                if(i.get_leftEndpoint() == endpoint){
                     port = i.get_rightEndpoint().get_port();
-                }
-                //verify the endpoint step into another component port or not
-                if(newPort != port){
-                    i.get_leftEndpoint().set_port(newPort);
-                    i.get_leftEndpoint().updatePosition();
-                }else{
-                    i.get_leftEndpoint().set_port(null);
-                }
-                break;
-            }
 
-            if(i.get_rightEndpoint() == endpoint){
-                if(i.get_leftEndpoint().get_port() != null){//find the port
+                    //verify the endpoint step into another port or not
+                    if(newPort != port){
+                        i.get_leftEndpoint().set_port(newPort);
+                    }else{
+                        i.get_leftEndpoint().set_port(null);
+                    }
+                    break;
+                }
+
+                if(i.get_rightEndpoint() == endpoint){
                     port = i.get_leftEndpoint().get_port();
+                    if(newPort != port){
+                        i.get_rightEndpoint().set_port(newPort);
+                    }else{
+                        i.get_rightEndpoint().set_port(null);
+                    }
+                    break;
                 }
-
-                if(newPort != port){
-                    i.get_rightEndpoint().set_port(newPort);
-                    i.get_rightEndpoint().updatePosition();
-                }else{
-                    i.get_rightEndpoint().set_port(null);
-                }
-                break;
             }
+        }else{
+            endpoint.set_port(null);
         }
+
     }
 
-    function linkPositionUpdate(){
+    public function linkPositionUpdate(){
         for(i in circuitDiagram.get_linkIterator()){
             i.get_leftEndpoint().updatePosition();
             i.get_rightEndpoint().updatePosition();

@@ -2,9 +2,9 @@ package com.mun.view.drawingImpl;
 
 
 class WorldToView implements WorldToViewI {
-    var base:Int = 1;//base number is 1
+    var base:Float = 1;//base number is 1
 
-    public function new(base:Int) {
+    public function new(base:Float) {
         this.base = base;
     }
 
@@ -22,5 +22,13 @@ class WorldToView implements WorldToViewI {
 
     public function invertY(view_y:Float):Float {
         return base * view_y;
+    }
+
+    public function getBase():Float{
+        return base;
+    }
+
+    public function setBase(base:Float):Void{
+        this.base = base;
     }
 }

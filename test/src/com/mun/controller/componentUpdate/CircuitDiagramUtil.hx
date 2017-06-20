@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.view.drawComponents.Constant;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
@@ -10,10 +11,11 @@ import com.mun.type.Type.Object;
 /**
 * utility for processing the update from canvas
 **/
-class CircuitDiagramUtil {
+class CircuitDiagramUtil extends Constant{
     var circuitDiagram:CircuitDiagramI;
 
     public function new(circuitDiagram:CircuitDiagramI) {
+        super();
         this.circuitDiagram = circuitDiagram;
     }
 
@@ -49,7 +51,7 @@ class CircuitDiagramUtil {
             var rightEndpoint:Endpoint = i.get_rightEndpoint();
             if(pointToLine(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
                             rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
-                            coordinate.xPosition, coordinate.yPosition) <= 3){
+                            coordinate.xPosition, coordinate.yPosition) <= pointToLineDistance){
                 //if the distance between the point to line less equal to 3, that means the line should be selected
                 //only process the first link met
 
@@ -65,11 +67,11 @@ class CircuitDiagramUtil {
                     Math.pow(Math.abs(coordinate.yPosition - i.get_rightEndpoint().get_yPosition()), 2)
                 );
                 if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
-                    if(theDistanceToRightEndpoint >= 5){
+                    if(theDistanceToRightEndpoint >= pointToEndpointDistance){
                         return i;
                     }
                 }else{
-                    if(theDistanaceToLeftEndpoint >= 5){
+                    if(theDistanaceToLeftEndpoint >= pointToEndpointDistance){
                         return i;
                     }
                 }
@@ -135,21 +137,22 @@ class CircuitDiagramUtil {
     * @return if the coordinate on the endpoint then return the endpoint
     *           or  return null;
     **/
-    public function pointOnEndpoint(coordinate:Coordinate):Endpoint{
+    public function pointOnEndpoint(coordinate:Coordinate):Array<Endpoint>{
+        var endpointArray:Array<Endpoint> = new Array<Endpoint>();
         for(i in circuitDiagram.get_linkIterator()){
             if(pointsDistance(i.get_leftEndpoint().get_xPosition(),
                             i.get_leftEndpoint().get_yPosition(),
-                            coordinate.xPosition, coordinate.yPosition) <= 4){
-                return i.get_leftEndpoint();
+                            coordinate.xPosition, coordinate.yPosition) <= pointToEndpointDistance){
+                endpointArray.push(i.get_leftEndpoint());
             }
 
             if(pointsDistance(i.get_rightEndpoint().get_xPosition(),
                                 i.get_rightEndpoint().get_yPosition(),
-                                coordinate.xPosition, coordinate.yPosition) <= 4){
-                return i.get_rightEndpoint();
+                                coordinate.xPosition, coordinate.yPosition) <= pointToEndpointDistance){
+                endpointArray.push(i.get_rightEndpoint());
             }
         }
-        return null;
+        return endpointArray;
     }
 
     /**
@@ -230,7 +233,7 @@ class CircuitDiagramUtil {
     **/
     public function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
         //the radius is 3
-        if(Math.abs(coordinate.xPosition - orignalXPosition) <= 3 && Math.abs(coordinate.yPosition - orignalYPosition) <= 3){
+        if(Math.abs(coordinate.xPosition - orignalXPosition) <= 4 && Math.abs(coordinate.yPosition - orignalYPosition) <= portRadius){
             return true;
         }else{
             return false;

@@ -63,21 +63,21 @@ class UpdateCircuitDiagram {
         this.updateToolBar = updateToolBar;
     }
 
-    public function createComponentByButton(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, inportNum:Int, drawingAdapter:DrawingAdapterI){
+    public function createComponentByCommand(component:Component){
+        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
+        var command:Command = new AddCommand(object,circuitDiagram);
+        commandManager.execute(command);
+        linkAndComponentArrayReset();
+
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
+    }
+
+    public function createComponent(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, inportNum:Int):Component{
         var componentkind_:ComponentKind = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
         component_.setNameOfTheComponentKind(name);
-
-        var object:Object = {"link":null,"component":component_,"endPoint":null, "port":null};
-        var command:Command = new AddCommand(object,circuitDiagram);
-        commandManager.execute(command);
-
-        linkAndComponentArrayReset();
-        linkAndComponentArray.componentArray = new Array<Component>();
-        linkAndComponentArray.componentArray.push(object.component);
-
-        updateToolBar.update(linkAndComponentArray);
-        hightLightObject(linkAndComponentArray);
+        return component_;
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
@@ -105,13 +105,21 @@ class UpdateCircuitDiagram {
 
         updateToolBar.update(linkAndComponentArray);
         hightLightObject(linkAndComponentArray);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
         return object.link;
     }
 
-    public function moveSelectedObjects(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray, currentMouseLocation:Coordinate, mouseDownLocation:Coordinate){
+    public function moveSelectedObjects(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray, currentMouseLocation:Coordinate, mouseDownLocation:Coordinate, mouseLocationFlag:Bool){
 
         var xMoveDistance:Float = currentMouseLocation.xPosition - mouseDownLocation.xPosition;
         var yMoveDistance:Float = currentMouseLocation.yPosition - mouseDownLocation.yPosition;
+
+        if(mouseLocationFlag){
+            linkAndComponentAndEndpointArray.componentArray[0].set_xPosition(currentMouseLocation.xPosition);
+            linkAndComponentAndEndpointArray.componentArray[0].set_yPosition(currentMouseLocation.yPosition);
+        }
+
         var command:Command = new MoveCommand(linkAndComponentAndEndpointArray, xMoveDistance, yMoveDistance, circuitDiagram);
         commandManager.execute(command);
         //those wires which link to this component should move either, which automactilly completed while move endpoint
@@ -129,9 +137,10 @@ class UpdateCircuitDiagram {
                 }
             }
         }
-
         updateToolBar.update(linkAndComponentArray);
         hightLightObject(linkAndComponentArray);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
     public function changeOrientation(componentArray:Array<Component>, orientation:Orientation){
@@ -139,6 +148,7 @@ class UpdateCircuitDiagram {
         commandManager.execute(orientationCommand);
         var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":componentArray};
         updateToolBar.update(linkAndComponentArray);
+        circuitDiagram.linkArraySelfUpdate();
         hightLightObject(linkAndComponentArray);
     }
 
@@ -147,13 +157,17 @@ class UpdateCircuitDiagram {
         commandManager.execute(deleteCommand);
 
         redrawCanvas(linkAndComponentArray);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
     public function deleteLink(link:Link){
         circuitDiagram.deleteLink(link);
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
-    public function getEndpoint(coordinate:Coordinate):Endpoint{
+    public function getEndpoint(coordinate:Coordinate):Array<Endpoint>{
         return circuitDiagramUtil.pointOnEndpoint(coordinate);
     }
 
@@ -189,6 +203,9 @@ class UpdateCircuitDiagram {
         }else{
             updateToolBar.visible();
         }
+
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
     public function redo(){
@@ -199,6 +216,9 @@ class UpdateCircuitDiagram {
         }else{
             updateToolBar.visible();
         }
+
+        //compute the size of this diagram
+        circuitDiagram.computeDiagramSize();
     }
 
     public function setRedoButton(){
@@ -226,5 +246,13 @@ class UpdateCircuitDiagram {
     public function linkAndComponentArrayReset(){
         linkAndComponentArray.linkArray = new Array<Link>();
         linkAndComponentArray.componentArray = new Array<Component>();
+    }
+
+    public function update(){
+
+        for(i in circuitDiagram.get_linkIterator()){
+            i.get_leftEndpoint().updatePosition();
+            i.get_rightEndpoint().updatePosition();
+        }
     }
 }

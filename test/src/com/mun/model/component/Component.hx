@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.view.drawingImpl.WorldToViewI;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
@@ -165,7 +166,10 @@ class Component {
         return this;
     }
 
-    public function drawComponent(component:Component, drawingAdpater:DrawingAdapterI, highLight:Bool){
-        componentKind.drawComponent(component, drawingAdpater, highLight);
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool){
+        componentKind.drawComponent(this, drawingAdpater, highLight);
+    }
+    public function viewToWolrd(worldToView:WorldToViewI){
+
     }
 }

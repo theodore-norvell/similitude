@@ -31,7 +31,6 @@ class DrawInput implements DrawComponent extends Constant{
         //draw outport
         for (i in component.get_outportIterator()) {
             var port:Port = i;
-            //init set the radius is 2
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
         }
