@@ -80,7 +80,7 @@
   <dt>Component</dt>
   <dd>A&nbsp; component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of Attributes that can be edited.(Implementation note: the state of a Component does not include any information associated with Simulations.)  </dd>
   <dt>Component kind</dt>
-  <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound components, q.v.)</dd>
+  <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound Component Kind, q.v.)</dd>
   <dt>Primitive Component&nbsp;Kind</dt>
   <dd>Primitive component kinds&nbsp;are things such and gates, not&nbsp;gates, adders,&nbsp;flip-flops, that are build in.&nbsp; Primitive components also include input terminals, output terminals and </dd>
   <dt>Compound Component Kind</dt>
@@ -112,12 +112,12 @@
   really a pair (d, (x,y)) where d is a Circuit and (x, y) is a point on the plane.</dd>
   <dt>View coordinates</dt>
   <dd>The coordinates of the canvas on which the circuit is displayed.</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
+  <dt>Folder</dt>
+  <dd>A folder is a collection of Files and Folders. Folders form a Tree such that each Folder (apart from the root) has&nbsp;a parent Folder&nbsp;and each File is in one Folder</dd>
+  <dt>Home Folder</dt>
+  <dd>Each User has a home folder, as does each Course.</dd>
+  <dt>File</dt>
+  <dd>A file is one of the following: A Saved Circuit, an Unsaved Circuit, a Saved Test, an Unsaved Test.</dd>
   <dt>abc</dt>
   <dd>def</dd>
   <dt>abc</dt>
@@ -156,6 +156,36 @@
   <li>On a touch device, the drag may be done with touch event rather than mouse events.'</li>
   <li>In step 5, if the drop is on top of a compound compononent and the compound component&nbsp;is &quot;white-box&quot;, then the new component is added to the diagram associated with that compond component.</li>
 </ul>
+<p></p>
+<h4>Add a new link by dragging</h4>
+<p>Requirements: Add links</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Depresses mouse button at a place <em>x</em> somewhere on the diagram such that it does not hit a&nbsp;selected component or link.</li>
+  <li>User: Moves mouse to another part of the diagram.</li>
+  <li>If&nbsp;<em>x</em>, is on or sufficiently close to&nbsp;a component.
+    <ol>
+      <li>A  link is added starting from the position of closest port on the component&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
+    </ol>
+  </li>
+  <li>Otherwise
+    <ol>
+      <li>A link is added starting from place <em>x</em> (converted into world coordinates)&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
+    </ol>
+  </li>
+  <li>User continues to move the mouse.</li>
+  <li>Client: As the mouse moves, the ending endpoint of the link is updated.</li>
+  <li>Client releases the mouse or the mouse moves to where it can no longer be converted to a suitable world coordinate.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>On a touch device, touch events can be used.</li>
+  <li>If <em>x</em> hits a selected component or link, then the use case for moves applies.</li>
+  <li>If the original point <em>x</em> is within a compound component <em>c</em>&nbsp;(not in the current selection) and the compound component is has a white-box view, then there is an ambiguity as to whether the link should be added to the outer circuit (the circuit that the component is a part of, or the inner circuit (the circuit the component contains). The best way to decide is probably based on whether <em>x</em> is close to the edge&nbsp;of <em>c</em>. </li>
+</ul>
 <h4>Add to the selection or clear the selection.</h4>
 <p>Requirements: None</p>
 <p>Actors: The user and the client</p>
@@ -172,35 +202,41 @@
 <ul>
   <li>On a touch device, touch events can be used.</li>
   <li>Disambiguating a mouse down should be done as follows: Links, then components.</li>
+  <li>If the mouse hits a component inside a compound component (in whitebox view), the inner component is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
 </ul>
 <p></p>
 <h4>Move components, links, and endpoints by drag</h4>
-<p>Requirements: Move components around the circuit diagram.</p>
+<p>Requirements:</p>
+<ul>
+  <li>Move components around the circuit diagram.</li>
+  <li>Move an endpoint of a link</li>
+</ul>
 <p>Actors: The user and the client</p>
-<p>Precondition: The client is in editing mode.</p>
+<p>Precondition: The client is in editing mode&nbsp;and the selection is not empty.</p>
 <p>Postcondition: The client is in editing mode.</p>
 <p>Basic Flow</p>
 <ol>
-  <li>User: Depresses mouse button over a component, link, or endpoint, <em>x</em>.</li>
+  <li>User: Depresses mouse button over a component or link or endpoint, <em>x</em> that is in the current selection.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>If the <em>x</em> (or when <em>x</em> is an endpoint, <em>x</em>'s link) is in the current selection:
-<ol>
-      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
-      <li>When the mouse is released the selection is unchanged.</li>
-    </ol>
-  </li>
-  <li>Otherwise
+  <li>If the <em>x</em>  is a link or component in the current selection:
     <ol>
-      <li>Client: As the mouse moves,  <em>x</em> --the component, link, or endpoint-- moves.</li>
-      <li>When the mouse is released, the component, link, or the link that the endpoint belongs to become the only&nbsp;selected thing.</li>
-      <li>When a component moves, all endpoints connected to its ports should also move.</li>
+      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
+      <li>Note: When a component moves, all endpoints connected to its ports should also move. However when a link moves,&nbsp;ports and components connected to its endpoints only move if they are in the current selection.</li>
     </ol>
   </li>
+  <li>Otherwise, <em>x</em> is the endpoint of a currently selected link.
+    <ol>
+      <li>Client: As the mouse moves, <em>x</em> moves.</li>
+      <li>Note: Only the endpoint moves.</li>
+    </ol>
+  </li>
+  <li>User: Releases the mouse.</li>
 </ol>
 <p>Notes:</p>
 <ul>
   <li>On a touch device, touch events can be used.</li>
   <li>Disambiguating a mouse down should be done as follows: Endpoints have top priority, then links, then components.</li>
+  <li>It may be that when the mouse is depressed, it is over a number of endpoints. If any of those endpoints' links are in the current selection, this use case applies, and all the endpoints whose links are in the current selection move together.</li>
   <li>Moving an endpoint or link may make new connections or break existing connections.</li>
   <li>Everything that moves, moves the same amount&nbsp;in terms of world coordinates.&nbsp; (This might not make a whole lot of sense when the Selection contains things from different circuits, but I'm not concerned about that anomalous case.)</li>
   <li>In particular suppose&nbsp;<em>x</em> is in a circuit associated with compound component. The mouse coordinates will cease to mean anything once the mouse leaves the compound component. So the last coordinates that were in the component can be used in that case&nbsp;to calculate the amount of the move.</li>
@@ -237,6 +273,25 @@
 <ul>
   <li>None.</li>
 </ul>
+<h4>Create a new circuit</h4>
+<p>Requirements: </p>
+<ul>
+  <li>Delete components from a circuit diagram.</li>
+  <li>Delete links</li>
+</ul>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and at least one component or link is selected</p>
+<p>Postcondition: The client is in editing mode. The selection is empty.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Clicks on the Cut button.</li>
+  <li>Client: Deletes all selected components and links.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>None.</li>
+</ul>
+<p></p>
 <p>&nbsp;</p>
 <h2>Discussion</h2>
 <h3><a name="onCompoundComponentKinds"></a>On compound component kinds</h3>
