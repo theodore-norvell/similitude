@@ -1,12 +1,19 @@
 package com.mun.model.component;
 
-import com.mun.view.drawingImpl.WorldToViewI;
+import com.mun.model.enumeration.POINT_MODE;
+import com.mun.model.enumeration.MODE;
+import com.mun.view.drawingImpl.Transform;
+import com.mun.view.drawingImpl.DrawingAdapter;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.Type.LinkAndComponentAndEndpointArray;
+import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.controller.command.CommandManager;
 import com.mun.controller.command.Stack;
 import com.mun.model.enumeration.Orientation;
 import com.mun.type.Type.Coordinate;
+import com.mun.type.Type.WorldPoint;
+import com.mun.global.Constant.*;
 
 class CircuitDiagram implements CircuitDiagramI{
     var componentArray:Array<Component> = new Array<Component>();
@@ -17,10 +24,14 @@ class CircuitDiagram implements CircuitDiagramI{
     var componentArrayReverseFlag:Bool = false;
     var linkArrayReverseFlag:Bool = false;
 
+    var drawingAdapter:DrawingAdapterI;
+    var transform:Transform;
+
     //circuit diagram has its width height
     @:isVar var diagramWidth(get, null):Float;
     @:isVar var diagramHeight(get, null):Float;
-    var margin:Float = 50;
+    var margin:Float = 100;
+    var leastWidthAndHeight:Int = 500;
     //initial the margin
     @:isVar var xMin(get, null):Float;
     @:isVar var yMin(get, null):Float;
@@ -100,6 +111,26 @@ class CircuitDiagram implements CircuitDiagramI{
 
         yMax = yMax + margin/2;
         yMin = yMin - margin/2;
+
+        //set the least width and height for diagram
+        if(diagramWidth < leastWidthAndHeight){
+            //width
+            var displacement = leastWidthAndHeight - diagramWidth;
+            yMax = yMax + displacement/2;
+            yMin = yMin - displacement/2;
+
+            diagramWidth = leastWidthAndHeight;
+        }
+
+        if(diagramHeight < leastWidthAndHeight){
+
+            //height
+            var displacement = leastWidthAndHeight - diagramHeight;
+            xMax = xMax + displacement/2;
+            xMin = xMin - displacement/2;
+
+            diagramHeight = leastWidthAndHeight;
+        }
     }
 
     public function get_diagramWidth():Float {
@@ -125,6 +156,15 @@ class CircuitDiagram implements CircuitDiagramI{
     public function get_yMax():Float {
         return yMax;
     }
+
+    public function get_drawingAdapter():DrawingAdapterI {
+        return drawingAdapter;
+    }
+
+    public function set_drawingAdapter(drawingAdapter:DrawingAdapterI):Void {
+        this.drawingAdapter = drawingAdapter;
+    }
+
     public function get_commandManager():CommandManager {
         return commandManager;
     }
@@ -262,7 +302,13 @@ class CircuitDiagram implements CircuitDiagramI{
         componentArray[componentArray.indexOf(component)].set_name(name);
     }
 
-    public function draw(?linkAndComponentArray:LinkAndComponentArray, drawingAdapter:DrawingAdapterI):Void{
+    /**
+    * for all components, if want to draw it, must convert world coordinate to view coordinate first.
+     * because draw() method only has the responsiblity to draw component itself.
+    **/
+    public function draw(?linkAndComponentArray:LinkAndComponentArray):Void{
+        drawingAdapter = new DrawingAdapter(CONTEXT, Transform.identity());
+
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
@@ -302,16 +348,33 @@ class CircuitDiagram implements CircuitDiagramI{
         }
     }
 
-    public function viewToWorld(w2v:WorldToViewI, viewCoordinate:Coordinate):Array<Float>{
-        return null;
+    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
+        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
+        for(i in linkArray){
+            linkAndComponentAndEndpointAndPortArray.linkArray.concat(i.findHitList(coordinate, mode).linkArray);
+            linkAndComponentAndEndpointAndPortArray.endpointArray.concat(i.findHitList(coordinate, mode).endpointArray);
+        }
+
+        for(i in componentArray){
+            linkAndComponentAndEndpointAndPortArray.componentArray.concat(i.findHitList(coordinate, mode).componentArray);
+            linkAndComponentAndEndpointAndPortArray.portArray.concat(i.findHitList(coordinate, mode).portArray);
+        }
+        return linkAndComponentAndEndpointAndPortArray;
     }
 
-    public function world2worldCoordinateTransform(cx:Float, cy:Float, cw:Float, ch:Float):Coordinate{
-        /**
-        * [1 0 cx] [cw/dw , 0    , 0] [0, 0, -dxmin]   [0,0, cw/diagramWidth * (-xMin) + ch/diagramHeight * (-yMin) + 1]
-        * [1 1 cy]*[0     , ch/dh, 0]*[0, 0, -dymin] = [0,0, ch/diagramHeight * (-yMin) + 1                            ]
-        * [0 0 1 ] [0     , 0    , 2] [0, 0, 1     ]   [0,0, (-xMin) * (-yMin) + 1                                     ]
-        **/
-        return {"xPosition": cw/diagramWidth * (-xMin) + ch/diagramHeight * (-yMin) + 1, "yPosition": ch/diagramHeight * (-yMin) + 1};
+    public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
+        var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
+
+        for(i in componentArray){
+            worldPointArray.concat(i.findWorldPoint(worldCoordinate, mode));
+            if(worldPointArray.length != 0){
+                break;
+            }
+        }
+
+        if(worldPointArray.length == 0 || mode == POINT_MODE.PATH){
+            worldPointArray.push({"circuitDiagram":this, "coordinate":worldCoordinate});
+        }
+        return worldPointArray;
     }
 }

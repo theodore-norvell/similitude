@@ -1,5 +1,6 @@
 package com.mun.type;
 
+import com.mun.model.component.CircuitDiagram;
 import com.mun.model.component.Port;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;
@@ -27,4 +28,14 @@ typedef LinkAndComponentAndEndpointArray = {
     var endpointArray:Array<Endpoint>;
 }
 
+typedef LinkAndComponentAndEndpointAndPortArray = {
+    var linkArray:Array<Link>;
+    var componentArray:Array<Component>;
+    var endpointArray:Array<Endpoint>;
+    var portArray:Array<Port>;
+}
 
+typedef WorldPoint = {
+    var circuitDiagram:CircuitDiagram;
+    var coordinate:Coordinate;
+}

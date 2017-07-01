@@ -1,15 +1,13 @@
 package ;
 
+import com.mun.global.Constant.*;
 import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
-import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.controller.mouseAction.ButtonClick;
-import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.view.drawingImpl.DrawingAdapter;
 import js.Browser;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
@@ -46,7 +44,9 @@ class Test {
         // our canvas element
         cxt.scale(pixelRatio, pixelRatio);
 
-        var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
+        CONTEXT = cxt;
+
+//        var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
 
         var circuitDiagram:CircuitDiagramI = new CircuitDiagram();
 
@@ -57,13 +57,13 @@ class Test {
         var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
         updateCircuitDiagram.setUpdateToolBar(updateToolBar);
 
-        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas,circuitDiagram,drawingAdapter);
+        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram);
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
         //add canvas listener
         var canvasListener:CanvasListener = new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
         //add button click listener
-        new ButtonClick(drawingAdapter,updateCircuitDiagram,pixelRatio, canvasListener);
+        new ButtonClick(updateCircuitDiagram,pixelRatio, canvasListener);
 
 
     }

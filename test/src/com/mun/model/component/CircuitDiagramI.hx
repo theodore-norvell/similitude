@@ -1,6 +1,11 @@
 package com.mun.model.component;
-import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.model.enumeration.POINT_MODE;
 import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.Type.Coordinate;
+import com.mun.type.Type.WorldPoint;
+import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.model.enumeration.MODE;
+import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.controller.command.CommandManager;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -49,6 +54,16 @@ interface CircuitDiagramI {
     * @:setter the name of the circuit diagram
     **/
     public function set_name(value:String):Void;
+
+    /**
+    * get the drawing adapter
+    **/
+    public function get_drawingAdapter():DrawingAdapterI;
+
+    /**
+    * set the drawing adapter
+    **/
+    public function set_drawingAdapter(drawingAdapter:DrawingAdapterI):Void;
 
     /**
     * add one link
@@ -111,7 +126,11 @@ interface CircuitDiagramI {
     public function componentSetName(component:Component, name:String):Void;
 
     /**
-    * compute the size of the circuitdiagram
+    * compute the size of this diagram
+    * note: the size of this diagram changed only happens in two suitutions
+    *       1. add a component
+    *       2. move a component (significant slow down the performance)
+    *            because there is no way to track the change for every component, so make this function public.
     **/
     public function computeDiagramSize():Void;
 
@@ -148,5 +167,15 @@ interface CircuitDiagramI {
     /**
     * draw the circuit diagram itself
     **/
-    public function draw(?linkAndComponentArray:LinkAndComponentArray, drawingAdapter:DrawingAdapterI):Void;
+    public function draw(?linkAndComponentArray:LinkAndComponentArray):Void;
+
+    /**
+    * find the hit list
+    **/
+    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray;
+
+    /**
+    * find the world points
+    **/
+    public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 }

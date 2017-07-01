@@ -1,34 +1,24 @@
 package com.mun.view.drawingImpl;
 
 
+import com.mun.type.Type.Coordinate;
 class WorldToView implements WorldToViewI {
-    var base:Float = 1;//base number is 1
+    @:isVar var transform(get, null):Transform;
 
-    public function new(base:Float) {
-        this.base = base;
+    public function new(transform:Transform) {
+        this.transform = transform;
     }
 
-    public function convertX(x:Float):Float {
-        return base * x;
+    /** Convert a world coordinate to a view coordinate.
+	 *
+	 * @param coordinate
+	 * @return
+	 */
+    public function convertCoordinate(coordinate:Coordinate):Coordinate{
+        return transform.pointInvert(coordinate);
     }
 
-    public function convertY(y:Float):Float {
-        return base * y;
-    }
-
-    public function invertX(view_x:Float):Float {
-        return base * view_x;
-    }
-
-    public function invertY(view_y:Float):Float {
-        return base * view_y;
-    }
-
-    public function getBase():Float{
-        return base;
-    }
-
-    public function setBase(base:Float):Void{
-        this.base = base;
+    public function get_transform():Transform {
+        return transform;
     }
 }

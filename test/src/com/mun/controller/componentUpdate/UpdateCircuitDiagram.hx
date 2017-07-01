@@ -11,7 +11,6 @@ import com.mun.controller.command.AddCommand;
 import com.mun.controller.command.CommandManager;
 import com.mun.model.gates.ComponentKind;
 import com.mun.model.enumeration.Orientation;
-import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.type.Type.Coordinate;
@@ -77,6 +76,20 @@ class UpdateCircuitDiagram {
         var componentkind_:ComponentKind = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
         component_.setNameOfTheComponentKind(name);
+
+        var inputCounter:Int = 0 ;
+        var outputCounter:Int = 0 ;
+        for(i in circuitDiagram.get_componentIterator()){
+            if(i.getNameOfTheComponentKind() == "Input"){
+                i.get_componentKind().set_sequence(inputCounter);
+                inputCounter++;
+            }else if(i.getNameOfTheComponentKind() == "Output"){
+                i.get_componentKind().set_sequence(outputCounter);
+                outputCounter++;
+            }else {
+                //other component doesn't need this parameter
+            }
+        }
         return component_;
     }
 

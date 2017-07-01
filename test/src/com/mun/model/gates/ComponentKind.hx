@@ -1,5 +1,10 @@
 package com.mun.model.gates;
 
+import com.mun.model.enumeration.POINT_MODE;
+import com.mun.model.enumeration.MODE;
+import com.mun.type.Type.Coordinate;
+import com.mun.type.Type.WorldPoint;
+import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Port;
@@ -70,5 +75,35 @@ interface ComponentKind {
      * @param component
      * @param drawingAdapter
     **/
-    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, hightLight:Bool):Void;
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool):Void;
+
+    /**
+    * get component sequence
+    **/
+    public function get_sequence():Int;
+
+    /**
+    * set component sequence
+    **/
+    public function set_sequence(value:Int):Int;
+
+    /**
+    * get the componentKind belongs to which component
+    **/
+    public function get_component():Component;
+
+    /**
+    * set the componentKind belongs to which component
+    **/
+    public function set_component(value:Component):Void;
+
+    /**
+    * find the hit list
+    **/
+    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray;
+
+    /**
+    * find world point
+    **/
+    public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 }

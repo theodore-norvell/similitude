@@ -18,7 +18,6 @@ import com.mun.model.enumeration.ValueLogic;
  *
  */
 class Input implements ComponentKind extends GateAbstract {
-    var sequence:Int;//the sequence of the input order in the diagram, the initial value is 1
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
@@ -98,14 +97,6 @@ class Input implements ComponentKind extends GateAbstract {
         super(1);
     }
 
-    function get_sequence():Int {
-        return sequence;
-    }
-
-    function set_sequence(value:Int) {
-        return this.sequence = value;
-    }
-
     override public function addInPort():Port {
         return null;//intput should only have one inport
     }
@@ -164,7 +155,7 @@ class Input implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawInput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

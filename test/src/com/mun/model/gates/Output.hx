@@ -147,7 +147,7 @@ class Output implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawOutput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

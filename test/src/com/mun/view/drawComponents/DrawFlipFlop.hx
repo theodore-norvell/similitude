@@ -4,16 +4,16 @@ import com.mun.model.component.Port;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
+import com.mun.global.Constant.*;
 /**
 * draw flip flop
 * @author wanhui
 **/
-class DrawFlipFlop implements DrawComponent extends Constant{
+class DrawFlipFlop implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
     public function new(component:Component, drawingAdapter:DrawingAdapterI) {
-        super();
         this.component = component;
         this.drawingAdapter = drawingAdapter;
     }

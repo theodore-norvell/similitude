@@ -1,5 +1,7 @@
 package com.mun.model.drawingInterface;
 
+import com.mun.view.drawingImpl.Transform;
+import js.html.CanvasRenderingContext2D;
 import com.mun.model.enumeration.Orientation;
 /**  A drawing adaptor represents a tool for outputting
  *   drawings to a part of a screen or page or similar
@@ -38,6 +40,21 @@ interface DrawingAdapterI {
 	 * @param width  -- Width is roughly in world units. I.e. width of 1 is roughly 1 in world units.
 	 */
     public function setLineWidth(width:Float):Void;
+
+    /**
+    * get the canvas context
+    **/
+    public function get_cxt():CanvasRenderingContext2D;
+
+    /**
+    * set the canvas context
+    **/
+    public function set_cxt(value:CanvasRenderingContext2D):Void;
+
+    /**
+    * make a new drawing Adapter
+    **/
+    public function transform(transform:Transform):DrawingAdapterI;
 
     /** reset all of those drawing parameter
 	 *  such as color, font, line width and so on

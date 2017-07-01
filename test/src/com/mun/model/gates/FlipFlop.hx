@@ -270,7 +270,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawFlipFlop(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

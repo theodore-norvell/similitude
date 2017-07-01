@@ -2,16 +2,16 @@ package com.mun.view.drawComponents;
 import com.mun.model.component.Component;
 import com.mun.model.component.Port;
 import com.mun.model.drawingInterface.DrawingAdapterI;
+import com.mun.global.Constant.*;
 /**
 * draw output gate
 * @author wanhui
 **/
-class DrawOutput implements DrawComponent extends Constant{
+class DrawOutput implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
     public function new(component:Component, drawingAdapter:DrawingAdapterI) {
-        super();
         this.component = component;
         this.drawingAdapter = drawingAdapter;
     }

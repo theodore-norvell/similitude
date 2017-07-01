@@ -1,7 +1,7 @@
 package com.mun.view.drawingImpl;
 import com.mun.type.Type.Coordinate;
-interface WorldToViewI {
-    /** Convert a world coordinate to a view x coordinate.
+interface ViewToWorldI {
+    /** Convert a view coordinate to a world coordinate.
 	 *
 	 * @param coordinate
 	 * @return

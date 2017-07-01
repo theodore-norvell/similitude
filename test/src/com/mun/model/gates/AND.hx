@@ -2,7 +2,6 @@ package com.mun.model.gates;
 
 import com.mun.view.drawComponents.DrawAND;
 import com.mun.view.drawComponents.DrawComponent;
-import com.mun.model.component.Component;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
@@ -59,7 +58,7 @@ class AND implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
-                    inport.set_sequence(counter);
+//                    inport.set_sequence(counter);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -74,7 +73,7 @@ class AND implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition + height / 2);
-                    inport.set_sequence(counter);
+//                    inport.set_sequence(counter);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -89,7 +88,7 @@ class AND implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition - height / 2);
-                    inport.set_sequence(counter);
+//                    inport.set_sequence(counter);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -104,7 +103,7 @@ class AND implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition + width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
-                    inport.set_sequence(counter);
+//                    inport.set_sequence(counter);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -121,7 +120,7 @@ class AND implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(component:Component, drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawAND(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

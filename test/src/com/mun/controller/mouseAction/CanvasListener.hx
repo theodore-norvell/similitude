@@ -58,7 +58,11 @@ class CanvasListener {
         var bbox = canvas.getBoundingClientRect();
         var coordinate:Coordinate = {"xPosition":0,"yPosition":0};
         coordinate.xPosition = (x - bbox.left) * (canvas.width  / bbox.width);
-        coordinate.yPosition = (y - bbox.top)  * (canvas.height / bbox.height);
+        coordinate.yPosition = (y - bbox.top)  * (canvas.height / bbox.height);//view coordinate
+
+        //TODO translate view coordinate to world coordinate
+        
+
         return coordinate;
     }
 
@@ -85,16 +89,19 @@ class CanvasListener {
                 for(i in endpointArray){
                     if(i == hightLightLink.get_leftEndpoint()){
                         endpoint = i;
+                        break;
                     }
 
                     if(i == hightLightLink.get_rightEndpoint()){
                         endpoint = i;
+                        break;
                     }
                 }
             }
             if(endpoint == null){
                 for(i in endpointArray){
                     endpoint = i;
+                    break;
                 }
             }
         }

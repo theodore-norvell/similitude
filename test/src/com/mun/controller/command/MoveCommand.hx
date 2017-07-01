@@ -11,6 +11,10 @@ import com.mun.type.Type.LinkAndComponentArray;
 import com.mun.type.Type.Coordinate;
 /**
 * move component
+*
+* Move action infulence the performance significantlly because every move will create a new move command which take lots of resources.
+* Moreover, continuously moving need to redraw the canvas very frequently
+*
 * @author wanhui
 **/
 class MoveCommand implements Command {
@@ -104,6 +108,7 @@ class MoveCommand implements Command {
 
                 linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(oldComponentXpositionArray[i], oldComponentYpositionArray[i]);
             }
+            componentMeetEndpoint();
             linkPositionUpdate();
         }
 
@@ -145,6 +150,7 @@ class MoveCommand implements Command {
                 linkAndComponentAndEndpointArray.componentArray[i].set_yPosition(recordComponentYpositionBeforeUndoArray[i]);
                 linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(recordComponentXpositionBeforeUndoArray[i], recordComponentYpositionBeforeUndoArray[i]);
             }
+            componentMeetEndpoint();
             linkPositionUpdate();
         }
 
@@ -177,6 +183,7 @@ class MoveCommand implements Command {
                 i.set_yPosition(i.get_yPosition() + yDisplacement);
                 i.updateMoveComponentPortPosition(i.get_xPosition(), i.get_yPosition());
             }
+            componentMeetEndpoint();
             linkPositionUpdate();
         }
 
@@ -198,6 +205,12 @@ class MoveCommand implements Command {
 
                 endpointMeetPort(i);
             }
+        }
+    }
+
+    function componentMeetEndpoint(){
+        for(i in circuitDiagram.get_linkIterator()){
+            linkMeetPortUpdate(i);
         }
     }
 

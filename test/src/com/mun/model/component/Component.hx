@@ -1,6 +1,10 @@
 package com.mun.model.component;
 
-import com.mun.view.drawingImpl.WorldToViewI;
+import com.mun.model.enumeration.POINT_MODE;
+import com.mun.model.enumeration.MODE;
+import com.mun.type.Type.Coordinate;
+import com.mun.type.Type.WorldPoint;
+import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
@@ -20,10 +24,10 @@ class Component {
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    var name:String = "component1";//the name of the component
+    var name:String = "";//the name of the component, unique
     var delay:Int;//delay of the component
     var inportsNum:Int;//init
-    var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"
+    var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     /**
     *   create component
      *   @param xPosition: x position
@@ -41,6 +45,7 @@ class Component {
         this.width = width;
         this.orientation = orientation;
         this.componentKind = componentKind;
+        this.componentKind.set_component(this);
         this.inportsNum = inportNum;
 
         this.delay = 0;//init is zero
@@ -167,9 +172,14 @@ class Component {
     }
 
     public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool){
-        componentKind.drawComponent(this, drawingAdpater, highLight);
+        componentKind.drawComponent(drawingAdpater, highLight);
     }
-    public function viewToWolrd(worldToView:WorldToViewI){
 
+    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
+        return componentKind.findHitList(coordinate, mode);
+    }
+
+    public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
+        return componentKind.findWorldPoint(coordinate, mode);
     }
 }

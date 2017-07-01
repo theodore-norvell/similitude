@@ -1,6 +1,6 @@
 package com.mun.view.drawComponents;
 
-import com.mun.view.drawComponents.Constant;
+import com.mun.global.Constant.*;
 import com.mun.model.component.Component;
 import com.mun.model.component.Port;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -8,12 +8,11 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 * draw and gate
 * @author wanhui
 **/
-class DrawAND implements DrawComponent extends Constant{
+class DrawAND implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
     public function new(component:Component, drawingAdapter:DrawingAdapterI) {
-        super();
         this.component = component;
         this.drawingAdapter = drawingAdapter;
     }

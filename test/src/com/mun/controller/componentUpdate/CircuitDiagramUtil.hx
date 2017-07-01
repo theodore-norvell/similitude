@@ -1,6 +1,6 @@
 package com.mun.controller.componentUpdate;
 
-import com.mun.view.drawComponents.Constant;
+import com.mun.global.Constant.*;
 import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
@@ -11,11 +11,10 @@ import com.mun.type.Type.Object;
 /**
 * utility for processing the update from canvas
 **/
-class CircuitDiagramUtil extends Constant{
+class CircuitDiagramUtil{
     var circuitDiagram:CircuitDiagramI;
 
     public function new(circuitDiagram:CircuitDiagramI) {
-        super();
         this.circuitDiagram = circuitDiagram;
     }
 
@@ -233,7 +232,7 @@ class CircuitDiagramUtil extends Constant{
     **/
     public function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
         //the radius is 3
-        if(Math.abs(coordinate.xPosition - orignalXPosition) <= 4 && Math.abs(coordinate.yPosition - orignalYPosition) <= portRadius){
+        if(Math.abs(coordinate.xPosition - orignalXPosition) <= portRadius && Math.abs(coordinate.yPosition - orignalYPosition) <= portRadius){
             return true;
         }else{
             return false;
