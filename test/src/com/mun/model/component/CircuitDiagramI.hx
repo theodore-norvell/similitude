@@ -56,16 +56,6 @@ interface CircuitDiagramI {
     public function set_name(value:String):Void;
 
     /**
-    * get the drawing adapter
-    **/
-    public function get_drawingAdapter():DrawingAdapterI;
-
-    /**
-    * set the drawing adapter
-    **/
-    public function set_drawingAdapter(drawingAdapter:DrawingAdapterI):Void;
-
-    /**
     * add one link
     **/
     public function addLink(link:Link):Void;
@@ -167,7 +157,7 @@ interface CircuitDiagramI {
     /**
     * draw the circuit diagram itself
     **/
-    public function draw(?linkAndComponentArray:LinkAndComponentArray):Void;
+    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentArray):Void;
 
     /**
     * find the hit list

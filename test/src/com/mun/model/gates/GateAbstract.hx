@@ -1,4 +1,5 @@
 package com.mun.model.gates;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.MODE;
@@ -53,36 +54,24 @@ class GateAbstract{
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition - width / 2);
                     portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-//                    if (portArray[i].get_sequence() == -1) {
-//                        portArray[i].set_sequence(i);
-//                    }
                 }
             };
             case Orientation.NORTH : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
                     portArray[i].set_yPosition(yPosition + height / 2);
-//                    if (portArray[i].get_sequence() == -1) {
-//                        portArray[i].set_sequence(i);
-//                    }
                 }
             };
             case Orientation.SOUTH : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
                     portArray[i].set_yPosition(yPosition - height / 2);
-//                    if (portArray[i].get_sequence() == -1) {
-//                        portArray[i].set_sequence(i);
-//                    }
                 }
             };
             case Orientation.WEST : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition + width / 2);
                     portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-//                    if (portArray[i].get_sequence() == -1) {
-//                        portArray[i].set_sequence(i);
-//                    }
                 }
             };
             default:{
@@ -170,4 +159,7 @@ class GateAbstract{
         return new Array<WorldPoint>();
     }
 
+    public function getInnerCircuitDiagram():CircuitDiagramI{
+        return null;//for most of the componentkind it has no circuit diagram inside, except compound component
+    }
 }

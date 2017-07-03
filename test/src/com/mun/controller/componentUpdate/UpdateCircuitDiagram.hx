@@ -77,17 +77,20 @@ class UpdateCircuitDiagram {
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
         component_.setNameOfTheComponentKind(name);
 
-        var inputCounter:Int = 0 ;
-        var outputCounter:Int = 0 ;
-        for(i in circuitDiagram.get_componentIterator()){
-            if(i.getNameOfTheComponentKind() == "Input"){
-                i.get_componentKind().set_sequence(inputCounter);
-                inputCounter++;
-            }else if(i.getNameOfTheComponentKind() == "Output"){
-                i.get_componentKind().set_sequence(outputCounter);
-                outputCounter++;
-            }else {
-                //other component doesn't need this parameter
+        if(component_.getNameOfTheComponentKind() == "Input" || component_.getNameOfTheComponentKind() == "Output"){
+            var inputCounter:Int = 0 ;
+            var outputCounter:Int = 0 ;
+
+            for(i in circuitDiagram.get_componentIterator()){
+                if(i.getNameOfTheComponentKind() == "Input"){
+                    i.get_componentKind().set_sequence(inputCounter);
+                    inputCounter++;
+                }else if(i.getNameOfTheComponentKind() == "Output"){
+                    i.get_componentKind().set_sequence(outputCounter);
+                    outputCounter++;
+                }else {
+                    //other component doesn't need this parameter
+                }
             }
         }
         return component_;

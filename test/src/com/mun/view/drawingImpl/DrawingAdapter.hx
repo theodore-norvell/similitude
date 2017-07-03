@@ -6,6 +6,7 @@ import com.mun.view.drawingImpl.WorldToView;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.Orientation;
 import js.html.CanvasRenderingContext2D;
+import com.mun.global.Constant.*;
 
 /** This class used for drawing the base components
 *
@@ -21,9 +22,10 @@ class DrawingAdapter implements DrawingAdapterI {
     var font:String = "8px serif";//initial is 8
     var worldToView:WorldToViewI;
 
-    public function new(cxt:CanvasRenderingContext2D, transform:Transform) {
-        this.cxt = cxt;
+    public function new(transform:Transform) {
         worldToView = new WorldToView(transform);
+
+        this.cxt = CONTEXT;
     }
 
     public function resetDrawingParam() {
@@ -63,7 +65,7 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function transform(transform:Transform):DrawingAdapterI{
-        return new DrawingAdapter(cxt,transform.compose(worldToView.get_transform()));
+        return new DrawingAdapter(transform.compose(worldToView.get_transform()));
     }
 
     public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {

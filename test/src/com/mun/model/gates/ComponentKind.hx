@@ -1,5 +1,6 @@
 package com.mun.model.gates;
 
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Type.Coordinate;
@@ -106,4 +107,9 @@ interface ComponentKind {
     * find world point
     **/
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
+
+    /**
+    * this function just use for compound component
+    **/
+    public function getInnerCircuitDiagram():CircuitDiagramI;
 }

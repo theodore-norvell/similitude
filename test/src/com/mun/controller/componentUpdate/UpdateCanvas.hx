@@ -1,5 +1,7 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.view.drawingImpl.Transform;
+import com.mun.view.drawingImpl.DrawingAdapter;
 import com.mun.type.Type.Object;
 import com.mun.type.Type.LinkAndComponentArray;
 import com.mun.model.component.CircuitDiagramI;
@@ -19,7 +21,7 @@ class UpdateCanvas {
         //clear the canvas
         canvas.width = canvas.width;
 
-        circuitDiagram.draw(linkAndComponentArray);
+        circuitDiagram.draw(new DrawingAdapter(Transform.identity()),linkAndComponentArray);
     }
 
 }

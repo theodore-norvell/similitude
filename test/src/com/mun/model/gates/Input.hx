@@ -3,7 +3,6 @@ package com.mun.model.gates;
 
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.component.Component;
 import com.mun.view.drawComponents.DrawInput;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
@@ -47,7 +46,6 @@ class Input implements ComponentKind extends GateAbstract {
             case Orientation.EAST : {
                 //inport
                 var inport:Port = new Inport(xPosition - width / 2, yPosition);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport
@@ -58,7 +56,6 @@ class Input implements ComponentKind extends GateAbstract {
             case Orientation.NORTH : {
                 //inport
                 var inport:Port = new Inport(xPosition, yPosition + height / 2);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport
@@ -68,7 +65,6 @@ class Input implements ComponentKind extends GateAbstract {
             };
             case Orientation.SOUTH : {
                 var inport:Port = new Inport(xPosition, yPosition - height / 2);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport
@@ -78,7 +74,6 @@ class Input implements ComponentKind extends GateAbstract {
             };
             case Orientation.WEST : {
                 var inport:Port = new Inport(xPosition + width / 2, yPosition);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport

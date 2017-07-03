@@ -1,4 +1,7 @@
 package com.mun.model.gates;
+import com.mun.view.drawComponents.DrawComponent;
+import com.mun.view.drawComponents.DrawCompoundComponent;
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.Box;
 import com.mun.model.enumeration.MODE;
@@ -13,6 +16,7 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.component.Port;
+import com.mun.global.Constant.*;
 /**
 * compound Component
 **/
@@ -36,34 +40,34 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         super(inputCounter);
     }
 
+    override public function getInnerCircuitDiagram():CircuitDiagramI{
+        return circuitDiagram;
+    }
+
     public function algorithm(portArray:Array<Port>):Array<Port> {
         return ; //TODO
     }
 
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
-        var inputCounter_:Int = 1;
-        var outputCounter_:Int = 1;
         //find how many inputs gate in the sub-circuit diagram
         switch(orientation){
             case Orientation.EAST : {
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2, height / (leastInportNum+1) * inputCounter_ + (yPosition - height / 2));
+                        var inport_1:Port = new Inport(xPosition - width / 2, height / (leastInportNum+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
                         inport_1.set_portDescription(IOTYPE.INPUT);
                         inport_1.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(inport_1);
 
-                        inputCounter_++;
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition + width / 2,  height / (outputCounter+1) * outputCounter_ + (yPosition - height / 2));
+                        var outport_:Port = new Outport(xPosition + width / 2,  height / (outputCounter+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
                         outport_.set_portDescription(IOTYPE.OUTPUT);
                         outport_.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(outport_);
 
-                        outputCounter_++;
                     }
                 }
             };
@@ -71,13 +75,13 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (leastInportNum+1) * inputCounter_, height + height/2);
+                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (leastInportNum+1) * (i.get_componentKind().get_sequence()+1), height + height/2);
                         inport_1.set_portDescription(IOTYPE.INPUT);
                         inport_1.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outputCounter+1) * outputCounter_, height - height/2);
+                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outputCounter+1) * (i.get_componentKind().get_sequence()+1), height - height/2);
                         outport_.set_portDescription(IOTYPE.OUTPUT);
                         outport_.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(outport_);
@@ -88,13 +92,13 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (leastInportNum+1) * inputCounter_, height - height/2);
+                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (leastInportNum+1) * (i.get_componentKind().get_sequence()+1), height - height/2);
                         inport_1.set_portDescription(IOTYPE.INPUT);
                         inport_1.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outputCounter+1) * outputCounter_, height + height/2);
+                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outputCounter+1) * (i.get_componentKind().get_sequence()+1), height + height/2);
                         outport_.set_portDescription(IOTYPE.OUTPUT);
                         outport_.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(outport_);
@@ -105,13 +109,13 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition + width / 2, height / (leastInportNum+1) * inputCounter_ + (yPosition - height / 2));
+                        var inport_1:Port = new Inport(xPosition + width / 2, height / (leastInportNum+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
                         inport_1.set_portDescription(IOTYPE.INPUT);
                         inport_1.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2,  height / (outputCounter+1) * outputCounter_ + (yPosition - height / 2));
+                        var outport_:Port = new Outport(xPosition - width / 2,  height / (outputCounter+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
                         outport_.set_portDescription(IOTYPE.OUTPUT);
                         outport_.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(outport_);
@@ -130,17 +134,26 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
     }
 
     public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool):Void {
-        //compound component need to draw all the components in ComponentArray, which should make a new transfrom
-        drawingAdapter = drawingAdapter.transform(makeTransform());
-        circuitDiagram.set_drawingAdapter(drawingAdapter);
-        circuitDiagram.draw();
+        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter);
+        if(hightLight){
+            drawComponent.drawCorrespondingComponent("red");
+        }else{
+            drawComponent.drawCorrespondingComponent("black");
+        }
+
+        if(BOX_TYPE == Box.WHITE_BOX){
+            //compound component need to draw all the components in ComponentArray, which should make a new transfrom
+            drawingAdapter = drawingAdapter.transform(makeTransform());
+            circuitDiagram.draw(drawingAdapter);
+        }
     }
 
     function makeTransform():Transform{
         var transform:Transform = Transform.identity();
-        return transform = transform.translate(component.get_xPosition(), component.get_yPosition()) *
-            transform.scale(component.get_width()/circuitDiagram.get_diagramWidth(), component.get_height()/circuitDiagram.get_diagramHeight()) *
-            transform.translate(-circuitDiagram.get_xMin(), -circuitDiagram.get_yMin());
+        transform = transform.translate(component.get_xPosition(), component.get_yPosition()) *
+                    transform.scale(component.get_width()/circuitDiagram.get_diagramWidth(), component.get_height()/circuitDiagram.get_diagramHeight()) *
+                    transform.translate(-circuitDiagram.get_xMin(), -circuitDiagram.get_yMin());
+        return transform;
     }
 
     override public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{

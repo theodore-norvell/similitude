@@ -1577,7 +1577,7 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	,circuitDiagram: null
 	,update: function(linkAndComponentArray) {
 		this.canvas.width = this.canvas.width;
-		this.circuitDiagram.draw(linkAndComponentArray);
+		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(com_mun_view_drawingImpl_Transform.identity()),linkAndComponentArray);
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
@@ -1616,17 +1616,19 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var componentkind_ = Type.createInstance(Type.resolveClass("com.mun.model.gates." + name),[]);
 		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
 		component_.setNameOfTheComponentKind(name);
-		var inputCounter = 0;
-		var outputCounter = 0;
-		var i = this.circuitDiagram.get_componentIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			if(i1.getNameOfTheComponentKind() == "Input") {
-				i1.get_componentKind().set_sequence(inputCounter);
-				++inputCounter;
-			} else if(i1.getNameOfTheComponentKind() == "Output") {
-				i1.get_componentKind().set_sequence(outputCounter);
-				++outputCounter;
+		if(component_.getNameOfTheComponentKind() == "Input" || component_.getNameOfTheComponentKind() == "Output") {
+			var inputCounter = 0;
+			var outputCounter = 0;
+			var i = this.circuitDiagram.get_componentIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				if(i1.getNameOfTheComponentKind() == "Input") {
+					i1.get_componentKind().set_sequence(inputCounter);
+					++inputCounter;
+				} else if(i1.getNameOfTheComponentKind() == "Output") {
+					i1.get_componentKind().set_sequence(outputCounter);
+					++outputCounter;
+				}
 			}
 		}
 		return component_;
@@ -2011,6 +2013,7 @@ var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircui
 	this.canvas = canvas;
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.updateToolBar = updateToolBar;
+	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(com_mun_view_drawingImpl_Transform.identity());
 	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
@@ -2038,11 +2041,13 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 	,linkAndComponentAndEndpointArray: null
 	,altKeyFlag: null
 	,buttonClickFlag: null
+	,viewToWorld: null
 	,getPointOnCanvas: function(canvas,x,y) {
 		var bbox = canvas.getBoundingClientRect();
 		var coordinate = { "xPosition" : 0, "yPosition" : 0};
 		coordinate.xPosition = (x - bbox.left) * (canvas.width / bbox.width);
 		coordinate.yPosition = (y - bbox.top) * (canvas.height / bbox.height);
+		coordinate = this.viewToWorld.convertCoordinate(coordinate);
 		return coordinate;
 	}
 	,doMouseDown: function(event) {
@@ -2219,8 +2224,6 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,get_linkIterator: null
 	,get_name: null
 	,set_name: null
-	,get_drawingAdapter: null
-	,set_drawingAdapter: null
 	,addLink: null
 	,addComponent: null
 	,removeLink: null
@@ -2265,7 +2268,6 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,commandManager: null
 	,componentArrayReverseFlag: null
 	,linkArrayReverseFlag: null
-	,drawingAdapter: null
 	,transform: null
 	,diagramWidth: null
 	,diagramHeight: null
@@ -2364,12 +2366,6 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	}
 	,get_yMax: function() {
 		return this.yMax;
-	}
-	,get_drawingAdapter: function() {
-		return this.drawingAdapter;
-	}
-	,set_drawingAdapter: function(drawingAdapter) {
-		this.drawingAdapter = drawingAdapter;
 	}
 	,get_commandManager: function() {
 		return this.commandManager;
@@ -2493,8 +2489,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,componentSetName: function(component,name) {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
-	,draw: function(linkAndComponentArray) {
-		this.drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(com_mun_global_Constant.CONTEXT,com_mun_view_drawingImpl_Transform.identity());
+	,draw: function(drawingAdapter,linkAndComponentArray) {
 		var drawFlag = false;
 		var _g = 0;
 		var _g1 = this.componentArray;
@@ -2508,13 +2503,13 @@ com_mun_model_component_CircuitDiagram.prototype = {
 					var j = _g3[_g2];
 					++_g2;
 					if(j == i) {
-						i.drawComponent(this.drawingAdapter,true);
+						i.drawComponent(drawingAdapter,true);
 						drawFlag = true;
 					}
 				}
 			}
 			if(!drawFlag) {
-				i.drawComponent(this.drawingAdapter,false);
+				i.drawComponent(drawingAdapter,false);
 			}
 			drawFlag = false;
 		}
@@ -2531,13 +2526,13 @@ com_mun_model_component_CircuitDiagram.prototype = {
 					var j1 = _g31[_g21];
 					++_g21;
 					if(j1 == i1) {
-						i1.drawLink(this.drawingAdapter,true);
+						i1.drawLink(drawingAdapter,true);
 						drawFlag = true;
 					}
 				}
 			}
 			if(!drawFlag) {
-				i1.drawLink(this.drawingAdapter,false);
+				i1.drawLink(drawingAdapter,false);
 			}
 			drawFlag = false;
 		}
@@ -3193,6 +3188,9 @@ com_mun_model_gates_GateAbstract.prototype = {
 	,findWorldPoint: function(coordinate,mode) {
 		return [];
 	}
+	,getInnerCircuitDiagram: function() {
+		return null;
+	}
 	,__class__: com_mun_model_gates_GateAbstract
 };
 var com_mun_model_gates_ComponentKind = function() { };
@@ -3212,6 +3210,7 @@ com_mun_model_gates_ComponentKind.prototype = {
 	,set_component: null
 	,findHitList: null
 	,findWorldPoint: null
+	,getInnerCircuitDiagram: null
 	,__class__: com_mun_model_gates_ComponentKind
 };
 var com_mun_model_gates_AND = function() {
@@ -3599,7 +3598,6 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 		switch(orientation[1]) {
 		case 0:
 			var inport = new com_mun_model_component_Inport(xPosition,yPosition + height / 2);
-			inport.set_sequence(1);
 			inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport);
 			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
@@ -3608,7 +3606,6 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 			break;
 		case 1:
 			var inport1 = new com_mun_model_component_Inport(xPosition,yPosition - height / 2);
-			inport1.set_sequence(1);
 			inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport1);
 			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
@@ -3617,7 +3614,6 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 			break;
 		case 2:
 			var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,yPosition);
-			inport2.set_sequence(1);
 			inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport2);
 			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
@@ -3626,7 +3622,6 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 			break;
 		case 3:
 			var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,yPosition);
-			inport3.set_sequence(1);
 			inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport3);
 			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
@@ -4312,7 +4307,6 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 		switch(orientation[1]) {
 		case 0:
 			var inport = new com_mun_model_component_Inport(xPosition,yPosition + height / 2);
-			inport.set_sequence(1);
 			inport.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport);
 			var outport_ = new com_mun_model_component_Outport(xPosition,yPosition - height / 2);
@@ -4321,7 +4315,6 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 			break;
 		case 1:
 			var inport1 = new com_mun_model_component_Inport(xPosition,yPosition - height / 2);
-			inport1.set_sequence(1);
 			inport1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport1);
 			var outport_1 = new com_mun_model_component_Outport(xPosition,yPosition + height / 2);
@@ -4330,7 +4323,6 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 			break;
 		case 2:
 			var inport2 = new com_mun_model_component_Inport(xPosition + width / 2,yPosition);
-			inport2.set_sequence(1);
 			inport2.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport2);
 			var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,yPosition);
@@ -4339,7 +4331,6 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 			break;
 		case 3:
 			var inport3 = new com_mun_model_component_Inport(xPosition - width / 2,yPosition);
-			inport3.set_sequence(1);
 			inport3.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 			portArray.push(inport3);
 			var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,yPosition);
@@ -5050,14 +5041,14 @@ com_mun_view_drawingImpl_Box.prototype = {
 	}
 	,__class__: com_mun_view_drawingImpl_Box
 };
-var com_mun_view_drawingImpl_DrawingAdapter = function(cxt,transform) {
+var com_mun_view_drawingImpl_DrawingAdapter = function(transform) {
 	this.font = "8px serif";
 	this.lineWidth = 1.0;
 	this.textColor = "black";
 	this.fillColor = "gray";
 	this.strokeColor = "black";
-	this.cxt = cxt;
 	this.worldToView = new com_mun_view_drawingImpl_WorldToView(transform);
+	this.cxt = com_mun_global_Constant.CONTEXT;
 };
 $hxClasses["com.mun.view.drawingImpl.DrawingAdapter"] = com_mun_view_drawingImpl_DrawingAdapter;
 com_mun_view_drawingImpl_DrawingAdapter.__name__ = ["com","mun","view","drawingImpl","DrawingAdapter"];
@@ -5099,7 +5090,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt = value;
 	}
 	,transform: function(transform) {
-		return new com_mun_view_drawingImpl_DrawingAdapter(this.cxt,transform.compose(this.worldToView.get_transform()));
+		return new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.worldToView.get_transform()));
 	}
 	,drawAndShape: function(x,y,width,height,orientation) {
 		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
@@ -5459,6 +5450,30 @@ com_mun_view_drawingImpl_Transform.prototype = {
 		return tempArray;
 	}
 	,__class__: com_mun_view_drawingImpl_Transform
+};
+var com_mun_view_drawingImpl_ViewToWorldI = function() { };
+$hxClasses["com.mun.view.drawingImpl.ViewToWorldI"] = com_mun_view_drawingImpl_ViewToWorldI;
+com_mun_view_drawingImpl_ViewToWorldI.__name__ = ["com","mun","view","drawingImpl","ViewToWorldI"];
+com_mun_view_drawingImpl_ViewToWorldI.prototype = {
+	convertCoordinate: null
+	,get_transform: null
+	,__class__: com_mun_view_drawingImpl_ViewToWorldI
+};
+var com_mun_view_drawingImpl_ViewToWorld = function(transform) {
+	this.transform = transform;
+};
+$hxClasses["com.mun.view.drawingImpl.ViewToWorld"] = com_mun_view_drawingImpl_ViewToWorld;
+com_mun_view_drawingImpl_ViewToWorld.__name__ = ["com","mun","view","drawingImpl","ViewToWorld"];
+com_mun_view_drawingImpl_ViewToWorld.__interfaces__ = [com_mun_view_drawingImpl_ViewToWorldI];
+com_mun_view_drawingImpl_ViewToWorld.prototype = {
+	transform: null
+	,convertCoordinate: function(coordinate) {
+		return this.transform.pointConvert(coordinate);
+	}
+	,get_transform: function() {
+		return this.transform;
+	}
+	,__class__: com_mun_view_drawingImpl_ViewToWorld
 };
 var com_mun_view_drawingImpl_WorldToViewI = function() { };
 $hxClasses["com.mun.view.drawingImpl.WorldToViewI"] = com_mun_view_drawingImpl_WorldToViewI;

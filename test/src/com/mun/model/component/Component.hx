@@ -56,7 +56,7 @@ class Component {
         for (o in 0...portArray.length) {
             var port:Port = portArray[o];
             if (port.get_portDescription() == IOTYPE.INPUT || port.get_portDescription() == IOTYPE.CLK || port.get_portDescription() == IOTYPE.D ||
-            port.get_portDescription() == IOTYPE.S) {
+                port.get_portDescription() == IOTYPE.S) {
                 inportArray.push(port);
             } else {
                 outportArray.push(port);

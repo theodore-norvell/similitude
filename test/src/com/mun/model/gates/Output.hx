@@ -46,7 +46,6 @@ class Output implements ComponentKind extends GateAbstract {
             case Orientation.EAST : {
                 //inport
                 var inport:Port = new Inport(xPosition - width / 2, yPosition);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport
@@ -57,7 +56,6 @@ class Output implements ComponentKind extends GateAbstract {
             case Orientation.NORTH : {
                 //inport
                 var inport:Port = new Inport(xPosition, yPosition + height / 2);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport
@@ -67,7 +65,6 @@ class Output implements ComponentKind extends GateAbstract {
             };
             case Orientation.SOUTH : {
                 var inport:Port = new Inport(xPosition, yPosition - height / 2);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport
@@ -77,7 +74,6 @@ class Output implements ComponentKind extends GateAbstract {
             };
             case Orientation.WEST : {
                 var inport:Port = new Inport(xPosition + width / 2, yPosition);
-                inport.set_sequence(1);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
                 //outport

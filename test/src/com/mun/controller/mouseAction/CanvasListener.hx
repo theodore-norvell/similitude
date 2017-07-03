@@ -1,5 +1,8 @@
 package com.mun.controller.mouseAction;
 
+import com.mun.view.drawingImpl.Transform;
+import com.mun.view.drawingImpl.ViewToWorld;
+import com.mun.view.drawingImpl.ViewToWorldI;
 import js.Browser;
 import js.html.KeyboardEvent;
 import com.mun.model.component.Port;
@@ -39,10 +42,14 @@ class CanvasListener {
     //button click flag
     var buttonClickFlag:Bool = false;
 
+    var viewToWorld:ViewToWorldI;
+
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram, updateToolBar:UpdateToolBar) {
         this.canvas = canvas;
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.updateToolBar = updateToolBar;
+
+        viewToWorld = new ViewToWorld(Transform.identity());
         //add mouse down listener
         canvas.addEventListener("mousedown", doMouseDown,false);
         canvas.addEventListener("mousemove", doMouseMove,false);
@@ -61,7 +68,7 @@ class CanvasListener {
         coordinate.yPosition = (y - bbox.top)  * (canvas.height / bbox.height);//view coordinate
 
         //TODO translate view coordinate to world coordinate
-        
+        coordinate = viewToWorld.convertCoordinate(coordinate);
 
         return coordinate;
     }

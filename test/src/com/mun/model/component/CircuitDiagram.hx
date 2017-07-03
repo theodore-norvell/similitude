@@ -24,7 +24,6 @@ class CircuitDiagram implements CircuitDiagramI{
     var componentArrayReverseFlag:Bool = false;
     var linkArrayReverseFlag:Bool = false;
 
-    var drawingAdapter:DrawingAdapterI;
     var transform:Transform;
 
     //circuit diagram has its width height
@@ -155,14 +154,6 @@ class CircuitDiagram implements CircuitDiagramI{
 
     public function get_yMax():Float {
         return yMax;
-    }
-
-    public function get_drawingAdapter():DrawingAdapterI {
-        return drawingAdapter;
-    }
-
-    public function set_drawingAdapter(drawingAdapter:DrawingAdapterI):Void {
-        this.drawingAdapter = drawingAdapter;
     }
 
     public function get_commandManager():CommandManager {
@@ -306,9 +297,7 @@ class CircuitDiagram implements CircuitDiagramI{
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
     **/
-    public function draw(?linkAndComponentArray:LinkAndComponentArray):Void{
-        drawingAdapter = new DrawingAdapter(CONTEXT, Transform.identity());
-
+    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentArray):Void{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
