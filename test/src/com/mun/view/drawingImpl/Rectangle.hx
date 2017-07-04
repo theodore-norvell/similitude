@@ -2,15 +2,27 @@ package com.mun.view.drawingImpl;
 import com.mun.type.Type.Coordinate;
 
 class Rectangle implements RectangleI{
+    // Inv minCoordinate.xPosition < maxCoordinate.xPosition
+    // Inv minCoordinate.yPosition < maxCoordinate.yPosition
     var minCoordinate:Coordinate;
     var maxCoordinate:Coordinate;
+    // Inv: width_ = maxCoordinate.xPosition - minCoordinate.xPosition
     var width_:Float;
     var height_:Float;
 
+    /**
+    * Precondition: corner0.xPosition != corner1.xPosition
+    * Precondition: corner0.yPosition != corner1.yPosition
+    **/
+    public function new(corner0:Coordinate, corner1:Coordinate) {
+        Assert.check( corner0.xPosition != corner1.xPosition ) ;
+        Assert.check( corner0.yPosition != corner1.yPosition ) ;
+        this.minCoordinate = { "xPosition" : Math.min( corner0.xPosition, corner1.xPosition ),
+                               "yPosition" : Math.min( corner0.yPosition, corner1.yPosition )};
 
-    public function new(minCoordinate:Coordinate, maxCoordinate:Coordinate) {
-        this.minCoordinate = minCoordinate;
-        this.maxCoordinate = maxCoordinate;
+        this.maxCoordinate = { "xPosition" : Math.max( corner0.xPosition, corner1.xPosition ),
+                               "yPosition" : Math.max( corner0.yPosition, corner1.yPosition )};
+        updateWidthAndHeight() ;
     }
 
     public function min():Coordinate {

@@ -156,38 +156,36 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return transform;
     }
 
-    override public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
+    override public function findHitList(outerWorldCoordinates:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
+        var linkAndComponentAndEndpointAndPortArray : LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
 
-        var hitComponent:Component = isInComponent(coordinate);
+        var hitComponent:Component = isInComponent(outerWorldCoordinates);
         if(hitComponent == null){
             return linkAndComponentAndEndpointAndPortArray;
         }else if(BOX_TYPE == Box.WHITE_BOX){
             var transform:Transform = makeTransform();
-            var worldCoordinate:Coordinate = transform.pointInvert(coordinate);
-            var result:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(coordinate, mode);
+            var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
+            var result:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(innerWorldCoordinates, mode);
 
-            if((result.endpointArray == null && result.portArray == null && result.componentArray == null && result.linkArray) || mode == MODE.INCLUDE_PARENTS){
-                return linkAndComponentAndEndpointAndPortArray.componentArray.push(component);
-            }else{
-                return result;
-            }
+            if(result.isEmpty() || mode == MODE.INCLUDE_PARENTS){
+                result.componentArray.push(component); }
+            return result;
         }else{
             return linkAndComponentAndEndpointAndPortArray.componentArray.push(component);
         }
     }
 
     override public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
-        var worldPointAray:Array<WorldPoint> = new Array<WorldPoint>();
+        var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
 
         if(isInComponent(coordinate) == null){
-            return worldPointAray;
+            return worldPointArray.push( coordinate );
         }else if(BOX_TYPE == Box.WHITE_BOX){
             var transform:Transform = makeTransform();
             var wForDiagram:Coordinate = transform.pointInvert(coordinate);
-            return circuitDiagram.findWorldPoint(coordinate, mode);
+            return circuitDiagram.findWorldPoint(wForDiagram, mode);
         }else{
-            return worldPointAray;
+            return worldPointArray.push( coordinate );
         }
 
     }

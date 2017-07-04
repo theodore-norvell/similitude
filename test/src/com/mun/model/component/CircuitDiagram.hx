@@ -24,8 +24,6 @@ class CircuitDiagram implements CircuitDiagramI{
     var componentArrayReverseFlag:Bool = false;
     var linkArrayReverseFlag:Bool = false;
 
-    var transform:Transform;
-
     //circuit diagram has its width height
     @:isVar var diagramWidth(get, null):Float;
     @:isVar var diagramHeight(get, null):Float;
@@ -172,7 +170,9 @@ class CircuitDiagram implements CircuitDiagramI{
     }
 
     public function get_componentReverseIterator():Iterator<Component>{
-        componentArrayReverse();
+        if( ! componentArrayReverseFlag){
+            componentArrayReverse();
+        }
         return componentArray.iterator();
     }
 
@@ -189,7 +189,9 @@ class CircuitDiagram implements CircuitDiagramI{
     }
 
     public function get_linkReverseIterator():Iterator<Link>{
-        linkArrayReverse();
+        if( ! linkArrayReverseFlag ){
+            linkArrayReverse();
+        }
         return linkArray.iterator();
     }
 
@@ -340,13 +342,17 @@ class CircuitDiagram implements CircuitDiagramI{
     public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
         var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
         for(i in linkArray){
-            linkAndComponentAndEndpointAndPortArray.linkArray.concat(i.findHitList(coordinate, mode).linkArray);
-            linkAndComponentAndEndpointAndPortArray.endpointArray.concat(i.findHitList(coordinate, mode).endpointArray);
+            var result = i.findHitList(coordinate, mode) ;
+            linkAndComponentAndEndpointAndPortArray.linkArray.concat(result.linkArray);
+            linkAndComponentAndEndpointAndPortArray.endpointArray.concat(result.endpointArray);
         }
 
         for(i in componentArray){
-            linkAndComponentAndEndpointAndPortArray.componentArray.concat(i.findHitList(coordinate, mode).componentArray);
-            linkAndComponentAndEndpointAndPortArray.portArray.concat(i.findHitList(coordinate, mode).portArray);
+            var result = i.findHitList(coordinate, mode) ;
+            linkAndComponentAndEndpointAndPortArray.componentArray.concat(result.componentArray);
+            linkAndComponentAndEndpointAndPortArray.linkArray.concat(result.linkArray);
+            linkAndComponentAndEndpointAndPortArray.endpointArray.concat(result.endpointArray);
+            linkAndComponentAndEndpointAndPortArray.portArray.concat( result.portArray);
         }
         return linkAndComponentAndEndpointAndPortArray;
     }
