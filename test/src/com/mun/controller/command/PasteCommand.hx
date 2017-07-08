@@ -1,5 +1,7 @@
 package com.mun.controller.command;
-import com.mun.type.Type.LinkAndComponentArray;
+
+import com.mun.type.LinkAndComponentArray;
+import com.mun.type.Object;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;
@@ -14,9 +16,11 @@ class PasteCommand implements Command {
     var yPosition:Int;
     var pasteStack:Stack;
     var circuitDiagram:CircuitDiagramI;
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
+    var linkAndComponentArray:LinkAndComponentArray;
 
     public function new(copyStack:Stack, xPosition:Float, yPosition:Float, circuitDiagram:CircuitDiagramI) {
+        linkAndComponentArray = new LinkAndComponentArray();
+
         this.copyStack = copyStack;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -35,8 +39,7 @@ class PasteCommand implements Command {
         }
         //clear paste stack
         pasteStack.clearStack();
-        linkAndComponentArray.componentArray = null;
-        linkAndComponentArray.linkArray = null;
+        linkAndComponentArray.clean();
         return linkAndComponentArray;
     }
 
@@ -47,24 +50,24 @@ class PasteCommand implements Command {
 
     public function execute():Void {
         var linkArray = copyStack.getLinkArray();
-        linkAndComponentArray.linkArray = linkArray;
+        linkAndComponentArray.set_linkArray(linkArray);
         if (linkArray != null) {
             for (i in 0...linkArray.length) {
-                var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
-                object.link = calculateNewLinkCoordinate(linkArray[i], xPosition, yPosition);
+                var object:Object = new Object();
+                object.set_link(calculateNewLinkCoordinate(linkArray[i], xPosition, yPosition));
                 var command:Command = new AddCommand(object,circuitDiagram);
                 circuitDiagram.get_commandManager().execute(command);
             }
         }
 
         var componentArray = copyStack.getComponentArray();
-        linkAndComponentArray.componentArray = componentArray;
+        linkAndComponentArray.set_componentArray(componentArray);
         if (componentArray != null) {
             for (i in 0...componentArray.length) {
-                var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+                var object:Object = new Object();
                 var component:Component = componentArray[i];
                 var newComponent:Component = new Component(xPosition, yPosition, component.get_height(), component.get_width(), component.get_orientation(), component.get_componentKind(), component.get_inportsNum());
-                object.component = component;
+                object.set_component(component);
                 var command:Command = new AddCommand(object,circuitDiagram);
                 circuitDiagram.get_commandManager().execute(command);
                 pasteStack.pushComponent(newComponent);

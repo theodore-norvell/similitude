@@ -5,9 +5,9 @@ import com.mun.model.component.Component;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.Endpoint;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 import com.mun.model.component.CircuitDiagramI;
-import com.mun.type.Type.Object;
+import com.mun.type.Object;
 /**
 * utility for processing the update from canvas
 **/
@@ -29,7 +29,7 @@ class CircuitDiagramUtil{
         for(i in circuitDiagram.get_componentIterator()){
             if(isInScope(i.get_xPosition(),
                             i.get_yPosition(),
-                            coordinate.xPosition, coordinate.yPosition,
+                            coordinate.get_xPosition(), coordinate.get_yPosition(),
                             i.get_height(),
                             i.get_width()) == true){
                 return i;
@@ -50,20 +50,20 @@ class CircuitDiagramUtil{
             var rightEndpoint:Endpoint = i.get_rightEndpoint();
             if(pointToLine(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
                             rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
-                            coordinate.xPosition, coordinate.yPosition) <= pointToLineDistance){
+                            coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToLineDistance){
                 //if the distance between the point to line less equal to 3, that means the line should be selected
                 //only process the first link met
 
                 //the mouse location should be a little away from the endpoint
                 //because in case of it confuse about select endpoint or link
                 var theDistanaceToLeftEndpoint = Math.sqrt(
-                    Math.pow(Math.abs(coordinate.xPosition - i.get_leftEndpoint().get_xPosition()), 2) +
-                    Math.pow(Math.abs(coordinate.yPosition - i.get_leftEndpoint().get_yPosition()), 2)
+                    Math.pow(Math.abs(coordinate.get_xPosition() - i.get_leftEndpoint().get_xPosition()), 2) +
+                    Math.pow(Math.abs(coordinate.get_yPosition() - i.get_leftEndpoint().get_yPosition()), 2)
                 );
 
                 var theDistanceToRightEndpoint = Math.sqrt(
-                    Math.pow(Math.abs(coordinate.xPosition - i.get_rightEndpoint().get_xPosition()), 2) +
-                    Math.pow(Math.abs(coordinate.yPosition - i.get_rightEndpoint().get_yPosition()), 2)
+                    Math.pow(Math.abs(coordinate.get_xPosition() - i.get_rightEndpoint().get_xPosition()), 2) +
+                    Math.pow(Math.abs(coordinate.get_yPosition() - i.get_rightEndpoint().get_yPosition()), 2)
                 );
                 if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
                     if(theDistanceToRightEndpoint >= pointToEndpointDistance){
@@ -141,13 +141,13 @@ class CircuitDiagramUtil{
         for(i in circuitDiagram.get_linkIterator()){
             if(pointsDistance(i.get_leftEndpoint().get_xPosition(),
                             i.get_leftEndpoint().get_yPosition(),
-                            coordinate.xPosition, coordinate.yPosition) <= pointToEndpointDistance){
+                            coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
                 endpointArray.push(i.get_leftEndpoint());
             }
 
             if(pointsDistance(i.get_rightEndpoint().get_xPosition(),
                                 i.get_rightEndpoint().get_yPosition(),
-                                coordinate.xPosition, coordinate.yPosition) <= pointToEndpointDistance){
+                                coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
                 endpointArray.push(i.get_rightEndpoint());
             }
         }
@@ -161,15 +161,15 @@ class CircuitDiagramUtil{
     *           or  return null;
     **/
     public function isOnPort(cooridnate:Coordinate):Object{
-        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+        var object:Object = new Object();
         for(i in circuitDiagram.get_componentIterator()){
             for(j in i.get_inportIterator()){
                 if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
-                    object.port = j;
+                    object.set_port(j);
                     for(k in circuitDiagram.get_linkIterator()){
-                        object.endPoint = isLinkOnPort(k,j);
+                        object.set_endPoint(isLinkOnPort(k,j));
                         return object;
                     }
                 }
@@ -178,9 +178,9 @@ class CircuitDiagramUtil{
                 if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
-                    object.port = j;
+                    object.set_port(j);
                     for(k in circuitDiagram.get_linkIterator()){
-                        object.endPoint = isLinkOnPort(k,j);
+                        object.set_endPoint(isLinkOnPort(k,j));
                         return object;
                     }
                 }
@@ -232,7 +232,7 @@ class CircuitDiagramUtil{
     **/
     public function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
         //the radius is 3
-        if(Math.abs(coordinate.xPosition - orignalXPosition) <= portRadius && Math.abs(coordinate.yPosition - orignalYPosition) <= portRadius){
+        if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius){
             return true;
         }else{
             return false;

@@ -2,17 +2,14 @@ package com.mun.model.component;
 
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
-import com.mun.view.drawingImpl.Transform;
-import com.mun.view.drawingImpl.DrawingAdapter;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.type.Type.LinkAndComponentArray;
-import com.mun.type.Type.LinkAndComponentAndEndpointArray;
-import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.controller.command.CommandManager;
 import com.mun.controller.command.Stack;
 import com.mun.model.enumeration.Orientation;
-import com.mun.type.Type.Coordinate;
-import com.mun.type.Type.WorldPoint;
+import com.mun.type.Coordinate;
+import com.mun.type.WorldPoint;
 import com.mun.global.Constant.*;
 
 class CircuitDiagram implements CircuitDiagramI{
@@ -303,8 +300,8 @@ class CircuitDiagram implements CircuitDiagramI{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
-            if(linkAndComponentArray.componentArray != null){
-                for(j in linkAndComponentArray.componentArray){
+            if(linkAndComponentArray.get_componentArray() != null){
+                for(j in linkAndComponentArray.get_componentArray()){
                     if(j == i){
                         i.drawComponent(drawingAdapter, true);
                         drawFlag = true;
@@ -322,8 +319,8 @@ class CircuitDiagram implements CircuitDiagramI{
         drawFlag = false;
         //update link array
         for(i in linkArray){
-            if(linkAndComponentArray.linkArray != null){
-                for(j in linkAndComponentArray.linkArray){
+            if(linkAndComponentArray.get_linkArray() != null){
+                for(j in linkAndComponentArray.get_linkArray()){
                     if(j == i){
                         i.drawLink(drawingAdapter, true);
                         drawFlag = true;
@@ -340,19 +337,19 @@ class CircuitDiagram implements CircuitDiagramI{
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
+        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         for(i in linkArray){
-            var result = i.findHitList(coordinate, mode) ;
-            linkAndComponentAndEndpointAndPortArray.linkArray.concat(result.linkArray);
-            linkAndComponentAndEndpointAndPortArray.endpointArray.concat(result.endpointArray);
+            var result:LinkAndComponentAndEndpointAndPortArray = i.findHitList(coordinate, mode) ;
+            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
+            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
         }
 
         for(i in componentArray){
-            var result = i.findHitList(coordinate, mode) ;
-            linkAndComponentAndEndpointAndPortArray.componentArray.concat(result.componentArray);
-            linkAndComponentAndEndpointAndPortArray.linkArray.concat(result.linkArray);
-            linkAndComponentAndEndpointAndPortArray.endpointArray.concat(result.endpointArray);
-            linkAndComponentAndEndpointAndPortArray.portArray.concat( result.portArray);
+            var result:LinkAndComponentAndEndpointAndPortArray = i.findHitList(coordinate, mode) ;
+            linkAndComponentAndEndpointAndPortArray.get_componentArray().concat(result.get_componentArray());
+            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
+            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
+            linkAndComponentAndEndpointAndPortArray.get_portArray().concat( result.get_portArray());
         }
         return linkAndComponentAndEndpointAndPortArray;
     }
@@ -368,7 +365,7 @@ class CircuitDiagram implements CircuitDiagramI{
         }
 
         if(worldPointArray.length == 0 || mode == POINT_MODE.PATH){
-            worldPointArray.push({"circuitDiagram":this, "coordinate":worldCoordinate});
+            worldPointArray.push(new WorldPoint(this, worldCoordinate));
         }
         return worldPointArray;
     }

@@ -1,6 +1,6 @@
 package com.mun.view.drawingImpl;
 
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 import com.mun.model.enumeration.Orientation;
 class Box {
     var xa:Float;
@@ -14,12 +14,12 @@ class Box {
 
     public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:Orientation, worldToView:WorldToViewI) {
 
-        var coordinate:Coordinate = worldToView.convertCoordinate({"xPosition":x_position, "yPosition":y_position});
+        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x_position, y_position));
 
-        var x0:Float = coordinate.xPosition - width / 2;
-        var y0:Float = coordinate.yPosition - height / 2;
-        var x1:Float = coordinate.xPosition + width / 2;
-        var y1:Float = coordinate.yPosition + height / 2;
+        var x0:Float = coordinate.get_xPosition() - width / 2;
+        var y0:Float = coordinate.get_yPosition() - height / 2;
+        var x1:Float = coordinate.get_xPosition() + width / 2;
+        var y1:Float = coordinate.get_yPosition() + height / 2;
         switch (orientation){
             case Orientation.EAST : {
                 xa = x0; ya = y0;

@@ -5,7 +5,7 @@ import com.mun.controller.command.OrientationCommand;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
 import com.mun.controller.command.MoveCommand;
-import com.mun.type.Type.Object;
+import com.mun.type.Object;
 import com.mun.controller.command.Command;
 import com.mun.controller.command.AddCommand;
 import com.mun.controller.command.CommandManager;
@@ -13,9 +13,9 @@ import com.mun.model.gates.ComponentKind;
 import com.mun.model.enumeration.Orientation;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
-import com.mun.type.Type.Coordinate;
-import com.mun.type.Type.LinkAndComponentArray;
-import com.mun.type.Type.LinkAndComponentAndEndpointArray;
+import com.mun.type.Coordinate;
+import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointArray;
 
 //all of those imports below can not be deleted, because of using Type.resolveClass
 //include all of the class under com.mun.model.gates
@@ -41,9 +41,11 @@ class UpdateCircuitDiagram {
     var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
 
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":null};
+    var linkAndComponentArray:LinkAndComponentArray;
 
     public function new(circuitDiagram:CircuitDiagramI) {
+        linkAndComponentArray = new LinkAndComponentArray();
+
         this.circuitDiagram = circuitDiagram;
 
         commandManager = new CommandManager();
@@ -63,7 +65,9 @@ class UpdateCircuitDiagram {
     }
 
     public function createComponentByCommand(component:Component){
-        var object:Object = {"link":null,"component":component,"endPoint":null, "port":null};
+        var object:Object = new Object();
+        object.set_component(component);
+
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
         linkAndComponentArrayReset();
@@ -97,58 +101,58 @@ class UpdateCircuitDiagram {
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
-        var object:Object = {"link":null,"component":null,"endPoint":null, "port":null};
+        var object:Object = new Object();
         object = isOnPort(coordinateFrom);
-        if(object.port != null){
-            var leftEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
-            var rightEndpoint:Endpoint = new Endpoint(object.port.get_xPosition(), object.port.get_yPosition());
+        if(object.get_port() != null){
+            var leftEndpoint:Endpoint = new Endpoint(object.get_port().get_xPosition(), object.get_port().get_yPosition());
+            var rightEndpoint:Endpoint = new Endpoint(object.get_port().get_xPosition(), object.get_port().get_yPosition());
             var link:Link = new Link(leftEndpoint,rightEndpoint);
-            link.get_leftEndpoint().set_port(object.port);
+            link.get_leftEndpoint().set_port(object.get_port());
             link.get_rightEndpoint().set_port(null);
-            object.link = link;
-            object.endPoint = null;
+            object.set_link(link);
+            object.set_endPoint(null);
         }else{
-            var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.xPosition, coordinateFrom.yPosition);
-            var rightEndpoint:Endpoint = new Endpoint(coordinateTo.xPosition+100, coordinateTo.yPosition+100);
+            var leftEndpoint:Endpoint = new Endpoint(coordinateFrom.get_xPosition(), coordinateFrom.get_yPosition());
+            var rightEndpoint:Endpoint = new Endpoint(coordinateTo.get_xPosition()+100, coordinateTo.get_yPosition()+100);
             var link:Link = new Link(leftEndpoint,rightEndpoint);
-            object.link = link;
+            object.set_link(link);
         }
         var command:Command = new AddCommand(object,circuitDiagram);
         commandManager.execute(command);
 
         linkAndComponentArrayReset();
-        linkAndComponentArray.linkArray.push(object.link);
+        linkAndComponentArray.get_linkArray().push(object.get_link());
 
         updateToolBar.update(linkAndComponentArray);
         hightLightObject(linkAndComponentArray);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        return object.link;
+        return object.get_link();
     }
 
     public function moveSelectedObjects(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray, currentMouseLocation:Coordinate, mouseDownLocation:Coordinate, mouseLocationFlag:Bool){
 
-        var xMoveDistance:Float = currentMouseLocation.xPosition - mouseDownLocation.xPosition;
-        var yMoveDistance:Float = currentMouseLocation.yPosition - mouseDownLocation.yPosition;
+        var xMoveDistance:Float = currentMouseLocation.get_xPosition() - mouseDownLocation.get_xPosition();
+        var yMoveDistance:Float = currentMouseLocation.get_yPosition() - mouseDownLocation.get_yPosition();
 
         if(mouseLocationFlag){
-            linkAndComponentAndEndpointArray.componentArray[0].set_xPosition(currentMouseLocation.xPosition);
-            linkAndComponentAndEndpointArray.componentArray[0].set_yPosition(currentMouseLocation.yPosition);
+            linkAndComponentAndEndpointArray.get_componentArray()[0].set_xPosition(currentMouseLocation.get_xPosition());
+            linkAndComponentAndEndpointArray.get_componentArray()[0].set_yPosition(currentMouseLocation.get_yPosition());
         }
 
         var command:Command = new MoveCommand(linkAndComponentAndEndpointArray, xMoveDistance, yMoveDistance, circuitDiagram);
         commandManager.execute(command);
         //those wires which link to this component should move either, which automactilly completed while move endpoint
-        linkAndComponentArray.linkArray = linkAndComponentAndEndpointArray.linkArray;
-        linkAndComponentArray.componentArray = linkAndComponentAndEndpointArray.componentArray;
+        linkAndComponentArray.set_linkArray(linkAndComponentAndEndpointArray.get_linkArray());
+        linkAndComponentArray.set_componentArray(linkAndComponentAndEndpointArray.get_componentArray());
 
-        if(linkAndComponentAndEndpointArray.endpointArray.length != 0){
+        if(linkAndComponentAndEndpointArray.get_endponentArray().length != 0){
             //find the corresponding link
             for(i in circuitDiagram.get_linkIterator()){
                 //every time only one endpoint can be move, so the array only have one element
-                if(i.get_leftEndpoint() == linkAndComponentAndEndpointArray.endpointArray[0]
-                    || i.get_rightEndpoint() == linkAndComponentAndEndpointArray.endpointArray[0]){
-                    linkAndComponentArray.linkArray.push(i);
+                if(i.get_leftEndpoint() == linkAndComponentAndEndpointArray.get_endponentArray()[0]
+                    || i.get_rightEndpoint() == linkAndComponentAndEndpointArray.get_endponentArray()[0]){
+                    linkAndComponentArray.addLink(i);
                     break;//one endpoint only belongs to 1 link
                 }
             }
@@ -162,7 +166,8 @@ class UpdateCircuitDiagram {
     public function changeOrientation(componentArray:Array<Component>, orientation:Orientation){
         var orientationCommand:Command = new OrientationCommand(componentArray, orientation);
         commandManager.execute(orientationCommand);
-        var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":componentArray};
+        var linkAndComponentArray:LinkAndComponentArray = new LinkAndComponentArray();
+        linkAndComponentArray.set_componentArray(componentArray);
         updateToolBar.update(linkAndComponentArray);
         circuitDiagram.linkArraySelfUpdate();
         hightLightObject(linkAndComponentArray);
@@ -214,7 +219,7 @@ class UpdateCircuitDiagram {
     public function undo(){
         var linkAndComponentArray:LinkAndComponentArray = commandManager.undo();
         redrawCanvas(linkAndComponentArray);
-        if(linkAndComponentArray.componentArray == null && linkAndComponentArray.linkArray == null){
+        if(linkAndComponentArray.get_componentArray().length == 0 && linkAndComponentArray.get_linkArray().length == 0){
             updateToolBar.hidden();
         }else{
             updateToolBar.visible();
@@ -227,7 +232,7 @@ class UpdateCircuitDiagram {
     public function redo(){
         var linkAndComponentArray:LinkAndComponentArray = commandManager.redo();
         redrawCanvas(linkAndComponentArray);
-        if(linkAndComponentArray.componentArray == null && linkAndComponentArray.linkArray == null){
+        if(linkAndComponentArray.get_componentArray().length == 0 && linkAndComponentArray.get_linkArray().length == 0){
             updateToolBar.hidden();
         }else{
             updateToolBar.visible();
@@ -260,8 +265,7 @@ class UpdateCircuitDiagram {
     }
 
     public function linkAndComponentArrayReset(){
-        linkAndComponentArray.linkArray = new Array<Link>();
-        linkAndComponentArray.componentArray = new Array<Component>();
+        linkAndComponentArray.clean();
     }
 
     public function update(){

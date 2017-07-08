@@ -12,11 +12,11 @@ import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Link;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import js.html.MouseEvent;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 import js.html.CanvasElement;
-import com.mun.type.Type.Object;
-import com.mun.type.Type.LinkAndComponentAndEndpointArray;
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.Object;
+import com.mun.type.LinkAndComponentAndEndpointArray;
+import com.mun.type.LinkAndComponentArray;
 
 class CanvasListener {
     var canvas:CanvasElement;
@@ -34,8 +34,8 @@ class CanvasListener {
     var endpointSelected:Bool = false;
     var port:Port;
     //for move multipile objects
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":null};
-    var  linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray = {"linkArray":null, "componentArray":null, "endpointArray":null};
+    var linkAndComponentArray:LinkAndComponentArray = new LinkAndComponentArray();
+    var  linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray = new LinkAndComponentAndEndpointArray();
     //key
     var altKeyFlag:Bool = false;
 
@@ -63,12 +63,12 @@ class CanvasListener {
 
     public function getPointOnCanvas(canvas:CanvasElement, x:Float, y:Float):Coordinate {
         var bbox = canvas.getBoundingClientRect();
-        var coordinate:Coordinate = {"xPosition":0,"yPosition":0};
-        coordinate.xPosition = (x - bbox.left) * (canvas.width  / bbox.width);
-        coordinate.yPosition = (y - bbox.top)  * (canvas.height / bbox.height);//view coordinate
+        var coordinate:Coordinate = new Coordinate(0, 0);
+        coordinate.set_xPosition((x - bbox.left) * (canvas.width  / bbox.width));
+        coordinate.set_yPosition((y - bbox.top)  * (canvas.height / bbox.height));//view coordinate
 
         //TODO translate view coordinate to world coordinate
-        coordinate = viewToWorld.convertCoordinate(coordinate);
+        //coordinate = viewToWorld.convertCoordinate(coordinate);
 
         return coordinate;
     }
@@ -124,28 +124,28 @@ class CanvasListener {
             if(link == null){//if this mouse location on the link, should be select link first
                 component = updateCircuitDiagram.getComponent(mouseDownLocation);
                 if(component != null && altKeyFlag){
-                    if(linkAndComponentArray.componentArray.indexOf(component) == -1){
-                        linkAndComponentArray.componentArray.push(component);
+                    if(linkAndComponentArray.get_componentArray().indexOf(component) == -1){
+                        linkAndComponentArray.addComponent(component);
                     }
                 }else if(component != null){
-                    linkAndComponentArray.componentArray.push(component);
+                    linkAndComponentArray.addComponent(component);
                 }
             }else{
                 linkHighLight = true;
                 hightLightLink = link;
                 if(altKeyFlag){
-                    if(linkAndComponentArray.componentArray.indexOf(component) == -1){
-                        linkAndComponentArray.linkArray.push(link);
+                    if(linkAndComponentArray.get_componentArray().indexOf(component) == -1){
+                        linkAndComponentArray.addLink(link);
                     }
                 }else{
-                    linkAndComponentArray.linkArray.push(link);
+                    linkAndComponentArray.addLink(link);
                 }
             }
         }
 
         updateCircuitDiagram.hightLightObject(linkAndComponentArray);
-        if((linkAndComponentArray.componentArray != null && linkAndComponentArray.componentArray.length != 0)
-        || (linkAndComponentArray.linkArray != null && linkAndComponentArray.linkArray.length != 0)){
+        if((linkAndComponentArray.get_componentArray() != null && linkAndComponentArray.get_componentArray().length != 0)
+        || (linkAndComponentArray.get_linkArray() != null && linkAndComponentArray.get_linkArray().length != 0)){
             updateToolBar.update(linkAndComponentArray);
         }else{
             updateToolBar.hidden();
@@ -159,7 +159,7 @@ class CanvasListener {
         if(link == null){
             linkHighLight = false;
         }
-        if(link == null && updateCircuitDiagram.isOnPort(mouseDownLocation).port != null){
+        if(link == null && updateCircuitDiagram.isOnPort(mouseDownLocation).get_port() != null){
             link = updateCircuitDiagram.addLink(mouseDownLocation,mouseDownLocation);
             hightLightLink = link;
             linkHighLight = true;
@@ -178,16 +178,16 @@ class CanvasListener {
             linkAndComponentAndEndpointArrayReset();
             if(createLinkFlag){//link has been created, so move this endpoint
                 //if the mouse position have a endpoint
-                linkAndComponentAndEndpointArray.endpointArray.push(link.get_rightEndpoint());
+                linkAndComponentAndEndpointArray.addEndpoint(link.get_rightEndpoint());
                 updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation, false);
             }else{
                 if(endpoint != null){
-                    linkAndComponentAndEndpointArray.endpointArray.push(endpoint);
+                    linkAndComponentAndEndpointArray.addEndpoint(endpoint);
                     updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation, false);
-                }else if((linkAndComponentArray.linkArray != null && linkAndComponentArray.linkArray.length != 0) ||
-                (linkAndComponentArray.componentArray != null && linkAndComponentArray.componentArray.length != 0)){
-                    linkAndComponentAndEndpointArray.componentArray = linkAndComponentArray.componentArray;
-                    linkAndComponentAndEndpointArray.linkArray = linkAndComponentArray.linkArray;
+                }else if((linkAndComponentArray.get_linkArray() != null && linkAndComponentArray.get_linkArray().length != 0) ||
+                (linkAndComponentArray.get_componentArray() != null && linkAndComponentArray.get_componentArray().length != 0)){
+                    linkAndComponentAndEndpointArray.set_componentArray(linkAndComponentArray.get_componentArray());
+                    linkAndComponentAndEndpointArray.set_linkArray(linkAndComponentArray.get_linkArray());
                     updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointArray,loc, mouseDownLocation, false);
                 }
             }
@@ -218,21 +218,18 @@ class CanvasListener {
     }
 
     public function linkAndComponentArrayReset(){
-        linkAndComponentArray.linkArray = new Array<Link>();
-        linkAndComponentArray.componentArray = new Array<Component>();
+        linkAndComponentArray.clean();
     }
 
     public function linkAndComponentAndEndpointArrayReset(){
-        linkAndComponentAndEndpointArray.componentArray = new Array<Component>();
-        linkAndComponentAndEndpointArray.linkArray = new Array<Link>();
-        linkAndComponentAndEndpointArray.endpointArray = new Array<Endpoint>();
+        linkAndComponentAndEndpointArray.clean();
     }
 
     public function setButtonClick(component:Component){
         linkAndComponentAndEndpointArrayReset();
         buttonClickFlag = true;
-        linkAndComponentAndEndpointArray.componentArray.push(component);
-        updateCircuitDiagram.createComponentByCommand(linkAndComponentAndEndpointArray.componentArray[0]);
+        linkAndComponentAndEndpointArray.addComponent(component);
+        updateCircuitDiagram.createComponentByCommand(linkAndComponentAndEndpointArray.get_componentArray()[0]);
     }
 
     public function setButtonClickFlagFlase(){

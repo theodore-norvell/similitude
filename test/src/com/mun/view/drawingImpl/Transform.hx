@@ -1,5 +1,5 @@
 package com.mun.view.drawingImpl;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 /**
 * this is a abstract class
 * because haxe doesn't has the abstract class
@@ -29,16 +29,16 @@ class Transform {
     **/
     public function pointConvert ( c : Coordinate ) : Coordinate {
 
-        return {"xPosition":convertMatrix[0]*c.xPosition + convertMatrix[1]*c.yPosition + convertMatrix[2],
-                "yPosition":convertMatrix[3]*c.xPosition + convertMatrix[4]*c.yPosition + convertMatrix[5]};
+        return new Coordinate(convertMatrix[0]*c.get_xPosition() + convertMatrix[1]*c.get_yPosition() + convertMatrix[2],
+                                convertMatrix[3]*c.get_xPosition() + convertMatrix[4]*c.get_yPosition() + convertMatrix[5]);
     }
 
     /** Convert a point to another point using the inverse of this transform.
       If c' = this.convert( c ), then this.invert( c' ) = c .
      */
     public function pointInvert ( c : Coordinate ) : Coordinate {
-        return {"xPosition":invertMatrix[0]*c.xPosition + invertMatrix[1]*c.yPosition + invertMatrix[2],
-            "yPosition":invertMatrix[3]*c.xPosition + invertMatrix[4]*c.yPosition + invertMatrix[5]};
+        return new Coordinate(invertMatrix[0]*c.get_xPosition() + invertMatrix[1]*c.get_yPosition() + invertMatrix[2],
+                                invertMatrix[3]*c.get_xPosition() + invertMatrix[4]*c.get_yPosition() + invertMatrix[5]);
     }
 
     /** Convert a Rectangle to another Rectangle using this transform */

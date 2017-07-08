@@ -1,8 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.model.component.Link;
-import com.mun.type.Type.Object;
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentArray;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.Orientation;
 /**
@@ -13,16 +11,18 @@ class OrientationCommand implements Command {
     var componentArray:Array<Component> = new Array<Component>();
     var newOrientation:Orientation;
     var oldOrientationArray:Array<Orientation> = new Array<Orientation>();
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
+    var linkAndComponentArray:LinkAndComponentArray;
 
     public function new(componentArray:Array<Component>, newOrientation:Orientation) {
+        linkAndComponentArray = new LinkAndComponentArray();
+
         for(i in componentArray){
             this.componentArray.push(i);
         }
 
         this.newOrientation = newOrientation;
 
-        linkAndComponentArray.componentArray = this.componentArray;
+        linkAndComponentArray.set_componentArray(this.componentArray);
 
         for(i in 0...componentArray.length){
             oldOrientationArray[i] = componentArray[i].get_orientation();

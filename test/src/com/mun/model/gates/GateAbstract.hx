@@ -3,9 +3,9 @@ import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.MODE;
-import com.mun.type.Type.Coordinate;
-import com.mun.type.Type.WorldPoint;
-import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.type.Coordinate;
+import com.mun.type.WorldPoint;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.Orientation;
@@ -115,9 +115,9 @@ class GateAbstract{
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
+        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
-        linkAndComponentAndEndpointAndPortArray.componentArray.push(isInComponent(coordinate));
+        linkAndComponentAndEndpointAndPortArray.get_componentArray().push(isInComponent(coordinate));
 
         return linkAndComponentAndEndpointAndPortArray;
     }
@@ -129,7 +129,7 @@ class GateAbstract{
     *           or  return null;
     **/
     function isInComponent(coordinate:Coordinate):Component{
-        if(isInScope(component.get_xPosition(), component.get_yPosition(), coordinate.xPosition, coordinate.yPosition, component.get_height(), component.get_width()) == true){
+        if(isInScope(component.get_xPosition(), component.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition(), component.get_height(), component.get_width()) == true){
             return component;
         }
         return null;

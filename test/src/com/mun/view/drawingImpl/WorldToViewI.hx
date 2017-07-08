@@ -1,5 +1,5 @@
 package com.mun.view.drawingImpl;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 interface WorldToViewI {
     /** Convert a world coordinate to a view x coordinate.
 	 *

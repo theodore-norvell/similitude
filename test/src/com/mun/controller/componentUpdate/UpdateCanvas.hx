@@ -2,8 +2,7 @@ package com.mun.controller.componentUpdate;
 
 import com.mun.view.drawingImpl.Transform;
 import com.mun.view.drawingImpl.DrawingAdapter;
-import com.mun.type.Type.Object;
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentArray;
 import com.mun.model.component.CircuitDiagramI;
 import js.html.CanvasElement;
 /**

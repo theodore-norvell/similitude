@@ -1,30 +1,31 @@
 package com.mun.controller.command;
-import com.mun.model.component.Component;
-import com.mun.model.component.Link;
+
 import com.mun.model.component.CircuitDiagramI;
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentArray;
 /**
 * delete command
 * @author wanhui
 **/
 class DeleteCommand implements Command {
     var circuitDiagram:CircuitDiagramI;
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
+    var linkAndComponentArray:LinkAndComponentArray;
 
     public function new(linkAndComponentArray:LinkAndComponentArray, circuitDiagram:CircuitDiagramI) {
+        linkAndComponentArray = new LinkAndComponentArray();
+
         this.linkAndComponentArray = linkAndComponentArray;
         this.circuitDiagram = circuitDiagram;
     }
 
     public function undo():LinkAndComponentArray {
-        if (linkAndComponentArray.linkArray != null) {
-            for(i in linkAndComponentArray.linkArray){
+        if (linkAndComponentArray.get_linkArray() != null) {
+            for (i in linkAndComponentArray.get_linkArray()) {
                 circuitDiagram.addLink(i);
             }
         }
 
-        if (linkAndComponentArray.componentArray != null) {
-            for(i in linkAndComponentArray.componentArray){
+        if (linkAndComponentArray.get_componentArray() != null) {
+            for (i in linkAndComponentArray.get_componentArray()) {
                 circuitDiagram.addComponent(i);
             }
         }
@@ -38,16 +39,13 @@ class DeleteCommand implements Command {
     }
 
     public function execute():Void {
-        if (linkAndComponentArray.linkArray != null) {
-            for(i in linkAndComponentArray.linkArray){
-                circuitDiagram.deleteLink(i);
-            }
+        for (i in linkAndComponentArray.get_linkArray()) {
+            circuitDiagram.deleteLink(i);
         }
 
-        if (linkAndComponentArray.componentArray != null) {
-            for(i in linkAndComponentArray.componentArray){
-                circuitDiagram.deleteComponent(i);
-            }
+        for (i in linkAndComponentArray.get_componentArray()) {
+            circuitDiagram.deleteComponent(i);
         }
+
     }
 }

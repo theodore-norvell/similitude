@@ -1,5 +1,5 @@
 package com.mun.view.drawingImpl;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 class ViewToWorld implements ViewToWorldI{
     var transform:Transform;
 

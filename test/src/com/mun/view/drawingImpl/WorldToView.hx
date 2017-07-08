@@ -1,7 +1,7 @@
 package com.mun.view.drawingImpl;
 
 
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 class WorldToView implements WorldToViewI {
     @:isVar var transform(get, null):Transform;
 

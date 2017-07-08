@@ -1,8 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.model.component.Component;
-import com.mun.model.component.Link;
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentArray;
 /**
 * command manager used to manage those command
 * @author wanhui
@@ -10,12 +8,13 @@ import com.mun.type.Type.LinkAndComponentArray;
 class CommandManager {
     var undoStack:Array<Command> = new Array<Command>();
     var redoStack:Array<Command> = new Array<Command>();
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
+    var linkAndComponentArray:LinkAndComponentArray;
     //most of actions will result add lots of commands into stack. such as
     //moveing component, link. therefore, need a flag to record the first step of moving
     var recordFlag:Bool = false;
 
     public function new() {
+        linkAndComponentArray = new LinkAndComponentArray();
     }
 
     public function execute(command:Command):Void {

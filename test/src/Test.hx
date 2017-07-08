@@ -64,8 +64,6 @@ class Test {
         var canvasListener:CanvasListener = new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
         //add button click listener
         new ButtonClick(updateCircuitDiagram,pixelRatio, canvasListener);
-
-
     }
 
 

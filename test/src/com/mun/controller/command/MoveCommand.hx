@@ -1,14 +1,17 @@
 package com.mun.controller.command;
 
+import com.mun.type.Coordinate;
+import com.mun.type.Coordinate;
+import com.mun.type.Coordinate;
 import com.mun.model.component.Component;
 import com.mun.model.component.Endpoint;
 import com.mun.controller.componentUpdate.CircuitDiagramUtil;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.CircuitDiagramI;
-import com.mun.type.Type.LinkAndComponentAndEndpointArray;
-import com.mun.type.Type.LinkAndComponentArray;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.LinkAndComponentAndEndpointArray;
+import com.mun.type.LinkAndComponentArray;
+import com.mun.type.Coordinate;
 /**
 * move component
 *
@@ -45,49 +48,49 @@ class MoveCommand implements Command {
     var oldEndpointXPositionArray:Array<Float> = new Array<Float>();
     var oldEndpointYPositionArray:Array<Float> = new Array<Float>();
 
-    var linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>(), "endpointArray":new Array<Endpoint>()};
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":null, "componentArray":null};
+    var linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray = new LinkAndComponentAndEndpointArray();
+    var linkAndComponentArray:LinkAndComponentArray = new LinkAndComponentArray();
 
     //the displacement use new mouse location position minus mouse down location
     public function new(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray, xDisplacement:Float, yDisplacement:Float, circuitDiagram:CircuitDiagramI) {
 
-        for(i in linkAndComponentAndEndpointArray.componentArray){
-            this.linkAndComponentAndEndpointArray.componentArray.push(i);
+        for(i in linkAndComponentAndEndpointArray.get_componentArray()){
+            this.linkAndComponentAndEndpointArray.addComponent(i);
         }
 
-        for(i in linkAndComponentAndEndpointArray.linkArray){
-            this.linkAndComponentAndEndpointArray.linkArray.push(i);
+        for(i in linkAndComponentAndEndpointArray.get_linkArray()){
+            this.linkAndComponentAndEndpointArray.addLink(i);
         }
 
-        for(i in linkAndComponentAndEndpointArray.endpointArray){
-            this.linkAndComponentAndEndpointArray.endpointArray.push(i);
+        for(i in linkAndComponentAndEndpointArray.get_endponentArray()){
+            this.linkAndComponentAndEndpointArray.addEndpoint(i);
         }
 
-        linkAndComponentArray.componentArray = this.linkAndComponentAndEndpointArray.componentArray;
-        linkAndComponentArray.linkArray = this.linkAndComponentAndEndpointArray.linkArray;
+        linkAndComponentArray.set_componentArray(this.linkAndComponentAndEndpointArray.get_componentArray());
+        linkAndComponentArray.set_linkArray(this.linkAndComponentAndEndpointArray.get_linkArray());
 
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
 
-        if(linkAndComponentAndEndpointArray.componentArray.length != 0){
-            for(i in 0...linkAndComponentAndEndpointArray.componentArray.length){
-                oldComponentXpositionArray[i] = linkAndComponentAndEndpointArray.componentArray[i].get_xPosition();
-                oldComponentYpositionArray[i] = linkAndComponentAndEndpointArray.componentArray[i].get_yPosition();
+        if(linkAndComponentAndEndpointArray.get_componentArray().length != 0){
+            for(i in 0...linkAndComponentAndEndpointArray.get_componentArray().length){
+                oldComponentXpositionArray[i] = linkAndComponentAndEndpointArray.get_componentArray()[i].get_xPosition();
+                oldComponentYpositionArray[i] = linkAndComponentAndEndpointArray.get_componentArray()[i].get_yPosition();
             }
         }
 
-        if(linkAndComponentAndEndpointArray.linkArray.length != 0){
-            for(i in 0...linkAndComponentAndEndpointArray.linkArray.length){
-                oldLinkLeftXpositionArray[i] =  linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().get_xPosition();
-                oldLinkLeftYpositionArray[i] =  linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().get_yPosition();
-                oldLinkRightXpositionArray[i] = linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().get_xPosition();
-                oldLinkRightYpositionArray[i] = linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().get_yPosition();
+        if(linkAndComponentAndEndpointArray.get_linkArray().length != 0){
+            for(i in 0...linkAndComponentAndEndpointArray.get_linkArray().length){
+                oldLinkLeftXpositionArray[i] =  linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().get_xPosition();
+                oldLinkLeftYpositionArray[i] =  linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().get_yPosition();
+                oldLinkRightXpositionArray[i] = linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().get_xPosition();
+                oldLinkRightYpositionArray[i] = linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().get_yPosition();
             }
         }
 
-        if(linkAndComponentAndEndpointArray.endpointArray.length != 0){
-            for(i in 0...linkAndComponentAndEndpointArray.endpointArray.length){
-                oldEndpointXPositionArray[i] =  linkAndComponentAndEndpointArray.endpointArray[i].get_xPosition();
-                oldEndpointYPositionArray[i] =  linkAndComponentAndEndpointArray.endpointArray[i].get_yPosition();
+        if(linkAndComponentAndEndpointArray.get_endponentArray().length != 0){
+            for(i in 0...linkAndComponentAndEndpointArray.get_endponentArray().length){
+                oldEndpointXPositionArray[i] =  linkAndComponentAndEndpointArray.get_endponentArray()[i].get_xPosition();
+                oldEndpointYPositionArray[i] =  linkAndComponentAndEndpointArray.get_endponentArray()[i].get_yPosition();
             }
         }
 
@@ -97,88 +100,88 @@ class MoveCommand implements Command {
     }
 
     public function undo():LinkAndComponentArray {
-        if (linkAndComponentAndEndpointArray.componentArray.length != 0) {
-            for(i in 0...linkAndComponentAndEndpointArray.componentArray.length){
+        if (linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
+            for(i in 0...linkAndComponentAndEndpointArray.get_componentArray().length){
 
-                recordComponentXpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.componentArray[i].get_xPosition();
-                recordComponentYpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.componentArray[i].get_yPosition();
+                recordComponentXpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.get_componentArray()[i].get_xPosition();
+                recordComponentYpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.get_componentArray()[i].get_yPosition();
 
-                linkAndComponentAndEndpointArray.componentArray[i].set_xPosition(oldComponentXpositionArray[i]);
-                linkAndComponentAndEndpointArray.componentArray[i].set_yPosition(oldComponentYpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_componentArray()[i].set_xPosition(oldComponentXpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_componentArray()[i].set_yPosition(oldComponentYpositionArray[i]);
 
-                linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(oldComponentXpositionArray[i], oldComponentYpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_componentArray()[i].updateMoveComponentPortPosition(oldComponentXpositionArray[i], oldComponentYpositionArray[i]);
             }
             componentMeetEndpoint();
             linkPositionUpdate();
         }
 
-        if (linkAndComponentAndEndpointArray.linkArray.length != 0) {
-            for(i in 0...linkAndComponentAndEndpointArray.linkArray.length){
+        if (linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
+            for(i in 0...linkAndComponentAndEndpointArray.get_linkArray().length){
 
-                recordLeftEndpointXpositionBeforeUndoArray[i] =  linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().get_xPosition();
-                recordLeftEndpointYpositionBeforeUndoArray[i] =  linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().get_yPosition();
-                recordRightEndpointXpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().get_xPosition();
-                recordRightEndpointYpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().get_yPosition();
+                recordLeftEndpointXpositionBeforeUndoArray[i] =  linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().get_xPosition();
+                recordLeftEndpointYpositionBeforeUndoArray[i] =  linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().get_yPosition();
+                recordRightEndpointXpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().get_xPosition();
+                recordRightEndpointYpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().get_yPosition();
 
-                linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().set_xPosition(oldLinkLeftXpositionArray[i]);
-                linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().set_yPosition(oldLinkLeftYpositionArray[i]);
-                linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().set_xPosition(oldLinkRightXpositionArray[i]);
-                linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().set_yPosition(oldLinkRightYpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().set_xPosition(oldLinkLeftXpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().set_yPosition(oldLinkLeftYpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().set_xPosition(oldLinkRightXpositionArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().set_yPosition(oldLinkRightYpositionArray[i]);
 
-                linkMeetPortUpdate(linkAndComponentAndEndpointArray.linkArray[i]);
+                linkMeetPortUpdate(linkAndComponentAndEndpointArray.get_linkArray()[i]);
             }
         }
 
-        if (linkAndComponentAndEndpointArray.endpointArray.length != 0) {
-            for(i in 0...linkAndComponentAndEndpointArray.endpointArray.length){
-                recordEndpointXpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.endpointArray[i].get_xPosition();
-                recordEndpointYpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.endpointArray[i].get_yPosition();
+        if (linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
+            for(i in 0...linkAndComponentAndEndpointArray.get_endponentArray().length){
+                recordEndpointXpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.get_endponentArray()[i].get_xPosition();
+                recordEndpointYpositionBeforeUndoArray[i] = linkAndComponentAndEndpointArray.get_endponentArray()[i].get_yPosition();
 
-                linkAndComponentAndEndpointArray.endpointArray[i].set_xPosition(oldEndpointXPositionArray[i]);
-                linkAndComponentAndEndpointArray.endpointArray[i].set_yPosition(oldEndpointYPositionArray[i]);
+                linkAndComponentAndEndpointArray.get_endponentArray()[i].set_xPosition(oldEndpointXPositionArray[i]);
+                linkAndComponentAndEndpointArray.get_endponentArray()[i].set_yPosition(oldEndpointYPositionArray[i]);
 
-                endpointMeetPort(linkAndComponentAndEndpointArray.endpointArray[i]);
+                endpointMeetPort(linkAndComponentAndEndpointArray.get_endponentArray()[i]);
             }
         }
         return linkAndComponentArray;
     }
 
     public function redo():LinkAndComponentArray {
-        if (linkAndComponentAndEndpointArray.componentArray.length != 0) {
-            for(i in 0...linkAndComponentAndEndpointArray.componentArray.length){
-                linkAndComponentAndEndpointArray.componentArray[i].set_xPosition(recordComponentXpositionBeforeUndoArray[i]);
-                linkAndComponentAndEndpointArray.componentArray[i].set_yPosition(recordComponentYpositionBeforeUndoArray[i]);
-                linkAndComponentAndEndpointArray.componentArray[i].updateMoveComponentPortPosition(recordComponentXpositionBeforeUndoArray[i], recordComponentYpositionBeforeUndoArray[i]);
+        if (linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
+            for(i in 0...linkAndComponentAndEndpointArray.get_componentArray().length){
+                linkAndComponentAndEndpointArray.get_componentArray()[i].set_xPosition(recordComponentXpositionBeforeUndoArray[i]);
+                linkAndComponentAndEndpointArray.get_componentArray()[i].set_yPosition(recordComponentYpositionBeforeUndoArray[i]);
+                linkAndComponentAndEndpointArray.get_componentArray()[i].updateMoveComponentPortPosition(recordComponentXpositionBeforeUndoArray[i], recordComponentYpositionBeforeUndoArray[i]);
             }
             componentMeetEndpoint();
             linkPositionUpdate();
         }
 
-        if (linkAndComponentAndEndpointArray.linkArray.length != 0) {
-            for(i in 0...linkAndComponentAndEndpointArray.linkArray.length){
-                linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().set_xPosition(recordLeftEndpointXpositionBeforeUndoArray[i]);
-                linkAndComponentAndEndpointArray.linkArray[i].get_leftEndpoint().set_yPosition(recordLeftEndpointYpositionBeforeUndoArray[i]);
-                linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().set_xPosition(recordRightEndpointXpositionBeforeUndoArray[i]);
-                linkAndComponentAndEndpointArray.linkArray[i].get_rightEndpoint().set_yPosition(recordRightEndpointYpositionBeforeUndoArray[i]);
+        if (linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
+            for(i in 0...linkAndComponentAndEndpointArray.get_linkArray().length){
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().set_xPosition(recordLeftEndpointXpositionBeforeUndoArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_leftEndpoint().set_yPosition(recordLeftEndpointYpositionBeforeUndoArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().set_xPosition(recordRightEndpointXpositionBeforeUndoArray[i]);
+                linkAndComponentAndEndpointArray.get_linkArray()[i].get_rightEndpoint().set_yPosition(recordRightEndpointYpositionBeforeUndoArray[i]);
 
-                linkMeetPortUpdate(linkAndComponentAndEndpointArray.linkArray[i]);
+                linkMeetPortUpdate(linkAndComponentAndEndpointArray.get_linkArray()[i]);
             }
         }
 
-        if (linkAndComponentAndEndpointArray.endpointArray.length != 0) {
-            for(i in 0...linkAndComponentAndEndpointArray.endpointArray.length){
-                linkAndComponentAndEndpointArray.endpointArray[i].set_xPosition(recordEndpointXpositionBeforeUndoArray[i]);
-                linkAndComponentAndEndpointArray.endpointArray[i].set_yPosition(recordEndpointYpositionBeforeUndoArray[i]);
+        if (linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
+            for(i in 0...linkAndComponentAndEndpointArray.get_endponentArray().length){
+                linkAndComponentAndEndpointArray.get_endponentArray()[i].set_xPosition(recordEndpointXpositionBeforeUndoArray[i]);
+                linkAndComponentAndEndpointArray.get_endponentArray()[i].set_yPosition(recordEndpointYpositionBeforeUndoArray[i]);
 
-                endpointMeetPort(linkAndComponentAndEndpointArray.endpointArray[i]);
+                endpointMeetPort(linkAndComponentAndEndpointArray.get_endponentArray()[i]);
             }
         }
         return linkAndComponentArray;
     }
 
     public function execute():Void {
-        if (linkAndComponentAndEndpointArray.componentArray.length != 0) {
-            for(i in linkAndComponentAndEndpointArray.componentArray){
+        if (linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
+            for(i in linkAndComponentAndEndpointArray.get_componentArray()){
                 i.set_xPosition(i.get_xPosition() + xDisplacement);
                 i.set_yPosition(i.get_yPosition() + yDisplacement);
                 i.updateMoveComponentPortPosition(i.get_xPosition(), i.get_yPosition());
@@ -187,8 +190,8 @@ class MoveCommand implements Command {
             linkPositionUpdate();
         }
 
-        if (linkAndComponentAndEndpointArray.linkArray.length != 0) {
-            for(i in linkAndComponentAndEndpointArray.linkArray){
+        if (linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
+            for(i in linkAndComponentAndEndpointArray.get_linkArray()){
                 i.get_leftEndpoint().set_xPosition(i.get_leftEndpoint().get_xPosition() + xDisplacement);
                 i.get_leftEndpoint().set_yPosition(i.get_leftEndpoint().get_yPosition() + yDisplacement);
                 i.get_rightEndpoint().set_xPosition(i.get_rightEndpoint().get_xPosition() + xDisplacement);
@@ -198,8 +201,8 @@ class MoveCommand implements Command {
             }
         }
 
-        if (linkAndComponentAndEndpointArray.endpointArray.length != 0) {
-            for(i in linkAndComponentAndEndpointArray.endpointArray){
+        if (linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
+            for(i in linkAndComponentAndEndpointArray.get_endponentArray()){
                 i.set_xPosition(i.get_xPosition() + xDisplacement);
                 i.set_yPosition(i.get_yPosition() + yDisplacement);
 
@@ -217,8 +220,8 @@ class MoveCommand implements Command {
     function linkMeetPortUpdate(link:Link){
         //verfy the endpoint of this link connect to a port or not while moving
         //left endpoint
-        var leftEndpointCoordinate:Coordinate = {"xPosition":link.get_leftEndpoint().get_xPosition(), "yPosition":link.get_leftEndpoint().get_yPosition()};
-        var port_temp:Port = circuitDiagramUtil.isOnPort(leftEndpointCoordinate).port;
+        var leftEndpointCoordinate:Coordinate = new Coordinate(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition());
+        var port_temp:Port = circuitDiagramUtil.isOnPort(leftEndpointCoordinate).get_port();
         var leftEndpointPort:Port = link.get_leftEndpoint().get_port();
         if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
             link.get_leftEndpoint().set_port(port_temp);
@@ -226,8 +229,8 @@ class MoveCommand implements Command {
             link.get_leftEndpoint().set_port(null);
         }
 
-        var rightEndpointCoordinate:Coordinate = {"xPosition":link.get_rightEndpoint().get_xPosition(), "yPosition":link.get_rightEndpoint().get_yPosition()};
-        port_temp = circuitDiagramUtil.isOnPort(rightEndpointCoordinate).port;
+        var rightEndpointCoordinate:Coordinate = new Coordinate(link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
+        port_temp = circuitDiagramUtil.isOnPort(rightEndpointCoordinate).get_port();
         var rightEndpointPort:Port = link.get_rightEndpoint().get_port();
 
         if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
@@ -238,8 +241,8 @@ class MoveCommand implements Command {
     }
 
     function endpointMeetPort(endpoint:Endpoint){
-        var coordinate:Coordinate = {"xPosition":endpoint.get_xPosition(), "yPosition":endpoint.get_yPosition()};
-        var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).port;
+        var coordinate:Coordinate = new Coordinate(endpoint.get_xPosition(), endpoint.get_yPosition());
+        var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).get_port();
         if(newPort != null){
             for(i in circuitDiagram.get_linkIterator()){
                 var port:Port = null;

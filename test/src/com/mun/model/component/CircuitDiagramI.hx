@@ -1,9 +1,9 @@
 package com.mun.model.component;
 import com.mun.model.enumeration.POINT_MODE;
-import com.mun.type.Type.LinkAndComponentArray;
-import com.mun.type.Type.Coordinate;
-import com.mun.type.Type.WorldPoint;
-import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.type.LinkAndComponentArray;
+import com.mun.type.Coordinate;
+import com.mun.type.WorldPoint;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.enumeration.MODE;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.controller.command.CommandManager;

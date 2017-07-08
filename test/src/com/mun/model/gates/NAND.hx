@@ -2,7 +2,6 @@ package com.mun.model.gates;
 
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.component.Component;
 import com.mun.view.drawComponents.DrawNAND;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;

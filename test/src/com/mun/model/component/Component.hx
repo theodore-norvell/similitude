@@ -2,9 +2,9 @@ package com.mun.model.component;
 
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
-import com.mun.type.Type.Coordinate;
-import com.mun.type.Type.WorldPoint;
-import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.type.Coordinate;
+import com.mun.type.WorldPoint;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.Orientation;
@@ -152,8 +152,9 @@ class Component {
         }
         this.inportsNum = value;
         while (inportArray.length < value) {
-            if (componentKind.addInPort() != null) {
-                inportArray.push(componentKind.addInPort());
+            var port:Port = componentKind.addInPort();
+            if (port != null) {
+                inportArray.push(port);
             } else {
                 return false;
             }

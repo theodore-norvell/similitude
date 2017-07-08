@@ -1,17 +1,19 @@
 package com.mun.controller.command;
-import com.mun.model.component.Component;
-import com.mun.model.component.Link;
+
 import com.mun.model.component.CircuitDiagramI;
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentArray;
 /**
 * Copy command
 * @author wanhui
 **/
 class CopyCommand implements Command {
     var circuitDiagram:CircuitDiagramI;
-    var linkAndComponentArray:LinkAndComponentArray = {"linkArray":new Array<Link>(), "componentArray":new Array<Component>()};
+    var linkAndComponentArray:LinkAndComponentArray;
 
     public function new(linkAndComponentArray:LinkAndComponentArray, circuitDiagram:CircuitDiagramI) {
+        linkAndComponentArray = new LinkAndComponentArray();
+
+        this.circuitDiagram = circuitDiagram;
         this.linkAndComponentArray = linkAndComponentArray;
     }
 
@@ -26,14 +28,14 @@ class CopyCommand implements Command {
     }
 
     public function execute():Void {
-        if (linkAndComponentArray.linkArray != null) {
-            for (i in linkAndComponentArray.linkArray) {
+        if (linkAndComponentArray.get_linkArray() != null) {
+            for (i in linkAndComponentArray.get_linkArray()) {
                 circuitDiagram.pushLinkToCopyStack(i);
             }
         }
 
-        if (linkAndComponentArray.componentArray != null) {
-            for (i in linkAndComponentArray.componentArray) {
+        if (linkAndComponentArray.get_componentArray() != null) {
+            for (i in linkAndComponentArray.get_componentArray()) {
                 circuitDiagram.pushComponentToCopyStack(i);
             }
         }

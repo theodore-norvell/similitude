@@ -1,7 +1,7 @@
 package com.mun.view.drawingImpl;
 
 import com.mun.view.drawingImpl.DrawingAdapter;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 import com.mun.view.drawingImpl.WorldToView;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.Orientation;
@@ -287,12 +287,12 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawRect(x:Float, y:Float, width:Float, height:Float):Void {
-        var coordinate:Coordinate = worldToView.convertCoordinate({"xPosition":x, "yPosition":y});
+        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x, y));
 
-        var x0:Float = coordinate.xPosition - width / 2;
-        var y0:Float = coordinate.yPosition - height / 2;
-        var x1:Float = coordinate.xPosition + width / 2;
-        var y1:Float = coordinate.yPosition + height / 2;
+        var x0:Float = coordinate.get_xPosition() - width / 2;
+        var y0:Float = coordinate.get_yPosition() - height / 2;
+        var x1:Float = coordinate.get_xPosition() + width / 2;
+        var y1:Float = coordinate.get_yPosition() + height / 2;
         cxt.rect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
         cxt.lineWidth = lineWidth;
         cxt.fillStyle = fillColor;
@@ -302,10 +302,10 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawText(str:String, x:Float, y:Float, width:Float):Void {
-        var coordinate:Coordinate = worldToView.convertCoordinate({"xPosition":x, "yPosition":y});
+        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x, y));
 
-        var x0:Float = coordinate.xPosition;
-        var y0:Float = coordinate.yPosition;
+        var x0:Float = coordinate.get_xPosition();
+        var y0:Float = coordinate.get_yPosition();
 
         cxt.lineWidth = lineWidth;
         cxt.font = font;
@@ -315,10 +315,10 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawCricle(x:Float, y:Float, radius:Float):Void {
-        var coordinate:Coordinate = worldToView.convertCoordinate({"xPosition":x, "yPosition":y});
+        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x, y));
 
-        var x0:Float = coordinate.xPosition;
-        var y0:Float = coordinate.yPosition;
+        var x0:Float = coordinate.get_xPosition();
+        var y0:Float = coordinate.get_yPosition();
         cxt.beginPath();
         cxt.arc(x0, y0, radius, 0, 2 * Math.PI, false);
         cxt.closePath;
@@ -330,13 +330,13 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawLine(x0:Float, y0:Float, x1:Float, y1:Float):Void {
-        var coordinate0:Coordinate = worldToView.convertCoordinate({"xPosition":x0, "yPosition":y0});
-        var coordinate1:Coordinate = worldToView.convertCoordinate({"xPosition":x1, "yPosition":y1});
+        var coordinate0:Coordinate = worldToView.convertCoordinate(new Coordinate(x0, y0));
+        var coordinate1:Coordinate = worldToView.convertCoordinate(new Coordinate(x1, y1));
 
-        var x0:Float = coordinate0.xPosition;
-        var y0:Float = coordinate0.yPosition;
-        var x1:Float = coordinate1.xPosition;
-        var y1:Float = coordinate1.yPosition;
+        var x0:Float = coordinate0.get_xPosition();
+        var y0:Float = coordinate0.get_yPosition();
+        var x1:Float = coordinate1.get_xPosition();
+        var y1:Float = coordinate1.get_yPosition();
         cxt.beginPath();
         cxt.moveTo(x0, y0);
         cxt.lineTo(x1, y1);

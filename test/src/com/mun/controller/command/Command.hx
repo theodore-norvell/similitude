@@ -3,7 +3,7 @@ package com.mun.controller.command;
 * interface for command, use command pattern to process some operations
 * @author wanhui
 **/
-import com.mun.type.Type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentArray;
 interface Command {
     /**
     * undo command

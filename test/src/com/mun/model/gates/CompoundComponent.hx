@@ -1,12 +1,13 @@
 package com.mun.model.gates;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.view.drawComponents.DrawCompoundComponent;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.Box;
 import com.mun.model.enumeration.MODE;
-import com.mun.type.Type.Coordinate;
-import com.mun.type.Type.WorldPoint;
+import com.mun.type.Coordinate;
+import com.mun.type.WorldPoint;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.model.component.Outport;
 import com.mun.model.enumeration.IOTYPE;
@@ -157,7 +158,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
     }
 
     override public function findHitList(outerWorldCoordinates:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray : LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
+        var linkAndComponentAndEndpointAndPortArray : LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
         var hitComponent:Component = isInComponent(outerWorldCoordinates);
         if(hitComponent == null){
@@ -168,10 +169,10 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
             var result:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(innerWorldCoordinates, mode);
 
             if(result.isEmpty() || mode == MODE.INCLUDE_PARENTS){
-                result.componentArray.push(component); }
+                result.get_componentArray().push(component); }
             return result;
         }else{
-            return linkAndComponentAndEndpointAndPortArray.componentArray.push(component);
+            return linkAndComponentAndEndpointAndPortArray.get_componentArray().push(component);
         }
     }
 

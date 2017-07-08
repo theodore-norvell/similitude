@@ -1,5 +1,5 @@
 package com.mun.view.drawingImpl;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.Coordinate;
 interface RectangleI {
     /** Returns the smallest x and smallest y of the four corners */
     public function min() : Coordinate;

@@ -7,8 +7,8 @@ package com.mun.model.component;
  */
 import com.mun.global.Constant.*;
 import com.mun.model.enumeration.MODE;
-import com.mun.type.Type.LinkAndComponentAndEndpointAndPortArray;
-import com.mun.type.Type.Coordinate;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.type.Coordinate;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.view.drawComponents.DrawLink;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -47,23 +47,23 @@ class Link{
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = {"linkArray": null, "componentArray": null, "endpointArray": null, "portArray": null};
+        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
-        linkAndComponentAndEndpointAndPortArray.linkArray.push(isOnLink(coordinate));
+        linkAndComponentAndEndpointAndPortArray.get_linkArray().push(isOnLink(coordinate));
 
-        linkAndComponentAndEndpointAndPortArray.endpointArray.push(pointOnEndpoint(coordinate));
+        linkAndComponentAndEndpointAndPortArray.get_endponentArray().push(pointOnEndpoint(coordinate));
 
         return linkAndComponentAndEndpointAndPortArray;
     }
 
     function pointOnEndpoint(coordinate:Coordinate):Endpoint{
             if(pointsDistance(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
-            coordinate.xPosition, coordinate.yPosition) <= pointToEndpointDistance){
+            coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
                 return leftEndpoint;
             }
 
             if(pointsDistance(rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
-            coordinate.xPosition, coordinate.yPosition) <= pointToEndpointDistance){
+            coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
                 return rightEndpoint;
             }
 
@@ -80,20 +80,20 @@ class Link{
 
         if(pointToLine(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
         rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
-        coordinate.xPosition, coordinate.yPosition) <= pointToLineDistance){
+        coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToLineDistance){
             //if the distance between the point to line less equal to 3, that means the line should be selected
             //only process the first link met
 
             //the mouse location should be a little away from the endpoint
             //because in case of it confuse about select endpoint or link
             var theDistanaceToLeftEndpoint = Math.sqrt(
-                Math.pow(Math.abs(coordinate.xPosition - leftEndpoint.get_xPosition()), 2) +
-                Math.pow(Math.abs(coordinate.yPosition - leftEndpoint.get_yPosition()), 2)
+                Math.pow(Math.abs(coordinate.get_xPosition() - leftEndpoint.get_xPosition()), 2) +
+                Math.pow(Math.abs(coordinate.get_yPosition() - leftEndpoint.get_yPosition()), 2)
             );
 
             var theDistanceToRightEndpoint = Math.sqrt(
-                Math.pow(Math.abs(coordinate.xPosition - rightEndpoint.get_xPosition()), 2) +
-                Math.pow(Math.abs(coordinate.yPosition - rightEndpoint.get_yPosition()), 2)
+                Math.pow(Math.abs(coordinate.get_xPosition() - rightEndpoint.get_xPosition()), 2) +
+                Math.pow(Math.abs(coordinate.get_yPosition() - rightEndpoint.get_yPosition()), 2)
             );
             if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
                 if(theDistanceToRightEndpoint >= pointToEndpointDistance){
