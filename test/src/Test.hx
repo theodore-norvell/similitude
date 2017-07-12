@@ -57,7 +57,7 @@ class Test {
         var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
         updateCircuitDiagram.setUpdateToolBar(updateToolBar);
 
-        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram);
+        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram, updateCircuitDiagram.get_transform());
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
         //add canvas listener

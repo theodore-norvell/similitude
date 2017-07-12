@@ -1,6 +1,5 @@
 package com.mun.controller.command;
 
-import com.mun.type.LinkAndComponentAndEndpointArray;
 import com.mun.type.Object;
 import com.mun.type.LinkAndComponentArray;
 import com.mun.model.component.CircuitDiagramI;

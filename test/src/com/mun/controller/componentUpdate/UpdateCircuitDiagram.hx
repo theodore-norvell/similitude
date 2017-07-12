@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.view.drawingImpl.Transform;
 import com.mun.controller.command.DeleteCommand;
 import com.mun.controller.command.OrientationCommand;
 import com.mun.model.component.Endpoint;
@@ -43,6 +44,8 @@ class UpdateCircuitDiagram {
 
     var linkAndComponentArray:LinkAndComponentArray;
 
+    var transform:Transform;
+
     public function new(circuitDiagram:CircuitDiagramI) {
         linkAndComponentArray = new LinkAndComponentArray();
 
@@ -50,6 +53,12 @@ class UpdateCircuitDiagram {
 
         commandManager = new CommandManager();
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
+
+        transform = Transform.identity();
+    }
+
+    public function get_transform():Transform {
+        return transform;
     }
 
     public function get_commandManager():CommandManager {
