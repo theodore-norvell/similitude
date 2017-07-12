@@ -14,7 +14,6 @@ import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import js.html.MouseEvent;
 import com.mun.type.Coordinate;
 import js.html.CanvasElement;
-import com.mun.type.Object;
 import com.mun.type.LinkAndComponentAndEndpointArray;
 import com.mun.type.LinkAndComponentArray;
 
@@ -49,7 +48,7 @@ class CanvasListener {
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.updateToolBar = updateToolBar;
 
-        viewToWorld = new ViewToWorld(Transform.identity());
+        viewToWorld = new ViewToWorld(updateCircuitDiagram.get_transform());
         //add mouse down listener
         canvas.addEventListener("mousedown", doMouseDown,false);
         canvas.addEventListener("mousemove", doMouseMove,false);
@@ -91,7 +90,7 @@ class CanvasListener {
         //get the endpoint or link or component on this mouse location
         //priority: endpint -> link -> component
         var endpointArray:Array<Endpoint> = updateCircuitDiagram.getEndpoint(mouseDownLocation);
-        if(endpointArray != null){
+        if(endpointArray.length != 0){
             if(hightLightLink != null){
                 for(i in endpointArray){
                     if(i == hightLightLink.get_leftEndpoint()){
@@ -118,7 +117,6 @@ class CanvasListener {
         }else{
             endpointSelected = false;
         }
-
         if(endpoint == null){
             link = updateCircuitDiagram.getLink(mouseDownLocation);
             if(link == null){//if this mouse location on the link, should be select link first
@@ -229,7 +227,7 @@ class CanvasListener {
         linkAndComponentAndEndpointArrayReset();
         buttonClickFlag = true;
         linkAndComponentAndEndpointArray.addComponent(component);
-        updateCircuitDiagram.createComponentByCommand(linkAndComponentAndEndpointArray.get_componentArray()[0]);
+        updateCircuitDiagram.createComponentByCommand(component);
     }
 
     public function setButtonClickFlagFlase(){

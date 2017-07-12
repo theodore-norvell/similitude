@@ -69,8 +69,8 @@ class LinkAndComponentAndEndpointArray {
 
     public function clean(){
         this.linkArray.splice(0,linkArray.length);
-        this.componentArray.splice(0,linkArray.length);
-        this.endponentArray.splice(0,linkArray.length);
+        this.componentArray.splice(0,componentArray.length);
+        this.endponentArray.splice(0,endponentArray.length);
     }
 
     public function isEmpty():Bool{

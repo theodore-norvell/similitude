@@ -50,7 +50,7 @@ class LinkAndComponentArray {
 
     public function clean(){
         this.linkArray.splice(0,linkArray.length);
-        this.componentArray.splice(0,linkArray.length);
+        this.componentArray.splice(0,componentArray.length);
     }
 
     public function isEmpty():Bool{

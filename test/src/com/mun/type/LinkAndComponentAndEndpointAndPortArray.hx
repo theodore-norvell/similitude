@@ -89,9 +89,9 @@ class LinkAndComponentAndEndpointAndPortArray {
 
     public function clean(){
         this.linkArray.splice(0,linkArray.length);
-        this.componentArray.splice(0,linkArray.length);
-        this.endponentArray.splice(0,linkArray.length);
-        this.portArray.splice(0,linkArray.length);
+        this.componentArray.splice(0,componentArray.length);
+        this.endponentArray.splice(0,endponentArray.length);
+        this.portArray.splice(0,portArray.length);
     }
 
     public function isEmpty():Bool{
