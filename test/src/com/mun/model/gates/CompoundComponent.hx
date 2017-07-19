@@ -163,7 +163,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         var hitComponent:Component = isInComponent(outerWorldCoordinates);
         if(hitComponent == null){
             return linkAndComponentAndEndpointAndPortArray;
-        }else if(BOX_TYPE == BOX.WHITE_BOX){
+        }else if(component.get_boxType() == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
             var result:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(innerWorldCoordinates, mode);
@@ -181,7 +181,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
 
         if(isInComponent(coordinate) == null){
             return worldPointArray.push( coordinate );
-        }else if(BOX_TYPE == BOX.WHITE_BOX){
+        }else if(component.get_boxType() == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
             var wForDiagram:Coordinate = transform.pointInvert(coordinate);
             return circuitDiagram.findWorldPoint(wForDiagram, mode);

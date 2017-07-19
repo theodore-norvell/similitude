@@ -99,9 +99,10 @@ class ControllerCanvasContext {
 
         mouseState = M_STATE.MOUSE_UP;
 
+        updateCircuitDiagram.resetCommandManagerRecordFlag();
+
         lastState = controllerState;
         controllerState = C_STATE.IDLE;
-
         checkState();
     }
 
@@ -119,6 +120,8 @@ class ControllerCanvasContext {
     }
 
     function mouseDownProcess(){
+        updateCircuitDiagram.resetCommandManagerRecordFlag();
+
         switch(keyState.get_keyState()){
             case K_STATE.KEY_DOWN : {
                 if(keyState.get_key() == KEY.ALT_KEY){
@@ -164,10 +167,6 @@ class ControllerCanvasContext {
         /**
         * Priority:
         * Port > Endpoint > Component = Link
-        *
-        * Details:
-        *
-        *
         * */
         var hitList:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
         //worldPointArray = circuitDiagram.findWorldPoint(worldCoordinate, pointMode);
