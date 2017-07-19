@@ -4,7 +4,7 @@ import com.mun.view.drawingImpl.DrawingAdapter;
 import com.mun.type.Coordinate;
 import com.mun.view.drawingImpl.WorldToView;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 import js.html.CanvasRenderingContext2D;
 import com.mun.global.Constant.*;
 
@@ -68,7 +68,7 @@ class DrawingAdapter implements DrawingAdapterI {
         return new DrawingAdapter(transform.compose(worldToView.get_transform()));
     }
 
-    public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
@@ -82,13 +82,13 @@ class DrawingAdapter implements DrawingAdapterI {
         //creat a circle for the AND gate
         //draw the ellipse
         switch (orientation){
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 180 * Math.PI / 180, 0, 1 * Math.PI);}
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 270 * Math.PI / 180, 0, 1 * Math.PI);}
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 0 * Math.PI / 180, 0, 1 * Math.PI);}
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 90 * Math.PI / 180, 0, 1 * Math.PI);}
             default : {
                 //noting. Orientation only have four values
@@ -103,7 +103,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
@@ -123,13 +123,13 @@ class DrawingAdapter implements DrawingAdapterI {
         //creat a circle for the AND gate
         //draw the ellipse
         switch (orientation){
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 180 * Math.PI / 180, 0, 1 * Math.PI);}
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 270 * Math.PI / 180, 0, 1 * Math.PI);}
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 0 * Math.PI / 180, 0, 1 * Math.PI);}
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 90 * Math.PI / 180, 0, 1 * Math.PI);}
             default : {
                 //noting. Orientation only have four values
@@ -149,7 +149,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -169,7 +169,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         var radius:Float = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10 ;
         cxt.beginPath();
@@ -190,7 +190,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         cxt.beginPath();
         // Start at point a
@@ -208,7 +208,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         // Start at point a
         cxt.beginPath();
@@ -226,13 +226,13 @@ class DrawingAdapter implements DrawingAdapterI {
 
         //draw the circle
         switch (orientation){
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 cxt.arc(circleCentreX, circleCentreY + radius / 2, radius, 0, 2 * Math.PI, false); }
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 cxt.arc(circleCentreX - radius / 2, circleCentreY, radius, 0, 2 * Math.PI, false); }
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 cxt.arc(circleCentreX, circleCentreY - radius / 2, radius, 0, 2 * Math.PI, false); }
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 cxt.arc(circleCentreX + radius / 2, circleCentreY, radius, 0, 2 * Math.PI, false); }
             default : {
                 //noting. Orientation only have four values
@@ -245,7 +245,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
+    public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -263,19 +263,19 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.fill();
         // Curve from (a+d)/8 to (a+d)/8 * 7
         switch (orientation){
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 cxt.moveTo(r.get_xa() + width / 8, r.get_ya());
                 cxt.quadraticCurveTo(x,y  + height/7, r.get_xa() + width / 8 * 7, r.get_ya());
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 cxt.moveTo(r.get_xa() - width / 8, r.get_ya());
                 cxt.quadraticCurveTo(x,y  - height/7, r.get_xa() - width / 8 * 7, r.get_ya());
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 cxt.moveTo(r.get_xa(), r.get_ya() - width / 8);
                 cxt.quadraticCurveTo(x + width/7,y, r.get_xa(), r.get_ya() - width / 8 * 7);
             };
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 cxt.moveTo(r.get_xa(), r.get_ya() + width / 8);
                 cxt.quadraticCurveTo(x - width/7,y, r.get_xa(), r.get_ya() + width / 8 * 7);
             };

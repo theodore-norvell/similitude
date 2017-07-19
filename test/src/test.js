@@ -645,7 +645,7 @@ Test.main = function() {
 	circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
 	var updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(updateCircuitDiagram);
 	updateCircuitDiagram.setUpdateToolBar(updateToolBar);
-	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram);
+	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,updateCircuitDiagram.get_transform());
 	updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 	var canvasListener = new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
 	new com_mun_controller_mouseAction_ButtonClick(updateCircuitDiagram,pixelRatio,canvasListener);
@@ -1562,18 +1562,20 @@ com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_CircuitDiagramUtil
 };
-var com_mun_controller_componentUpdate_UpdateCanvas = function(canvas,circuitDiagram) {
+var com_mun_controller_componentUpdate_UpdateCanvas = function(canvas,circuitDiagram,transform) {
 	this.canvas = canvas;
 	this.circuitDiagram = circuitDiagram;
+	this.transform = transform;
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCanvas"] = com_mun_controller_componentUpdate_UpdateCanvas;
 com_mun_controller_componentUpdate_UpdateCanvas.__name__ = ["com","mun","controller","componentUpdate","UpdateCanvas"];
 com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	canvas: null
 	,circuitDiagram: null
+	,transform: null
 	,update: function(linkAndComponentArray) {
 		this.canvas.width = this.canvas.width;
-		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(com_mun_view_drawingImpl_Transform.identity()),linkAndComponentArray);
+		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(this.transform),linkAndComponentArray);
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
@@ -1582,6 +1584,7 @@ var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDi
 	this.circuitDiagram = circuitDiagram;
 	this.commandManager = new com_mun_controller_command_CommandManager();
 	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
+	this.transform = com_mun_view_drawingImpl_Transform.identity();
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCircuitDiagram"] = com_mun_controller_componentUpdate_UpdateCircuitDiagram;
 com_mun_controller_componentUpdate_UpdateCircuitDiagram.__name__ = ["com","mun","controller","componentUpdate","UpdateCircuitDiagram"];
@@ -1592,6 +1595,10 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,circuitDiagramUtil: null
 	,updateToolBar: null
 	,linkAndComponentArray: null
+	,transform: null
+	,get_transform: function() {
+		return this.transform;
+	}
 	,get_commandManager: function() {
 		return this.commandManager;
 	}
@@ -2000,16 +2007,16 @@ com_mun_controller_mouseAction_ButtonClick.prototype = {
 var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
 	this.buttonClickFlag = false;
 	this.altKeyFlag = false;
-	this.linkAndComponentAndEndpointArray = new com_mun_type_LinkAndComponentAndEndpointArray();
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
 	this.endpointSelected = false;
 	this.createLinkFlag = false;
 	this.linkHighLight = false;
 	this.mouseDownFlag = false;
+	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
+	this.linkAndComponentAndEndpointArray = new com_mun_type_LinkAndComponentAndEndpointArray();
 	this.canvas = canvas;
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.updateToolBar = updateToolBar;
-	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(com_mun_view_drawingImpl_Transform.identity());
+	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(updateCircuitDiagram.get_transform());
 	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
@@ -2046,7 +2053,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		return coordinate;
 	}
 	,doMouseDown: function(event) {
-		this.setButtonClickFlagFlase();
+		this.setButtonClickFlagFalse();
 		if(!this.altKeyFlag) {
 			this.linkAndComponentArrayReset();
 		}
@@ -2056,7 +2063,7 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
 		this.mouseDownFlag = true;
 		var endpointArray = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
-		if(endpointArray != null) {
+		if(endpointArray.length != 0) {
 			if(this.hightLightLink != null) {
 				var _g = 0;
 				while(_g < endpointArray.length) {
@@ -2182,9 +2189,9 @@ com_mun_controller_mouseAction_CanvasListener.prototype = {
 		this.linkAndComponentAndEndpointArrayReset();
 		this.buttonClickFlag = true;
 		this.linkAndComponentAndEndpointArray.addComponent(component);
-		this.updateCircuitDiagram.createComponentByCommand(this.linkAndComponentAndEndpointArray.get_componentArray()[0]);
+		this.updateCircuitDiagram.createComponentByCommand(component);
 	}
-	,setButtonClickFlagFlase: function() {
+	,setButtonClickFlagFalse: function() {
 		this.buttonClickFlag = false;
 	}
 	,__class__: com_mun_controller_mouseAction_CanvasListener
@@ -4587,9 +4594,9 @@ com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
 	}
 	,clean: function() {
 		this.get_linkArray().splice(0,this.get_linkArray().length);
-		this.get_componentArray().splice(0,this.get_linkArray().length);
-		this.get_endponentArray().splice(0,this.get_linkArray().length);
-		this.get_portArray().splice(0,this.get_linkArray().length);
+		this.get_componentArray().splice(0,this.get_componentArray().length);
+		this.get_endponentArray().splice(0,this.get_endponentArray().length);
+		this.get_portArray().splice(0,this.get_portArray().length);
 	}
 	,isEmpty: function() {
 		if(this.get_linkArray() == null || this.get_linkArray().length == 0) {
@@ -4656,8 +4663,8 @@ com_mun_type_LinkAndComponentAndEndpointArray.prototype = {
 	}
 	,clean: function() {
 		this.get_linkArray().splice(0,this.get_linkArray().length);
-		this.get_componentArray().splice(0,this.get_linkArray().length);
-		this.get_endponentArray().splice(0,this.get_linkArray().length);
+		this.get_componentArray().splice(0,this.get_componentArray().length);
+		this.get_endponentArray().splice(0,this.get_endponentArray().length);
 	}
 	,isEmpty: function() {
 		if(this.get_linkArray() == null || this.get_linkArray().length == 0) {
@@ -4708,7 +4715,7 @@ com_mun_type_LinkAndComponentArray.prototype = {
 	}
 	,clean: function() {
 		this.get_linkArray().splice(0,this.get_linkArray().length);
-		this.get_componentArray().splice(0,this.get_linkArray().length);
+		this.get_componentArray().splice(0,this.get_componentArray().length);
 	}
 	,isEmpty: function() {
 		if(this.get_linkArray() == null || this.get_linkArray().length == 0) {

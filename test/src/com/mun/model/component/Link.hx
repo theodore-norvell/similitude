@@ -49,9 +49,9 @@ class Link{
     public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
         var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
-        linkAndComponentAndEndpointAndPortArray.get_linkArray().push(isOnLink(coordinate));
+        linkAndComponentAndEndpointAndPortArray.addLink(isOnLink(coordinate));
 
-        linkAndComponentAndEndpointAndPortArray.get_endponentArray().push(pointOnEndpoint(coordinate));
+        linkAndComponentAndEndpointAndPortArray.addEndpoint(pointOnEndpoint(coordinate));
 
         return linkAndComponentAndEndpointAndPortArray;
     }

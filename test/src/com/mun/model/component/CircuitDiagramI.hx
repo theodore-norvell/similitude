@@ -1,13 +1,12 @@
 package com.mun.model.component;
 import com.mun.model.enumeration.POINT_MODE;
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
-import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.enumeration.MODE;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.controller.command.CommandManager;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 /**
 * interface for CicuitDiagram
 **/
@@ -93,7 +92,7 @@ interface CircuitDiagramI {
     /**
     * set new orientation for one component
     **/
-    public function setNewOirentation(component:Component, newOrientation:Orientation):Void;
+    public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void;
 
     /**
     * delete one link
@@ -157,7 +156,7 @@ interface CircuitDiagramI {
     /**
     * draw the circuit diagram itself
     **/
-    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentArray):Void;
+    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
 
     /**
     * find the hit list

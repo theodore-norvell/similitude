@@ -8,8 +8,8 @@ import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
-import com.mun.model.enumeration.Orientation;
-import com.mun.model.enumeration.ValueLogic;
+import com.mun.model.enumeration.ORIENTATION;
+import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * 2-1 MUX<br>
  * For MUX, the format in the map should be like this:<br>
@@ -37,8 +37,8 @@ class MUX implements ComponentKind extends GateAbstract {
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
-        var value:ValueLogic = ValueLogic.TRUE;
-        var selectValue:ValueLogic = ValueLogic.FALSE;
+        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
+        var selectValue:VALUE_LOGIC = VALUE_LOGIC.FALSE;
 
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.S) {
@@ -48,14 +48,14 @@ class MUX implements ComponentKind extends GateAbstract {
         }
 
         //if s == 1 the output should as the same as the input 2
-        if (selectValue == ValueLogic.TRUE) {
+        if (selectValue == VALUE_LOGIC.TRUE) {
             for (port in portArray) {
                 if (port.get_sequence() == 1) {
                     value = port.get_value();
                     break;
                 }
             }
-        } else if (selectValue == ValueLogic.FALSE) {//if S == 0, the output should as the same as input 1
+        } else if (selectValue == VALUE_LOGIC.FALSE) {//if S == 0, the output should as the same as input 1
             for (port in portArray) {
                 if (port.get_sequence() == 0) {
                     value = port.get_value();
@@ -73,11 +73,11 @@ class MUX implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         //mux have one select inport and two input inports
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 //inport
                 var inport_S:Port = new Inport(xPosition, yPosition - height / 2);
                 inport_S.set_portDescription(IOTYPE.S);
@@ -95,7 +95,7 @@ class MUX implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 //inport
                 var inport_S:Port = new Inport(xPosition, yPosition - height / 2);
                 inport_S.set_portDescription(IOTYPE.S);
@@ -113,7 +113,7 @@ class MUX implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 //inport
                 var inport_S:Port = new Inport(xPosition - width / 2, yPosition);
                 inport_S.set_portDescription(IOTYPE.S);
@@ -131,7 +131,7 @@ class MUX implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 //inport
                 var inport_S:Port = new Inport(xPosition + width / 2, yPosition);
                 inport_S.set_portDescription(IOTYPE.S);
@@ -158,9 +158,9 @@ class MUX implements ComponentKind extends GateAbstract {
     /**
     * different from others, this function used in move command when the componenet has been re-located
     **/
-    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 for (i in 0...portArray.length) {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition - width / 2);
@@ -174,7 +174,7 @@ class MUX implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 for (i in 0...portArray.length) {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
@@ -188,7 +188,7 @@ class MUX implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 for (i in 0...portArray.length) {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
@@ -202,7 +202,7 @@ class MUX implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 for (i in 0...portArray.length) {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition + width / 2);

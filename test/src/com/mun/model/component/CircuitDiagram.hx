@@ -3,14 +3,12 @@ package com.mun.model.component;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
 import com.mun.model.drawingInterface.DrawingAdapterI;
-import com.mun.type.LinkAndComponentArray;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.controller.command.CommandManager;
 import com.mun.controller.command.Stack;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
-import com.mun.global.Constant.*;
 
 class CircuitDiagram implements CircuitDiagramI{
     var componentArray:Array<Component> = new Array<Component>();
@@ -233,7 +231,7 @@ class CircuitDiagram implements CircuitDiagramI{
         copyStack.pushComponent(component);
     }
 
-    public function setNewOirentation(component:Component, newOrientation:Orientation):Void{
+    public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void{
         for (i in 0...componentArray.length) {
             if (component == componentArray[i]) {
                 componentArray[i].set_orientation(newOrientation);
@@ -296,12 +294,12 @@ class CircuitDiagram implements CircuitDiagramI{
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
     **/
-    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentArray):Void{
+    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
-            if(linkAndComponentArray.get_componentArray() != null){
-                for(j in linkAndComponentArray.get_componentArray()){
+            if(linkAndComponentArray.getComponentIteratorLength() != 0){
+                for(j in linkAndComponentArray.get_componentIterator()){
                     if(j == i){
                         i.drawComponent(drawingAdapter, true);
                         drawFlag = true;
@@ -319,8 +317,8 @@ class CircuitDiagram implements CircuitDiagramI{
         drawFlag = false;
         //update link array
         for(i in linkArray){
-            if(linkAndComponentArray.get_linkArray() != null){
-                for(j in linkAndComponentArray.get_linkArray()){
+            if(linkAndComponentArray.getLinkIteratorLength() != 0){
+                for(j in linkAndComponentArray.get_linkIterator()){
                     if(j == i){
                         i.drawLink(drawingAdapter, true);
                         drawFlag = true;
@@ -340,16 +338,41 @@ class CircuitDiagram implements CircuitDiagramI{
         var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         for(i in linkArray){
             var result:LinkAndComponentAndEndpointAndPortArray = i.findHitList(coordinate, mode) ;
-            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
-            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
+
+            for(j in result.get_linkIterator()){
+                linkAndComponentAndEndpointAndPortArray.addLink(j);
+            }
+
+            for(j in result.get_endponentIterator()){
+                linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
+            }
+//            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
+//            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
         }
 
         for(i in componentArray){
             var result:LinkAndComponentAndEndpointAndPortArray = i.findHitList(coordinate, mode) ;
-            linkAndComponentAndEndpointAndPortArray.get_componentArray().concat(result.get_componentArray());
-            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
-            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
-            linkAndComponentAndEndpointAndPortArray.get_portArray().concat( result.get_portArray());
+
+            for(j in result.get_linkIterator()){
+                linkAndComponentAndEndpointAndPortArray.addLink(j);
+            }
+
+            for(j in result.get_endponentIterator()){
+                linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
+            }
+
+            for(j in result.get_componentIterator()){
+                linkAndComponentAndEndpointAndPortArray.addComponent(j);
+            }
+
+            for(j in result.get_portIterator()){
+                linkAndComponentAndEndpointAndPortArray.addPort(j);
+            }
+
+//            linkAndComponentAndEndpointAndPortArray.get_componentArray().concat(result.get_componentArray());
+//            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
+//            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
+//            linkAndComponentAndEndpointAndPortArray.get_portArray().concat( result.get_portArray());
         }
         return linkAndComponentAndEndpointAndPortArray;
     }

@@ -1,6 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Object;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
@@ -16,10 +16,10 @@ class PasteCommand implements Command {
     var yPosition:Int;
     var pasteStack:Stack;
     var circuitDiagram:CircuitDiagramI;
-    var linkAndComponentArray:LinkAndComponentArray;
+    var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
 
     public function new(copyStack:Stack, xPosition:Float, yPosition:Float, circuitDiagram:CircuitDiagramI) {
-        linkAndComponentArray = new LinkAndComponentArray();
+        linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
 
         this.copyStack = copyStack;
         this.xPosition = xPosition;
@@ -27,7 +27,7 @@ class PasteCommand implements Command {
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():LinkAndComponentArray {
+    public function undo():LinkAndComponentAndEndpointAndPortArray {
         var linkArray:Array<Link> = pasteStack.getLinkArray();
         var componentArray:Array<Component> = pasteStack.getComponentArray();
         for (i in 0...linkArray.length) {
@@ -43,14 +43,19 @@ class PasteCommand implements Command {
         return linkAndComponentArray;
     }
 
-    public function redo():LinkAndComponentArray {
+    public function redo():LinkAndComponentAndEndpointAndPortArray {
         execute();
         return linkAndComponentArray;
     }
 
     public function execute():Void {
         var linkArray = copyStack.getLinkArray();
-        linkAndComponentArray.set_linkArray(linkArray);
+
+        linkAndComponentArray.clean();
+        for(i in linkArray){
+            linkAndComponentArray.addLink(i);
+        }
+
         if (linkArray != null) {
             for (i in 0...linkArray.length) {
                 var object:Object = new Object();
@@ -61,7 +66,11 @@ class PasteCommand implements Command {
         }
 
         var componentArray = copyStack.getComponentArray();
-        linkAndComponentArray.set_componentArray(componentArray);
+
+        for(i in componentArray){
+            linkAndComponentArray.addComponent(componentArray);
+        }
+
         if (componentArray != null) {
             for (i in 0...componentArray.length) {
                 var object:Object = new Object();

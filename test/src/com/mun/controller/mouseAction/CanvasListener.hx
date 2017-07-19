@@ -1,6 +1,5 @@
 package com.mun.controller.mouseAction;
 
-import com.mun.view.drawingImpl.Transform;
 import com.mun.view.drawingImpl.ViewToWorld;
 import com.mun.view.drawingImpl.ViewToWorldI;
 import js.Browser;
@@ -14,8 +13,7 @@ import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import js.html.MouseEvent;
 import com.mun.type.Coordinate;
 import js.html.CanvasElement;
-import com.mun.type.LinkAndComponentAndEndpointArray;
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 
 class CanvasListener {
     var canvas:CanvasElement;
@@ -33,8 +31,8 @@ class CanvasListener {
     var endpointSelected:Bool = false;
     var port:Port;
     //for move multipile objects
-    var linkAndComponentArray:LinkAndComponentArray = new LinkAndComponentArray();
-    var  linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointArray = new LinkAndComponentAndEndpointArray();
+    var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
+    var  linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointAndPortArray;
     //key
     var altKeyFlag:Bool = false;
 
@@ -44,6 +42,9 @@ class CanvasListener {
     var viewToWorld:ViewToWorldI;
 
     public function new(canvas:CanvasElement, updateCircuitDiagram:UpdateCircuitDiagram, updateToolBar:UpdateToolBar) {
+        linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
+        linkAndComponentAndEndpointArray = new LinkAndComponentAndEndpointAndPortArray();
+
         this.canvas = canvas;
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.updateToolBar = updateToolBar;
@@ -73,7 +74,7 @@ class CanvasListener {
     }
 
     public function doMouseDown(event:MouseEvent){
-        setButtonClickFlagFlase();
+        setButtonClickFlagFalse();
         if(!altKeyFlag){
             linkAndComponentArrayReset();
         }
@@ -230,7 +231,7 @@ class CanvasListener {
         updateCircuitDiagram.createComponentByCommand(component);
     }
 
-    public function setButtonClickFlagFlase(){
+    public function setButtonClickFlagFalse(){
         buttonClickFlag = false;
     }
 }

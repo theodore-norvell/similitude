@@ -9,7 +9,7 @@ import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Port;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 /**
 * Component Kind
 * @author wanhui
@@ -39,7 +39,7 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port>;
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port>;
 
     /**
     * add an inport
@@ -57,7 +57,7 @@ interface ComponentKind {
     *  @param orientation : direction
     *  @return the array of the updated ports
     **/
-    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>;
+    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
 
     /**
     * update all of the position of ports in in outportArray
@@ -69,7 +69,7 @@ interface ComponentKind {
     *  @param orientation : direction
     *  @return the array of the updated ports
     **/
-    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>;
+    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
 
     /**
     * draw this componentkind

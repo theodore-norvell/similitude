@@ -17,6 +17,5 @@ enum IOTYPE {
     //below are outputs
     OUTPUT;//COMMON OUTPUT
     Q;//FLIP-FLOP
-    QN;
-    //QN MEANS Q NOT
+    QN;//QN MEANS Q NOT
 }

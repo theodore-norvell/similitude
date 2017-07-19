@@ -12,10 +12,10 @@ import com.mun.model.component.Port;
 }
 **/
 class LinkAndComponentAndEndpointAndPortArray {
-    @:isVar var linkArray(get, set):Array<Link>;
-    @:isVar var componentArray(get, set):Array<Component>;
-    @:isVar var endponentArray(get, set):Array<Endpoint>;
-    @:isVar var portArray(get, set):Array<Port>;
+    var linkArray:Array<Link>;
+    var componentArray:Array<Component>;
+    var endponentArray:Array<Endpoint>;
+    var portArray:Array<Port>;
     public function new() {
         this.linkArray = new Array<Link>();
         this.componentArray = new Array<Component>();
@@ -55,36 +55,52 @@ class LinkAndComponentAndEndpointAndPortArray {
         portArray.remove(port);
     }
 
-    public function get_linkArray():Array<Link> {
-        return linkArray;
+    public function get_linkIterator():Iterator<Link> {
+        return linkArray.iterator();
     }
 
-    public function set_linkArray(value:Array<Link>) {
-        return this.linkArray = value;
+    public function get_componentIterator():Iterator<Component> {
+        return componentArray.iterator();
     }
 
-    public function get_componentArray():Array<Component> {
-        return componentArray;
+    public function get_endponentIterator():Iterator<Endpoint> {
+        return endponentArray.iterator();
     }
 
-    public function set_componentArray(value:Array<Component>) {
-        return this.componentArray = value;
+    public function get_portIterator():Iterator<Port>{
+        return portArray.iterator();
     }
 
-    public function get_endponentArray():Array<Endpoint> {
-        return endponentArray;
+    public function getLinkIteratorLength():Int{
+        return linkArray.length;
     }
 
-    public function set_endponentArray(value:Array<Endpoint>) {
-        return this.endponentArray = value;
+    public function getEndppointIteratorLength():Int{
+        return endponentArray.length;
     }
 
-    public function get_portArray():Array<Port> {
-        return portArray;
+    public function getComponentIteratorLength():Int{
+        return componentArray.length;
     }
 
-    public function set_portArray(value:Array<Port>) {
-        return this.portArray = value;
+    public function getPortIteratorLength():Int{
+        return portArray.length;
+    }
+
+    public function getComponentFromIndex(index:Int):Component{
+        return componentArray[index];
+    }
+
+    public function getLinkFromIndex(index:Int):Link{
+        return linkArray[index];
+    }
+
+    public function getEndpointFromIndex(index:Int):Endpoint{
+        return endponentArray[index];
+    }
+
+    public function getPortFromIndex(index:Int):Port{
+        return portArray[index];
     }
 
     public function clean(){
@@ -95,13 +111,13 @@ class LinkAndComponentAndEndpointAndPortArray {
     }
 
     public function isEmpty():Bool{
-        if(linkArray == null || linkArray.length == 0){
+        if(linkArray.length == 0){
             return true;
-        }else if(componentArray == null || componentArray.length == 0){
+        }else if(componentArray.length == 0){
             return true;
-        }else if(endponentArray == null || endponentArray.length == 0){
+        }else if(endponentArray.length == 0){
             return true;
-        }else if(portArray == null || portArray.length == 0){
+        }else if(portArray.length == 0){
             return true;
         }else{
             return false;

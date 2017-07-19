@@ -1,20 +1,20 @@
 package com.mun.controller.command;
 
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.Component;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 /**
 * change the Orientation
 * @author wanhui
 **/
 class OrientationCommand implements Command {
     var componentArray:Array<Component> = new Array<Component>();
-    var newOrientation:Orientation;
-    var oldOrientationArray:Array<Orientation> = new Array<Orientation>();
-    var linkAndComponentArray:LinkAndComponentArray;
+    var newOrientation:ORIENTATION;
+    var oldOrientationArray:Array<ORIENTATION> = new Array<ORIENTATION>();
+    var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
 
-    public function new(componentArray:Array<Component>, newOrientation:Orientation) {
-        linkAndComponentArray = new LinkAndComponentArray();
+    public function new(componentArray:Array<Component>, newOrientation:ORIENTATION) {
+        linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
 
         for(i in componentArray){
             this.componentArray.push(i);
@@ -22,14 +22,15 @@ class OrientationCommand implements Command {
 
         this.newOrientation = newOrientation;
 
-        linkAndComponentArray.set_componentArray(this.componentArray);
-
+        linkAndComponentArray.clean();
         for(i in 0...componentArray.length){
+            linkAndComponentArray.addComponent(componentArray[i]);
+
             oldOrientationArray[i] = componentArray[i].get_orientation();
         }
     }
 
-    public function undo():LinkAndComponentArray {
+    public function undo():LinkAndComponentAndEndpointAndPortArray {
         for(i in 0...componentArray.length){
             componentArray[i].set_orientation(oldOrientationArray[i]);
             componentArray[i].updateMoveComponentPortPosition(componentArray[i].get_xPosition(), componentArray[i].get_yPosition());
@@ -37,7 +38,7 @@ class OrientationCommand implements Command {
         return linkAndComponentArray;
     }
 
-    public function redo():LinkAndComponentArray {
+    public function redo():LinkAndComponentAndEndpointAndPortArray {
         execute();
         return linkAndComponentArray;
     }

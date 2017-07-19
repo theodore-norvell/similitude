@@ -1,18 +1,16 @@
 package com.mun.controller.componentUpdate;
 
-import com.mun.model.component.Component;
-import com.mun.model.component.Link;
 import js.jquery.JQuery;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 import js.html.DOMElement;
 import js.Browser;
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 /**
 * update the tool bar
 **/
 class UpdateToolBar {
     var updateCircuitDiagram:UpdateCircuitDiagram;
-    var linkAndComponentArray:LinkAndComponentArray;
+    var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
     var nameInput:DOMElement;
     var orientation:DOMElement;
     var orientation_div:DOMElement;
@@ -23,7 +21,7 @@ class UpdateToolBar {
     var redo:DOMElement;
 
     public function new(updateCircuitDiagram:UpdateCircuitDiagram) {
-        linkAndComponentArray = new LinkAndComponentArray();
+        linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
 
         this.updateCircuitDiagram = updateCircuitDiagram;
 
@@ -54,28 +52,28 @@ class UpdateToolBar {
         updateCircuitDiagram.get_commandManager().recordFlagRest();
     }
 
-    public function update(linkAndComponentArray:LinkAndComponentArray){
+    public function update(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
 
         linkAndComponentArrayReset();
 
-        if(linkAndComponentArray.get_componentArray() != null){
-            for(i in linkAndComponentArray.get_componentArray()){
+        if(linkAndComponentArray.getComponentIteratorLength() != 0){
+            for(i in linkAndComponentArray.get_componentIterator()){
                 this.linkAndComponentArray.addComponent(i);
             }
         }
 
-        if(linkAndComponentArray.get_linkArray() != null){
-            for(i in linkAndComponentArray.get_linkArray()){
+        if(linkAndComponentArray.getLinkIteratorLength() != 0){
+            for(i in linkAndComponentArray.get_linkIterator()){
                 this.linkAndComponentArray.addLink(i);
             }
         }
 
         //linkAndComponentArray may contains link and component, so when link and component both exists, then only show those things both have
 
-        if(linkAndComponentArray.get_componentArray().length != 0 && (linkAndComponentArray.get_linkArray() == null || linkAndComponentArray.get_linkArray().length == 0)){
+        if(linkAndComponentArray.getComponentIteratorLength() != 0 && linkAndComponentArray.getLinkIteratorLength() == 0){
             visible();
             setOrientation();
-            if(linkAndComponentArray.get_componentArray().length == 1){
+            if(linkAndComponentArray.getComponentIteratorLength() == 1){
                 setNameInput();
             }else{
                 component_name_div.style.visibility = "hidden";
@@ -88,52 +86,52 @@ class UpdateToolBar {
     }
 
     public function setOrientation(){
-        if(linkAndComponentArray.get_componentArray() != null && linkAndComponentArray.get_componentArray().length == 1){
-            new JQuery(orientation).val(linkAndComponentArray.get_componentArray()[0].get_orientation() + "");
+        if(linkAndComponentArray.getComponentIteratorLength() == 1){
+            new JQuery(orientation).val(linkAndComponentArray.getComponentFromIndex(0).get_orientation()+ "");
         }else{
-            new JQuery(orientation).val(Orientation.UNKNOW + "");
+            new JQuery(orientation).val(ORIENTATION.UNKNOW + "");
         }
 
     }
 
     public function setNameInput(){
-        new JQuery(nameInput).val(linkAndComponentArray.get_componentArray()[0].get_name());
+        new JQuery(nameInput).val(linkAndComponentArray.getComponentFromIndex(0).get_name());
     }
 
     public function changeToNorth(){
-        if(linkAndComponentArray.get_componentArray().length != 0){
-            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentArray(),Orientation.NORTH);
+        if(linkAndComponentArray.getComponentIteratorLength() != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.NORTH);
             setOrientation();
         }
     }
     public function changeToSouth(){
-        if(linkAndComponentArray.get_componentArray().length != 0){
-            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentArray(),Orientation.SOUTH);
+        if(linkAndComponentArray.getComponentIteratorLength() != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.SOUTH);
             setOrientation();
         }
     }
     public function changeToWest(){
-        if(linkAndComponentArray.get_componentArray().length != 0){
-            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentArray(),Orientation.WEST);
+        if(linkAndComponentArray.getComponentIteratorLength() != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.WEST);
             setOrientation();
         }
     }
     public function chageToEast(){
-        if(linkAndComponentArray.get_componentArray().length != 0){
-            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentArray(),Orientation.EAST);
+        if(linkAndComponentArray.getComponentIteratorLength() != 0){
+            updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.EAST);
             setOrientation();
         }
     }
 
     public function inputChange(){
-        if(linkAndComponentArray.get_componentArray() != null && linkAndComponentArray.get_componentArray().length == 1){
+        if(linkAndComponentArray.getComponentIteratorLength() == 1){
             var temp:Dynamic = new JQuery(nameInput).val();
-            updateCircuitDiagram.setComponentName(linkAndComponentArray.get_componentArray()[0],temp);
+            updateCircuitDiagram.setComponentName(linkAndComponentArray.getComponentFromIndex(0),temp);
         }
     }
 
     public function deleteObject(){
-        if(linkAndComponentArray.get_componentArray().length != 0 || linkAndComponentArray.get_linkArray().length != 0){
+        if(linkAndComponentArray.getComponentIteratorLength() != 0 || linkAndComponentArray.getLinkIteratorLength() != 0){
             updateCircuitDiagram.deleteObject(linkAndComponentArray);
         }
     }

@@ -3,17 +3,17 @@ package com.mun.controller.command;
 * interface for command, use command pattern to process some operations
 * @author wanhui
 **/
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 interface Command {
     /**
     * undo command
     **/
-    public function undo():LinkAndComponentArray;
+    public function undo():LinkAndComponentAndEndpointAndPortArray;
 
     /**
     * redo command
     **/
-    public function redo():LinkAndComponentArray;
+    public function redo():LinkAndComponentAndEndpointAndPortArray;
 
     /**
     * execute command

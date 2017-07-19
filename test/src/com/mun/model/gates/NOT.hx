@@ -7,8 +7,8 @@ import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
-import com.mun.model.enumeration.Orientation;
-import com.mun.model.enumeration.ValueLogic;
+import com.mun.model.enumeration.ORIENTATION;
+import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * NOT gate<br>
  * Truth Table
@@ -26,7 +26,7 @@ import com.mun.model.enumeration.ValueLogic;
 class NOT implements ComponentKind extends GateAbstract {
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
-        var value:ValueLogic = ValueLogic.TRUE;
+        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
 
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.INPUT) {//for input gate there should be have only one input port and also only one output port
@@ -36,23 +36,23 @@ class NOT implements ComponentKind extends GateAbstract {
         }
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.OUTPUT) {
-                if (value == ValueLogic.TRUE)
-                    port.set_value(ValueLogic.FALSE);
-                else if (value == ValueLogic.FALSE)
-                    port.set_value(ValueLogic.TRUE);
+                if (value == VALUE_LOGIC.TRUE)
+                    port.set_value(VALUE_LOGIC.FALSE);
+                else if (value == VALUE_LOGIC.FALSE)
+                    port.set_value(VALUE_LOGIC.TRUE);
             }
         }
 
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         if(true){//not gate not have one input
             inportNum = 1;
         }
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
@@ -67,7 +67,7 @@ class NOT implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
@@ -82,7 +82,7 @@ class NOT implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
@@ -97,7 +97,7 @@ class NOT implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {

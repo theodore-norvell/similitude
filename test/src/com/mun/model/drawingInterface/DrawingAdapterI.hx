@@ -2,7 +2,7 @@ package com.mun.model.drawingInterface;
 
 import com.mun.view.drawingImpl.Transform;
 import js.html.CanvasRenderingContext2D;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 /**  A drawing adaptor represents a tool for outputting
  *   drawings to a part of a screen or page or similar
  *   device.
@@ -70,7 +70,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw an NAND gate within a given bounding box.
 	 *
@@ -80,7 +80,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw an OR gate within a given bounding box.
 	 *
@@ -90,7 +90,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw a NOR gate within a given bounding box.
 	 *
@@ -100,7 +100,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw a buffer (i.e. triangle) within a given bounding box.
 	 *
@@ -110,7 +110,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw a NOT gate within a given bounding box.
 	 *
@@ -120,7 +120,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw a XOR gate within a given bounding box.
 	 *
@@ -130,7 +130,7 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 * @param orientation -- The direction of the output.
 	 */
-    public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void;
+    public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void;
 
     /** Draw a rectangle.
 	 *

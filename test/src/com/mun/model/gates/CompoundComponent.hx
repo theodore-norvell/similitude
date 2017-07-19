@@ -4,7 +4,7 @@ import com.mun.view.drawComponents.DrawComponent;
 import com.mun.view.drawComponents.DrawCompoundComponent;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
-import com.mun.model.enumeration.Box;
+import com.mun.model.enumeration.BOX;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
@@ -15,7 +15,7 @@ import com.mun.model.component.Inport;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.component.Port;
 import com.mun.global.Constant.*;
 /**
@@ -49,11 +49,11 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return ; //TODO
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, inportNum:Int):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         //find how many inputs gate in the sub-circuit diagram
         switch(orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
@@ -72,7 +72,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                     }
                 }
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
@@ -89,7 +89,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                     }
                 }
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
@@ -142,7 +142,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
             drawComponent.drawCorrespondingComponent("black");
         }
 
-        if(BOX_TYPE == Box.WHITE_BOX){
+        if(BOX_TYPE == BOX.WHITE_BOX){
             //compound component need to draw all the components in ComponentArray, which should make a new transfrom
             drawingAdapter = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapter);
@@ -163,16 +163,16 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         var hitComponent:Component = isInComponent(outerWorldCoordinates);
         if(hitComponent == null){
             return linkAndComponentAndEndpointAndPortArray;
-        }else if(BOX_TYPE == Box.WHITE_BOX){
+        }else if(BOX_TYPE == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
             var result:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(innerWorldCoordinates, mode);
 
             if(result.isEmpty() || mode == MODE.INCLUDE_PARENTS){
-                result.get_componentArray().push(component); }
+                result.addComponent(component); }
             return result;
         }else{
-            return linkAndComponentAndEndpointAndPortArray.get_componentArray().push(component);
+            return linkAndComponentAndEndpointAndPortArray.addComponent(component);
         }
     }
 
@@ -181,7 +181,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
 
         if(isInComponent(coordinate) == null){
             return worldPointArray.push( coordinate );
-        }else if(BOX_TYPE == Box.WHITE_BOX){
+        }else if(BOX_TYPE == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
             var wForDiagram:Coordinate = transform.pointInvert(coordinate);
             return circuitDiagram.findWorldPoint(wForDiagram, mode);

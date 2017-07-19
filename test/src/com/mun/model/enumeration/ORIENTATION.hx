@@ -1,6 +1,6 @@
 package com.mun.model.enumeration;
 
-enum Orientation {
+enum ORIENTATION {
     NORTH;
     SOUTH;
     WEST;

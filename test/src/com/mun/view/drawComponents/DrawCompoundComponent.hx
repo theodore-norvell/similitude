@@ -1,6 +1,6 @@
 package com.mun.view.drawComponents;
 import com.mun.model.component.Port;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.global.Constant.*;
@@ -33,16 +33,16 @@ class DrawCompoundComponent implements DrawComponent{
             //draw text
             drawingAdapter.setTextColor("black");
             switch (component.get_orientation()){
-                case Orientation.EAST : {
+                case ORIENTATION.EAST : {
                     drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition() - 2, port.get_yPosition() - 5, component.get_width() - 4);
                 };
-                case Orientation.WEST : {
+                case ORIENTATION.WEST : {
                     drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition() - 2, port.get_yPosition() - 5, component.get_width() - 4);
                 };
-                case Orientation.SOUTH : {
+                case ORIENTATION.SOUTH : {
                     drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition() - 2, port.get_yPosition() - 5, component.get_width() - 4);
                 };
-                case Orientation.NORTH : {
+                case ORIENTATION.NORTH : {
                     drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition() - 2, port.get_yPosition() - 5, component.get_width() - 4);
                 };
                 default : {

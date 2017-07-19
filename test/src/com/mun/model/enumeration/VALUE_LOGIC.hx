@@ -10,7 +10,7 @@ package com.mun.model.enumeration;
  * @author wanhui
  *
  */
-enum ValueLogic {
+enum VALUE_LOGIC {
     FALSE;
     TRUE;
     UNDEFINED;

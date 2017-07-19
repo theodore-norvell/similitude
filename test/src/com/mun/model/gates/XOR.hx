@@ -7,8 +7,8 @@ import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
-import com.mun.model.enumeration.Orientation;
-import com.mun.model.enumeration.ValueLogic;
+import com.mun.model.enumeration.ORIENTATION;
+import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * XOR gate<br>
  * Truth Table
@@ -28,20 +28,20 @@ import com.mun.model.enumeration.ValueLogic;
 class XOR implements ComponentKind extends GateAbstract {
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
-        var value:ValueLogic;
+        var value:VALUE_LOGIC;
         var counter:Int = 0;//counter
         //for 2 or more inputs, if the number of  ValueLogic.TRUE is even, the output should be ValueLogic.FALSE
         //otherwise, the output should be ValueLogic.TRUE
         for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.INPUT && port.get_value() == ValueLogic.TRUE) {
+            if (port.get_portDescription() == IOTYPE.INPUT && port.get_value() == VALUE_LOGIC.TRUE) {
                 counter++;
             }
         }
 
         if (counter % 2 == 0) {
-            value = ValueLogic.FALSE;
+            value = VALUE_LOGIC.FALSE;
         } else {
-            value = ValueLogic.TRUE;
+            value = VALUE_LOGIC.TRUE;
         }
 
         for (port in portArray) {
@@ -52,13 +52,13 @@ class XOR implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         if(inportNum == null || inportNum <2){
             inportNum = 2;
         }
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
@@ -73,7 +73,7 @@ class XOR implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
@@ -88,7 +88,7 @@ class XOR implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
@@ -103,7 +103,7 @@ class XOR implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {

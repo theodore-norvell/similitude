@@ -7,7 +7,7 @@ import com.mun.type.WorldPoint;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.gates.ComponentKind;
 /**
  * Component composite by gates and ports, in this class
@@ -20,7 +20,7 @@ class Component {
     var yPosition:Float;//the y position of the component
     var height:Float;//height
     var width:Float;//width
-    var orientation:Orientation;//the orientation of the component
+    var orientation:ORIENTATION;//the orientation of the component
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
@@ -38,7 +38,7 @@ class Component {
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, componentKind:ComponentKind, inportNum:Int) {
+    public function new(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.height = height;
@@ -81,11 +81,11 @@ class Component {
         return this.yPosition = value;
     }
 
-    public function get_orientation():Orientation {
+    public function get_orientation():ORIENTATION {
         return orientation;
     }
 
-    public function set_orientation(value:Orientation) {
+    public function set_orientation(value:ORIENTATION) {
         return this.orientation = value;
     }
 

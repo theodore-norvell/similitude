@@ -1,5 +1,5 @@
 package com.mun.model.enumeration;
-enum Box {
+enum BOX {
     WHITE_BOX;
     BLACK_BOX;
 }

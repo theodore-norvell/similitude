@@ -1,49 +1,49 @@
 package com.mun.controller.command;
 
 import com.mun.model.component.CircuitDiagramI;
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 /**
 * delete command
 * @author wanhui
 **/
 class DeleteCommand implements Command {
     var circuitDiagram:CircuitDiagramI;
-    var linkAndComponentArray:LinkAndComponentArray;
+    var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
 
-    public function new(linkAndComponentArray:LinkAndComponentArray, circuitDiagram:CircuitDiagramI) {
-        linkAndComponentArray = new LinkAndComponentArray();
+    public function new(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, circuitDiagram:CircuitDiagramI) {
+        linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
 
-        this.linkAndComponentArray = linkAndComponentArray;
+        this.linkAndComponentAndEndpointAndPortArray = linkAndComponentArray;
         this.circuitDiagram = circuitDiagram;
     }
 
-    public function undo():LinkAndComponentArray {
-        if (linkAndComponentArray.get_linkArray() != null) {
-            for (i in linkAndComponentArray.get_linkArray()) {
+    public function undo():LinkAndComponentAndEndpointAndPortArray {
+        if (linkAndComponentAndEndpointAndPortArray.getLinkIteratorLength() != 0) {
+            for (i in linkAndComponentAndEndpointAndPortArray.get_linkIterator()) {
                 circuitDiagram.addLink(i);
             }
         }
 
-        if (linkAndComponentArray.get_componentArray() != null) {
-            for (i in linkAndComponentArray.get_componentArray()) {
+        if (linkAndComponentAndEndpointAndPortArray.getComponentIteratorLength() != 0) {
+            for (i in linkAndComponentAndEndpointAndPortArray.get_componentIterator()) {
                 circuitDiagram.addComponent(i);
             }
         }
 
-        return linkAndComponentArray;
+        return linkAndComponentAndEndpointAndPortArray;
     }
 
-    public function redo():LinkAndComponentArray {
+    public function redo():LinkAndComponentAndEndpointAndPortArray {
         execute();
-        return linkAndComponentArray;
+        return linkAndComponentAndEndpointAndPortArray;
     }
 
     public function execute():Void {
-        for (i in linkAndComponentArray.get_linkArray()) {
+        for (i in linkAndComponentAndEndpointAndPortArray.get_linkIterator()) {
             circuitDiagram.deleteLink(i);
         }
 
-        for (i in linkAndComponentArray.get_componentArray()) {
+        for (i in linkAndComponentAndEndpointAndPortArray.get_componentIterator()) {
             circuitDiagram.deleteComponent(i);
         }
 

@@ -8,8 +8,8 @@ import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
-import com.mun.model.enumeration.Orientation;
-import com.mun.model.enumeration.ValueLogic;
+import com.mun.model.enumeration.ORIENTATION;
+import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * input<br>
  * the output is the same as input
@@ -20,7 +20,7 @@ class Input implements ComponentKind extends GateAbstract {
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
-        var value:ValueLogic = ValueLogic.TRUE;
+        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
 
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.INPUT) {//for input gate there should be have only one input port and also only one output port
@@ -37,13 +37,13 @@ class Input implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         if(true){//input should only have one input
             inportNum = 1;
         }
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 //inport
                 var inport:Port = new Inport(xPosition - width / 2, yPosition);
                 inport.set_portDescription(IOTYPE.INPUT);
@@ -53,7 +53,7 @@ class Input implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 //inport
                 var inport:Port = new Inport(xPosition, yPosition + height / 2);
                 inport.set_portDescription(IOTYPE.INPUT);
@@ -63,7 +63,7 @@ class Input implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 var inport:Port = new Inport(xPosition, yPosition - height / 2);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
@@ -72,7 +72,7 @@ class Input implements ComponentKind extends GateAbstract {
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 var inport:Port = new Inport(xPosition + width / 2, yPosition);
                 inport.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport);
@@ -98,21 +98,21 @@ class Input implements ComponentKind extends GateAbstract {
     /**
     * different from others, this function used in move command when the componenet has been re-located
     **/
-    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 portArray[0].set_xPosition(xPosition - width / 2);
                 portArray[0].set_yPosition(yPosition);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 portArray[0].set_xPosition(xPosition);
                 portArray[0].set_yPosition(yPosition + height / 2);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 portArray[0].set_xPosition(xPosition);
                 portArray[0].set_yPosition(yPosition - height / 2);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 portArray[0].set_xPosition(xPosition + width / 2);
                 portArray[0].set_yPosition(yPosition);
             };
@@ -125,21 +125,21 @@ class Input implements ComponentKind extends GateAbstract {
     /**
     * different from others, this function used in move command when the componenet has been re-located
     **/
-    override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>{
+    override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 portArray[0].set_xPosition(xPosition + width / 2);
                 portArray[0].set_yPosition(yPosition);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 portArray[0].set_xPosition(xPosition);
                 portArray[0].set_yPosition(yPosition - height / 2);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 portArray[0].set_xPosition(xPosition);
                 portArray[0].set_yPosition(yPosition + height / 2);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 portArray[0].set_xPosition(xPosition - width / 2);
                 portArray[0].set_yPosition(yPosition);
             };

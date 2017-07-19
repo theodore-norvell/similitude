@@ -2,7 +2,7 @@ package com.mun.controller.componentUpdate;
 
 import com.mun.view.drawingImpl.Transform;
 import com.mun.view.drawingImpl.DrawingAdapter;
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.CircuitDiagramI;
 import js.html.CanvasElement;
 /**
@@ -18,7 +18,7 @@ class UpdateCanvas {
         this.circuitDiagram = circuitDiagram;
         this.transform = transform;
     }
-    public function update(?linkAndComponentArray:LinkAndComponentArray){
+    public function update(?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         //clear the canvas
         canvas.width = canvas.width;
 

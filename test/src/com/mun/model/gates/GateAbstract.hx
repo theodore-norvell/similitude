@@ -8,7 +8,7 @@ import com.mun.type.WorldPoint;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Port;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 /**
 * abstract class for gates
 * @author wanhui
@@ -48,27 +48,27 @@ class GateAbstract{
         return this.sequence = value;
     }
 
-    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition - width / 2);
                     portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
                 }
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
                     portArray[i].set_yPosition(yPosition + height / 2);
                 }
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
                     portArray[i].set_yPosition(yPosition - height / 2);
                 }
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 for (i in 0...portArray.length) {
                     portArray[i].set_xPosition(xPosition + width / 2);
                     portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
@@ -81,27 +81,27 @@ class GateAbstract{
         return portArray;
     }
 
-    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>{
+    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
         switch(orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 for(i in 0...portArray.length){
                     portArray[i].set_xPosition(xPosition + width / 2);
                     portArray[i].set_yPosition(yPosition);
                 }
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 for(i in 0...portArray.length){
                     portArray[i].set_xPosition(xPosition);
                     portArray[i].set_yPosition(yPosition - height / 2);
                 }
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 for(i in 0...portArray.length){
                     portArray[i].set_xPosition(xPosition);
                     portArray[i].set_yPosition(yPosition + height / 2);
                 }
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 for(i in 0...portArray.length){
                     portArray[i].set_xPosition(xPosition - width / 2);
                     portArray[i].set_yPosition(yPosition);
@@ -117,7 +117,7 @@ class GateAbstract{
     public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
         var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
-        linkAndComponentAndEndpointAndPortArray.get_componentArray().push(isInComponent(coordinate));
+        linkAndComponentAndEndpointAndPortArray.addComponent(isInComponent(coordinate));
 
         return linkAndComponentAndEndpointAndPortArray;
     }

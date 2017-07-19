@@ -8,8 +8,8 @@ import com.mun.model.component.Inport;
 import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
-import com.mun.model.enumeration.Orientation;
-import com.mun.model.enumeration.ValueLogic;
+import com.mun.model.enumeration.ORIENTATION;
+import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * Flip-Flop<br>
  * Truth Table
@@ -30,11 +30,11 @@ class FlipFlop implements ComponentKind extends GateAbstract {
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
-        var value:ValueLogic = ValueLogic.TRUE;
+        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
 
         for (port in portArray) {
             if (port.get_portDescription() == IOTYPE.CLK) {
-                if (port.get_value() != ValueLogic.RISING_EDGE) {
+                if (port.get_value() != VALUE_LOGIC.RISING_EDGE) {
                     //if clock is not at rising edge, then the value of flip-flop will not change
                     return portArray;
                 }
@@ -53,21 +53,21 @@ class FlipFlop implements ComponentKind extends GateAbstract {
             }
 
             if (port.get_portDescription() == IOTYPE.QN) {
-                if (value == ValueLogic.TRUE) {
-                    port.set_value(ValueLogic.FALSE);
-                } else if (value == ValueLogic.FALSE) {
-                    port.set_value(ValueLogic.TRUE);
+                if (value == VALUE_LOGIC.TRUE) {
+                    port.set_value(VALUE_LOGIC.FALSE);
+                } else if (value == VALUE_LOGIC.FALSE) {
+                    port.set_value(VALUE_LOGIC.TRUE);
                 }
             }
         }
         return portArray;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         //flip-flop have an input inport and one clock inport
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 //inport
                 var inport_D:Port = new Inport(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_D.set_portDescription(IOTYPE.D);
@@ -83,7 +83,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 //inport
                 var inport_D:Port = new Inport(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_D.set_portDescription(IOTYPE.D);
@@ -99,7 +99,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 //inport
                 var inport_D:Port = new Inport(xPosition - width / 2 + width / 3 * 1, yPosition - height / 2);
                 inport_D.set_portDescription(IOTYPE.D);
@@ -115,7 +115,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 //inport
                 var inport_D:Port = new Inport(xPosition - width / 2 + width / 3 * 1, yPosition + height / 2);
                 inport_D.set_portDescription(IOTYPE.D);
@@ -145,9 +145,9 @@ class FlipFlop implements ComponentKind extends GateAbstract {
     /**
     * different from others, this function used in move command when the componenet has been re-located
     **/
-    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
+    override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.D){
                         portArray[i].set_xPosition(xPosition - width / 2);
@@ -160,7 +160,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.D){
                         portArray[i].set_xPosition(xPosition + width / 2);
@@ -173,7 +173,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.D){
                         portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
@@ -186,7 +186,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.D){
                         portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
@@ -208,9 +208,9 @@ class FlipFlop implements ComponentKind extends GateAbstract {
     /**
     * different from others, this function used in move command when the componenet has been re-located
     **/
-    override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>{
+    override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.Q){
                         portArray[i].set_xPosition(xPosition + width / 2);
@@ -223,7 +223,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.Q){
                         portArray[i].set_xPosition(xPosition - width / 2);
@@ -236,7 +236,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.Q){
                         portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);
@@ -249,7 +249,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
                     }
                 }
             };
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 for(i in 0...portArray.length){
                     if(portArray[i].get_portDescription() == IOTYPE.Q){
                         portArray[i].set_xPosition(xPosition - width / 2 + width / 3 * 1);

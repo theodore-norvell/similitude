@@ -1,7 +1,7 @@
 package com.mun.view.drawingImpl;
 
 import com.mun.type.Coordinate;
-import com.mun.model.enumeration.Orientation;
+import com.mun.model.enumeration.ORIENTATION;
 class Box {
     var xa:Float;
     var ya:Float;
@@ -12,7 +12,7 @@ class Box {
     var xd:Float;
     var yd:Float;
 
-    public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:Orientation, worldToView:WorldToViewI) {
+    public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:ORIENTATION, worldToView:WorldToViewI) {
 
         var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x_position, y_position));
 
@@ -21,25 +21,25 @@ class Box {
         var x1:Float = coordinate.get_xPosition() + width / 2;
         var y1:Float = coordinate.get_yPosition() + height / 2;
         switch (orientation){
-            case Orientation.EAST : {
+            case ORIENTATION.EAST : {
                 xa = x0; ya = y0;
                 xb = x1; yb = y0;
                 xc = x1; yc = y1;
                 xd = x0; yd = y1;
             }
-            case Orientation.SOUTH : {
+            case ORIENTATION.SOUTH : {
                 xd = x0; yd = y0;
                 xa = x1; ya = y0;
                 xb = x1; yb = y1;
                 xc = x0; yc = y1;
             }
-            case Orientation.WEST : {
+            case ORIENTATION.WEST : {
                 xc = x0; yc = y0;
                 xd = x1; yd = y0;
                 xa = x1; ya = y1;
                 xb = x0; yb = y1;
             }
-            case Orientation.NORTH : {
+            case ORIENTATION.NORTH : {
                 xb = x0; yb = y0;
                 xc = x1; yc = y0;
                 xd = x1; yd = y1;

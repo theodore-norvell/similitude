@@ -1,6 +1,6 @@
 package com.mun.controller.command;
 
-import com.mun.type.LinkAndComponentArray;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 /**
 * command manager used to manage those command
 * @author wanhui
@@ -8,13 +8,13 @@ import com.mun.type.LinkAndComponentArray;
 class CommandManager {
     var undoStack:Array<Command> = new Array<Command>();
     var redoStack:Array<Command> = new Array<Command>();
-    var linkAndComponentArray:LinkAndComponentArray;
+    var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
     //most of actions will result add lots of commands into stack. such as
     //moveing component, link. therefore, need a flag to record the first step of moving
     var recordFlag:Bool = false;
 
     public function new() {
-        linkAndComponentArray = new LinkAndComponentArray();
+        linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
     }
 
     public function execute(command:Command):Void {
@@ -31,24 +31,24 @@ class CommandManager {
         }
     }
 
-    public function undo():LinkAndComponentArray {
+    public function undo():LinkAndComponentAndEndpointAndPortArray {
         if (undoStack.length == 0) {
-            return linkAndComponentArray;
+            return linkAndComponentAndEndpointAndPortArray;
         }
         var command:Command = undoStack.pop();
-        linkAndComponentArray = command.undo();
+        linkAndComponentAndEndpointAndPortArray = command.undo();
         redoStack.push(command);
-        return linkAndComponentArray;
+        return linkAndComponentAndEndpointAndPortArray;
     }
 
-    public function redo():LinkAndComponentArray {
+    public function redo():LinkAndComponentAndEndpointAndPortArray {
         if (redoStack.length == 0) {
-            return linkAndComponentArray;
+            return linkAndComponentAndEndpointAndPortArray;
         }
         var command:Command = redoStack.pop();
-        linkAndComponentArray = command.redo();
+        linkAndComponentAndEndpointAndPortArray = command.redo();
         undoStack.push(command);
-        return linkAndComponentArray;
+        return linkAndComponentAndEndpointAndPortArray;
     }
 
     public function recordFlagRest(){
