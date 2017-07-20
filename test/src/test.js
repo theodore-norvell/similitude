@@ -2074,6 +2074,10 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			this.lastState = this.controllerState;
 			this.controllerState = com_mun_model_enumeration_C_$STATE.MOVE;
 			this.checkState();
+		} else if(this.controllerState == com_mun_model_enumeration_C_$STATE.MOVE && this.mouseState == com_mun_model_enumeration_M_$STATE.MOUSE_DOWN) {
+			this.lastState = this.controllerState;
+			this.controllerState = com_mun_model_enumeration_C_$STATE.MOVE;
+			this.checkState();
 		}
 	}
 	,checkHitList: function() {

@@ -170,6 +170,10 @@ class ControllerCanvasContext {
             lastState = controllerState;
             controllerState = C_STATE.MOVE;
             checkState();
+        }else if(controllerState == C_STATE.MOVE && mouseState == M_STATE.MOUSE_DOWN){
+            lastState = controllerState;
+            controllerState = C_STATE.MOVE;
+            checkState();
         }
     }
 
