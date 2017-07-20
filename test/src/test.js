@@ -2082,7 +2082,8 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	}
 	,checkHitList: function() {
 		var hitList = this.circuitDiagram.findHitList(this.mouseDownWorldCoordinate,this.mode);
-		if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0 && hitList.getComponentIteratorLength() == 0 && hitList.getLinkIteratorLength() == 0) {
+		haxe_Log.trace(hitList,{ fileName : "ControllerCanvasContext.hx", lineNumber : 186, className : "com.mun.controller.controllerState.ControllerCanvasContext", methodName : "checkHitList"});
+		if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0) {
 			this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
 			this.checkState();
 		} else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() != 0) {
@@ -3310,6 +3311,7 @@ com_mun_model_gates_GateAbstract.prototype = {
 	,findHitList: function(coordinate,mode) {
 		var linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 		linkAndComponentAndEndpointAndPortArray.addComponent(this.isInComponent(coordinate));
+		linkAndComponentAndEndpointAndPortArray.addPort(this.isOnPort(coordinate));
 		return linkAndComponentAndEndpointAndPortArray;
 	}
 	,isInComponent: function(coordinate) {
@@ -3320,6 +3322,33 @@ com_mun_model_gates_GateAbstract.prototype = {
 	}
 	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
 		if(mouseXPosition >= Math.abs(orignalXposition - width / 2) && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= Math.abs(orignalYposition - heigh / 2) && mouseYposition <= orignalYposition + heigh / 2)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isOnPort: function(cooridnate) {
+		var port;
+		var j = this.component.get_inportIterator();
+		while(j.hasNext()) {
+			var j1 = j.next();
+			if(this.isInCircle(cooridnate,j1.get_xPosition(),j1.get_yPosition())) {
+				port = j1;
+				return port;
+			}
+		}
+		var j2 = this.component.get_outportIterator();
+		while(j2.hasNext()) {
+			var j3 = j2.next();
+			if(this.isInCircle(cooridnate,j3.get_xPosition(),j3.get_yPosition())) {
+				port = j3;
+				return port;
+			}
+		}
+		return null;
+	}
+	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
+		if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= com_mun_global_Constant.portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= com_mun_global_Constant.portRadius) {
 			return true;
 		} else {
 			return false;
@@ -6822,6 +6851,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_io_FPHelper = function() { };
 $hxClasses["haxe.io.FPHelper"] = haxe_io_FPHelper;

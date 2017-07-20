@@ -1,4 +1,7 @@
 package com.mun.model.gates;
+import com.mun.model.component.Link;
+import com.mun.model.component.Endpoint;
+import com.mun.type.Object;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.component.Component;
@@ -9,6 +12,7 @@ import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.ORIENTATION;
+import com.mun.global.Constant.*;
 /**
 * abstract class for gates
 * @author wanhui
@@ -119,6 +123,8 @@ class GateAbstract{
 
         linkAndComponentAndEndpointAndPortArray.addComponent(isInComponent(coordinate));
 
+        linkAndComponentAndEndpointAndPortArray.addPort(isOnPort(coordinate));
+
         return linkAndComponentAndEndpointAndPortArray;
     }
 
@@ -152,6 +158,53 @@ class GateAbstract{
             return false;
         }
     }
+
+    /**
+    * verify this coordinate on port or not
+    * @param coordinate
+    * @return if the coordinate on the port then return the port
+    *           or  return null;
+    **/
+    function isOnPort(cooridnate:Coordinate):Port{
+        var port:Port;
+
+            for(j in component.get_inportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    port = j;
+                    return port;
+                }
+            }
+            for(j in component.get_outportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    port = j;
+                    return port;
+                }
+            }
+
+        return null;
+    }
+
+
+    /**
+    * verify a point is in a circuit or not
+     * @param coordinate     the point need to be verified
+     * @param orignalXPosition   the circuit x position
+     * @param orignalYPosition   the circuit y position
+     * @return if in the circle, return true; otherwise, return false;
+    **/
+    function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
+        //the radius is 3
+        if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     /**
     * for all component kinds except, find world point always return a empty list
     **/

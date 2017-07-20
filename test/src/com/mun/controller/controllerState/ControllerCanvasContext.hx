@@ -186,7 +186,7 @@ class ControllerCanvasContext {
 
         //worldPointArray = circuitDiagram.findWorldPoint(worldCoordinate, pointMode);
 
-        if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0 && hitList.getComponentIteratorLength() == 0 && hitList.getLinkIteratorLength() == 0){
+        if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0){
             //only port slected
             controllerState = C_STATE.CREATE_LINK;
             checkState();
