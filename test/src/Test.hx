@@ -1,7 +1,7 @@
 package ;
 
+import com.mun.controller.controllerState.ControllerCanvasContext;
 import com.mun.global.Constant.*;
-import com.mun.controller.mouseAction.CanvasListener;
 import com.mun.model.component.CircuitDiagram;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
@@ -46,8 +46,6 @@ class Test {
 
         CONTEXT = cxt;
 
-//        var drawingAdapter:DrawingAdapterI = new DrawingAdapter(cxt);
-
         var circuitDiagram:CircuitDiagramI = new CircuitDiagram();
 
 
@@ -60,10 +58,12 @@ class Test {
         var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram, updateCircuitDiagram.get_transform());
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
-        //add canvas listener
-        var canvasListener:CanvasListener = new CanvasListener(canvas,updateCircuitDiagram,updateToolBar);
         //add button click listener
-        new ButtonClick(updateCircuitDiagram,pixelRatio, canvasListener);
+        var buttonClick = new ButtonClick(updateCircuitDiagram,pixelRatio);
+
+        var controllerCanvasContext:ControllerCanvasContext = new ControllerCanvasContext(canvas, circuitDiagram, updateCircuitDiagram, buttonClick, updateToolBar);
+
+        buttonClick.setControllerCanvasContext(controllerCanvasContext);
     }
 
 

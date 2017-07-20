@@ -48,14 +48,13 @@ class UpdateToolBar {
         toolBar.onfocus = onfocus;
     }
 
-    public function onfocus(){
+    function onfocus(){
         updateCircuitDiagram.get_commandManager().recordFlagRest();
     }
 
     public function update(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
 
         linkAndComponentArrayReset();
-
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             for(i in linkAndComponentArray.get_componentIterator()){
                 this.linkAndComponentArray.addComponent(i);
@@ -85,7 +84,7 @@ class UpdateToolBar {
         }
     }
 
-    public function setOrientation(){
+    function setOrientation(){
         if(linkAndComponentArray.getComponentIteratorLength() == 1){
             new JQuery(orientation).val(linkAndComponentArray.getComponentFromIndex(0).get_orientation()+ "");
         }else{
@@ -94,53 +93,53 @@ class UpdateToolBar {
 
     }
 
-    public function setNameInput(){
+    function setNameInput(){
         new JQuery(nameInput).val(linkAndComponentArray.getComponentFromIndex(0).get_name());
     }
 
-    public function changeToNorth(){
+    function changeToNorth(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.NORTH);
             setOrientation();
         }
     }
-    public function changeToSouth(){
+    function changeToSouth(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.SOUTH);
             setOrientation();
         }
     }
-    public function changeToWest(){
+    function changeToWest(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.WEST);
             setOrientation();
         }
     }
-    public function chageToEast(){
+    function chageToEast(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.EAST);
             setOrientation();
         }
     }
 
-    public function inputChange(){
+    function inputChange(){
         if(linkAndComponentArray.getComponentIteratorLength() == 1){
             var temp:Dynamic = new JQuery(nameInput).val();
             updateCircuitDiagram.setComponentName(linkAndComponentArray.getComponentFromIndex(0),temp);
         }
     }
 
-    public function deleteObject(){
+    function deleteObject(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0 || linkAndComponentArray.getLinkIteratorLength() != 0){
             updateCircuitDiagram.deleteObject(linkAndComponentArray);
         }
     }
 
-    public function undoCommand(){
+    function undoCommand(){
         updateCircuitDiagram.undo();
     }
 
-    public function redoCommand(){
+    function redoCommand(){
         updateCircuitDiagram.redo();
     }
 
@@ -172,7 +171,7 @@ class UpdateToolBar {
         }
     }
 
-    public function linkAndComponentArrayReset(){
+    function linkAndComponentArrayReset(){
         linkAndComponentArray.clean();
     }
 }

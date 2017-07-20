@@ -1,4 +1,7 @@
 package com.mun.controller.controllerState;
+import com.mun.model.component.CircuitDiagramI;
+import com.mun.controller.componentUpdate.UpdateToolBar;
+import com.mun.model.component.Endpoint;
 import com.mun.controller.mouseAction.ButtonClick;
 import com.mun.model.enumeration.KEY;
 import com.mun.model.enumeration.K_STATE;
@@ -11,7 +14,6 @@ import com.mun.model.enumeration.MODE;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.view.drawingImpl.ViewToWorld;
 import com.mun.view.drawingImpl.ViewToWorldI;
-import com.mun.model.component.CircuitDiagram;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import js.html.MouseEvent;
@@ -19,10 +21,11 @@ import js.html.CanvasElement;
 import com.mun.model.enumeration.C_STATE;
 class ControllerCanvasContext {
     var canvas:CanvasElement;
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var keyState:KeyState;
     var buttonClick:ButtonClick;
+    var updateToolBar:UpdateToolBar;
 
     var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
     var worldPointArray:Array<WorldPoint>;
@@ -38,13 +41,14 @@ class ControllerCanvasContext {
     var mode:MODE;
     var pointMode:POINT_MODE;
 
+    var hightLightLink:Link;
 
-
-    public function new(canvas:CanvasElement, circuitDiagram:CircuitDiagram, updateCircuitDiagram:UpdateCircuitDiagram, buttonClick:ButtonClick) {
+    public function new(canvas:CanvasElement, circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, buttonClick:ButtonClick, upateToolBar:UpdateToolBar) {
         this.canvas = canvas;
         this.circuitDiagram = circuitDiagram;
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.buttonClick = buttonClick;
+        this.updateToolBar = upateToolBar;
 
         controllerState = C_STATE.IDLE;
         lastState = C_STATE.IDLE;
@@ -104,12 +108,15 @@ class ControllerCanvasContext {
         lastState = controllerState;
         controllerState = C_STATE.IDLE;
         checkState();
+
+        //redraw canvas
+        updateCircuitDiagram.update();
     }
 
     function doMouseMove(event:MouseEvent){
         var x:Float = event.clientX;
         var y:Float = event.clientY;
-        var mouseMoveLocation:Coordinate = getPointOnCanvas(canvas,x,y);
+        var mouseMoveLocation:Coordinate = getPointOnCanvas(x,y);
 
         //translate to world coordinate
         mouseMoveWorldCoordiante = viewToWorld.convertCoordinate(mouseMoveLocation);
@@ -156,7 +163,9 @@ class ControllerCanvasContext {
             lastState = controllerState;
             controllerState = C_STATE.MOVE;
             checkState();
-        }else if((controllerState == C_STATE.SINGLE_SELECTION || controllerState = C_STATE.MULTI_SELECTION) && mouseState = M_STATE.MOUSE_DOWN){
+
+            controllerState = C_STATE.CREATE_COMPONENT;
+        }else if((controllerState == C_STATE.SINGLE_SELECTION || controllerState == C_STATE.MULTI_SELECTION || controllerState == C_STATE.CREATE_LINK) && mouseState == M_STATE.MOUSE_DOWN){
             lastState = controllerState;
             controllerState = C_STATE.MOVE;
             checkState();
@@ -175,16 +184,31 @@ class ControllerCanvasContext {
             //only port slected
             controllerState = C_STATE.CREATE_LINK;
             checkState();
-        }else if(hitList.getEndppointIteratorLength() != 0){//endpoint selected
+        }else if(hitList.getEndppointIteratorLength() !=0 && hitList.getPortIteratorLength() != 0){//if this point on one endpoint and one port
+            var endpoint:Endpoint = hitList.getEndpointFromIndex(0);
+            if(updateCircuitDiagram.findLinkThroughEndpoint(endpoint) == hightLightLink){
+                linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+            }else{
+                controllerState = C_STATE.CREATE_LINK;
+                checkState();
+            }
+        }else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() == 0){//endpoint selected
             //only one endpoint can be selected
             linkAndComponentAndEndpointAndPortArray.addEndpoint(hitList.getEndpointFromIndex(0));
         }else if(hitList.getComponentIteratorLength() != 0){//component selected
             linkAndComponentAndEndpointAndPortArray.addComponent(hitList.getComponentFromIndex(0));
         }else if(hitList.getLinkIteratorLength() != 0){//link selected
-            linkAndComponentAndEndpointAndPortArray.addLink(hitList.getLinkFromIndex(0));
+            var link:Link = hitList.getLinkFromIndex(0);
+            hightLightLink = link;
+            linkAndComponentAndEndpointAndPortArray.addLink(link);
         }else{
             //do nothing
         }
+
+        updateCircuitDiagram.hightLightObject(linkAndComponentAndEndpointAndPortArray);
+
+        //update tool bar
+        toolBarUpdate();
     }
 
     function checkState(){
@@ -220,6 +244,13 @@ class ControllerCanvasContext {
                 //no other state
             }
         }
+    }
 
+    function toolBarUpdate(){
+        if(linkAndComponentAndEndpointAndPortArray.getComponentIteratorLength() !=0 || linkAndComponentAndEndpointAndPortArray.getLinkIteratorLength() != 0){
+            updateToolBar.update(linkAndComponentAndEndpointAndPortArray);
+        }else{
+            updateToolBar.hidden();
+        }
     }
 }

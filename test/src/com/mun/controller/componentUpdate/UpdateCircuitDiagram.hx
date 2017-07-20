@@ -226,7 +226,7 @@ class UpdateCircuitDiagram {
         redrawCanvas(linkAndComponentArray);
     }
 
-    public function isOnPort(coordinate:Coordinate):Object{
+    function isOnPort(coordinate:Coordinate):Object{
         return circuitDiagramUtil.isOnPort(coordinate);
     }
 
@@ -296,5 +296,19 @@ class UpdateCircuitDiagram {
             i.get_leftEndpoint().updatePosition();
             i.get_rightEndpoint().updatePosition();
         }
+    }
+
+    /**
+    * prediction: the endpoint must be exsited
+    **/
+    public function findLinkThroughEndpoint(endpoint:Endpoint):Link{
+        for(i in circuitDiagram.get_linkIterator()){
+            if(i.get_rightEndpoint() == endpoint){
+                return i;
+            }else if(i.get_leftEndpoint() == endpoint){
+                return i;
+            }
+        }
+        return null;
     }
 }

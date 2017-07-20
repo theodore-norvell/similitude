@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
-import flash.events.KeyboardEvent;
+
+import js.html.KeyboardEvent;
 import js.Browser;
 import com.mun.model.enumeration.KEY;
 import com.mun.model.enumeration.K_STATE;

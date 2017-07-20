@@ -647,8 +647,9 @@ Test.main = function() {
 	updateCircuitDiagram.setUpdateToolBar(updateToolBar);
 	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,updateCircuitDiagram.get_transform());
 	updateCircuitDiagram.setUpdateCanvas(updateCanvas);
-	var canvasListener = new com_mun_controller_mouseAction_CanvasListener(Test.canvas,updateCircuitDiagram,updateToolBar);
-	new com_mun_controller_mouseAction_ButtonClick(updateCircuitDiagram,pixelRatio,canvasListener);
+	var buttonClick = new com_mun_controller_mouseAction_ButtonClick(updateCircuitDiagram,pixelRatio);
+	var controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(Test.canvas,circuitDiagram,updateCircuitDiagram,buttonClick,updateToolBar);
+	buttonClick.setControllerCanvasContext(controllerCanvasContext);
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -889,7 +890,7 @@ var com_mun_controller_command_AddCommand = function(object,circuitDiagram) {
 	this.link = object.get_link();
 	this.component = object.get_component();
 	this.circuitDiagram = circuitDiagram;
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
+	this.linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 };
 $hxClasses["com.mun.controller.command.AddCommand"] = com_mun_controller_command_AddCommand;
 com_mun_controller_command_AddCommand.__name__ = ["com","mun","controller","command","AddCommand"];
@@ -898,30 +899,30 @@ com_mun_controller_command_AddCommand.prototype = {
 	link: null
 	,component: null
 	,circuitDiagram: null
-	,linkAndComponentArray: null
+	,linkAndComponentAndEndpointAndPortArray: null
 	,undo: function() {
 		if(this.link != null) {
 			this.circuitDiagram.removeLink(this.link);
-			this.linkAndComponentArray.removeLink(this.link);
+			this.linkAndComponentAndEndpointAndPortArray.removeLink(this.link);
 		}
 		if(this.component != null) {
 			this.circuitDiagram.removeComponent(this.component);
-			this.linkAndComponentArray.removeComponent(this.component);
+			this.linkAndComponentAndEndpointAndPortArray.removeComponent(this.component);
 		}
-		return this.linkAndComponentArray;
+		return this.linkAndComponentAndEndpointAndPortArray;
 	}
 	,redo: function() {
 		this.execute();
-		return this.linkAndComponentArray;
+		return this.linkAndComponentAndEndpointAndPortArray;
 	}
 	,execute: function() {
 		if(this.link != null) {
 			this.circuitDiagram.addLink(this.link);
-			this.linkAndComponentArray.addLink(this.link);
+			this.linkAndComponentAndEndpointAndPortArray.addLink(this.link);
 		}
 		if(this.component != null) {
 			this.circuitDiagram.addComponent(this.component);
-			this.linkAndComponentArray.addComponent(this.component);
+			this.linkAndComponentAndEndpointAndPortArray.addComponent(this.component);
 		}
 	}
 	,__class__: com_mun_controller_command_AddCommand
@@ -930,14 +931,14 @@ var com_mun_controller_command_CommandManager = function() {
 	this.recordFlag = false;
 	this.redoStack = [];
 	this.undoStack = [];
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
+	this.linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 };
 $hxClasses["com.mun.controller.command.CommandManager"] = com_mun_controller_command_CommandManager;
 com_mun_controller_command_CommandManager.__name__ = ["com","mun","controller","command","CommandManager"];
 com_mun_controller_command_CommandManager.prototype = {
 	undoStack: null
 	,redoStack: null
-	,linkAndComponentArray: null
+	,linkAndComponentAndEndpointAndPortArray: null
 	,recordFlag: null
 	,execute: function(command) {
 		command.execute();
@@ -956,21 +957,21 @@ com_mun_controller_command_CommandManager.prototype = {
 	}
 	,undo: function() {
 		if(this.undoStack.length == 0) {
-			return this.linkAndComponentArray;
+			return this.linkAndComponentAndEndpointAndPortArray;
 		}
 		var command = this.undoStack.pop();
-		this.linkAndComponentArray = command.undo();
+		this.linkAndComponentAndEndpointAndPortArray = command.undo();
 		this.redoStack.push(command);
-		return this.linkAndComponentArray;
+		return this.linkAndComponentAndEndpointAndPortArray;
 	}
 	,redo: function() {
 		if(this.redoStack.length == 0) {
-			return this.linkAndComponentArray;
+			return this.linkAndComponentAndEndpointAndPortArray;
 		}
 		var command = this.redoStack.pop();
-		this.linkAndComponentArray = command.redo();
+		this.linkAndComponentAndEndpointAndPortArray = command.redo();
 		this.undoStack.push(command);
-		return this.linkAndComponentArray;
+		return this.linkAndComponentAndEndpointAndPortArray;
 	}
 	,recordFlagRest: function() {
 		this.recordFlag = false;
@@ -987,8 +988,8 @@ com_mun_controller_command_CommandManager.prototype = {
 	,__class__: com_mun_controller_command_CommandManager
 };
 var com_mun_controller_command_DeleteCommand = function(linkAndComponentArray,circuitDiagram) {
-	linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
-	this.linkAndComponentArray = linkAndComponentArray;
+	linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+	this.linkAndComponentAndEndpointAndPortArray = linkAndComponentArray;
 	this.circuitDiagram = circuitDiagram;
 };
 $hxClasses["com.mun.controller.command.DeleteCommand"] = com_mun_controller_command_DeleteCommand;
@@ -996,53 +997,45 @@ com_mun_controller_command_DeleteCommand.__name__ = ["com","mun","controller","c
 com_mun_controller_command_DeleteCommand.__interfaces__ = [com_mun_controller_command_Command];
 com_mun_controller_command_DeleteCommand.prototype = {
 	circuitDiagram: null
-	,linkAndComponentArray: null
+	,linkAndComponentAndEndpointAndPortArray: null
 	,undo: function() {
-		if(this.linkAndComponentArray.get_linkArray() != null) {
-			var _g = 0;
-			var _g1 = this.linkAndComponentArray.get_linkArray();
-			while(_g < _g1.length) {
-				var i = _g1[_g];
-				++_g;
-				this.circuitDiagram.addLink(i);
+		if(this.linkAndComponentAndEndpointAndPortArray.getLinkIteratorLength() != 0) {
+			var i = this.linkAndComponentAndEndpointAndPortArray.get_linkIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				this.circuitDiagram.addLink(i1);
 			}
 		}
-		if(this.linkAndComponentArray.get_componentArray() != null) {
-			var _g2 = 0;
-			var _g11 = this.linkAndComponentArray.get_componentArray();
-			while(_g2 < _g11.length) {
-				var i1 = _g11[_g2];
-				++_g2;
-				this.circuitDiagram.addComponent(i1);
+		if(this.linkAndComponentAndEndpointAndPortArray.getComponentIteratorLength() != 0) {
+			var i2 = this.linkAndComponentAndEndpointAndPortArray.get_componentIterator();
+			while(i2.hasNext()) {
+				var i3 = i2.next();
+				this.circuitDiagram.addComponent(i3);
 			}
 		}
-		return this.linkAndComponentArray;
+		return this.linkAndComponentAndEndpointAndPortArray;
 	}
 	,redo: function() {
 		this.execute();
-		return this.linkAndComponentArray;
+		return this.linkAndComponentAndEndpointAndPortArray;
 	}
 	,execute: function() {
-		var _g = 0;
-		var _g1 = this.linkAndComponentArray.get_linkArray();
-		while(_g < _g1.length) {
-			var i = _g1[_g];
-			++_g;
-			this.circuitDiagram.deleteLink(i);
+		var i = this.linkAndComponentAndEndpointAndPortArray.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			this.circuitDiagram.deleteLink(i1);
 		}
-		var _g2 = 0;
-		var _g11 = this.linkAndComponentArray.get_componentArray();
-		while(_g2 < _g11.length) {
-			var i1 = _g11[_g2];
-			++_g2;
-			this.circuitDiagram.deleteComponent(i1);
+		var i2 = this.linkAndComponentAndEndpointAndPortArray.get_componentIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			this.circuitDiagram.deleteComponent(i3);
 		}
 	}
 	,__class__: com_mun_controller_command_DeleteCommand
 };
 var com_mun_controller_command_MoveCommand = function(linkAndComponentAndEndpointArray,xDisplacement,yDisplacement,circuitDiagram) {
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
-	this.linkAndComponentAndEndpointArray = new com_mun_type_LinkAndComponentAndEndpointArray();
+	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+	this.linkAndComponentAndEndpointArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.oldEndpointYPositionArray = [];
 	this.oldEndpointXPositionArray = [];
 	this.oldLinkRightYpositionArray = [];
@@ -1059,57 +1052,63 @@ var com_mun_controller_command_MoveCommand = function(linkAndComponentAndEndpoin
 	this.recordLeftEndpointXpositionBeforeUndoArray = [];
 	this.recordComponentYpositionBeforeUndoArray = [];
 	this.recordComponentXpositionBeforeUndoArray = [];
-	var _g = 0;
-	var _g1 = linkAndComponentAndEndpointArray.get_componentArray();
-	while(_g < _g1.length) {
-		var i = _g1[_g];
-		++_g;
-		this.linkAndComponentAndEndpointArray.addComponent(i);
+	var i = linkAndComponentAndEndpointArray.get_componentIterator();
+	while(i.hasNext()) {
+		var i1 = i.next();
+		this.linkAndComponentAndEndpointArray.addComponent(i1);
 	}
-	var _g2 = 0;
-	var _g11 = linkAndComponentAndEndpointArray.get_linkArray();
-	while(_g2 < _g11.length) {
-		var i1 = _g11[_g2];
-		++_g2;
-		this.linkAndComponentAndEndpointArray.addLink(i1);
+	var i2 = linkAndComponentAndEndpointArray.get_linkIterator();
+	while(i2.hasNext()) {
+		var i3 = i2.next();
+		this.linkAndComponentAndEndpointArray.addLink(i3);
 	}
-	var _g3 = 0;
-	var _g12 = linkAndComponentAndEndpointArray.get_endponentArray();
-	while(_g3 < _g12.length) {
-		var i2 = _g12[_g3];
-		++_g3;
-		this.linkAndComponentAndEndpointArray.addEndpoint(i2);
+	var i4 = linkAndComponentAndEndpointArray.get_endponentIterator();
+	while(i4.hasNext()) {
+		var i5 = i4.next();
+		this.linkAndComponentAndEndpointArray.addEndpoint(i5);
 	}
-	this.linkAndComponentArray.set_componentArray(this.linkAndComponentAndEndpointArray.get_componentArray());
-	this.linkAndComponentArray.set_linkArray(this.linkAndComponentAndEndpointArray.get_linkArray());
+	this.linkAndComponentArray.clean();
+	var i6 = this.linkAndComponentAndEndpointArray.get_componentIterator();
+	while(i6.hasNext()) {
+		var i7 = i6.next();
+		this.linkAndComponentArray.addComponent(i7);
+	}
+	var i8 = this.linkAndComponentAndEndpointArray.get_linkIterator();
+	while(i8.hasNext()) {
+		var i9 = i8.next();
+		this.linkAndComponentArray.addLink(i9);
+	}
 	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
-	if(linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
-		var _g13 = 0;
-		var _g4 = linkAndComponentAndEndpointArray.get_componentArray().length;
-		while(_g13 < _g4) {
-			var i3 = _g13++;
-			this.oldComponentXpositionArray[i3] = linkAndComponentAndEndpointArray.get_componentArray()[i3].get_xPosition();
-			this.oldComponentYpositionArray[i3] = linkAndComponentAndEndpointArray.get_componentArray()[i3].get_yPosition();
+	var i10 = 0;
+	if(linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0) {
+		var j = linkAndComponentAndEndpointArray.get_componentIterator();
+		while(j.hasNext()) {
+			var j1 = j.next();
+			this.oldComponentXpositionArray[i10] = j1.get_xPosition();
+			this.oldComponentYpositionArray[i10] = j1.get_yPosition();
+			++i10;
 		}
 	}
-	if(linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
-		var _g14 = 0;
-		var _g5 = linkAndComponentAndEndpointArray.get_linkArray().length;
-		while(_g14 < _g5) {
-			var i4 = _g14++;
-			this.oldLinkLeftXpositionArray[i4] = linkAndComponentAndEndpointArray.get_linkArray()[i4].get_leftEndpoint().get_xPosition();
-			this.oldLinkLeftYpositionArray[i4] = linkAndComponentAndEndpointArray.get_linkArray()[i4].get_leftEndpoint().get_yPosition();
-			this.oldLinkRightXpositionArray[i4] = linkAndComponentAndEndpointArray.get_linkArray()[i4].get_rightEndpoint().get_xPosition();
-			this.oldLinkRightYpositionArray[i4] = linkAndComponentAndEndpointArray.get_linkArray()[i4].get_rightEndpoint().get_yPosition();
+	i10 = 0;
+	if(linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0) {
+		var j2 = linkAndComponentAndEndpointArray.get_linkIterator();
+		while(j2.hasNext()) {
+			var j3 = j2.next();
+			this.oldLinkLeftXpositionArray[i10] = j3.get_leftEndpoint().get_xPosition();
+			this.oldLinkLeftYpositionArray[i10] = j3.get_leftEndpoint().get_yPosition();
+			this.oldLinkRightXpositionArray[i10] = j3.get_rightEndpoint().get_xPosition();
+			this.oldLinkRightYpositionArray[i10] = j3.get_rightEndpoint().get_yPosition();
+			++i10;
 		}
 	}
-	if(linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
-		var _g15 = 0;
-		var _g6 = linkAndComponentAndEndpointArray.get_endponentArray().length;
-		while(_g15 < _g6) {
-			var i5 = _g15++;
-			this.oldEndpointXPositionArray[i5] = linkAndComponentAndEndpointArray.get_endponentArray()[i5].get_xPosition();
-			this.oldEndpointYPositionArray[i5] = linkAndComponentAndEndpointArray.get_endponentArray()[i5].get_yPosition();
+	i10 = 0;
+	if(linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
+		var j4 = linkAndComponentAndEndpointArray.get_endponentIterator();
+		while(j4.hasNext()) {
+			var j5 = j4.next();
+			this.oldEndpointXPositionArray[i10] = j5.get_xPosition();
+			this.oldEndpointYPositionArray[i10] = j5.get_yPosition();
+			++i10;
 		}
 	}
 	this.xDisplacement = xDisplacement;
@@ -1143,123 +1142,123 @@ com_mun_controller_command_MoveCommand.prototype = {
 	,linkAndComponentAndEndpointArray: null
 	,linkAndComponentArray: null
 	,undo: function() {
-		if(this.linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
-			var _g1 = 0;
-			var _g = this.linkAndComponentAndEndpointArray.get_componentArray().length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				this.recordComponentXpositionBeforeUndoArray[i] = this.linkAndComponentAndEndpointArray.get_componentArray()[i].get_xPosition();
-				this.recordComponentYpositionBeforeUndoArray[i] = this.linkAndComponentAndEndpointArray.get_componentArray()[i].get_yPosition();
-				this.linkAndComponentAndEndpointArray.get_componentArray()[i].set_xPosition(this.oldComponentXpositionArray[i]);
-				this.linkAndComponentAndEndpointArray.get_componentArray()[i].set_yPosition(this.oldComponentYpositionArray[i]);
-				this.linkAndComponentAndEndpointArray.get_componentArray()[i].updateMoveComponentPortPosition(this.oldComponentXpositionArray[i],this.oldComponentYpositionArray[i]);
+		var i = 0;
+		if(this.linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0) {
+			var j = this.linkAndComponentAndEndpointArray.get_componentIterator();
+			while(j.hasNext()) {
+				var j1 = j.next();
+				this.recordComponentXpositionBeforeUndoArray[i] = j1.get_xPosition();
+				this.recordComponentYpositionBeforeUndoArray[i] = j1.get_yPosition();
+				j1.set_xPosition(this.oldComponentXpositionArray[i]);
+				j1.set_yPosition(this.oldComponentYpositionArray[i]);
+				j1.updateMoveComponentPortPosition(this.oldComponentXpositionArray[i],this.oldComponentYpositionArray[i]);
+				++i;
 			}
 			this.componentMeetEndpoint();
 			this.linkPositionUpdate();
 		}
-		if(this.linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
-			var _g11 = 0;
-			var _g2 = this.linkAndComponentAndEndpointArray.get_linkArray().length;
-			while(_g11 < _g2) {
-				var i1 = _g11++;
-				this.recordLeftEndpointXpositionBeforeUndoArray[i1] = this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_leftEndpoint().get_xPosition();
-				this.recordLeftEndpointYpositionBeforeUndoArray[i1] = this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_leftEndpoint().get_yPosition();
-				this.recordRightEndpointXpositionBeforeUndoArray[i1] = this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_rightEndpoint().get_xPosition();
-				this.recordRightEndpointYpositionBeforeUndoArray[i1] = this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_rightEndpoint().get_yPosition();
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_leftEndpoint().set_xPosition(this.oldLinkLeftXpositionArray[i1]);
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_leftEndpoint().set_yPosition(this.oldLinkLeftYpositionArray[i1]);
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_rightEndpoint().set_xPosition(this.oldLinkRightXpositionArray[i1]);
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_rightEndpoint().set_yPosition(this.oldLinkRightYpositionArray[i1]);
-				this.linkMeetPortUpdate(this.linkAndComponentAndEndpointArray.get_linkArray()[i1]);
+		i = 0;
+		if(this.linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0) {
+			var j2 = this.linkAndComponentAndEndpointArray.get_linkIterator();
+			while(j2.hasNext()) {
+				var j3 = j2.next();
+				this.recordLeftEndpointXpositionBeforeUndoArray[i] = j3.get_leftEndpoint().get_xPosition();
+				this.recordLeftEndpointYpositionBeforeUndoArray[i] = j3.get_leftEndpoint().get_yPosition();
+				this.recordRightEndpointXpositionBeforeUndoArray[i] = j3.get_rightEndpoint().get_xPosition();
+				this.recordRightEndpointYpositionBeforeUndoArray[i] = j3.get_rightEndpoint().get_yPosition();
+				j3.get_leftEndpoint().set_xPosition(this.oldLinkLeftXpositionArray[i]);
+				j3.get_leftEndpoint().set_yPosition(this.oldLinkLeftYpositionArray[i]);
+				j3.get_rightEndpoint().set_xPosition(this.oldLinkRightXpositionArray[i]);
+				j3.get_rightEndpoint().set_yPosition(this.oldLinkRightYpositionArray[i]);
+				this.linkMeetPortUpdate(j3);
+				++i;
 			}
 		}
-		if(this.linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
-			var _g12 = 0;
-			var _g3 = this.linkAndComponentAndEndpointArray.get_endponentArray().length;
-			while(_g12 < _g3) {
-				var i2 = _g12++;
-				this.recordEndpointXpositionBeforeUndoArray[i2] = this.linkAndComponentAndEndpointArray.get_endponentArray()[i2].get_xPosition();
-				this.recordEndpointYpositionBeforeUndoArray[i2] = this.linkAndComponentAndEndpointArray.get_endponentArray()[i2].get_yPosition();
-				this.linkAndComponentAndEndpointArray.get_endponentArray()[i2].set_xPosition(this.oldEndpointXPositionArray[i2]);
-				this.linkAndComponentAndEndpointArray.get_endponentArray()[i2].set_yPosition(this.oldEndpointYPositionArray[i2]);
-				this.endpointMeetPort(this.linkAndComponentAndEndpointArray.get_endponentArray()[i2]);
+		i = 0;
+		if(this.linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
+			var j4 = this.linkAndComponentAndEndpointArray.get_endponentIterator();
+			while(j4.hasNext()) {
+				var j5 = j4.next();
+				this.recordEndpointXpositionBeforeUndoArray[i] = j5.get_xPosition();
+				this.recordEndpointYpositionBeforeUndoArray[i] = j5.get_yPosition();
+				j5.set_xPosition(this.oldEndpointXPositionArray[i]);
+				j5.set_yPosition(this.oldEndpointYPositionArray[i]);
+				this.endpointMeetPort(j5);
+				++i;
 			}
 		}
 		return this.linkAndComponentArray;
 	}
 	,redo: function() {
-		if(this.linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
-			var _g1 = 0;
-			var _g = this.linkAndComponentAndEndpointArray.get_componentArray().length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				this.linkAndComponentAndEndpointArray.get_componentArray()[i].set_xPosition(this.recordComponentXpositionBeforeUndoArray[i]);
-				this.linkAndComponentAndEndpointArray.get_componentArray()[i].set_yPosition(this.recordComponentYpositionBeforeUndoArray[i]);
-				this.linkAndComponentAndEndpointArray.get_componentArray()[i].updateMoveComponentPortPosition(this.recordComponentXpositionBeforeUndoArray[i],this.recordComponentYpositionBeforeUndoArray[i]);
+		var i = 0;
+		if(this.linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0) {
+			var j = this.linkAndComponentAndEndpointArray.get_componentIterator();
+			while(j.hasNext()) {
+				var j1 = j.next();
+				j1.set_xPosition(this.recordComponentXpositionBeforeUndoArray[i]);
+				j1.set_yPosition(this.recordComponentYpositionBeforeUndoArray[i]);
+				j1.updateMoveComponentPortPosition(this.recordComponentXpositionBeforeUndoArray[i],this.recordComponentYpositionBeforeUndoArray[i]);
+				++i;
 			}
 			this.componentMeetEndpoint();
 			this.linkPositionUpdate();
 		}
-		if(this.linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
-			var _g11 = 0;
-			var _g2 = this.linkAndComponentAndEndpointArray.get_linkArray().length;
-			while(_g11 < _g2) {
-				var i1 = _g11++;
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_leftEndpoint().set_xPosition(this.recordLeftEndpointXpositionBeforeUndoArray[i1]);
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_leftEndpoint().set_yPosition(this.recordLeftEndpointYpositionBeforeUndoArray[i1]);
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_rightEndpoint().set_xPosition(this.recordRightEndpointXpositionBeforeUndoArray[i1]);
-				this.linkAndComponentAndEndpointArray.get_linkArray()[i1].get_rightEndpoint().set_yPosition(this.recordRightEndpointYpositionBeforeUndoArray[i1]);
-				this.linkMeetPortUpdate(this.linkAndComponentAndEndpointArray.get_linkArray()[i1]);
+		i = 0;
+		if(this.linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0) {
+			var j2 = this.linkAndComponentAndEndpointArray.get_linkIterator();
+			while(j2.hasNext()) {
+				var j3 = j2.next();
+				j3.get_leftEndpoint().set_xPosition(this.recordLeftEndpointXpositionBeforeUndoArray[i]);
+				j3.get_leftEndpoint().set_yPosition(this.recordLeftEndpointYpositionBeforeUndoArray[i]);
+				j3.get_rightEndpoint().set_xPosition(this.recordRightEndpointXpositionBeforeUndoArray[i]);
+				j3.get_rightEndpoint().set_yPosition(this.recordRightEndpointYpositionBeforeUndoArray[i]);
+				this.linkMeetPortUpdate(j3);
+				++i;
 			}
 		}
-		if(this.linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
-			var _g12 = 0;
-			var _g3 = this.linkAndComponentAndEndpointArray.get_endponentArray().length;
-			while(_g12 < _g3) {
-				var i2 = _g12++;
-				this.linkAndComponentAndEndpointArray.get_endponentArray()[i2].set_xPosition(this.recordEndpointXpositionBeforeUndoArray[i2]);
-				this.linkAndComponentAndEndpointArray.get_endponentArray()[i2].set_yPosition(this.recordEndpointYpositionBeforeUndoArray[i2]);
-				this.endpointMeetPort(this.linkAndComponentAndEndpointArray.get_endponentArray()[i2]);
+		i = 0;
+		if(this.linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
+			var j4 = this.linkAndComponentAndEndpointArray.get_endponentIterator();
+			while(j4.hasNext()) {
+				var j5 = j4.next();
+				j5.set_xPosition(this.recordEndpointXpositionBeforeUndoArray[i]);
+				j5.set_yPosition(this.recordEndpointYpositionBeforeUndoArray[i]);
+				this.endpointMeetPort(j5);
+				++i;
 			}
 		}
 		return this.linkAndComponentArray;
 	}
 	,execute: function() {
-		if(this.linkAndComponentAndEndpointArray.get_componentArray().length != 0) {
-			var _g = 0;
-			var _g1 = this.linkAndComponentAndEndpointArray.get_componentArray();
-			while(_g < _g1.length) {
-				var i = _g1[_g];
-				++_g;
-				i.set_xPosition(i.get_xPosition() + this.xDisplacement);
-				i.set_yPosition(i.get_yPosition() + this.yDisplacement);
-				i.updateMoveComponentPortPosition(i.get_xPosition(),i.get_yPosition());
+		if(this.linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0) {
+			var i = this.linkAndComponentAndEndpointArray.get_componentIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				i1.set_xPosition(i1.get_xPosition() + this.xDisplacement);
+				i1.set_yPosition(i1.get_yPosition() + this.yDisplacement);
+				i1.updateMoveComponentPortPosition(i1.get_xPosition(),i1.get_yPosition());
 			}
 			this.componentMeetEndpoint();
 			this.linkPositionUpdate();
 		}
-		if(this.linkAndComponentAndEndpointArray.get_linkArray().length != 0) {
-			var _g2 = 0;
-			var _g11 = this.linkAndComponentAndEndpointArray.get_linkArray();
-			while(_g2 < _g11.length) {
-				var i1 = _g11[_g2];
-				++_g2;
-				i1.get_leftEndpoint().set_xPosition(i1.get_leftEndpoint().get_xPosition() + this.xDisplacement);
-				i1.get_leftEndpoint().set_yPosition(i1.get_leftEndpoint().get_yPosition() + this.yDisplacement);
-				i1.get_rightEndpoint().set_xPosition(i1.get_rightEndpoint().get_xPosition() + this.xDisplacement);
-				i1.get_rightEndpoint().set_yPosition(i1.get_rightEndpoint().get_yPosition() + this.yDisplacement);
-				this.linkMeetPortUpdate(i1);
+		if(this.linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0) {
+			var i2 = this.linkAndComponentAndEndpointArray.get_linkIterator();
+			while(i2.hasNext()) {
+				var i3 = i2.next();
+				i3.get_leftEndpoint().set_xPosition(i3.get_leftEndpoint().get_xPosition() + this.xDisplacement);
+				i3.get_leftEndpoint().set_yPosition(i3.get_leftEndpoint().get_yPosition() + this.yDisplacement);
+				i3.get_rightEndpoint().set_xPosition(i3.get_rightEndpoint().get_xPosition() + this.xDisplacement);
+				i3.get_rightEndpoint().set_yPosition(i3.get_rightEndpoint().get_yPosition() + this.yDisplacement);
+				this.linkMeetPortUpdate(i3);
 			}
 		}
-		if(this.linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
-			var _g3 = 0;
-			var _g12 = this.linkAndComponentAndEndpointArray.get_endponentArray();
-			while(_g3 < _g12.length) {
-				var i2 = _g12[_g3];
-				++_g3;
-				i2.set_xPosition(i2.get_xPosition() + this.xDisplacement);
-				i2.set_yPosition(i2.get_yPosition() + this.yDisplacement);
-				this.endpointMeetPort(i2);
+		if(this.linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
+			var i4 = this.linkAndComponentAndEndpointArray.get_endponentIterator();
+			while(i4.hasNext()) {
+				var i5 = i4.next();
+				i5.set_xPosition(i5.get_xPosition() + this.xDisplacement);
+				i5.set_yPosition(i5.get_yPosition() + this.yDisplacement);
+				this.endpointMeetPort(i5);
 			}
 		}
 	}
@@ -1332,7 +1331,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 var com_mun_controller_command_OrientationCommand = function(componentArray,newOrientation) {
 	this.oldOrientationArray = [];
 	this.componentArray = [];
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
+	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	var _g = 0;
 	while(_g < componentArray.length) {
 		var i = componentArray[_g];
@@ -1340,11 +1339,12 @@ var com_mun_controller_command_OrientationCommand = function(componentArray,newO
 		this.componentArray.push(i);
 	}
 	this.newOrientation = newOrientation;
-	this.linkAndComponentArray.set_componentArray(this.componentArray);
+	this.linkAndComponentArray.clean();
 	var _g1 = 0;
 	var _g2 = componentArray.length;
 	while(_g1 < _g2) {
 		var i1 = _g1++;
+		this.linkAndComponentArray.addComponent(componentArray[i1]);
 		this.oldOrientationArray[i1] = componentArray[i1].get_orientation();
 	}
 };
@@ -1580,7 +1580,7 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
 var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDiagram) {
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
+	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.circuitDiagram = circuitDiagram;
 	this.commandManager = new com_mun_controller_command_CommandManager();
 	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
@@ -1650,14 +1650,14 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			object.set_endPoint(null);
 		} else {
 			var leftEndpoint1 = new com_mun_model_component_Endpoint(coordinateFrom.get_xPosition(),coordinateFrom.get_yPosition());
-			var rightEndpoint1 = new com_mun_model_component_Endpoint(coordinateTo.get_xPosition() + 100,coordinateTo.get_yPosition() + 100);
+			var rightEndpoint1 = new com_mun_model_component_Endpoint(coordinateTo.get_xPosition(),coordinateTo.get_yPosition());
 			var link1 = new com_mun_model_component_Link(leftEndpoint1,rightEndpoint1);
 			object.set_link(link1);
 		}
 		var command = new com_mun_controller_command_AddCommand(object,this.circuitDiagram);
 		this.get_commandManager().execute(command);
 		this.linkAndComponentArrayReset();
-		this.linkAndComponentArray.get_linkArray().push(object.get_link());
+		this.linkAndComponentArray.addLink(object.get_link());
 		this.updateToolBar.update(this.linkAndComponentArray);
 		this.hightLightObject(this.linkAndComponentArray);
 		this.circuitDiagram.computeDiagramSize();
@@ -1667,19 +1667,28 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var xMoveDistance = currentMouseLocation.get_xPosition() - mouseDownLocation.get_xPosition();
 		var yMoveDistance = currentMouseLocation.get_yPosition() - mouseDownLocation.get_yPosition();
 		if(mouseLocationFlag) {
-			linkAndComponentAndEndpointArray.get_componentArray()[0].set_xPosition(currentMouseLocation.get_xPosition());
-			linkAndComponentAndEndpointArray.get_componentArray()[0].set_yPosition(currentMouseLocation.get_yPosition());
+			linkAndComponentAndEndpointArray.getComponentFromIndex(0).set_xPosition(currentMouseLocation.get_xPosition());
+			linkAndComponentAndEndpointArray.getComponentFromIndex(0).set_yPosition(currentMouseLocation.get_yPosition());
 		}
 		var command = new com_mun_controller_command_MoveCommand(linkAndComponentAndEndpointArray,xMoveDistance,yMoveDistance,this.circuitDiagram);
 		this.get_commandManager().execute(command);
-		this.linkAndComponentArray.set_linkArray(linkAndComponentAndEndpointArray.get_linkArray());
-		this.linkAndComponentArray.set_componentArray(linkAndComponentAndEndpointArray.get_componentArray());
-		if(linkAndComponentAndEndpointArray.get_endponentArray().length != 0) {
-			var i = this.circuitDiagram.get_linkIterator();
-			while(i.hasNext()) {
-				var i1 = i.next();
-				if(i1.get_leftEndpoint() == linkAndComponentAndEndpointArray.get_endponentArray()[0] || i1.get_rightEndpoint() == linkAndComponentAndEndpointArray.get_endponentArray()[0]) {
-					this.linkAndComponentArray.addLink(i1);
+		this.linkAndComponentArray.clean();
+		var i = linkAndComponentAndEndpointArray.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			this.linkAndComponentArray.addLink(i1);
+		}
+		var i2 = linkAndComponentAndEndpointArray.get_componentIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			this.linkAndComponentArray.addComponent(i3);
+		}
+		if(linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
+			var i4 = this.circuitDiagram.get_linkIterator();
+			while(i4.hasNext()) {
+				var i5 = i4.next();
+				if(i5.get_leftEndpoint() == linkAndComponentAndEndpointArray.getEndpointFromIndex(0) || i5.get_rightEndpoint() == linkAndComponentAndEndpointArray.getEndpointFromIndex(0)) {
+					this.linkAndComponentArray.addLink(i5);
 					break;
 				}
 			}
@@ -1688,11 +1697,21 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.hightLightObject(this.linkAndComponentArray);
 		this.circuitDiagram.computeDiagramSize();
 	}
-	,changeOrientation: function(componentArray,orientation) {
+	,changeOrientation: function(componentIterator,orientation) {
+		var componentArray = [];
+		var i = componentIterator;
+		while(i.hasNext()) {
+			var i1 = i.next();
+			componentArray.push(i1);
+		}
 		var orientationCommand = new com_mun_controller_command_OrientationCommand(componentArray,orientation);
 		this.get_commandManager().execute(orientationCommand);
-		var linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
-		linkAndComponentArray.set_componentArray(componentArray);
+		var linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+		var i2 = componentIterator;
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			linkAndComponentArray.addComponent(i3);
+		}
 		this.updateToolBar.update(linkAndComponentArray);
 		this.circuitDiagram.linkArraySelfUpdate();
 		this.hightLightObject(linkAndComponentArray);
@@ -1731,7 +1750,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,undo: function() {
 		var linkAndComponentArray = this.get_commandManager().undo();
 		this.redrawCanvas(linkAndComponentArray);
-		if(linkAndComponentArray.get_componentArray().length == 0 && linkAndComponentArray.get_linkArray().length == 0) {
+		if(linkAndComponentArray.getComponentIteratorLength() == 0 && linkAndComponentArray.getLinkIteratorLength() == 0) {
 			this.updateToolBar.hidden();
 		} else {
 			this.updateToolBar.visible();
@@ -1741,7 +1760,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,redo: function() {
 		var linkAndComponentArray = this.get_commandManager().redo();
 		this.redrawCanvas(linkAndComponentArray);
-		if(linkAndComponentArray.get_componentArray().length == 0 && linkAndComponentArray.get_linkArray().length == 0) {
+		if(linkAndComponentArray.getComponentIteratorLength() == 0 && linkAndComponentArray.getLinkIteratorLength() == 0) {
 			this.updateToolBar.hidden();
 		} else {
 			this.updateToolBar.visible();
@@ -1778,11 +1797,23 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			i1.get_rightEndpoint().updatePosition();
 		}
 	}
+	,findLinkThroughEndpoint: function(endpoint) {
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(i1.get_rightEndpoint() == endpoint) {
+				return i1;
+			} else if(i1.get_leftEndpoint() == endpoint) {
+				return i1;
+			}
+		}
+		return null;
+	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
 	,__properties__: {get_commandManager:"get_commandManager"}
 };
 var com_mun_controller_componentUpdate_UpdateToolBar = function(updateCircuitDiagram) {
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
+	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.nameInput = window.document.getElementById("name_input");
 	this.orientation = window.document.getElementById("orientation");
@@ -1822,28 +1853,24 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,update: function(linkAndComponentArray) {
 		this.linkAndComponentArrayReset();
-		if(linkAndComponentArray.get_componentArray() != null) {
-			var _g = 0;
-			var _g1 = linkAndComponentArray.get_componentArray();
-			while(_g < _g1.length) {
-				var i = _g1[_g];
-				++_g;
-				this.linkAndComponentArray.addComponent(i);
+		if(linkAndComponentArray.getComponentIteratorLength() != 0) {
+			var i = linkAndComponentArray.get_componentIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				this.linkAndComponentArray.addComponent(i1);
 			}
 		}
-		if(linkAndComponentArray.get_linkArray() != null) {
-			var _g2 = 0;
-			var _g11 = linkAndComponentArray.get_linkArray();
-			while(_g2 < _g11.length) {
-				var i1 = _g11[_g2];
-				++_g2;
-				this.linkAndComponentArray.addLink(i1);
+		if(linkAndComponentArray.getLinkIteratorLength() != 0) {
+			var i2 = linkAndComponentArray.get_linkIterator();
+			while(i2.hasNext()) {
+				var i3 = i2.next();
+				this.linkAndComponentArray.addLink(i3);
 			}
 		}
-		if(linkAndComponentArray.get_componentArray().length != 0 && (linkAndComponentArray.get_linkArray() == null || linkAndComponentArray.get_linkArray().length == 0)) {
+		if(linkAndComponentArray.getComponentIteratorLength() != 0 && linkAndComponentArray.getLinkIteratorLength() == 0) {
 			this.visible();
 			this.setOrientation();
-			if(linkAndComponentArray.get_componentArray().length == 1) {
+			if(linkAndComponentArray.getComponentIteratorLength() == 1) {
 				this.setNameInput();
 			} else {
 				this.component_name_div.style.visibility = "hidden";
@@ -1855,47 +1882,47 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		}
 	}
 	,setOrientation: function() {
-		if(this.linkAndComponentArray.get_componentArray() != null && this.linkAndComponentArray.get_componentArray().length == 1) {
-			$(this.orientation).val(Std.string(this.linkAndComponentArray.get_componentArray()[0].get_orientation()) + "");
+		if(this.linkAndComponentArray.getComponentIteratorLength() == 1) {
+			$(this.orientation).val(Std.string(this.linkAndComponentArray.getComponentFromIndex(0).get_orientation()) + "");
 		} else {
-			$(this.orientation).val(Std.string(com_mun_model_enumeration_Orientation.UNKNOW) + "");
+			$(this.orientation).val(Std.string(com_mun_model_enumeration_ORIENTATION.UNKNOW) + "");
 		}
 	}
 	,setNameInput: function() {
-		$(this.nameInput).val(this.linkAndComponentArray.get_componentArray()[0].get_name());
+		$(this.nameInput).val(this.linkAndComponentArray.getComponentFromIndex(0).get_name());
 	}
 	,changeToNorth: function() {
-		if(this.linkAndComponentArray.get_componentArray().length != 0) {
-			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentArray(),com_mun_model_enumeration_Orientation.NORTH);
+		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
+			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentIterator(),com_mun_model_enumeration_ORIENTATION.NORTH);
 			this.setOrientation();
 		}
 	}
 	,changeToSouth: function() {
-		if(this.linkAndComponentArray.get_componentArray().length != 0) {
-			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentArray(),com_mun_model_enumeration_Orientation.SOUTH);
+		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
+			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentIterator(),com_mun_model_enumeration_ORIENTATION.SOUTH);
 			this.setOrientation();
 		}
 	}
 	,changeToWest: function() {
-		if(this.linkAndComponentArray.get_componentArray().length != 0) {
-			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentArray(),com_mun_model_enumeration_Orientation.WEST);
+		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
+			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentIterator(),com_mun_model_enumeration_ORIENTATION.WEST);
 			this.setOrientation();
 		}
 	}
 	,chageToEast: function() {
-		if(this.linkAndComponentArray.get_componentArray().length != 0) {
-			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentArray(),com_mun_model_enumeration_Orientation.EAST);
+		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
+			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentIterator(),com_mun_model_enumeration_ORIENTATION.EAST);
 			this.setOrientation();
 		}
 	}
 	,inputChange: function() {
-		if(this.linkAndComponentArray.get_componentArray() != null && this.linkAndComponentArray.get_componentArray().length == 1) {
+		if(this.linkAndComponentArray.getComponentIteratorLength() == 1) {
 			var temp = $(this.nameInput).val();
-			this.updateCircuitDiagram.setComponentName(this.linkAndComponentArray.get_componentArray()[0],temp);
+			this.updateCircuitDiagram.setComponentName(this.linkAndComponentArray.getComponentFromIndex(0),temp);
 		}
 	}
 	,deleteObject: function() {
-		if(this.linkAndComponentArray.get_componentArray().length != 0 || this.linkAndComponentArray.get_linkArray().length != 0) {
+		if(this.linkAndComponentArray.getComponentIteratorLength() != 0 || this.linkAndComponentArray.getLinkIteratorLength() != 0) {
 			this.updateCircuitDiagram.deleteObject(this.linkAndComponentArray);
 		}
 	}
@@ -1934,10 +1961,220 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
-var com_mun_controller_mouseAction_ButtonClick = function(updateCircuitDiagram,pixelRatio,canvasListener) {
+var com_mun_controller_controllerState_ControllerCanvasContext = function(canvas,circuitDiagram,updateCircuitDiagram,buttonClick,upateToolBar) {
+	this.canvas = canvas;
+	this.circuitDiagram = circuitDiagram;
+	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.buttonClick = buttonClick;
+	this.updateToolBar = upateToolBar;
+	this.controllerState = com_mun_model_enumeration_C_$STATE.IDLE;
+	this.lastState = com_mun_model_enumeration_C_$STATE.IDLE;
+	this.mode = com_mun_model_enumeration_MODE.EXCLUDE_PARENTS;
+	this.pointMode = com_mun_model_enumeration_POINT_$MODE.ONE;
+	this.mouseState = com_mun_model_enumeration_M_$STATE.IDLE;
+	this.transform = com_mun_view_drawingImpl_Transform.identity();
+	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(this.transform);
+	this.keyState = new com_mun_controller_controllerState_KeyState();
+	this.linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
+	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
+	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
+};
+$hxClasses["com.mun.controller.controllerState.ControllerCanvasContext"] = com_mun_controller_controllerState_ControllerCanvasContext;
+com_mun_controller_controllerState_ControllerCanvasContext.__name__ = ["com","mun","controller","controllerState","ControllerCanvasContext"];
+com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
+	canvas: null
+	,circuitDiagram: null
+	,updateCircuitDiagram: null
+	,keyState: null
+	,buttonClick: null
+	,updateToolBar: null
+	,linkAndComponentAndEndpointAndPortArray: null
+	,worldPointArray: null
+	,mouseDownWorldCoordinate: null
+	,mouseMoveWorldCoordiante: null
+	,viewToWorld: null
+	,transform: null
+	,lastState: null
+	,controllerState: null
+	,mouseState: null
+	,mode: null
+	,pointMode: null
+	,hightLightLink: null
+	,get_controllerState: function() {
+		return this.controllerState;
+	}
+	,set_controllerState: function(value) {
+		this.lastState = this.controllerState;
+		this.controllerState = value;
+		this.checkState();
+	}
+	,getPointOnCanvas: function(x,y) {
+		var bbox = this.canvas.getBoundingClientRect();
+		var coordinate = new com_mun_type_Coordinate(0,0);
+		coordinate.set_xPosition((x - bbox.left) * (this.canvas.width / bbox.width));
+		coordinate.set_yPosition((y - bbox.top) * (this.canvas.height / bbox.height));
+		return coordinate;
+	}
+	,doMouseDown: function(event) {
+		var x = event.clientX;
+		var y = event.clientY;
+		var mouseDownLocation = this.getPointOnCanvas(x,y);
+		this.mouseDownWorldCoordinate = this.viewToWorld.convertCoordinate(mouseDownLocation);
+		this.mouseState = com_mun_model_enumeration_M_$STATE.MOUSE_DOWN;
+		this.mouseDownProcess();
+	}
+	,doMouseUp: function(event) {
+		this.mouseState = com_mun_model_enumeration_M_$STATE.MOUSE_UP;
+		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
+		this.lastState = this.controllerState;
+		this.controllerState = com_mun_model_enumeration_C_$STATE.IDLE;
+		this.checkState();
+		this.updateCircuitDiagram.update();
+	}
+	,doMouseMove: function(event) {
+		var x = event.clientX;
+		var y = event.clientY;
+		var mouseMoveLocation = this.getPointOnCanvas(x,y);
+		this.mouseMoveWorldCoordiante = this.viewToWorld.convertCoordinate(mouseMoveLocation);
+		this.mouseMoveResultProcess();
+		this.mouseDownWorldCoordinate = this.mouseMoveWorldCoordiante;
+	}
+	,mouseDownProcess: function() {
+		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
+		var _g = this.keyState.get_keyState();
+		switch(_g[1]) {
+		case 0:
+			this.lastState = this.controllerState;
+			this.controllerState = com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION;
+			break;
+		case 1:
+			this.lastState = this.controllerState;
+			this.controllerState = com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION;
+			break;
+		case 2:
+			if(this.keyState.get_key() == com_mun_model_enumeration_KEY.ALT_KEY) {
+				this.lastState = this.controllerState;
+				this.controllerState = com_mun_model_enumeration_C_$STATE.MULTI_SELECTION;
+			} else {
+				this.lastState = this.controllerState;
+				this.controllerState = com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION;
+			}
+			break;
+		}
+		this.checkState();
+	}
+	,mouseMoveResultProcess: function() {
+		if(this.controllerState == com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT) {
+			this.lastState = this.controllerState;
+			this.controllerState = com_mun_model_enumeration_C_$STATE.MOVE;
+			this.checkState();
+			this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT;
+		} else if((this.controllerState == com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION || this.controllerState == com_mun_model_enumeration_C_$STATE.MULTI_SELECTION || this.controllerState == com_mun_model_enumeration_C_$STATE.CREATE_LINK) && this.mouseState == com_mun_model_enumeration_M_$STATE.MOUSE_DOWN) {
+			this.lastState = this.controllerState;
+			this.controllerState = com_mun_model_enumeration_C_$STATE.MOVE;
+			this.checkState();
+		}
+	}
+	,checkHitList: function() {
+		var hitList = this.circuitDiagram.findHitList(this.mouseDownWorldCoordinate,this.mode);
+		if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0 && hitList.getComponentIteratorLength() == 0 && hitList.getLinkIteratorLength() == 0) {
+			this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
+			this.checkState();
+		} else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() != 0) {
+			var endpoint = hitList.getEndpointFromIndex(0);
+			if(this.updateCircuitDiagram.findLinkThroughEndpoint(endpoint) == this.hightLightLink) {
+				this.linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+			} else {
+				this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
+				this.checkState();
+			}
+		} else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() == 0) {
+			this.linkAndComponentAndEndpointAndPortArray.addEndpoint(hitList.getEndpointFromIndex(0));
+		} else if(hitList.getComponentIteratorLength() != 0) {
+			this.linkAndComponentAndEndpointAndPortArray.addComponent(hitList.getComponentFromIndex(0));
+		} else if(hitList.getLinkIteratorLength() != 0) {
+			var link = hitList.getLinkFromIndex(0);
+			this.hightLightLink = link;
+			this.linkAndComponentAndEndpointAndPortArray.addLink(link);
+		}
+		this.updateCircuitDiagram.hightLightObject(this.linkAndComponentAndEndpointAndPortArray);
+		this.toolBarUpdate();
+	}
+	,checkState: function() {
+		var _g = this.controllerState;
+		switch(_g[1]) {
+		case 0:
+			this.linkAndComponentAndEndpointAndPortArray.clean();
+			break;
+		case 1:
+			this.updateCircuitDiagram.createComponentByCommand(this.buttonClick.getComponent());
+			this.linkAndComponentAndEndpointAndPortArray.addComponent(this.buttonClick.getComponent());
+			break;
+		case 2:
+			var link = this.updateCircuitDiagram.addLink(this.mouseDownWorldCoordinate,this.mouseDownWorldCoordinate);
+			this.linkAndComponentAndEndpointAndPortArray.addEndpoint(link.get_rightEndpoint());
+			break;
+		case 3:
+			if(!this.linkAndComponentAndEndpointAndPortArray.isEmpty()) {
+				if(this.lastState == com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT) {
+					this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointAndPortArray,this.mouseMoveWorldCoordiante,this.mouseMoveWorldCoordiante,true);
+				} else {
+					this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointAndPortArray,this.mouseMoveWorldCoordiante,this.mouseDownWorldCoordinate,false);
+				}
+			}
+			break;
+		case 4:
+			this.checkHitList();
+			break;
+		case 5:
+			this.linkAndComponentAndEndpointAndPortArray.clean();
+			this.checkHitList();
+			break;
+		}
+	}
+	,toolBarUpdate: function() {
+		if(this.linkAndComponentAndEndpointAndPortArray.getComponentIteratorLength() != 0 || this.linkAndComponentAndEndpointAndPortArray.getLinkIteratorLength() != 0) {
+			this.updateToolBar.update(this.linkAndComponentAndEndpointAndPortArray);
+		} else {
+			this.updateToolBar.hidden();
+		}
+	}
+	,__class__: com_mun_controller_controllerState_ControllerCanvasContext
+};
+var com_mun_controller_controllerState_KeyState = function() {
+	this.keyState = com_mun_model_enumeration_K_$STATE.IDLE;
+	window.document.addEventListener("keydown",$bind(this,this.keyDown),false);
+	window.document.addEventListener("keyup",$bind(this,this.keyUp),false);
+};
+$hxClasses["com.mun.controller.controllerState.KeyState"] = com_mun_controller_controllerState_KeyState;
+com_mun_controller_controllerState_KeyState.__name__ = ["com","mun","controller","controllerState","KeyState"];
+com_mun_controller_controllerState_KeyState.prototype = {
+	keyState: null
+	,key: null
+	,keyDown: function(event) {
+		this.keyState = com_mun_model_enumeration_K_$STATE.KEY_DOWN;
+		if(event.altKey) {
+			this.key = com_mun_model_enumeration_KEY.ALT_KEY;
+		}
+	}
+	,keyUp: function(event) {
+		this.keyState = com_mun_model_enumeration_K_$STATE.KEY_UP;
+		if(event.altKey) {
+			this.key = com_mun_model_enumeration_KEY.ALT_KEY;
+		}
+	}
+	,get_keyState: function() {
+		return this.keyState;
+	}
+	,get_key: function() {
+		return this.key;
+	}
+	,__class__: com_mun_controller_controllerState_KeyState
+};
+var com_mun_controller_mouseAction_ButtonClick = function(updateCircuitDiagram,pixelRatio) {
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.pixelRatio = pixelRatio;
-	this.canvasListener = canvasListener;
 	window.document.getElementById("AND").onclick = $bind(this,this.andOnClick);
 	window.document.getElementById("FlipFlop").onclick = $bind(this,this.flipFlopOnClick);
 	window.document.getElementById("INPUT").onclick = $bind(this,this.inputOnClick);
@@ -1955,255 +2192,58 @@ com_mun_controller_mouseAction_ButtonClick.__name__ = ["com","mun","controller",
 com_mun_controller_mouseAction_ButtonClick.prototype = {
 	updateCircuitDiagram: null
 	,pixelRatio: null
-	,canvasListener: null
 	,component: null
+	,controllerCanavasContext: null
+	,setControllerCanvasContext: function(controllerCanvasContext) {
+		this.controllerCanavasContext = controllerCanvasContext;
+	}
+	,getComponent: function() {
+		return this.component;
+	}
 	,andOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("AND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("AND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,flipFlopOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("FlipFlop",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("FlipFlop",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,inputOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("Input",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("Input",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,muxOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("MUX",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("MUX",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,nandOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("NAND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("NAND",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,norOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("NOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("NOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,notOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("NOT",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("NOT",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,orOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("OR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("OR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,outputOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("Output",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("Output",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,xorOnClick: function() {
-		this.component = this.updateCircuitDiagram.createComponent("XOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_Orientation.EAST,2);
-		this.canvasListener.setButtonClick(this.component);
+		this.component = this.updateCircuitDiagram.createComponent("XOR",250,50,40 * this.pixelRatio,40 * this.pixelRatio,com_mun_model_enumeration_ORIENTATION.EAST,2);
+		this.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
 	}
 	,compoundComponentOnClick: function() {
 	}
-	,getComponemt: function() {
-		return this.component;
-	}
 	,__class__: com_mun_controller_mouseAction_ButtonClick
 };
-var com_mun_controller_mouseAction_CanvasListener = function(canvas,updateCircuitDiagram,updateToolBar) {
-	this.buttonClickFlag = false;
-	this.altKeyFlag = false;
-	this.endpointSelected = false;
-	this.createLinkFlag = false;
-	this.linkHighLight = false;
-	this.mouseDownFlag = false;
-	this.linkAndComponentArray = new com_mun_type_LinkAndComponentArray();
-	this.linkAndComponentAndEndpointArray = new com_mun_type_LinkAndComponentAndEndpointArray();
-	this.canvas = canvas;
-	this.updateCircuitDiagram = updateCircuitDiagram;
-	this.updateToolBar = updateToolBar;
-	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(updateCircuitDiagram.get_transform());
-	canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
-	canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
-	canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
-	window.document.addEventListener("keydown",$bind(this,this.keyDown),false);
-	window.document.addEventListener("keyup",$bind(this,this.keyUp),false);
-	this.linkAndComponentArrayReset();
-};
-$hxClasses["com.mun.controller.mouseAction.CanvasListener"] = com_mun_controller_mouseAction_CanvasListener;
-com_mun_controller_mouseAction_CanvasListener.__name__ = ["com","mun","controller","mouseAction","CanvasListener"];
-com_mun_controller_mouseAction_CanvasListener.prototype = {
-	canvas: null
-	,mouseDownFlag: null
-	,updateCircuitDiagram: null
-	,mouseDownLocation: null
-	,updateToolBar: null
-	,link: null
-	,hightLightLink: null
-	,linkHighLight: null
-	,createLinkFlag: null
-	,component: null
-	,endpoint: null
-	,endpointSelected: null
-	,port: null
-	,linkAndComponentArray: null
-	,linkAndComponentAndEndpointArray: null
-	,altKeyFlag: null
-	,buttonClickFlag: null
-	,viewToWorld: null
-	,getPointOnCanvas: function(canvas,x,y) {
-		var bbox = canvas.getBoundingClientRect();
-		var coordinate = new com_mun_type_Coordinate(0,0);
-		coordinate.set_xPosition((x - bbox.left) * (canvas.width / bbox.width));
-		coordinate.set_yPosition((y - bbox.top) * (canvas.height / bbox.height));
-		return coordinate;
-	}
-	,doMouseDown: function(event) {
-		this.setButtonClickFlagFalse();
-		if(!this.altKeyFlag) {
-			this.linkAndComponentArrayReset();
-		}
-		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
-		var x = event.clientX;
-		var y = event.clientY;
-		this.mouseDownLocation = this.getPointOnCanvas(this.canvas,x,y);
-		this.mouseDownFlag = true;
-		var endpointArray = this.updateCircuitDiagram.getEndpoint(this.mouseDownLocation);
-		if(endpointArray.length != 0) {
-			if(this.hightLightLink != null) {
-				var _g = 0;
-				while(_g < endpointArray.length) {
-					var i = endpointArray[_g];
-					++_g;
-					if(i == this.hightLightLink.get_leftEndpoint()) {
-						this.endpoint = i;
-						break;
-					}
-					if(i == this.hightLightLink.get_rightEndpoint()) {
-						this.endpoint = i;
-						break;
-					}
-				}
-			}
-			if(this.endpoint == null) {
-				var _g1 = 0;
-				while(_g1 < endpointArray.length) {
-					var i1 = endpointArray[_g1];
-					++_g1;
-					this.endpoint = i1;
-					break;
-				}
-			}
-		}
-		if(this.endpoint != null) {
-			this.endpointSelected = true;
-		} else {
-			this.endpointSelected = false;
-		}
-		if(this.endpoint == null) {
-			this.link = this.updateCircuitDiagram.getLink(this.mouseDownLocation);
-			if(this.link == null) {
-				this.component = this.updateCircuitDiagram.getComponent(this.mouseDownLocation);
-				if(this.component != null && this.altKeyFlag) {
-					if(this.linkAndComponentArray.get_componentArray().indexOf(this.component) == -1) {
-						this.linkAndComponentArray.addComponent(this.component);
-					}
-				} else if(this.component != null) {
-					this.linkAndComponentArray.addComponent(this.component);
-				}
-			} else {
-				this.linkHighLight = true;
-				this.hightLightLink = this.link;
-				if(this.altKeyFlag) {
-					if(this.linkAndComponentArray.get_componentArray().indexOf(this.component) == -1) {
-						this.linkAndComponentArray.addLink(this.link);
-					}
-				} else {
-					this.linkAndComponentArray.addLink(this.link);
-				}
-			}
-		}
-		this.updateCircuitDiagram.hightLightObject(this.linkAndComponentArray);
-		if(this.linkAndComponentArray.get_componentArray() != null && this.linkAndComponentArray.get_componentArray().length != 0 || this.linkAndComponentArray.get_linkArray() != null && this.linkAndComponentArray.get_linkArray().length != 0) {
-			this.updateToolBar.update(this.linkAndComponentArray);
-		} else {
-			this.updateToolBar.hidden();
-		}
-		if(this.linkHighLight && this.endpointSelected) {
-			this.linkHighLight = false;
-			this.endpointSelected = false;
-			return;
-		}
-		if(this.link == null) {
-			this.linkHighLight = false;
-		}
-		if(this.link == null && this.updateCircuitDiagram.isOnPort(this.mouseDownLocation).get_port() != null) {
-			this.link = this.updateCircuitDiagram.addLink(this.mouseDownLocation,this.mouseDownLocation);
-			this.hightLightLink = this.link;
-			this.linkHighLight = true;
-			this.createLinkFlag = true;
-		}
-	}
-	,doMouseMove: function(event) {
-		var x = event.clientX;
-		var y = event.clientY;
-		var loc = this.getPointOnCanvas(this.canvas,x,y);
-		if(this.buttonClickFlag) {
-			this.mouseDownLocation = loc;
-			this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,true);
-		} else if(this.mouseDownFlag == true) {
-			this.linkAndComponentAndEndpointArrayReset();
-			if(this.createLinkFlag) {
-				this.linkAndComponentAndEndpointArray.addEndpoint(this.link.get_rightEndpoint());
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
-			} else if(this.endpoint != null) {
-				this.linkAndComponentAndEndpointArray.addEndpoint(this.endpoint);
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
-			} else if(this.linkAndComponentArray.get_linkArray() != null && this.linkAndComponentArray.get_linkArray().length != 0 || this.linkAndComponentArray.get_componentArray() != null && this.linkAndComponentArray.get_componentArray().length != 0) {
-				this.linkAndComponentAndEndpointArray.set_componentArray(this.linkAndComponentArray.get_componentArray());
-				this.linkAndComponentAndEndpointArray.set_linkArray(this.linkAndComponentArray.get_linkArray());
-				this.updateCircuitDiagram.moveSelectedObjects(this.linkAndComponentAndEndpointArray,loc,this.mouseDownLocation,false);
-			}
-		}
-		this.mouseDownLocation = loc;
-	}
-	,doMouseUp: function(event) {
-		this.mouseDownFlag = false;
-		this.component = null;
-		this.endpoint = null;
-		this.link = null;
-		this.port = null;
-		this.createLinkFlag = false;
-		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
-		this.updateCircuitDiagram.update();
-	}
-	,keyDown: function(event) {
-		if(event.altKey) {
-			this.altKeyFlag = true;
-		}
-	}
-	,keyUp: function(event) {
-		this.altKeyFlag = false;
-	}
-	,linkAndComponentArrayReset: function() {
-		this.linkAndComponentArray.clean();
-	}
-	,linkAndComponentAndEndpointArrayReset: function() {
-		this.linkAndComponentAndEndpointArray.clean();
-	}
-	,setButtonClick: function(component) {
-		this.linkAndComponentAndEndpointArrayReset();
-		this.buttonClickFlag = true;
-		this.linkAndComponentAndEndpointArray.addComponent(component);
-		this.updateCircuitDiagram.createComponentByCommand(component);
-	}
-	,setButtonClickFlagFalse: function() {
-		this.buttonClickFlag = false;
-	}
-	,__class__: com_mun_controller_mouseAction_CanvasListener
-};
-var com_mun_model_enumeration_Box = $hxClasses["com.mun.model.enumeration.Box"] = { __ename__ : ["com","mun","model","enumeration","Box"], __constructs__ : ["WHITE_BOX","BLACK_BOX"] };
-com_mun_model_enumeration_Box.WHITE_BOX = ["WHITE_BOX",0];
-com_mun_model_enumeration_Box.WHITE_BOX.toString = $estr;
-com_mun_model_enumeration_Box.WHITE_BOX.__enum__ = com_mun_model_enumeration_Box;
-com_mun_model_enumeration_Box.BLACK_BOX = ["BLACK_BOX",1];
-com_mun_model_enumeration_Box.BLACK_BOX.toString = $estr;
-com_mun_model_enumeration_Box.BLACK_BOX.__enum__ = com_mun_model_enumeration_Box;
-com_mun_model_enumeration_Box.__empty_constructs__ = [com_mun_model_enumeration_Box.WHITE_BOX,com_mun_model_enumeration_Box.BLACK_BOX];
 var com_mun_global_Constant = function() {
 };
 $hxClasses["com.mun.global.Constant"] = com_mun_global_Constant;
@@ -2498,13 +2538,11 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			if(linkAndComponentArray.get_componentArray() != null) {
-				var _g2 = 0;
-				var _g3 = linkAndComponentArray.get_componentArray();
-				while(_g2 < _g3.length) {
-					var j = _g3[_g2];
-					++_g2;
-					if(j == i) {
+			if(linkAndComponentArray.getComponentIteratorLength() != 0) {
+				var j = linkAndComponentArray.get_componentIterator();
+				while(j.hasNext()) {
+					var j1 = j.next();
+					if(j1 == i) {
 						i.drawComponent(drawingAdapter,true);
 						drawFlag = true;
 					}
@@ -2516,18 +2554,16 @@ com_mun_model_component_CircuitDiagram.prototype = {
 			drawFlag = false;
 		}
 		drawFlag = false;
-		var _g4 = 0;
+		var _g2 = 0;
 		var _g11 = this.linkArray;
-		while(_g4 < _g11.length) {
-			var i1 = _g11[_g4];
-			++_g4;
-			if(linkAndComponentArray.get_linkArray() != null) {
-				var _g21 = 0;
-				var _g31 = linkAndComponentArray.get_linkArray();
-				while(_g21 < _g31.length) {
-					var j1 = _g31[_g21];
-					++_g21;
-					if(j1 == i1) {
+		while(_g2 < _g11.length) {
+			var i1 = _g11[_g2];
+			++_g2;
+			if(linkAndComponentArray.getLinkIteratorLength() != 0) {
+				var j2 = linkAndComponentArray.get_linkIterator();
+				while(j2.hasNext()) {
+					var j3 = j2.next();
+					if(j3 == i1) {
 						i1.drawLink(drawingAdapter,true);
 						drawFlag = true;
 					}
@@ -2547,8 +2583,16 @@ com_mun_model_component_CircuitDiagram.prototype = {
 			var i = _g1[_g];
 			++_g;
 			var result = i.findHitList(coordinate,mode);
-			linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
-			linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
+			var j = result.get_linkIterator();
+			while(j.hasNext()) {
+				var j1 = j.next();
+				linkAndComponentAndEndpointAndPortArray.addLink(j1);
+			}
+			var j2 = result.get_endponentIterator();
+			while(j2.hasNext()) {
+				var j3 = j2.next();
+				linkAndComponentAndEndpointAndPortArray.addEndpoint(j3);
+			}
 		}
 		var _g2 = 0;
 		var _g11 = this.componentArray;
@@ -2556,10 +2600,26 @@ com_mun_model_component_CircuitDiagram.prototype = {
 			var i1 = _g11[_g2];
 			++_g2;
 			var result1 = i1.findHitList(coordinate,mode);
-			linkAndComponentAndEndpointAndPortArray.get_componentArray().concat(result1.get_componentArray());
-			linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result1.get_linkArray());
-			linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result1.get_endponentArray());
-			linkAndComponentAndEndpointAndPortArray.get_portArray().concat(result1.get_portArray());
+			var j4 = result1.get_linkIterator();
+			while(j4.hasNext()) {
+				var j5 = j4.next();
+				linkAndComponentAndEndpointAndPortArray.addLink(j5);
+			}
+			var j6 = result1.get_endponentIterator();
+			while(j6.hasNext()) {
+				var j7 = j6.next();
+				linkAndComponentAndEndpointAndPortArray.addEndpoint(j7);
+			}
+			var j8 = result1.get_componentIterator();
+			while(j8.hasNext()) {
+				var j9 = j8.next();
+				linkAndComponentAndEndpointAndPortArray.addComponent(j9);
+			}
+			var j10 = result1.get_portIterator();
+			while(j10.hasNext()) {
+				var j11 = j10.next();
+				linkAndComponentAndEndpointAndPortArray.addPort(j11);
+			}
 		}
 		return linkAndComponentAndEndpointAndPortArray;
 	}
@@ -2625,6 +2685,7 @@ com_mun_model_component_Component.prototype = {
 	,delay: null
 	,inportsNum: null
 	,nameOfTheComponentKind: null
+	,boxType: null
 	,get_xPosition: function() {
 		return this.xPosition;
 	}
@@ -2648,6 +2709,12 @@ com_mun_model_component_Component.prototype = {
 	}
 	,set_componentKind: function(value) {
 		return this.componentKind = value;
+	}
+	,get_boxType: function() {
+		return this.boxType;
+	}
+	,set_boxType: function(value) {
+		this.boxType = value;
 	}
 	,get_inportIterator: function() {
 		return HxOverrides.iter(this.inportArray);
@@ -2853,8 +2920,8 @@ com_mun_model_component_Link.prototype = {
 	}
 	,findHitList: function(coordinate,mode) {
 		var linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
-		linkAndComponentAndEndpointAndPortArray.get_linkArray().push(this.isOnLink(coordinate));
-		linkAndComponentAndEndpointAndPortArray.get_endponentArray().push(this.pointOnEndpoint(coordinate));
+		linkAndComponentAndEndpointAndPortArray.addLink(this.isOnLink(coordinate));
+		linkAndComponentAndEndpointAndPortArray.addEndpoint(this.pointOnEndpoint(coordinate));
 		return linkAndComponentAndEndpointAndPortArray;
 	}
 	,pointOnEndpoint: function(coordinate) {
@@ -2988,6 +3055,34 @@ com_mun_model_drawingInterface_DrawingAdapterI.prototype = {
 	,drawLine: null
 	,__class__: com_mun_model_drawingInterface_DrawingAdapterI
 };
+var com_mun_model_enumeration_BOX = $hxClasses["com.mun.model.enumeration.BOX"] = { __ename__ : ["com","mun","model","enumeration","BOX"], __constructs__ : ["WHITE_BOX","BLACK_BOX"] };
+com_mun_model_enumeration_BOX.WHITE_BOX = ["WHITE_BOX",0];
+com_mun_model_enumeration_BOX.WHITE_BOX.toString = $estr;
+com_mun_model_enumeration_BOX.WHITE_BOX.__enum__ = com_mun_model_enumeration_BOX;
+com_mun_model_enumeration_BOX.BLACK_BOX = ["BLACK_BOX",1];
+com_mun_model_enumeration_BOX.BLACK_BOX.toString = $estr;
+com_mun_model_enumeration_BOX.BLACK_BOX.__enum__ = com_mun_model_enumeration_BOX;
+com_mun_model_enumeration_BOX.__empty_constructs__ = [com_mun_model_enumeration_BOX.WHITE_BOX,com_mun_model_enumeration_BOX.BLACK_BOX];
+var com_mun_model_enumeration_C_$STATE = $hxClasses["com.mun.model.enumeration.C_STATE"] = { __ename__ : ["com","mun","model","enumeration","C_STATE"], __constructs__ : ["IDLE","CREATE_COMPONENT","CREATE_LINK","MOVE","MULTI_SELECTION","SINGLE_SELECTION"] };
+com_mun_model_enumeration_C_$STATE.IDLE = ["IDLE",0];
+com_mun_model_enumeration_C_$STATE.IDLE.toString = $estr;
+com_mun_model_enumeration_C_$STATE.IDLE.__enum__ = com_mun_model_enumeration_C_$STATE;
+com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT = ["CREATE_COMPONENT",1];
+com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT.toString = $estr;
+com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT.__enum__ = com_mun_model_enumeration_C_$STATE;
+com_mun_model_enumeration_C_$STATE.CREATE_LINK = ["CREATE_LINK",2];
+com_mun_model_enumeration_C_$STATE.CREATE_LINK.toString = $estr;
+com_mun_model_enumeration_C_$STATE.CREATE_LINK.__enum__ = com_mun_model_enumeration_C_$STATE;
+com_mun_model_enumeration_C_$STATE.MOVE = ["MOVE",3];
+com_mun_model_enumeration_C_$STATE.MOVE.toString = $estr;
+com_mun_model_enumeration_C_$STATE.MOVE.__enum__ = com_mun_model_enumeration_C_$STATE;
+com_mun_model_enumeration_C_$STATE.MULTI_SELECTION = ["MULTI_SELECTION",4];
+com_mun_model_enumeration_C_$STATE.MULTI_SELECTION.toString = $estr;
+com_mun_model_enumeration_C_$STATE.MULTI_SELECTION.__enum__ = com_mun_model_enumeration_C_$STATE;
+com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION = ["SINGLE_SELECTION",5];
+com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION.toString = $estr;
+com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION.__enum__ = com_mun_model_enumeration_C_$STATE;
+com_mun_model_enumeration_C_$STATE.__empty_constructs__ = [com_mun_model_enumeration_C_$STATE.IDLE,com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT,com_mun_model_enumeration_C_$STATE.CREATE_LINK,com_mun_model_enumeration_C_$STATE.MOVE,com_mun_model_enumeration_C_$STATE.MULTI_SELECTION,com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION];
 var com_mun_model_enumeration_IOTYPE = $hxClasses["com.mun.model.enumeration.IOTYPE"] = { __ename__ : ["com","mun","model","enumeration","IOTYPE"], __constructs__ : ["INPUT","S","D","CLK","OUTPUT","Q","QN"] };
 com_mun_model_enumeration_IOTYPE.INPUT = ["INPUT",0];
 com_mun_model_enumeration_IOTYPE.INPUT.toString = $estr;
@@ -3011,6 +3106,25 @@ com_mun_model_enumeration_IOTYPE.QN = ["QN",6];
 com_mun_model_enumeration_IOTYPE.QN.toString = $estr;
 com_mun_model_enumeration_IOTYPE.QN.__enum__ = com_mun_model_enumeration_IOTYPE;
 com_mun_model_enumeration_IOTYPE.__empty_constructs__ = [com_mun_model_enumeration_IOTYPE.INPUT,com_mun_model_enumeration_IOTYPE.S,com_mun_model_enumeration_IOTYPE.D,com_mun_model_enumeration_IOTYPE.CLK,com_mun_model_enumeration_IOTYPE.OUTPUT,com_mun_model_enumeration_IOTYPE.Q,com_mun_model_enumeration_IOTYPE.QN];
+var com_mun_model_enumeration_KEY = $hxClasses["com.mun.model.enumeration.KEY"] = { __ename__ : ["com","mun","model","enumeration","KEY"], __constructs__ : ["NONE","ALT_KEY"] };
+com_mun_model_enumeration_KEY.NONE = ["NONE",0];
+com_mun_model_enumeration_KEY.NONE.toString = $estr;
+com_mun_model_enumeration_KEY.NONE.__enum__ = com_mun_model_enumeration_KEY;
+com_mun_model_enumeration_KEY.ALT_KEY = ["ALT_KEY",1];
+com_mun_model_enumeration_KEY.ALT_KEY.toString = $estr;
+com_mun_model_enumeration_KEY.ALT_KEY.__enum__ = com_mun_model_enumeration_KEY;
+com_mun_model_enumeration_KEY.__empty_constructs__ = [com_mun_model_enumeration_KEY.NONE,com_mun_model_enumeration_KEY.ALT_KEY];
+var com_mun_model_enumeration_K_$STATE = $hxClasses["com.mun.model.enumeration.K_STATE"] = { __ename__ : ["com","mun","model","enumeration","K_STATE"], __constructs__ : ["IDLE","KEY_UP","KEY_DOWN"] };
+com_mun_model_enumeration_K_$STATE.IDLE = ["IDLE",0];
+com_mun_model_enumeration_K_$STATE.IDLE.toString = $estr;
+com_mun_model_enumeration_K_$STATE.IDLE.__enum__ = com_mun_model_enumeration_K_$STATE;
+com_mun_model_enumeration_K_$STATE.KEY_UP = ["KEY_UP",1];
+com_mun_model_enumeration_K_$STATE.KEY_UP.toString = $estr;
+com_mun_model_enumeration_K_$STATE.KEY_UP.__enum__ = com_mun_model_enumeration_K_$STATE;
+com_mun_model_enumeration_K_$STATE.KEY_DOWN = ["KEY_DOWN",2];
+com_mun_model_enumeration_K_$STATE.KEY_DOWN.toString = $estr;
+com_mun_model_enumeration_K_$STATE.KEY_DOWN.__enum__ = com_mun_model_enumeration_K_$STATE;
+com_mun_model_enumeration_K_$STATE.__empty_constructs__ = [com_mun_model_enumeration_K_$STATE.IDLE,com_mun_model_enumeration_K_$STATE.KEY_UP,com_mun_model_enumeration_K_$STATE.KEY_DOWN];
 var com_mun_model_enumeration_MODE = $hxClasses["com.mun.model.enumeration.MODE"] = { __ename__ : ["com","mun","model","enumeration","MODE"], __constructs__ : ["EXCLUDE_PARENTS","INCLUDE_PARENTS"] };
 com_mun_model_enumeration_MODE.EXCLUDE_PARENTS = ["EXCLUDE_PARENTS",0];
 com_mun_model_enumeration_MODE.EXCLUDE_PARENTS.toString = $estr;
@@ -3019,23 +3133,34 @@ com_mun_model_enumeration_MODE.INCLUDE_PARENTS = ["INCLUDE_PARENTS",1];
 com_mun_model_enumeration_MODE.INCLUDE_PARENTS.toString = $estr;
 com_mun_model_enumeration_MODE.INCLUDE_PARENTS.__enum__ = com_mun_model_enumeration_MODE;
 com_mun_model_enumeration_MODE.__empty_constructs__ = [com_mun_model_enumeration_MODE.EXCLUDE_PARENTS,com_mun_model_enumeration_MODE.INCLUDE_PARENTS];
-var com_mun_model_enumeration_Orientation = $hxClasses["com.mun.model.enumeration.Orientation"] = { __ename__ : ["com","mun","model","enumeration","Orientation"], __constructs__ : ["NORTH","SOUTH","WEST","EAST","UNKNOW"] };
-com_mun_model_enumeration_Orientation.NORTH = ["NORTH",0];
-com_mun_model_enumeration_Orientation.NORTH.toString = $estr;
-com_mun_model_enumeration_Orientation.NORTH.__enum__ = com_mun_model_enumeration_Orientation;
-com_mun_model_enumeration_Orientation.SOUTH = ["SOUTH",1];
-com_mun_model_enumeration_Orientation.SOUTH.toString = $estr;
-com_mun_model_enumeration_Orientation.SOUTH.__enum__ = com_mun_model_enumeration_Orientation;
-com_mun_model_enumeration_Orientation.WEST = ["WEST",2];
-com_mun_model_enumeration_Orientation.WEST.toString = $estr;
-com_mun_model_enumeration_Orientation.WEST.__enum__ = com_mun_model_enumeration_Orientation;
-com_mun_model_enumeration_Orientation.EAST = ["EAST",3];
-com_mun_model_enumeration_Orientation.EAST.toString = $estr;
-com_mun_model_enumeration_Orientation.EAST.__enum__ = com_mun_model_enumeration_Orientation;
-com_mun_model_enumeration_Orientation.UNKNOW = ["UNKNOW",4];
-com_mun_model_enumeration_Orientation.UNKNOW.toString = $estr;
-com_mun_model_enumeration_Orientation.UNKNOW.__enum__ = com_mun_model_enumeration_Orientation;
-com_mun_model_enumeration_Orientation.__empty_constructs__ = [com_mun_model_enumeration_Orientation.NORTH,com_mun_model_enumeration_Orientation.SOUTH,com_mun_model_enumeration_Orientation.WEST,com_mun_model_enumeration_Orientation.EAST,com_mun_model_enumeration_Orientation.UNKNOW];
+var com_mun_model_enumeration_M_$STATE = $hxClasses["com.mun.model.enumeration.M_STATE"] = { __ename__ : ["com","mun","model","enumeration","M_STATE"], __constructs__ : ["IDLE","MOUSE_DOWN","MOUSE_UP"] };
+com_mun_model_enumeration_M_$STATE.IDLE = ["IDLE",0];
+com_mun_model_enumeration_M_$STATE.IDLE.toString = $estr;
+com_mun_model_enumeration_M_$STATE.IDLE.__enum__ = com_mun_model_enumeration_M_$STATE;
+com_mun_model_enumeration_M_$STATE.MOUSE_DOWN = ["MOUSE_DOWN",1];
+com_mun_model_enumeration_M_$STATE.MOUSE_DOWN.toString = $estr;
+com_mun_model_enumeration_M_$STATE.MOUSE_DOWN.__enum__ = com_mun_model_enumeration_M_$STATE;
+com_mun_model_enumeration_M_$STATE.MOUSE_UP = ["MOUSE_UP",2];
+com_mun_model_enumeration_M_$STATE.MOUSE_UP.toString = $estr;
+com_mun_model_enumeration_M_$STATE.MOUSE_UP.__enum__ = com_mun_model_enumeration_M_$STATE;
+com_mun_model_enumeration_M_$STATE.__empty_constructs__ = [com_mun_model_enumeration_M_$STATE.IDLE,com_mun_model_enumeration_M_$STATE.MOUSE_DOWN,com_mun_model_enumeration_M_$STATE.MOUSE_UP];
+var com_mun_model_enumeration_ORIENTATION = $hxClasses["com.mun.model.enumeration.ORIENTATION"] = { __ename__ : ["com","mun","model","enumeration","ORIENTATION"], __constructs__ : ["NORTH","SOUTH","WEST","EAST","UNKNOW"] };
+com_mun_model_enumeration_ORIENTATION.NORTH = ["NORTH",0];
+com_mun_model_enumeration_ORIENTATION.NORTH.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.NORTH.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.SOUTH = ["SOUTH",1];
+com_mun_model_enumeration_ORIENTATION.SOUTH.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.SOUTH.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.WEST = ["WEST",2];
+com_mun_model_enumeration_ORIENTATION.WEST.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.WEST.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.EAST = ["EAST",3];
+com_mun_model_enumeration_ORIENTATION.EAST.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.EAST.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.UNKNOW = ["UNKNOW",4];
+com_mun_model_enumeration_ORIENTATION.UNKNOW.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.UNKNOW.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.__empty_constructs__ = [com_mun_model_enumeration_ORIENTATION.NORTH,com_mun_model_enumeration_ORIENTATION.SOUTH,com_mun_model_enumeration_ORIENTATION.WEST,com_mun_model_enumeration_ORIENTATION.EAST,com_mun_model_enumeration_ORIENTATION.UNKNOW];
 var com_mun_model_enumeration_POINT_$MODE = $hxClasses["com.mun.model.enumeration.POINT_MODE"] = { __ename__ : ["com","mun","model","enumeration","POINT_MODE"], __constructs__ : ["ONE","ALL","PATH"] };
 com_mun_model_enumeration_POINT_$MODE.ONE = ["ONE",0];
 com_mun_model_enumeration_POINT_$MODE.ONE.toString = $estr;
@@ -3047,23 +3172,23 @@ com_mun_model_enumeration_POINT_$MODE.PATH = ["PATH",2];
 com_mun_model_enumeration_POINT_$MODE.PATH.toString = $estr;
 com_mun_model_enumeration_POINT_$MODE.PATH.__enum__ = com_mun_model_enumeration_POINT_$MODE;
 com_mun_model_enumeration_POINT_$MODE.__empty_constructs__ = [com_mun_model_enumeration_POINT_$MODE.ONE,com_mun_model_enumeration_POINT_$MODE.ALL,com_mun_model_enumeration_POINT_$MODE.PATH];
-var com_mun_model_enumeration_ValueLogic = $hxClasses["com.mun.model.enumeration.ValueLogic"] = { __ename__ : ["com","mun","model","enumeration","ValueLogic"], __constructs__ : ["FALSE","TRUE","UNDEFINED","RISING_EDGE","DOWN_EDGE"] };
-com_mun_model_enumeration_ValueLogic.FALSE = ["FALSE",0];
-com_mun_model_enumeration_ValueLogic.FALSE.toString = $estr;
-com_mun_model_enumeration_ValueLogic.FALSE.__enum__ = com_mun_model_enumeration_ValueLogic;
-com_mun_model_enumeration_ValueLogic.TRUE = ["TRUE",1];
-com_mun_model_enumeration_ValueLogic.TRUE.toString = $estr;
-com_mun_model_enumeration_ValueLogic.TRUE.__enum__ = com_mun_model_enumeration_ValueLogic;
-com_mun_model_enumeration_ValueLogic.UNDEFINED = ["UNDEFINED",2];
-com_mun_model_enumeration_ValueLogic.UNDEFINED.toString = $estr;
-com_mun_model_enumeration_ValueLogic.UNDEFINED.__enum__ = com_mun_model_enumeration_ValueLogic;
-com_mun_model_enumeration_ValueLogic.RISING_EDGE = ["RISING_EDGE",3];
-com_mun_model_enumeration_ValueLogic.RISING_EDGE.toString = $estr;
-com_mun_model_enumeration_ValueLogic.RISING_EDGE.__enum__ = com_mun_model_enumeration_ValueLogic;
-com_mun_model_enumeration_ValueLogic.DOWN_EDGE = ["DOWN_EDGE",4];
-com_mun_model_enumeration_ValueLogic.DOWN_EDGE.toString = $estr;
-com_mun_model_enumeration_ValueLogic.DOWN_EDGE.__enum__ = com_mun_model_enumeration_ValueLogic;
-com_mun_model_enumeration_ValueLogic.__empty_constructs__ = [com_mun_model_enumeration_ValueLogic.FALSE,com_mun_model_enumeration_ValueLogic.TRUE,com_mun_model_enumeration_ValueLogic.UNDEFINED,com_mun_model_enumeration_ValueLogic.RISING_EDGE,com_mun_model_enumeration_ValueLogic.DOWN_EDGE];
+var com_mun_model_enumeration_VALUE_$LOGIC = $hxClasses["com.mun.model.enumeration.VALUE_LOGIC"] = { __ename__ : ["com","mun","model","enumeration","VALUE_LOGIC"], __constructs__ : ["FALSE","TRUE","UNDEFINED","RISING_EDGE","DOWN_EDGE"] };
+com_mun_model_enumeration_VALUE_$LOGIC.FALSE = ["FALSE",0];
+com_mun_model_enumeration_VALUE_$LOGIC.FALSE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.FALSE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.TRUE = ["TRUE",1];
+com_mun_model_enumeration_VALUE_$LOGIC.TRUE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.TRUE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED = ["UNDEFINED",2];
+com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE = ["RISING_EDGE",3];
+com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE = ["DOWN_EDGE",4];
+com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.__empty_constructs__ = [com_mun_model_enumeration_VALUE_$LOGIC.FALSE,com_mun_model_enumeration_VALUE_$LOGIC.TRUE,com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED,com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE,com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE];
 var com_mun_model_gates_GateAbstract = function(leastInportNum) {
 	this.leastInportNum = leastInportNum;
 	this.sequence = -1;
@@ -3178,7 +3303,7 @@ com_mun_model_gates_GateAbstract.prototype = {
 	}
 	,findHitList: function(coordinate,mode) {
 		var linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
-		linkAndComponentAndEndpointAndPortArray.get_componentArray().push(this.isInComponent(coordinate));
+		linkAndComponentAndEndpointAndPortArray.addComponent(this.isInComponent(coordinate));
 		return linkAndComponentAndEndpointAndPortArray;
 	}
 	,isInComponent: function(coordinate) {
@@ -3232,13 +3357,13 @@ com_mun_model_gates_AND.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
 			++_g;
-			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.FALSE) {
-				value = com_mun_model_enumeration_ValueLogic.FALSE;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_VALUE_$LOGIC.FALSE) {
+				value = com_mun_model_enumeration_VALUE_$LOGIC.FALSE;
 				break;
 			}
 		}
@@ -3327,13 +3452,13 @@ com_mun_model_gates_FlipFlop.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
 			++_g;
 			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK) {
-				if(port1.get_value() != com_mun_model_enumeration_ValueLogic.RISING_EDGE) {
+				if(port1.get_value() != com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE) {
 					return portArray;
 				}
 			}
@@ -3354,10 +3479,10 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 				port3.set_value(value);
 			}
 			if(port3.get_portDescription() == com_mun_model_enumeration_IOTYPE.QN) {
-				if(value == com_mun_model_enumeration_ValueLogic.TRUE) {
-					port3.set_value(com_mun_model_enumeration_ValueLogic.FALSE);
-				} else if(value == com_mun_model_enumeration_ValueLogic.FALSE) {
-					port3.set_value(com_mun_model_enumeration_ValueLogic.TRUE);
+				if(value == com_mun_model_enumeration_VALUE_$LOGIC.TRUE) {
+					port3.set_value(com_mun_model_enumeration_VALUE_$LOGIC.FALSE);
+				} else if(value == com_mun_model_enumeration_VALUE_$LOGIC.FALSE) {
+					port3.set_value(com_mun_model_enumeration_VALUE_$LOGIC.TRUE);
 				}
 			}
 		}
@@ -3581,7 +3706,7 @@ com_mun_model_gates_Input.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
@@ -3708,8 +3833,8 @@ com_mun_model_gates_MUX.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
-		var selectValue = com_mun_model_enumeration_ValueLogic.FALSE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
+		var selectValue = com_mun_model_enumeration_VALUE_$LOGIC.FALSE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
@@ -3719,7 +3844,7 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 				break;
 			}
 		}
-		if(selectValue == com_mun_model_enumeration_ValueLogic.TRUE) {
+		if(selectValue == com_mun_model_enumeration_VALUE_$LOGIC.TRUE) {
 			var _g1 = 0;
 			while(_g1 < portArray.length) {
 				var port2 = portArray[_g1];
@@ -3729,7 +3854,7 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 					break;
 				}
 			}
-		} else if(selectValue == com_mun_model_enumeration_ValueLogic.FALSE) {
+		} else if(selectValue == com_mun_model_enumeration_VALUE_$LOGIC.FALSE) {
 			var _g2 = 0;
 			while(_g2 < portArray.length) {
 				var port3 = portArray[_g2];
@@ -3896,13 +4021,13 @@ com_mun_model_gates_NAND.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.FALSE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.FALSE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
 			++_g;
-			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.FALSE) {
-				value = com_mun_model_enumeration_ValueLogic.TRUE;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_VALUE_$LOGIC.FALSE) {
+				value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 				break;
 			}
 		}
@@ -3994,13 +4119,13 @@ com_mun_model_gates_NOR.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
 			++_g;
-			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.TRUE) {
-				value = com_mun_model_enumeration_ValueLogic.FALSE;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_VALUE_$LOGIC.TRUE) {
+				value = com_mun_model_enumeration_VALUE_$LOGIC.FALSE;
 				break;
 			}
 		}
@@ -4092,7 +4217,7 @@ com_mun_model_gates_NOT.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
@@ -4107,10 +4232,10 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 			var port2 = portArray[_g1];
 			++_g1;
 			if(port2.get_portDescription() == com_mun_model_enumeration_IOTYPE.OUTPUT) {
-				if(value == com_mun_model_enumeration_ValueLogic.TRUE) {
-					port2.set_value(com_mun_model_enumeration_ValueLogic.FALSE);
-				} else if(value == com_mun_model_enumeration_ValueLogic.FALSE) {
-					port2.set_value(com_mun_model_enumeration_ValueLogic.TRUE);
+				if(value == com_mun_model_enumeration_VALUE_$LOGIC.TRUE) {
+					port2.set_value(com_mun_model_enumeration_VALUE_$LOGIC.FALSE);
+				} else if(value == com_mun_model_enumeration_VALUE_$LOGIC.FALSE) {
+					port2.set_value(com_mun_model_enumeration_VALUE_$LOGIC.TRUE);
 				}
 			}
 		}
@@ -4192,13 +4317,13 @@ com_mun_model_gates_OR.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.FALSE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.FALSE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
 			++_g;
-			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.TRUE) {
-				value = com_mun_model_enumeration_ValueLogic.TRUE;
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_VALUE_$LOGIC.TRUE) {
+				value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 				break;
 			}
 		}
@@ -4290,7 +4415,7 @@ com_mun_model_gates_Output.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
 	algorithm: function(portArray) {
 		var port;
-		var value = com_mun_model_enumeration_ValueLogic.TRUE;
+		var value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		var _g = 0;
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
@@ -4420,14 +4545,14 @@ com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		while(_g < portArray.length) {
 			var port1 = portArray[_g];
 			++_g;
-			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_ValueLogic.TRUE) {
+			if(port1.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT && port1.get_value() == com_mun_model_enumeration_VALUE_$LOGIC.TRUE) {
 				++counter;
 			}
 		}
 		if(counter % 2 == 0) {
-			value = com_mun_model_enumeration_ValueLogic.FALSE;
+			value = com_mun_model_enumeration_VALUE_$LOGIC.FALSE;
 		} else {
-			value = com_mun_model_enumeration_ValueLogic.TRUE;
+			value = com_mun_model_enumeration_VALUE_$LOGIC.TRUE;
 		}
 		var _g1 = 0;
 		while(_g1 < portArray.length) {
@@ -4532,10 +4657,10 @@ com_mun_type_Coordinate.prototype = {
 	,__properties__: {set_yPosition:"set_yPosition",get_yPosition:"get_yPosition",set_xPosition:"set_xPosition",get_xPosition:"get_xPosition"}
 };
 var com_mun_type_LinkAndComponentAndEndpointAndPortArray = function() {
-	this.set_linkArray([]);
-	this.set_componentArray([]);
-	this.set_endponentArray([]);
-	this.set_portArray([]);
+	this.linkArray = [];
+	this.componentArray = [];
+	this.endponentArray = [];
+	this.portArray = [];
 };
 $hxClasses["com.mun.type.LinkAndComponentAndEndpointAndPortArray"] = com_mun_type_LinkAndComponentAndEndpointAndPortArray;
 com_mun_type_LinkAndComponentAndEndpointAndPortArray.__name__ = ["com","mun","type","LinkAndComponentAndEndpointAndPortArray"];
@@ -4545,189 +4670,95 @@ com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
 	,endponentArray: null
 	,portArray: null
 	,addLink: function(link) {
-		this.get_linkArray().push(link);
+		if(this.linkArray.indexOf(link) == -1) {
+			this.linkArray.push(link);
+		}
 	}
 	,addComponent: function(component) {
-		this.get_componentArray().push(component);
+		if(this.componentArray.indexOf(component) == -1) {
+			this.componentArray.push(component);
+		}
 	}
 	,addEndpoint: function(endpoint) {
-		this.get_endponentArray().push(endpoint);
+		if(this.endponentArray.indexOf(endpoint) == -1) {
+			this.endponentArray.push(endpoint);
+		}
 	}
 	,addPort: function(port) {
-		this.get_portArray().push(port);
+		if(this.portArray.indexOf(port) == -1) {
+			this.portArray.push(port);
+		}
 	}
 	,removeLink: function(link) {
-		HxOverrides.remove(this.get_linkArray(),link);
+		if(this.linkArray.indexOf(link) != -1) {
+			HxOverrides.remove(this.linkArray,link);
+		}
 	}
 	,removeComponent: function(component) {
-		HxOverrides.remove(this.get_componentArray(),component);
+		if(this.componentArray.indexOf(component) != -1) {
+			HxOverrides.remove(this.componentArray,component);
+		}
 	}
 	,removeEndpoint: function(endpoint) {
-		HxOverrides.remove(this.get_endponentArray(),endpoint);
+		if(this.endponentArray.indexOf(endpoint) != -1) {
+			HxOverrides.remove(this.endponentArray,endpoint);
+		}
 	}
 	,removePort: function(port) {
-		HxOverrides.remove(this.get_portArray(),port);
+		if(this.portArray.indexOf(port) != -1) {
+			HxOverrides.remove(this.portArray,port);
+		}
 	}
-	,get_linkArray: function() {
-		return this.linkArray;
+	,get_linkIterator: function() {
+		return HxOverrides.iter(this.linkArray);
 	}
-	,set_linkArray: function(value) {
-		return this.linkArray = value;
+	,get_componentIterator: function() {
+		return HxOverrides.iter(this.componentArray);
 	}
-	,get_componentArray: function() {
-		return this.componentArray;
+	,get_endponentIterator: function() {
+		return HxOverrides.iter(this.endponentArray);
 	}
-	,set_componentArray: function(value) {
-		return this.componentArray = value;
+	,get_portIterator: function() {
+		return HxOverrides.iter(this.portArray);
 	}
-	,get_endponentArray: function() {
-		return this.endponentArray;
+	,getLinkIteratorLength: function() {
+		return this.linkArray.length;
 	}
-	,set_endponentArray: function(value) {
-		return this.endponentArray = value;
+	,getEndppointIteratorLength: function() {
+		return this.endponentArray.length;
 	}
-	,get_portArray: function() {
-		return this.portArray;
+	,getComponentIteratorLength: function() {
+		return this.componentArray.length;
 	}
-	,set_portArray: function(value) {
-		return this.portArray = value;
+	,getPortIteratorLength: function() {
+		return this.portArray.length;
+	}
+	,getComponentFromIndex: function(index) {
+		return this.componentArray[index];
+	}
+	,getLinkFromIndex: function(index) {
+		return this.linkArray[index];
+	}
+	,getEndpointFromIndex: function(index) {
+		return this.endponentArray[index];
+	}
+	,getPortFromIndex: function(index) {
+		return this.portArray[index];
 	}
 	,clean: function() {
-		this.get_linkArray().splice(0,this.get_linkArray().length);
-		this.get_componentArray().splice(0,this.get_componentArray().length);
-		this.get_endponentArray().splice(0,this.get_endponentArray().length);
-		this.get_portArray().splice(0,this.get_portArray().length);
+		this.linkArray.splice(0,this.linkArray.length);
+		this.componentArray.splice(0,this.componentArray.length);
+		this.endponentArray.splice(0,this.endponentArray.length);
+		this.portArray.splice(0,this.portArray.length);
 	}
 	,isEmpty: function() {
-		if(this.get_linkArray() == null || this.get_linkArray().length == 0) {
-			return true;
-		} else if(this.get_componentArray() == null || this.get_componentArray().length == 0) {
-			return true;
-		} else if(this.get_endponentArray() == null || this.get_endponentArray().length == 0) {
-			return true;
-		} else if(this.get_portArray() == null || this.get_portArray().length == 0) {
+		if(this.linkArray.length == 0 && this.componentArray.length == 0 && this.endponentArray.length == 0 && this.portArray.length == 0) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 	,__class__: com_mun_type_LinkAndComponentAndEndpointAndPortArray
-	,__properties__: {set_portArray:"set_portArray",get_portArray:"get_portArray",set_endponentArray:"set_endponentArray",get_endponentArray:"get_endponentArray",set_componentArray:"set_componentArray",get_componentArray:"get_componentArray",set_linkArray:"set_linkArray",get_linkArray:"get_linkArray"}
-};
-var com_mun_type_LinkAndComponentAndEndpointArray = function() {
-	this.set_linkArray([]);
-	this.set_componentArray([]);
-	this.set_endponentArray([]);
-};
-$hxClasses["com.mun.type.LinkAndComponentAndEndpointArray"] = com_mun_type_LinkAndComponentAndEndpointArray;
-com_mun_type_LinkAndComponentAndEndpointArray.__name__ = ["com","mun","type","LinkAndComponentAndEndpointArray"];
-com_mun_type_LinkAndComponentAndEndpointArray.prototype = {
-	linkArray: null
-	,componentArray: null
-	,endponentArray: null
-	,addLink: function(link) {
-		this.get_linkArray().push(link);
-	}
-	,addComponent: function(component) {
-		this.get_componentArray().push(component);
-	}
-	,addEndpoint: function(endpoint) {
-		this.get_endponentArray().push(endpoint);
-	}
-	,removeLink: function(link) {
-		HxOverrides.remove(this.get_linkArray(),link);
-	}
-	,removeComponent: function(component) {
-		HxOverrides.remove(this.get_componentArray(),component);
-	}
-	,removeEndpoint: function(endpoint) {
-		HxOverrides.remove(this.get_endponentArray(),endpoint);
-	}
-	,get_linkArray: function() {
-		return this.linkArray;
-	}
-	,set_linkArray: function(value) {
-		return this.linkArray = value;
-	}
-	,get_componentArray: function() {
-		return this.componentArray;
-	}
-	,set_componentArray: function(value) {
-		return this.componentArray = value;
-	}
-	,get_endponentArray: function() {
-		return this.endponentArray;
-	}
-	,set_endponentArray: function(value) {
-		return this.endponentArray = value;
-	}
-	,clean: function() {
-		this.get_linkArray().splice(0,this.get_linkArray().length);
-		this.get_componentArray().splice(0,this.get_componentArray().length);
-		this.get_endponentArray().splice(0,this.get_endponentArray().length);
-	}
-	,isEmpty: function() {
-		if(this.get_linkArray() == null || this.get_linkArray().length == 0) {
-			return true;
-		} else if(this.get_componentArray() == null || this.get_componentArray().length == 0) {
-			return true;
-		} else if(this.get_endponentArray() == null || this.get_endponentArray().length == 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,__class__: com_mun_type_LinkAndComponentAndEndpointArray
-	,__properties__: {set_endponentArray:"set_endponentArray",get_endponentArray:"get_endponentArray",set_componentArray:"set_componentArray",get_componentArray:"get_componentArray",set_linkArray:"set_linkArray",get_linkArray:"get_linkArray"}
-};
-var com_mun_type_LinkAndComponentArray = function() {
-	this.set_linkArray([]);
-	this.set_componentArray([]);
-};
-$hxClasses["com.mun.type.LinkAndComponentArray"] = com_mun_type_LinkAndComponentArray;
-com_mun_type_LinkAndComponentArray.__name__ = ["com","mun","type","LinkAndComponentArray"];
-com_mun_type_LinkAndComponentArray.prototype = {
-	linkArray: null
-	,componentArray: null
-	,addLink: function(link) {
-		this.get_linkArray().push(link);
-	}
-	,addComponent: function(component) {
-		this.get_componentArray().push(component);
-	}
-	,removeLink: function(link) {
-		HxOverrides.remove(this.get_linkArray(),link);
-	}
-	,removeComponent: function(component) {
-		HxOverrides.remove(this.get_componentArray(),component);
-	}
-	,get_linkArray: function() {
-		return this.linkArray;
-	}
-	,set_linkArray: function(value) {
-		return this.linkArray = value;
-	}
-	,get_componentArray: function() {
-		return this.componentArray;
-	}
-	,set_componentArray: function(value) {
-		return this.componentArray = value;
-	}
-	,clean: function() {
-		this.get_linkArray().splice(0,this.get_linkArray().length);
-		this.get_componentArray().splice(0,this.get_componentArray().length);
-	}
-	,isEmpty: function() {
-		if(this.get_linkArray() == null || this.get_linkArray().length == 0) {
-			return true;
-		} else if(this.get_componentArray() == null || this.get_componentArray().length == 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,__class__: com_mun_type_LinkAndComponentArray
-	,__properties__: {set_componentArray:"set_componentArray",get_componentArray:"get_componentArray",set_linkArray:"set_linkArray",get_linkArray:"get_linkArray"}
 };
 var com_mun_type_Object = function() {
 };
@@ -7472,7 +7503,6 @@ StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
 com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
 com_mun_global_Constant.pointToEndpointDistance = 3;
-com_mun_global_Constant.BOX_TYPE = com_mun_model_enumeration_Box.BLACK_BOX;
 com_mun_global_Constant.CONTEXT = null;
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;

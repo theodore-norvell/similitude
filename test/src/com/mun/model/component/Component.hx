@@ -1,6 +1,6 @@
 package com.mun.model.component;
 
-import com.mun.view.drawingImpl.Box;
+import com.mun.model.enumeration.BOX;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
@@ -29,7 +29,7 @@ class Component {
     var delay:Int;//delay of the component
     var inportsNum:Int;//init
     var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
-    @:isVar var boxType(get, set):Box;
+    var boxType:BOX;
     /**
     *   create component
      *   @param xPosition: x position
@@ -99,11 +99,11 @@ class Component {
         return this.componentKind = value;
     }
 
-    public function get_boxType():Box {
+    public function get_boxType():BOX {
         return boxType;
     }
 
-    public function set_boxType(value:Box) {
+    public function set_boxType(value:BOX) {
         this.boxType = value;
     }
 

@@ -24,35 +24,51 @@ class LinkAndComponentAndEndpointAndPortArray {
     }
 
     public function addLink(link:Link){
-        linkArray.push(link);
+        if(linkArray.indexOf(link) == -1){
+            linkArray.push(link);
+        }
     }
 
     public function addComponent(component:Component){
-        componentArray.push(component);
+        if(componentArray.indexOf(component) == -1){
+            componentArray.push(component);
+        }
     }
 
     public function addEndpoint(endpoint:Endpoint){
-        endponentArray.push(endpoint);
+        if(endponentArray.indexOf(endpoint) == -1){
+            endponentArray.push(endpoint);
+        }
     }
 
     public function addPort(port:Port){
-        portArray.push(port);
+        if(portArray.indexOf(port) == -1){
+            portArray.push(port);
+        }
     }
 
     public function removeLink(link:Link){
-        linkArray.remove(link);
+        if(linkArray.indexOf(link) != -1){
+            linkArray.remove(link);
+        }
     }
 
     public function removeComponent(component:Component){
-        componentArray.remove(component);
+        if(componentArray.indexOf(component) != -1){
+            componentArray.remove(component);
+        }
     }
 
     public function removeEndpoint(endpoint:Endpoint){
-        endponentArray.remove(endpoint);
+        if(endponentArray.indexOf(endpoint) != -1){
+            endponentArray.remove(endpoint);
+        }
     }
 
     public function removePort(port:Port){
-        portArray.remove(port);
+        if(portArray.indexOf(port) != -1){
+            portArray.remove(port);
+        }
     }
 
     public function get_linkIterator():Iterator<Link> {
@@ -111,13 +127,7 @@ class LinkAndComponentAndEndpointAndPortArray {
     }
 
     public function isEmpty():Bool{
-        if(linkArray.length == 0){
-            return true;
-        }else if(componentArray.length == 0){
-            return true;
-        }else if(endponentArray.length == 0){
-            return true;
-        }else if(portArray.length == 0){
+        if(linkArray.length == 0 && componentArray.length == 0 && endponentArray.length == 0 && portArray.length == 0){
             return true;
         }else{
             return false;

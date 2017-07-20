@@ -142,7 +142,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
             drawComponent.drawCorrespondingComponent("black");
         }
 
-        if(BOX_TYPE == BOX.WHITE_BOX){
+        if(component.get_boxType() == BOX.WHITE_BOX){
             //compound component need to draw all the components in ComponentArray, which should make a new transfrom
             drawingAdapter = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapter);
