@@ -2097,6 +2097,8 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			var link = hitList.getLinkFromIndex(0);
 			this.hightLightLink = link;
 			this.linkAndComponentAndEndpointAndPortArray.addLink(link);
+		} else if(hitList.isEmpty()) {
+			return;
 		}
 		this.updateCircuitDiagram.hightLightObject(this.linkAndComponentAndEndpointAndPortArray);
 		this.toolBarUpdate();
@@ -4670,42 +4672,42 @@ com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
 	,endponentArray: null
 	,portArray: null
 	,addLink: function(link) {
-		if(this.linkArray.indexOf(link) == -1) {
+		if(this.linkArray.indexOf(link) == -1 && link != null) {
 			this.linkArray.push(link);
 		}
 	}
 	,addComponent: function(component) {
-		if(this.componentArray.indexOf(component) == -1) {
+		if(this.componentArray.indexOf(component) == -1 && component != null) {
 			this.componentArray.push(component);
 		}
 	}
 	,addEndpoint: function(endpoint) {
-		if(this.endponentArray.indexOf(endpoint) == -1) {
+		if(this.endponentArray.indexOf(endpoint) == -1 && endpoint != null) {
 			this.endponentArray.push(endpoint);
 		}
 	}
 	,addPort: function(port) {
-		if(this.portArray.indexOf(port) == -1) {
+		if(this.portArray.indexOf(port) == -1 && port != null) {
 			this.portArray.push(port);
 		}
 	}
 	,removeLink: function(link) {
-		if(this.linkArray.indexOf(link) != -1) {
+		if(this.linkArray.indexOf(link) != -1 && link != null) {
 			HxOverrides.remove(this.linkArray,link);
 		}
 	}
 	,removeComponent: function(component) {
-		if(this.componentArray.indexOf(component) != -1) {
+		if(this.componentArray.indexOf(component) != -1 && component != null) {
 			HxOverrides.remove(this.componentArray,component);
 		}
 	}
 	,removeEndpoint: function(endpoint) {
-		if(this.endponentArray.indexOf(endpoint) != -1) {
+		if(this.endponentArray.indexOf(endpoint) != -1 && endpoint != null) {
 			HxOverrides.remove(this.endponentArray,endpoint);
 		}
 	}
 	,removePort: function(port) {
-		if(this.portArray.indexOf(port) != -1) {
+		if(this.portArray.indexOf(port) != -1 && port != null) {
 			HxOverrides.remove(this.portArray,port);
 		}
 	}

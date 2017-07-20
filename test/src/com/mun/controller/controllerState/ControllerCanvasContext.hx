@@ -1,4 +1,5 @@
 package com.mun.controller.controllerState;
+
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Endpoint;
@@ -178,6 +179,7 @@ class ControllerCanvasContext {
         * Port > Endpoint > Component = Link
         * */
         var hitList:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
+
         //worldPointArray = circuitDiagram.findWorldPoint(worldCoordinate, pointMode);
 
         if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0 && hitList.getComponentIteratorLength() == 0 && hitList.getLinkIteratorLength() == 0){
@@ -201,8 +203,9 @@ class ControllerCanvasContext {
             var link:Link = hitList.getLinkFromIndex(0);
             hightLightLink = link;
             linkAndComponentAndEndpointAndPortArray.addLink(link);
-        }else{
+        }else if(hitList.isEmpty()){
             //do nothing
+            return;
         }
 
         updateCircuitDiagram.hightLightObject(linkAndComponentAndEndpointAndPortArray);

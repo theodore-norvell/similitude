@@ -24,49 +24,49 @@ class LinkAndComponentAndEndpointAndPortArray {
     }
 
     public function addLink(link:Link){
-        if(linkArray.indexOf(link) == -1){
+        if(linkArray.indexOf(link) == -1 && link != null){
             linkArray.push(link);
         }
     }
 
     public function addComponent(component:Component){
-        if(componentArray.indexOf(component) == -1){
+        if(componentArray.indexOf(component) == -1 && component != null){
             componentArray.push(component);
         }
     }
 
     public function addEndpoint(endpoint:Endpoint){
-        if(endponentArray.indexOf(endpoint) == -1){
+        if(endponentArray.indexOf(endpoint) == -1 && endpoint != null){
             endponentArray.push(endpoint);
         }
     }
 
     public function addPort(port:Port){
-        if(portArray.indexOf(port) == -1){
+        if(portArray.indexOf(port) == -1 && port != null){
             portArray.push(port);
         }
     }
 
     public function removeLink(link:Link){
-        if(linkArray.indexOf(link) != -1){
+        if(linkArray.indexOf(link) != -1  && link != null){
             linkArray.remove(link);
         }
     }
 
     public function removeComponent(component:Component){
-        if(componentArray.indexOf(component) != -1){
+        if(componentArray.indexOf(component) != -1 && component != null){
             componentArray.remove(component);
         }
     }
 
     public function removeEndpoint(endpoint:Endpoint){
-        if(endponentArray.indexOf(endpoint) != -1){
+        if(endponentArray.indexOf(endpoint) != -1 && endpoint != null){
             endponentArray.remove(endpoint);
         }
     }
 
     public function removePort(port:Port){
-        if(portArray.indexOf(port) != -1){
+        if(portArray.indexOf(port) != -1 && port != null){
             portArray.remove(port);
         }
     }
