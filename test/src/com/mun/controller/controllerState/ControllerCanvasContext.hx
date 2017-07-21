@@ -186,7 +186,6 @@ class ControllerCanvasContext {
         * */
         var hitList:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
         //worldPointArray = circuitDiagram.findWorldPoint(worldCoordinate, pointMode);
-
         if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0){
             //only port slected
             controllerState = C_STATE.CREATE_LINK;
@@ -219,8 +218,8 @@ class ControllerCanvasContext {
     function checkState(){
         switch(controllerState){
             case C_STATE.IDLE : {
+                lastClickArray.setArray(linkAndComponentAndEndpointAndPortArray);
                 if(!(keyState.get_key() == KEY.ALT_KEY && keyState.get_keyState() == K_STATE.KEY_DOWN)){
-                    lastClickArray.setArray(linkAndComponentAndEndpointAndPortArray);
                     linkAndComponentAndEndpointAndPortArray.clean();
                 }
             };
@@ -246,6 +245,7 @@ class ControllerCanvasContext {
                 checkHitList();
             };
             case C_STATE.SINGLE_SELECTION : {
+                linkAndComponentAndEndpointAndPortArray.clean();
                 checkHitList();
             };
             default : {

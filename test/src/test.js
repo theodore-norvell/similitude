@@ -1056,59 +1056,50 @@ var com_mun_controller_command_MoveCommand = function(linkAndComponentAndEndpoin
 	while(i.hasNext()) {
 		var i1 = i.next();
 		this.linkAndComponentAndEndpointArray.addComponent(i1);
+		this.linkAndComponentArray.addComponent(i1);
 	}
 	var i2 = linkAndComponentAndEndpointArray.get_linkIterator();
 	while(i2.hasNext()) {
 		var i3 = i2.next();
 		this.linkAndComponentAndEndpointArray.addLink(i3);
+		this.linkAndComponentArray.addLink(i3);
 	}
-	var i4 = linkAndComponentAndEndpointArray.get_endponentIterator();
+	var i4 = linkAndComponentAndEndpointArray.get_endpointIterator();
 	while(i4.hasNext()) {
 		var i5 = i4.next();
 		this.linkAndComponentAndEndpointArray.addEndpoint(i5);
 	}
-	this.linkAndComponentArray.clean();
-	var i6 = this.linkAndComponentAndEndpointArray.get_componentIterator();
-	while(i6.hasNext()) {
-		var i7 = i6.next();
-		this.linkAndComponentArray.addComponent(i7);
-	}
-	var i8 = this.linkAndComponentAndEndpointArray.get_linkIterator();
-	while(i8.hasNext()) {
-		var i9 = i8.next();
-		this.linkAndComponentArray.addLink(i9);
-	}
 	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
-	var i10 = 0;
+	var i6 = 0;
 	if(linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0) {
 		var j = linkAndComponentAndEndpointArray.get_componentIterator();
 		while(j.hasNext()) {
 			var j1 = j.next();
-			this.oldComponentXpositionArray[i10] = j1.get_xPosition();
-			this.oldComponentYpositionArray[i10] = j1.get_yPosition();
-			++i10;
+			this.oldComponentXpositionArray[i6] = j1.get_xPosition();
+			this.oldComponentYpositionArray[i6] = j1.get_yPosition();
+			++i6;
 		}
 	}
-	i10 = 0;
+	i6 = 0;
 	if(linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0) {
 		var j2 = linkAndComponentAndEndpointArray.get_linkIterator();
 		while(j2.hasNext()) {
 			var j3 = j2.next();
-			this.oldLinkLeftXpositionArray[i10] = j3.get_leftEndpoint().get_xPosition();
-			this.oldLinkLeftYpositionArray[i10] = j3.get_leftEndpoint().get_yPosition();
-			this.oldLinkRightXpositionArray[i10] = j3.get_rightEndpoint().get_xPosition();
-			this.oldLinkRightYpositionArray[i10] = j3.get_rightEndpoint().get_yPosition();
-			++i10;
+			this.oldLinkLeftXpositionArray[i6] = j3.get_leftEndpoint().get_xPosition();
+			this.oldLinkLeftYpositionArray[i6] = j3.get_leftEndpoint().get_yPosition();
+			this.oldLinkRightXpositionArray[i6] = j3.get_rightEndpoint().get_xPosition();
+			this.oldLinkRightYpositionArray[i6] = j3.get_rightEndpoint().get_yPosition();
+			++i6;
 		}
 	}
-	i10 = 0;
+	i6 = 0;
 	if(linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-		var j4 = linkAndComponentAndEndpointArray.get_endponentIterator();
+		var j4 = linkAndComponentAndEndpointArray.get_endpointIterator();
 		while(j4.hasNext()) {
 			var j5 = j4.next();
-			this.oldEndpointXPositionArray[i10] = j5.get_xPosition();
-			this.oldEndpointYPositionArray[i10] = j5.get_yPosition();
-			++i10;
+			this.oldEndpointXPositionArray[i6] = j5.get_xPosition();
+			this.oldEndpointYPositionArray[i6] = j5.get_yPosition();
+			++i6;
 		}
 	}
 	this.xDisplacement = xDisplacement;
@@ -1176,7 +1167,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 		}
 		i = 0;
 		if(this.linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-			var j4 = this.linkAndComponentAndEndpointArray.get_endponentIterator();
+			var j4 = this.linkAndComponentAndEndpointArray.get_endpointIterator();
 			while(j4.hasNext()) {
 				var j5 = j4.next();
 				this.recordEndpointXpositionBeforeUndoArray[i] = j5.get_xPosition();
@@ -1218,7 +1209,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 		}
 		i = 0;
 		if(this.linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-			var j4 = this.linkAndComponentAndEndpointArray.get_endponentIterator();
+			var j4 = this.linkAndComponentAndEndpointArray.get_endpointIterator();
 			while(j4.hasNext()) {
 				var j5 = j4.next();
 				j5.set_xPosition(this.recordEndpointXpositionBeforeUndoArray[i]);
@@ -1253,7 +1244,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 			}
 		}
 		if(this.linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-			var i4 = this.linkAndComponentAndEndpointArray.get_endponentIterator();
+			var i4 = this.linkAndComponentAndEndpointArray.get_endpointIterator();
 			while(i4.hasNext()) {
 				var i5 = i4.next();
 				i5.set_xPosition(i5.get_xPosition() + this.xDisplacement);
@@ -2107,8 +2098,8 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		var _g = this.controllerState;
 		switch(_g[1]) {
 		case 0:
+			this.lastClickArray.setArray(this.linkAndComponentAndEndpointAndPortArray);
 			if(!(this.keyState.get_key() == com_mun_model_enumeration_KEY.ALT_KEY && this.keyState.get_keyState() == com_mun_model_enumeration_K_$STATE.KEY_DOWN)) {
-				this.lastClickArray.setArray(this.linkAndComponentAndEndpointAndPortArray);
 				this.linkAndComponentAndEndpointAndPortArray.clean();
 			}
 			break;
@@ -2134,6 +2125,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			this.checkHitList();
 			break;
 		case 5:
+			this.linkAndComponentAndEndpointAndPortArray.clean();
 			this.checkHitList();
 			break;
 		}
@@ -2593,7 +2585,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				var j1 = j.next();
 				linkAndComponentAndEndpointAndPortArray.addLink(j1);
 			}
-			var j2 = result.get_endponentIterator();
+			var j2 = result.get_endpointIterator();
 			while(j2.hasNext()) {
 				var j3 = j2.next();
 				linkAndComponentAndEndpointAndPortArray.addEndpoint(j3);
@@ -2610,7 +2602,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				var j5 = j4.next();
 				linkAndComponentAndEndpointAndPortArray.addLink(j5);
 			}
-			var j6 = result1.get_endponentIterator();
+			var j6 = result1.get_endpointIterator();
 			while(j6.hasNext()) {
 				var j7 = j6.next();
 				linkAndComponentAndEndpointAndPortArray.addEndpoint(j7);
@@ -4748,7 +4740,7 @@ com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
 	,get_componentIterator: function() {
 		return HxOverrides.iter(this.componentArray);
 	}
-	,get_endponentIterator: function() {
+	,get_endpointIterator: function() {
 		return HxOverrides.iter(this.endponentArray);
 	}
 	,get_portIterator: function() {
@@ -4779,6 +4771,7 @@ com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
 		return this.portArray[index];
 	}
 	,setArray: function(array) {
+		this.clean();
 		var i = array.get_linkIterator();
 		while(i.hasNext()) {
 			var i1 = i.next();
@@ -4794,7 +4787,7 @@ com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
 			var i5 = i4.next();
 			this.addPort(i5);
 		}
-		var i6 = array.get_endponentIterator();
+		var i6 = array.get_endpointIterator();
 		while(i6.hasNext()) {
 			var i7 = i6.next();
 			this.addEndpoint(i7);

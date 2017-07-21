@@ -79,7 +79,7 @@ class LinkAndComponentAndEndpointAndPortArray {
         return componentArray.iterator();
     }
 
-    public function get_endponentIterator():Iterator<Endpoint> {
+    public function get_endpointIterator():Iterator<Endpoint> {
         return endponentArray.iterator();
     }
 
@@ -120,6 +120,7 @@ class LinkAndComponentAndEndpointAndPortArray {
     }
 
     public function setArray(array:LinkAndComponentAndEndpointAndPortArray){
+        clean();
         for(i in array.get_linkIterator()){
             addLink(i);
         }
@@ -129,7 +130,7 @@ class LinkAndComponentAndEndpointAndPortArray {
         for(i in array.get_portIterator()){
             addPort(i);
         }
-        for(i in array.get_endponentIterator()){
+        for(i in array.get_endpointIterator()){
             addEndpoint(i);
         }
     }

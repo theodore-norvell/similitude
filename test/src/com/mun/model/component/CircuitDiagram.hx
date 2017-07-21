@@ -343,7 +343,7 @@ class CircuitDiagram implements CircuitDiagramI{
                 linkAndComponentAndEndpointAndPortArray.addLink(j);
             }
 
-            for(j in result.get_endponentIterator()){
+            for(j in result.get_endpointIterator()){
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
             }
 //            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
@@ -357,7 +357,7 @@ class CircuitDiagram implements CircuitDiagramI{
                 linkAndComponentAndEndpointAndPortArray.addLink(j);
             }
 
-            for(j in result.get_endponentIterator()){
+            for(j in result.get_endpointIterator()){
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
             }
 

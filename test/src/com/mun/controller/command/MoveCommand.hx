@@ -51,23 +51,16 @@ class MoveCommand implements Command {
 
         for(i in linkAndComponentAndEndpointArray.get_componentIterator()){
             this.linkAndComponentAndEndpointArray.addComponent(i);
+            this.linkAndComponentArray.addComponent(i);
         }
 
         for(i in linkAndComponentAndEndpointArray.get_linkIterator()){
             this.linkAndComponentAndEndpointArray.addLink(i);
-        }
-
-        for(i in linkAndComponentAndEndpointArray.get_endponentIterator()){
-            this.linkAndComponentAndEndpointArray.addEndpoint(i);
-        }
-
-        linkAndComponentArray.clean();
-        for(i in this.linkAndComponentAndEndpointArray.get_componentIterator()){
-            linkAndComponentArray.addComponent(i);
-        }
-
-        for(i in this.linkAndComponentAndEndpointArray.get_linkIterator()){
             linkAndComponentArray.addLink(i);
+        }
+
+        for(i in linkAndComponentAndEndpointArray.get_endpointIterator()){
+            this.linkAndComponentAndEndpointArray.addEndpoint(i);
         }
 
         circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
@@ -92,7 +85,7 @@ class MoveCommand implements Command {
 
         i = 0;//reset i
         if(linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0){
-            for(j in linkAndComponentAndEndpointArray.get_endponentIterator()){
+            for(j in linkAndComponentAndEndpointArray.get_endpointIterator()){
                 oldEndpointXPositionArray[i] =  j.get_xPosition();
                 oldEndpointYPositionArray[i] =  j.get_yPosition();
                 i++;
@@ -144,7 +137,7 @@ class MoveCommand implements Command {
 
         i = 0;//reset i
         if (linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-            for(j in linkAndComponentAndEndpointArray.get_endponentIterator()){
+            for(j in linkAndComponentAndEndpointArray.get_endpointIterator()){
                 recordEndpointXpositionBeforeUndoArray[i] = j.get_xPosition();
                 recordEndpointYpositionBeforeUndoArray[i] = j.get_yPosition();
 
@@ -186,7 +179,7 @@ class MoveCommand implements Command {
 
         i = 0;//reset i
         if (linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-            for(j in linkAndComponentAndEndpointArray.get_endponentIterator()){
+            for(j in linkAndComponentAndEndpointArray.get_endpointIterator()){
                 j.set_xPosition(recordEndpointXpositionBeforeUndoArray[i]);
                 j.set_yPosition(recordEndpointYpositionBeforeUndoArray[i]);
 
@@ -220,7 +213,7 @@ class MoveCommand implements Command {
         }
 
         if (linkAndComponentAndEndpointArray.getEndppointIteratorLength() != 0) {
-            for(i in linkAndComponentAndEndpointArray.get_endponentIterator()){
+            for(i in linkAndComponentAndEndpointArray.get_endpointIterator()){
                 i.set_xPosition(i.get_xPosition() + xDisplacement);
                 i.set_yPosition(i.get_yPosition() + yDisplacement);
 
