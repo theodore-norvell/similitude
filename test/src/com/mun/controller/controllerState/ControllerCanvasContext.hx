@@ -29,6 +29,7 @@ class ControllerCanvasContext {
     var updateToolBar:UpdateToolBar;
 
     var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
+    var lastClickArray:LinkAndComponentAndEndpointAndPortArray;
     var worldPointArray:Array<WorldPoint>;
     var mouseDownWorldCoordinate:Coordinate;
     var mouseMoveWorldCoordiante:Coordinate;
@@ -62,6 +63,7 @@ class ControllerCanvasContext {
         viewToWorld = new ViewToWorld(transform);
         keyState = new KeyState();
         linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+        lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
 
         //add mouse  listener
         canvas.addEventListener("mousedown", doMouseDown,false);
@@ -183,7 +185,6 @@ class ControllerCanvasContext {
         * Port > Endpoint > Component = Link
         * */
         var hitList:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
-
         //worldPointArray = circuitDiagram.findWorldPoint(worldCoordinate, pointMode);
 
         if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0){
@@ -207,9 +208,6 @@ class ControllerCanvasContext {
             var link:Link = hitList.getLinkFromIndex(0);
             hightLightLink = link;
             linkAndComponentAndEndpointAndPortArray.addLink(link);
-        }else if(hitList.isEmpty()){
-            //do nothing
-            return;
         }
 
         updateCircuitDiagram.hightLightObject(linkAndComponentAndEndpointAndPortArray);
@@ -221,7 +219,10 @@ class ControllerCanvasContext {
     function checkState(){
         switch(controllerState){
             case C_STATE.IDLE : {
-                linkAndComponentAndEndpointAndPortArray.clean();
+                if(!(keyState.get_key() == KEY.ALT_KEY && keyState.get_keyState() == K_STATE.KEY_DOWN)){
+                    lastClickArray.setArray(linkAndComponentAndEndpointAndPortArray);
+                    linkAndComponentAndEndpointAndPortArray.clean();
+                }
             };
             case C_STATE.CREATE_COMPONENT : {
                 updateCircuitDiagram.createComponentByCommand(buttonClick.getComponent());
@@ -241,10 +242,10 @@ class ControllerCanvasContext {
                 }
             };
             case C_STATE.MULTI_SELECTION : {
+                linkAndComponentAndEndpointAndPortArray.setArray(lastClickArray);
                 checkHitList();
             };
             case C_STATE.SINGLE_SELECTION : {
-                linkAndComponentAndEndpointAndPortArray.clean();
                 checkHitList();
             };
             default : {

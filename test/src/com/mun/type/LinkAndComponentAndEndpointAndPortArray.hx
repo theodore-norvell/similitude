@@ -119,6 +119,21 @@ class LinkAndComponentAndEndpointAndPortArray {
         return portArray[index];
     }
 
+    public function setArray(array:LinkAndComponentAndEndpointAndPortArray){
+        for(i in array.get_linkIterator()){
+            addLink(i);
+        }
+        for(i in array.get_componentIterator()){
+            addComponent(i);
+        }
+        for(i in array.get_portIterator()){
+            addPort(i);
+        }
+        for(i in array.get_endponentIterator()){
+            addEndpoint(i);
+        }
+    }
+
     public function clean(){
         this.linkArray.splice(0,linkArray.length);
         this.componentArray.splice(0,componentArray.length);

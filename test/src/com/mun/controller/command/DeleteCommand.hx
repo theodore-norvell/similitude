@@ -11,7 +11,7 @@ class DeleteCommand implements Command {
     var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
 
     public function new(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, circuitDiagram:CircuitDiagramI) {
-        linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
+        linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
         this.linkAndComponentAndEndpointAndPortArray = linkAndComponentArray;
         this.circuitDiagram = circuitDiagram;

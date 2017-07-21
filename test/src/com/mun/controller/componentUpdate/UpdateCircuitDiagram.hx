@@ -179,16 +179,13 @@ class UpdateCircuitDiagram {
 
     public function changeOrientation(componentIterator:Iterator<Component>, orientation:ORIENTATION){
         var componentArray:Array<Component> = new Array<Component>();
+        var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         for(i in componentIterator){
             componentArray.push(i);
+            linkAndComponentArray.addComponent(i);
         }
         var orientationCommand:Command = new OrientationCommand(componentArray, orientation);
         commandManager.execute(orientationCommand);
-
-        var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
-        for(i in componentIterator){
-            linkAndComponentArray.addComponent(i);
-        }
 
         updateToolBar.update(linkAndComponentArray);
         circuitDiagram.linkArraySelfUpdate();
@@ -198,7 +195,6 @@ class UpdateCircuitDiagram {
     public function deleteObject(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var deleteCommand:Command = new DeleteCommand(linkAndComponentArray, circuitDiagram);
         commandManager.execute(deleteCommand);
-
         redrawCanvas(linkAndComponentArray);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
@@ -241,7 +237,8 @@ class UpdateCircuitDiagram {
     public function undo(){
         var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = commandManager.undo();
         redrawCanvas(linkAndComponentArray);
-        if(linkAndComponentArray.getComponentIteratorLength() == 0 && linkAndComponentArray.getLinkIteratorLength() == 0){
+
+        if((linkAndComponentArray.getComponentIteratorLength() == 0 || linkAndComponentArray.getComponentIteratorLength() >= 2)){
             updateToolBar.hidden();
         }else{
             updateToolBar.visible();

@@ -152,7 +152,7 @@ class GateAbstract{
      * @reutrn if in the scope, return true; otherwise, return false;
     **/
     function isInScope(orignalXposition:Float, orignalYposition:Float, mouseXPosition:Float, mouseYposition:Float, heigh:Float, width:Float):Bool{
-        if((mouseXPosition >= Math.abs(orignalXposition - width/2) && orignalXposition <= orignalXposition + width/2)&&(mouseYposition >= Math.abs(orignalYposition - heigh/2) && mouseYposition <= orignalYposition + heigh/2)){
+        if((mouseXPosition >= Math.abs(orignalXposition - width/2) && mouseXPosition <= orignalXposition + width/2)&&(mouseYposition >= Math.abs(orignalYposition - heigh/2) && mouseYposition <= orignalYposition + heigh/2)){
             return true;
         }else{
             return false;
