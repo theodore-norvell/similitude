@@ -184,11 +184,10 @@ class UpdateCircuitDiagram {
             componentArray.push(i);
             linkAndComponentArray.addComponent(i);
         }
-        var orientationCommand:Command = new OrientationCommand(componentArray, orientation);
+        var orientationCommand:Command = new OrientationCommand(componentArray, orientation, circuitDiagram);
         commandManager.execute(orientationCommand);
 
         updateToolBar.update(linkAndComponentArray);
-        circuitDiagram.linkArraySelfUpdate();
         hightLightObject(linkAndComponentArray);
     }
 

@@ -279,7 +279,7 @@ class CircuitDiagram implements CircuitDiagramI{
     /**
     * because component may update the port position, so the link should update all of the port connect to the component port
     **/
-    public function linkArraySelfUpdate():Void{
+    function linkArraySelfUpdate():Void{
         for(i in 0...linkArray.length){
             linkArray[i].get_leftEndpoint().updatePosition();
             linkArray[i].get_rightEndpoint().updatePosition();

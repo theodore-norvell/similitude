@@ -105,11 +105,6 @@ interface CircuitDiagramI {
     public function deleteComponent(component:Component):Void;
 
     /**
-    * link need to update the enpdoint position by itself
-    **/
-    public function linkArraySelfUpdate():Void;
-
-    /**
     * set name for component
     **/
     public function componentSetName(component:Component, name:String):Void;

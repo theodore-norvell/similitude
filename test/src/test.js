@@ -1317,10 +1317,11 @@ com_mun_controller_command_MoveCommand.prototype = {
 	}
 	,__class__: com_mun_controller_command_MoveCommand
 };
-var com_mun_controller_command_OrientationCommand = function(componentArray,newOrientation) {
+var com_mun_controller_command_OrientationCommand = function(componentArray,newOrientation,circuitDiagram) {
 	this.oldOrientationArray = [];
 	this.componentArray = [];
 	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+	this.circuitDiagram = circuitDiagram;
 	var _g = 0;
 	while(_g < componentArray.length) {
 		var i = componentArray[_g];
@@ -1345,6 +1346,7 @@ com_mun_controller_command_OrientationCommand.prototype = {
 	,newOrientation: null
 	,oldOrientationArray: null
 	,linkAndComponentArray: null
+	,circuitDiagram: null
 	,undo: function() {
 		var _g1 = 0;
 		var _g = this.componentArray.length;
@@ -1353,6 +1355,7 @@ com_mun_controller_command_OrientationCommand.prototype = {
 			this.componentArray[i].set_orientation(this.oldOrientationArray[i]);
 			this.componentArray[i].updateMoveComponentPortPosition(this.componentArray[i].get_xPosition(),this.componentArray[i].get_yPosition());
 		}
+		this.linkPositionUpdate();
 		return this.linkAndComponentArray;
 	}
 	,redo: function() {
@@ -1367,6 +1370,15 @@ com_mun_controller_command_OrientationCommand.prototype = {
 			++_g;
 			i.set_orientation(this.newOrientation);
 			i.updateMoveComponentPortPosition(i.get_xPosition(),i.get_yPosition());
+		}
+		this.linkPositionUpdate();
+	}
+	,linkPositionUpdate: function() {
+		var i = this.circuitDiagram.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			i1.get_leftEndpoint().updatePosition();
+			i1.get_rightEndpoint().updatePosition();
 		}
 	}
 	,__class__: com_mun_controller_command_OrientationCommand
@@ -1695,10 +1707,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			componentArray.push(i1);
 			linkAndComponentArray.addComponent(i1);
 		}
-		var orientationCommand = new com_mun_controller_command_OrientationCommand(componentArray,orientation);
+		var orientationCommand = new com_mun_controller_command_OrientationCommand(componentArray,orientation,this.circuitDiagram);
 		this.get_commandManager().execute(orientationCommand);
 		this.updateToolBar.update(linkAndComponentArray);
-		this.circuitDiagram.linkArraySelfUpdate();
 		this.hightLightObject(linkAndComponentArray);
 	}
 	,deleteObject: function(linkAndComponentArray) {
@@ -2268,7 +2279,6 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,setNewOirentation: null
 	,deleteLink: null
 	,deleteComponent: null
-	,linkArraySelfUpdate: null
 	,componentSetName: null
 	,computeDiagramSize: null
 	,get_diagramWidth: null
