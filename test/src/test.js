@@ -1145,7 +1145,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 				j1.updateMoveComponentPortPosition(this.oldComponentXpositionArray[i],this.oldComponentYpositionArray[i]);
 				++i;
 			}
-			this.componentMeetEndpoint();
 			this.linkPositionUpdate();
 		}
 		i = 0;
@@ -1191,7 +1190,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 				j1.updateMoveComponentPortPosition(this.recordComponentXpositionBeforeUndoArray[i],this.recordComponentYpositionBeforeUndoArray[i]);
 				++i;
 			}
-			this.componentMeetEndpoint();
 			this.linkPositionUpdate();
 		}
 		i = 0;
@@ -1203,7 +1201,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 				j3.get_leftEndpoint().set_yPosition(this.recordLeftEndpointYpositionBeforeUndoArray[i]);
 				j3.get_rightEndpoint().set_xPosition(this.recordRightEndpointXpositionBeforeUndoArray[i]);
 				j3.get_rightEndpoint().set_yPosition(this.recordRightEndpointYpositionBeforeUndoArray[i]);
-				this.linkMeetPortUpdate(j3);
+				this.linkPositionUpdate();
 				++i;
 			}
 		}
@@ -1819,7 +1817,7 @@ var com_mun_controller_componentUpdate_UpdateToolBar = function(updateCircuitDia
 	window.document.getElementById("north").onclick = $bind(this,this.changeToNorth);
 	window.document.getElementById("south").onclick = $bind(this,this.changeToSouth);
 	window.document.getElementById("west").onclick = $bind(this,this.changeToWest);
-	window.document.getElementById("east").onclick = $bind(this,this.chageToEast);
+	window.document.getElementById("east").onclick = $bind(this,this.changeToEast);
 	this.toolBar.onfocus = $bind(this,this.onfocus);
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateToolBar"] = com_mun_controller_componentUpdate_UpdateToolBar;
@@ -1896,7 +1894,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 			this.setOrientation();
 		}
 	}
-	,chageToEast: function() {
+	,changeToEast: function() {
 		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
 			this.updateCircuitDiagram.changeOrientation(this.linkAndComponentArray.get_componentIterator(),com_mun_model_enumeration_ORIENTATION.EAST);
 			this.setOrientation();

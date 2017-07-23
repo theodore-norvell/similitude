@@ -43,7 +43,7 @@ class UpdateToolBar {
         Browser.document.getElementById("north").onclick = changeToNorth;
         Browser.document.getElementById("south").onclick = changeToSouth;
         Browser.document.getElementById("west").onclick = changeToWest;
-        Browser.document.getElementById("east").onclick = chageToEast;
+        Browser.document.getElementById("east").onclick = changeToEast;
 
         toolBar.onfocus = onfocus;
     }
@@ -115,7 +115,7 @@ class UpdateToolBar {
             setOrientation();
         }
     }
-    function chageToEast(){
+    function changeToEast(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.EAST);
             setOrientation();

@@ -112,7 +112,6 @@ class MoveCommand implements Command {
 
                 i++;
             }
-            componentMeetEndpoint();
             linkPositionUpdate();
         }
 
@@ -160,7 +159,6 @@ class MoveCommand implements Command {
                 j.updateMoveComponentPortPosition(recordComponentXpositionBeforeUndoArray[i], recordComponentYpositionBeforeUndoArray[i]);
                 i++;
             }
-            componentMeetEndpoint();
             linkPositionUpdate();
         }
 
@@ -172,7 +170,7 @@ class MoveCommand implements Command {
                 j.get_rightEndpoint().set_xPosition(recordRightEndpointXpositionBeforeUndoArray[i]);
                 j.get_rightEndpoint().set_yPosition(recordRightEndpointYpositionBeforeUndoArray[i]);
 
-                linkMeetPortUpdate(j);
+                linkPositionUpdate();
                 i++;
             }
         }
