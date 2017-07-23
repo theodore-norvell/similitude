@@ -2099,6 +2099,9 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			var link = hitList.getLinkFromIndex(0);
 			this.hightLightLink = link;
 			this.linkAndComponentAndEndpointAndPortArray.addLink(link);
+		} else if(hitList.isEmpty()) {
+			this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
+			this.checkState();
 		}
 		this.updateCircuitDiagram.hightLightObject(this.linkAndComponentAndEndpointAndPortArray);
 		this.toolBarUpdate();

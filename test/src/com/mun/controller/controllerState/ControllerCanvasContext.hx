@@ -207,6 +207,9 @@ class ControllerCanvasContext {
             var link:Link = hitList.getLinkFromIndex(0);
             hightLightLink = link;
             linkAndComponentAndEndpointAndPortArray.addLink(link);
+        }else if(hitList.isEmpty()){
+            controllerState = C_STATE.CREATE_LINK;
+            checkState();
         }
 
         updateCircuitDiagram.hightLightObject(linkAndComponentAndEndpointAndPortArray);
