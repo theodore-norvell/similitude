@@ -112,4 +112,9 @@ interface ComponentKind {
     * this function just use for compound component
     **/
     public function getInnerCircuitDiagram():CircuitDiagramI;
+
+    /**
+    * create xml file
+    **/
+    public function createXML():Xml;
 }

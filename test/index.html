@@ -19,29 +19,39 @@
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="row">
-            <div class="col-sm-1 col-md-1 col-lg-1" id="leftDIV">
-                <div class="btn-group-vertical btn-group-sm" role="group" aria-label="..." style="border: 1px solid">
-                    <!--add initial gate button-->
-                    <button id="AND" type="button" class="btn btn-default active">AND Gate</button>
-                    <button id="OR" type="button" class="btn btn-default active">OR Gate</button>
-                    <button id="NOT" type="button" class="btn btn-default active">NOT Gate</button>
-                    <button id="NOR" type="button" class="btn btn-default active">NOR Gate</button>
-                    <button id="NAND" type="button" class="btn btn-default active">NAND Gate</button>
-                    <button id="XOR" type="button" class="btn btn-default active">XOR Gate</button>
-                    <button id="MUX" type="button" class="btn btn-default active">MUX</button>
-                    <button id="FlipFlop" type="button" class="btn btn-default active">FlipFlop</button>
-                    <button id="INPUT" type="button" class="btn btn-default active">INPUT</button>
-                    <button id="OUTPUT" type="button" class="btn btn-default active">OUTPUT</button>
-                    <!-- test for compound component -->
-                    <button id="compoundComponent" type="button" class="btn btn-default active">Compound Component</button>
+            <div class="col-sm-2 col-md-2 col-lg-2" id="leftDIV">
+                <form class="form-search">
+                    <input class="input-medium search-query" type="text" id="search" placeholder="Search..."/>
+                </form>
+                <div class="tabbable" id="tabs-516484">
+                    <ul class="nav nav-tabs">
+                        <li role="presentation" class="active">
+                            <a href="#panel-834014" data-toggle="tab" id="buttonList">Button List</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#panel-395645" data-toggle="tab" id="fileList">File List</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="panel-834014">
+                            <div id="buttonGroupList" class="btn-group-vertical btn-group-sm" role="group" aria-label="..." style="border: 1px solid">
+                                <!--add initial gate button-->
+
+                                <!-- test for compound component -->
+
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="panel-395645">
+                            <p>
+                                Files
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- canvas -->
-            <div class="col-sm-11 col-md-11 col-lg-11" id="rightDIV">
+            <div class="col-sm-9 col-md-9 col-lg-9" id="rightDIV" >
                 <canvas id="canvas" style="border: 1px solid;">update your browser to enjoy canvas</canvas>
-            </div>
-            <div class="col-sm-1 col-md-1 col-lg-1">
-                <!-- nothing -->
             </div>
             <!-- tool bar start -->
             <div class="col-sm-11 col-md-11 col-lg-11" style="border: 1px solid; visibility: hidden" id="toolbar_div">
@@ -79,6 +89,10 @@
                 </div>
             </div>
             <!-- tool bar end -->
+            <div class="col-sm-2 col-md-2 col-lg-2">
+                <button id="download" type="button" class="btn btn-default" disabled="disabled">download</button>
+                <a id="download_a"  disabled="disabled">download</a>
+            </div>
         </div>
     </div>
 </div>

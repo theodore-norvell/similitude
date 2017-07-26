@@ -162,4 +162,11 @@ interface CircuitDiagramI {
     * find the world points
     **/
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
+
+    /**
+    * is this circuitdiagram has nothing?
+    **/
+    public function isEmpty():Bool;
+
+    public function createXML():Xml;
 }

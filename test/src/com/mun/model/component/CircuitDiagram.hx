@@ -20,15 +20,15 @@ class CircuitDiagram implements CircuitDiagramI{
     var linkArrayReverseFlag:Bool = false;
 
     //circuit diagram has its width height
-    @:isVar var diagramWidth(get, null):Float;
-    @:isVar var diagramHeight(get, null):Float;
+    var diagramWidth:Float;
+    var diagramHeight:Float;
     var margin:Float = 100;
     var leastWidthAndHeight:Int = 500;
     //initial the margin
-    @:isVar var xMin(get, null):Float;
-    @:isVar var yMin(get, null):Float;
-    @:isVar var xMax(get, null):Float;
-    @:isVar var yMax(get, null):Float;
+    var xMin:Float;
+    var yMin:Float;
+    var xMax:Float;
+    var yMax:Float;
 
     public function new() {
         copyStack = new Stack();
@@ -391,5 +391,58 @@ class CircuitDiagram implements CircuitDiagramI{
             worldPointArray.push(new WorldPoint(this, worldCoordinate));
         }
         return worldPointArray;
+    }
+
+    public function isEmpty():Bool{
+        if(componentArray.length == 0 && linkArray.length == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public function createXML():Xml{
+        var circuitDiagramXML:Xml = Xml.createElement("Circuit Diagram");//root
+
+        var nameXML:Xml = Xml.createElement("name");
+        circuitDiagramXML.addChild(nameXML);
+        nameXML.addChild(Xml.createPCData(name));
+
+        var diagramWidthXML:Xml = Xml.createElement("diagramWidth");
+        circuitDiagramXML.addChild(diagramWidthXML);
+        diagramWidthXML.addChild(Xml.createPCData(diagramWidth + ""));
+
+        var diagramHeightXML:Xml = Xml.createElement("diagramHeight");
+        circuitDiagramXML.addChild(diagramHeightXML);
+        diagramHeightXML.addChild(Xml.createPCData(diagramHeight + ""));
+
+        var xMinXML:Xml = Xml.createElement("xMin");
+        circuitDiagramXML.addChild(xMinXML);
+        xMinXML.addChild(Xml.createPCData(xMin + ""));
+
+        var xMaxXML:Xml = Xml.createElement("xMax");
+        circuitDiagramXML.addChild(xMaxXML);
+        xMaxXML.addChild(Xml.createPCData(xMax + ""));
+
+        var yMinXML:Xml = Xml.createElement("xMax");
+        circuitDiagramXML.addChild(yMinXML);
+        yMinXML.addChild(Xml.createPCData(yMin + ""));
+
+        var yMaxXML:Xml = Xml.createElement("yMax");
+        circuitDiagramXML.addChild(yMaxXML);
+        yMaxXML.addChild(Xml.createPCData(yMax + ""));
+
+        var componentArrayXML:Xml = Xml.createElement("Component Array");
+        circuitDiagramXML.addChild(componentArrayXML);
+        for(i in componentArray){
+            circuitDiagramXML.addChild(i.createXML());
+        }
+
+        var linkArrayXML:Xml = Xml.createElement("Link Array");
+        circuitDiagramXML.addChild(linkArrayXML);
+        for(i in linkArray){
+            circuitDiagramXML.addChild(i.createXML());
+        }
+        return circuitDiagramXML;
     }
 }

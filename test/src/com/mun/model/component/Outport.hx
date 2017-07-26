@@ -55,4 +55,25 @@ class Outport implements Port {
         this.yPosition = yPosition;
         portDescription = IOTYPE.OUTPUT;
     }
+
+    public function createXML():Xml{
+        var OutportXML:Xml = Xml.createElement("Outport");
+        var xPositionXML:Xml = Xml.createElement("xPosition");
+        OutportXML.addChild(xPositionXML);
+        xPositionXML.addChild(Xml.createPCData(xPosition + ""));
+
+        var yPositionXML:Xml = Xml.createElement("yPosition");
+        OutportXML.addChild(yPositionXML);
+        yPositionXML.addChild(Xml.createPCData(yPosition + ""));
+
+        var portDescriptionXML:Xml = Xml.createElement("portDescription");
+        OutportXML.addChild(portDescriptionXML);
+        portDescriptionXML.addChild(Xml.createPCData(portDescription + ""));
+
+        var sequenceXML:Xml = Xml.createElement("sequence");
+        OutportXML.addChild(sequenceXML);
+        sequenceXML.addChild(Xml.createPCData(sequence + ""));
+
+        return OutportXML;
+    }
 }

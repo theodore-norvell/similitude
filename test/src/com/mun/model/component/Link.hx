@@ -157,4 +157,11 @@ class Link{
         lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         return lineLength;
     }
+
+    public function createXML():Xml{
+        var linkXML:Xml = Xml.createElement("Link");
+        linkXML.addChild(leftEndpoint.createXML());
+        linkXML.addChild(rightEndpoint.createXML());
+        return linkXML;
+    }
 }

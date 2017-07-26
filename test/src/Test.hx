@@ -1,5 +1,7 @@
 package ;
 
+import com.mun.controller.file.FileSystem;
+import com.mun.controller.controllerState.SideBar;
 import com.mun.controller.controllerState.ControllerCanvasContext;
 import com.mun.global.Constant.*;
 import com.mun.model.component.CircuitDiagram;
@@ -7,7 +9,6 @@ import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
-import com.mun.controller.mouseAction.ButtonClick;
 import js.Browser;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
@@ -33,8 +34,8 @@ class Test {
         else cast( backingStoreRatioDynamic, Float ) ;
 
         var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
-        var oldWidth:Int = cast Browser.window.innerWidth * 0.9;
-        var oldHeight:Int =cast Browser.window.innerHeight * 0.9;
+        var oldWidth:Int = cast Browser.window.innerWidth * 0.81;
+        var oldHeight:Int =cast Browser.window.innerHeight * 0.81;
         canvas.width = oldWidth * pixelRatio;
         canvas.height = oldHeight * pixelRatio;
         canvas.style.width = oldWidth + 'px';
@@ -59,11 +60,14 @@ class Test {
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
         //add button click listener
-        var buttonClick = new ButtonClick(updateCircuitDiagram,pixelRatio);
+        var sideBar = new SideBar(updateCircuitDiagram,pixelRatio);
 
-        var controllerCanvasContext:ControllerCanvasContext = new ControllerCanvasContext(canvas, circuitDiagram, updateCircuitDiagram, buttonClick, updateToolBar);
+        var controllerCanvasContext:ControllerCanvasContext = new ControllerCanvasContext(canvas, circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar);
 
-        buttonClick.setControllerCanvasContext(controllerCanvasContext);
+        var fileSystem = new FileSystem(circuitDiagram);
+        updateCircuitDiagram.set_fileSystem(fileSystem);
+
+        sideBar.setControllerCanvasContext(controllerCanvasContext);
     }
 
 

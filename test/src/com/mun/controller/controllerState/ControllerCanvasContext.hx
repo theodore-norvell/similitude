@@ -3,7 +3,6 @@ package com.mun.controller.controllerState;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Endpoint;
-import com.mun.controller.mouseAction.ButtonClick;
 import com.mun.model.enumeration.KEY;
 import com.mun.model.enumeration.K_STATE;
 import com.mun.model.component.Link;
@@ -25,7 +24,7 @@ class ControllerCanvasContext {
     var circuitDiagram:CircuitDiagramI;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var keyState:KeyState;
-    var buttonClick:ButtonClick;
+    var sideBar:SideBar;
     var updateToolBar:UpdateToolBar;
 
     var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
@@ -45,11 +44,11 @@ class ControllerCanvasContext {
 
     var hightLightLink:Link;
 
-    public function new(canvas:CanvasElement, circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, buttonClick:ButtonClick, upateToolBar:UpdateToolBar) {
+    public function new(canvas:CanvasElement, circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, sideBar:SideBar, upateToolBar:UpdateToolBar) {
         this.canvas = canvas;
         this.circuitDiagram = circuitDiagram;
         this.updateCircuitDiagram = updateCircuitDiagram;
-        this.buttonClick = buttonClick;
+        this.sideBar = sideBar;
         this.updateToolBar = upateToolBar;
 
         controllerState = C_STATE.IDLE;
@@ -227,8 +226,8 @@ class ControllerCanvasContext {
                 }
             };
             case C_STATE.CREATE_COMPONENT : {
-                updateCircuitDiagram.createComponentByCommand(buttonClick.getComponent());
-                linkAndComponentAndEndpointAndPortArray.addComponent(buttonClick.getComponent());
+                updateCircuitDiagram.createComponentByCommand(sideBar.getComponent());
+                linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
             };
             case C_STATE.CREATE_LINK : {
                 var link:Link = updateCircuitDiagram.addLink(mouseDownWorldCoordinate,mouseDownWorldCoordinate);

@@ -193,4 +193,63 @@ class Component {
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         return componentKind.findWorldPoint(coordinate, mode);
     }
+
+    public function createXML():Xml{
+        var componentXML:Xml = Xml.createElement("Component");//root
+
+        var xPositionXML:Xml = Xml.createElement("xPosition");
+        componentXML.addChild(xPositionXML);
+        xPositionXML.addChild(Xml.createPCData(xPosition + ""));
+
+        var yPositionXML:Xml = Xml.createElement("yPosition");
+        componentXML.addChild(yPositionXML);
+        yPositionXML.addChild(Xml.createPCData(yPosition + ""));
+
+        var heightXML:Xml = Xml.createElement("height");
+        componentXML.addChild(heightXML);
+        heightXML.addChild(Xml.createPCData(height + ""));
+
+        var widthXML:Xml = Xml.createElement("width");
+        componentXML.addChild(widthXML);
+        widthXML.addChild(Xml.createPCData(width + ""));
+
+        var orientationXML:Xml = Xml.createElement("orientation");
+        componentXML.addChild(orientationXML);
+        orientationXML.addChild(Xml.createPCData(orientation + ""));
+
+        var nameXML:Xml = Xml.createElement("name");
+        componentXML.addChild(nameXML);
+        nameXML.addChild(Xml.createPCData(name));
+
+        var delayXML:Xml = Xml.createElement("delay");
+        componentXML.addChild(delayXML);
+        delayXML.addChild(Xml.createPCData(delay + ""));
+
+        var inportsNumXML:Xml = Xml.createElement("inportsNum");
+        componentXML.addChild(inportsNumXML);
+        inportsNumXML.addChild(Xml.createPCData(inportsNum + ""));
+
+        var nameOfTheComponentKindXML:Xml = Xml.createElement("nameOfTheComponentKind");
+        componentXML.addChild(nameOfTheComponentKindXML);
+        nameOfTheComponentKindXML.addChild(Xml.createPCData(nameOfTheComponentKind));
+
+        var boxTypeXML:Xml = Xml.createElement("boxType");
+        componentXML.addChild(boxTypeXML);
+        boxTypeXML.addChild(Xml.createPCData(boxType + ""));
+
+        var inportArrayXML:Xml = Xml.createElement("inport Array");
+        componentXML.addChild(inportArrayXML);
+        for(i in inportArray){
+            componentXML.addChild(i.createXML());
+        }
+
+        var outportArrayXML:Xml = Xml.createElement("outport Array");
+        componentXML.addChild(outportArrayXML);
+        for(i in outportArray){
+            componentXML.addChild(i.createXML());
+        }
+
+        componentXML.addChild(componentKind.createXML());
+        return componentXML;
+    }
 }

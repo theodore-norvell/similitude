@@ -1,7 +1,4 @@
 package com.mun.model.gates;
-import com.mun.model.component.Link;
-import com.mun.model.component.Endpoint;
-import com.mun.type.Object;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.component.Component;
@@ -214,5 +211,14 @@ class GateAbstract{
 
     public function getInnerCircuitDiagram():CircuitDiagramI{
         return null;//for most of the componentkind it has no circuit diagram inside, except compound component
+    }
+
+    public function createXML():Xml{
+        var componentKindXML:Xml = Xml.createElement("Component Kind");//root
+
+        var sequenceXML:Xml = Xml.createElement("sequence");
+        componentKindXML.addChild(sequenceXML);
+        sequenceXML.addChild(Xml.createPCData(sequence + ""));
+        return componentKindXML;
     }
 }
