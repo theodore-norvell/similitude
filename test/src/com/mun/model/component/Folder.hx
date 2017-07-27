@@ -31,22 +31,24 @@ class Folder implements FolderI{
 
     public function createNewCircuitDiagram():CircuitDiagramI{
         var circuitDiagram:CircuitDiagramI = new CircuitDiagram();
-        var defaultName:String = "Untitled";
+        var autoGenerateName:String = "";
         var counter:Int = 0;
         var uniqueNmaeFlag:Bool = true;
         while(true){
+            autoGenerateName = "Untitled " + counter;
             for(i in circuitDiagramMap.keys()){
-                defaultName = defaultName + " " + counter;
-                if(i.toString() == defaultName){
+                if(i.toString() == autoGenerateName){
                     uniqueNmaeFlag = false;
-                    counter ++;
+                    break;
                 }
             }
 
             if(uniqueNmaeFlag == true){
-                circuitDiagram.set_name(defaultName);
+                circuitDiagram.set_name(autoGenerateName);
                 break;
             }
+            counter ++;
+            uniqueNmaeFlag = true;
         }
 
         pushCircuitDiagramToMap(circuitDiagram);

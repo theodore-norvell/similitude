@@ -298,7 +298,7 @@ class CircuitDiagram implements CircuitDiagramI{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
-            if(linkAndComponentArray.getComponentIteratorLength() != 0){
+            if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0){
                 for(j in linkAndComponentArray.get_componentIterator()){
                     if(j == i){
                         i.drawComponent(drawingAdapter, true);
@@ -317,7 +317,7 @@ class CircuitDiagram implements CircuitDiagramI{
         drawFlag = false;
         //update link array
         for(i in linkArray){
-            if(linkAndComponentArray.getLinkIteratorLength() != 0){
+            if(linkAndComponentArray != null && linkAndComponentArray.getLinkIteratorLength() != 0){
                 for(j in linkAndComponentArray.get_linkIterator()){
                     if(j == i){
                         i.drawLink(drawingAdapter, true);
@@ -346,8 +346,6 @@ class CircuitDiagram implements CircuitDiagramI{
             for(j in result.get_endpointIterator()){
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
             }
-//            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
-//            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
         }
 
         for(i in componentArray){
@@ -368,11 +366,6 @@ class CircuitDiagram implements CircuitDiagramI{
             for(j in result.get_portIterator()){
                 linkAndComponentAndEndpointAndPortArray.addPort(j);
             }
-
-//            linkAndComponentAndEndpointAndPortArray.get_componentArray().concat(result.get_componentArray());
-//            linkAndComponentAndEndpointAndPortArray.get_linkArray().concat(result.get_linkArray());
-//            linkAndComponentAndEndpointAndPortArray.get_endponentArray().concat(result.get_endponentArray());
-//            linkAndComponentAndEndpointAndPortArray.get_portArray().concat( result.get_portArray());
         }
         return linkAndComponentAndEndpointAndPortArray;
     }

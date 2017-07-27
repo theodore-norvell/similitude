@@ -690,17 +690,8 @@ Test.main = function() {
 	Test.cxt.scale(pixelRatio,pixelRatio);
 	com_mun_global_Constant.CONTEXT = Test.cxt;
 	com_mun_global_Constant.PIXELRATIO = pixelRatio;
-	var folder = new com_mun_model_component_Folder();
-	var circuitDiagram = folder.createNewCircuitDiagram();
-	var updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(circuitDiagram);
-	circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
-	var updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(updateCircuitDiagram);
-	updateCircuitDiagram.setUpdateToolBar(updateToolBar);
-	var updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(Test.canvas,circuitDiagram,updateCircuitDiagram.get_transform());
-	updateCircuitDiagram.setUpdateCanvas(updateCanvas);
-	var sideBar = new com_mun_controller_controllerState_SideBar(updateCircuitDiagram);
-	var controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(Test.canvas,circuitDiagram,updateCircuitDiagram,sideBar,updateToolBar);
-	sideBar.setControllerCanvasContext(controllerCanvasContext);
+	com_mun_global_Constant.CANVAS = Test.canvas;
+	var folderState = new com_mun_controller_controllerState_FolderState();
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -2453,6 +2444,134 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	}
 	,__class__: com_mun_controller_controllerState_ControllerCanvasContext
 };
+var com_mun_controller_controllerState_FolderState = function() {
+	var _gthis = this;
+	this.updateCircuitDiagramMap = new haxe_ds_ObjectMap();
+	this.updateToolBarMap = new haxe_ds_ObjectMap();
+	this.updateCanvasMap = new haxe_ds_ObjectMap();
+	this.sideBarMap = new haxe_ds_ObjectMap();
+	this.controllerCanvasContextMap = new haxe_ds_ObjectMap();
+	this.previouseCircuitDiagramName = [];
+	this.nextCircuitDiagramName = [];
+	this.folder = new com_mun_model_component_Folder();
+	this.currentState = com_mun_model_enumeration_F_$STATE.IDLE;
+	this.checkState();
+	window.document.getElementById("createNewCircuitDiagram").onclick = function() {
+		_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
+		_gthis.checkState();
+	};
+	window.document.getElementById("previouseCD").onclick = function() {
+		_gthis.currentState = com_mun_model_enumeration_F_$STATE.PREVIOUS;
+		_gthis.checkState();
+	};
+	window.document.getElementById("nextCD").onclick = function() {
+		_gthis.currentState = com_mun_model_enumeration_F_$STATE.NEXT;
+		_gthis.checkState();
+	};
+};
+$hxClasses["com.mun.controller.controllerState.FolderState"] = com_mun_controller_controllerState_FolderState;
+com_mun_controller_controllerState_FolderState.__name__ = ["com","mun","controller","controllerState","FolderState"];
+com_mun_controller_controllerState_FolderState.prototype = {
+	currentState: null
+	,folder: null
+	,circuitDiagram: null
+	,updateCircuitDiagram: null
+	,updateToolBar: null
+	,updateCanvas: null
+	,sideBar: null
+	,controllerCanvasContext: null
+	,updateCircuitDiagramMap: null
+	,updateToolBarMap: null
+	,updateCanvasMap: null
+	,sideBarMap: null
+	,controllerCanvasContextMap: null
+	,previouseCircuitDiagramName: null
+	,nextCircuitDiagramName: null
+	,checkState: function() {
+		var _g = this.currentState;
+		switch(_g[1]) {
+		case 0:
+			this.createATotallyNewCircuitDiagram();
+			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+			this.checkState();
+			break;
+		case 1:
+			if(this.previouseCircuitDiagramName.length != 0) {
+				this.nextCircuitDiagramName.push(this.circuitDiagram.get_name());
+				this.setToCurrentCircuitDiagram(this.previouseCircuitDiagramName.pop());
+				this.updateCircuitDiagram.redrawCanvas();
+			}
+			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+			this.checkState();
+			break;
+		case 2:
+			this.previouseCircuitDiagramName.push(this.circuitDiagram.get_name());
+			this.createATotallyNewCircuitDiagram();
+			this.updateCircuitDiagram.redrawCanvas();
+			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+			this.checkState();
+			break;
+		case 3:
+			window.document.getElementById("nameofcd").innerText = this.circuitDiagram.get_name();
+			if(this.previouseCircuitDiagramName.length == 0) {
+				this.setButtonDisability(window.document.getElementById("previouseCD"),true);
+			} else {
+				this.setButtonDisability(window.document.getElementById("previouseCD"),false);
+			}
+			if(this.nextCircuitDiagramName.length == 0) {
+				this.setButtonDisability(window.document.getElementById("nextCD"),true);
+			} else {
+				this.setButtonDisability(window.document.getElementById("nextCD"),false);
+			}
+			break;
+		case 4:
+			if(this.nextCircuitDiagramName.length != 0) {
+				this.previouseCircuitDiagramName.push(this.circuitDiagram.get_name());
+				this.setToCurrentCircuitDiagram(this.nextCircuitDiagramName.pop());
+				this.updateCircuitDiagram.redrawCanvas();
+			}
+			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+			this.checkState();
+			break;
+		}
+	}
+	,setToCurrentCircuitDiagram: function(name) {
+		this.circuitDiagram = this.folder.findCircuitDiagram(name);
+		this.updateCircuitDiagram = this.updateCircuitDiagramMap.h[this.circuitDiagram.__id__];
+		this.updateToolBar = this.updateToolBarMap.h[this.circuitDiagram.__id__];
+		this.updateCanvas = this.updateCanvasMap.h[this.circuitDiagram.__id__];
+		this.sideBar = this.sideBarMap.h[this.circuitDiagram.__id__];
+		this.controllerCanvasContext = this.controllerCanvasContextMap.h[this.circuitDiagram.__id__];
+	}
+	,createATotallyNewCircuitDiagram: function() {
+		this.circuitDiagram = this.folder.createNewCircuitDiagram();
+		this.updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(this.circuitDiagram);
+		this.circuitDiagram.set_commandManager(this.updateCircuitDiagram.get_commandManager());
+		this.updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(this.updateCircuitDiagram);
+		this.updateCircuitDiagram.setUpdateToolBar(this.updateToolBar);
+		this.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(com_mun_global_Constant.CANVAS,this.circuitDiagram,this.updateCircuitDiagram.get_transform());
+		this.updateCircuitDiagram.setUpdateCanvas(this.updateCanvas);
+		this.sideBar = new com_mun_controller_controllerState_SideBar(this.updateCircuitDiagram);
+		this.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(com_mun_global_Constant.CANVAS,this.circuitDiagram,this.updateCircuitDiagram,this.sideBar,this.updateToolBar);
+		this.sideBar.setControllerCanvasContext(this.controllerCanvasContext);
+		this.pushToMap();
+	}
+	,pushToMap: function() {
+		this.updateCircuitDiagramMap.set(this.circuitDiagram,this.updateCircuitDiagram);
+		this.updateToolBarMap.set(this.circuitDiagram,this.updateToolBar);
+		this.updateCanvasMap.set(this.circuitDiagram,this.updateCanvas);
+		this.sideBarMap.set(this.circuitDiagram,this.sideBar);
+		this.controllerCanvasContextMap.set(this.circuitDiagram,this.controllerCanvasContext);
+	}
+	,setButtonDisability: function(button,disable) {
+		if(disable) {
+			button.setAttribute("disabled","disabled");
+		} else {
+			$(button).removeAttr("disabled");
+		}
+	}
+	,__class__: com_mun_controller_controllerState_FolderState
+};
 var com_mun_controller_controllerState_KeyState = function() {
 	this.keyState = com_mun_model_enumeration_K_$STATE.IDLE;
 	window.document.addEventListener("keydown",$bind(this,this.keyDown),false);
@@ -2925,7 +3044,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			if(linkAndComponentArray.getComponentIteratorLength() != 0) {
+			if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0) {
 				var j = linkAndComponentArray.get_componentIterator();
 				while(j.hasNext()) {
 					var j1 = j.next();
@@ -2946,7 +3065,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		while(_g2 < _g11.length) {
 			var i1 = _g11[_g2];
 			++_g2;
-			if(linkAndComponentArray.getLinkIteratorLength() != 0) {
+			if(linkAndComponentArray != null && linkAndComponentArray.getLinkIteratorLength() != 0) {
 				var j2 = linkAndComponentArray.get_linkIterator();
 				while(j2.hasNext()) {
 					var j3 = j2.next();
@@ -3376,23 +3495,25 @@ com_mun_model_component_Folder.prototype = {
 	}
 	,createNewCircuitDiagram: function() {
 		var circuitDiagram = new com_mun_model_component_CircuitDiagram();
-		var defaultName = "Untitled";
+		var autoGenerateName = "";
 		var counter = 0;
 		var uniqueNmaeFlag = true;
 		while(true) {
+			autoGenerateName = "Untitled " + counter;
 			var i = this.circuitDiagramMap.keys();
 			while(i.hasNext()) {
 				var i1 = i.next();
-				defaultName = defaultName + " " + counter;
-				if(i1.toString() == defaultName) {
+				if(i1.toString() == autoGenerateName) {
 					uniqueNmaeFlag = false;
-					++counter;
+					break;
 				}
 			}
 			if(uniqueNmaeFlag == true) {
-				circuitDiagram.set_name(defaultName);
+				circuitDiagram.set_name(autoGenerateName);
 				break;
 			}
+			++counter;
+			uniqueNmaeFlag = true;
 		}
 		this.pushCircuitDiagramToMap(circuitDiagram);
 		return circuitDiagram;
@@ -3695,6 +3816,23 @@ com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION = ["SINGLE_SELECTION",5];
 com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION.toString = $estr;
 com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION.__enum__ = com_mun_model_enumeration_C_$STATE;
 com_mun_model_enumeration_C_$STATE.__empty_constructs__ = [com_mun_model_enumeration_C_$STATE.IDLE,com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT,com_mun_model_enumeration_C_$STATE.CREATE_LINK,com_mun_model_enumeration_C_$STATE.MOVE,com_mun_model_enumeration_C_$STATE.MULTI_SELECTION,com_mun_model_enumeration_C_$STATE.SINGLE_SELECTION];
+var com_mun_model_enumeration_F_$STATE = $hxClasses["com.mun.model.enumeration.F_STATE"] = { __ename__ : ["com","mun","model","enumeration","F_STATE"], __constructs__ : ["IDLE","PREVIOUS","CREATE","CURRENT","NEXT"] };
+com_mun_model_enumeration_F_$STATE.IDLE = ["IDLE",0];
+com_mun_model_enumeration_F_$STATE.IDLE.toString = $estr;
+com_mun_model_enumeration_F_$STATE.IDLE.__enum__ = com_mun_model_enumeration_F_$STATE;
+com_mun_model_enumeration_F_$STATE.PREVIOUS = ["PREVIOUS",1];
+com_mun_model_enumeration_F_$STATE.PREVIOUS.toString = $estr;
+com_mun_model_enumeration_F_$STATE.PREVIOUS.__enum__ = com_mun_model_enumeration_F_$STATE;
+com_mun_model_enumeration_F_$STATE.CREATE = ["CREATE",2];
+com_mun_model_enumeration_F_$STATE.CREATE.toString = $estr;
+com_mun_model_enumeration_F_$STATE.CREATE.__enum__ = com_mun_model_enumeration_F_$STATE;
+com_mun_model_enumeration_F_$STATE.CURRENT = ["CURRENT",3];
+com_mun_model_enumeration_F_$STATE.CURRENT.toString = $estr;
+com_mun_model_enumeration_F_$STATE.CURRENT.__enum__ = com_mun_model_enumeration_F_$STATE;
+com_mun_model_enumeration_F_$STATE.NEXT = ["NEXT",4];
+com_mun_model_enumeration_F_$STATE.NEXT.toString = $estr;
+com_mun_model_enumeration_F_$STATE.NEXT.__enum__ = com_mun_model_enumeration_F_$STATE;
+com_mun_model_enumeration_F_$STATE.__empty_constructs__ = [com_mun_model_enumeration_F_$STATE.IDLE,com_mun_model_enumeration_F_$STATE.PREVIOUS,com_mun_model_enumeration_F_$STATE.CREATE,com_mun_model_enumeration_F_$STATE.CURRENT,com_mun_model_enumeration_F_$STATE.NEXT];
 var com_mun_model_enumeration_IOTYPE = $hxClasses["com.mun.model.enumeration.IOTYPE"] = { __ename__ : ["com","mun","model","enumeration","IOTYPE"], __constructs__ : ["INPUT","S","D","CLK","OUTPUT","Q","QN"] };
 com_mun_model_enumeration_IOTYPE.INPUT = ["INPUT",0];
 com_mun_model_enumeration_IOTYPE.INPUT.toString = $estr;
@@ -9325,6 +9463,7 @@ com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
 com_mun_global_Constant.pointToEndpointDistance = 3;
 com_mun_global_Constant.PIXELRATIO = 1;
+com_mun_global_Constant.CANVAS = null;
 com_mun_global_Constant.CONTEXT = null;
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;

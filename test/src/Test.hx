@@ -1,5 +1,6 @@
 package ;
 
+import com.mun.controller.controllerState.FolderState;
 import com.mun.model.component.Folder;
 import com.mun.model.component.FolderI;
 import com.mun.controller.controllerState.SideBar;
@@ -48,25 +49,27 @@ class Test {
 
         CONTEXT = cxt;
         PIXELRATIO = pixelRatio;
+        CANVAS = canvas;
 
-        var folder:FolderI = new Folder();
-
-        var circuitDiagram:CircuitDiagramI = folder.createNewCircuitDiagram();
-
-
-        var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
-        circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
-
-        var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
-        updateCircuitDiagram.setUpdateToolBar(updateToolBar);
-
-        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram, updateCircuitDiagram.get_transform());
-        updateCircuitDiagram.setUpdateCanvas(updateCanvas);
-
-        var sideBar = new SideBar(updateCircuitDiagram);
-
-        var controllerCanvasContext:ControllerCanvasContext = new ControllerCanvasContext(canvas, circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar);
-        sideBar.setControllerCanvasContext(controllerCanvasContext);
+        var folderState:FolderState = new FolderState();
+//        var folder:FolderI = new Folder();
+//
+//        var circuitDiagram:CircuitDiagramI = folder.createNewCircuitDiagram();
+//
+//
+//        var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
+//        circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
+//
+//        var updateToolBar:UpdateToolBar = new UpdateToolBar(updateCircuitDiagram);
+//        updateCircuitDiagram.setUpdateToolBar(updateToolBar);
+//
+//        var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram, updateCircuitDiagram.get_transform());
+//        updateCircuitDiagram.setUpdateCanvas(updateCanvas);
+//
+//        var sideBar = new SideBar(updateCircuitDiagram);
+//
+//        var controllerCanvasContext:ControllerCanvasContext = new ControllerCanvasContext(canvas, circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar);
+//        sideBar.setControllerCanvasContext(controllerCanvasContext);
     }
 
 
