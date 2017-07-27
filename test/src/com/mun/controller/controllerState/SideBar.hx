@@ -8,9 +8,9 @@ import com.mun.model.component.Component;
 import js.Browser;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.model.enumeration.ORIENTATION;
+import com.mun.global.Constant.*;
 class SideBar {
     var updateCircuitDiagram:UpdateCircuitDiagram;
-    var pixelRatio:Int;
     var component:Component;
     var controllerCanavasContext:ControllerCanvasContext;
     var buttonOrFileList:Bool;//button = true;   file = false
@@ -20,9 +20,8 @@ class SideBar {
 
     var gateNameArray:Array<String>;
 
-    public function new(updateCircuitDiagram:UpdateCircuitDiagram, pixelRatio:Int) {
+    public function new(updateCircuitDiagram:UpdateCircuitDiagram) {
         this.updateCircuitDiagram = updateCircuitDiagram;
-        this.pixelRatio = pixelRatio;
 
         gateNameArray = new Array<String>();
 
@@ -98,43 +97,43 @@ class SideBar {
     }
 
     function andOnClick(){
-        component = updateCircuitDiagram.createComponent("AND",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("AND",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function flipFlopOnClick(){
-        component = updateCircuitDiagram.createComponent("FlipFlop",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("FlipFlop",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function inputOnClick(){
-        component = updateCircuitDiagram.createComponent("Input",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("Input",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function muxOnClick(){
-        component = updateCircuitDiagram.createComponent("MUX",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("MUX",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function nandOnClick(){
-        component = updateCircuitDiagram.createComponent("NAND",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("NAND",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function norOnClick(){
-        component = updateCircuitDiagram.createComponent("NOR",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("NOR",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function notOnClick(){
-        component = updateCircuitDiagram.createComponent("NOT",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("NOT",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function orOnClick(){
-        component = updateCircuitDiagram.createComponent("OR",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("OR",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function outputOnClick(){
-        component = updateCircuitDiagram.createComponent("Output",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("Output",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
     function xorOnClick(){
-        component = updateCircuitDiagram.createComponent("XOR",250, 50, 40 * pixelRatio, 40 * pixelRatio, ORIENTATION.EAST, 2);
+        component = updateCircuitDiagram.createComponent("XOR",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
     }
 

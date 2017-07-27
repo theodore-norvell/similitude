@@ -1,6 +1,5 @@
 package com.mun.controller.componentUpdate;
 
-import com.mun.controller.file.FileSystem;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.controller.command.DeleteCommand;
 import com.mun.controller.command.OrientationCommand;
@@ -41,7 +40,6 @@ class UpdateCircuitDiagram {
     var commandManager:CommandManager;
     var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
-    var fileSystem:FileSystem;
 
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
 
@@ -60,10 +58,6 @@ class UpdateCircuitDiagram {
 
     public function get_transform():Transform {
         return transform;
-    }
-
-    public function set_fileSystem(value:FileSystem) {
-        return this.fileSystem = value;
     }
 
     public function get_commandManager():CommandManager {
@@ -88,7 +82,7 @@ class UpdateCircuitDiagram {
 
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
     }
 
     public function createComponent(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:ORIENTATION, inportNum:Int):Component{
@@ -142,7 +136,7 @@ class UpdateCircuitDiagram {
         hightLightObject(linkAndComponentArray);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
         return object.get_link();
     }
 
@@ -183,7 +177,7 @@ class UpdateCircuitDiagram {
         hightLightObject(linkAndComponentArray);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
     }
 
     public function changeOrientation(componentIterator:Iterator<Component>, orientation:ORIENTATION){
@@ -206,14 +200,14 @@ class UpdateCircuitDiagram {
         redrawCanvas(linkAndComponentArray);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
     }
 
     public function deleteLink(link:Link){
         circuitDiagram.deleteLink(link);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
     }
 
     public function getEndpoint(coordinate:Coordinate):Array<Endpoint>{
@@ -256,7 +250,7 @@ class UpdateCircuitDiagram {
 
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
     }
 
     public function redo(){
@@ -270,7 +264,7 @@ class UpdateCircuitDiagram {
 
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        setDownloadButton();
+        
     }
 
     public function setRedoButton(){
@@ -319,13 +313,5 @@ class UpdateCircuitDiagram {
             }
         }
         return null;
-    }
-
-    function setDownloadButton(){
-        if(circuitDiagram.isEmpty()){
-            fileSystem.disableDownLoadButton(true);
-        }else{
-            fileSystem.disableDownLoadButton(false);
-        }
     }
 }

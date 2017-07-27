@@ -1,6 +1,7 @@
 package ;
 
-import com.mun.controller.file.FileSystem;
+import com.mun.model.component.Folder;
+import com.mun.model.component.FolderI;
 import com.mun.controller.controllerState.SideBar;
 import com.mun.controller.controllerState.ControllerCanvasContext;
 import com.mun.global.Constant.*;
@@ -46,8 +47,11 @@ class Test {
         cxt.scale(pixelRatio, pixelRatio);
 
         CONTEXT = cxt;
+        PIXELRATIO = pixelRatio;
 
-        var circuitDiagram:CircuitDiagramI = new CircuitDiagram();
+        var folder:FolderI = new Folder();
+
+        var circuitDiagram:CircuitDiagramI = folder.createNewCircuitDiagram();
 
 
         var updateCircuitDiagram:UpdateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
@@ -59,14 +63,9 @@ class Test {
         var updateCanvas:UpdateCanvas = new UpdateCanvas(canvas, circuitDiagram, updateCircuitDiagram.get_transform());
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
-        //add button click listener
-        var sideBar = new SideBar(updateCircuitDiagram,pixelRatio);
+        var sideBar = new SideBar(updateCircuitDiagram);
 
         var controllerCanvasContext:ControllerCanvasContext = new ControllerCanvasContext(canvas, circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar);
-
-        var fileSystem = new FileSystem(circuitDiagram);
-        updateCircuitDiagram.set_fileSystem(fileSystem);
-
         sideBar.setControllerCanvasContext(controllerCanvasContext);
     }
 

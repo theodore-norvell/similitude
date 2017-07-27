@@ -1,9 +1,9 @@
 package com.mun.controller.command;
 
+import com.mun.controller.componentUpdate.CircuitDiagramUtil;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import com.mun.model.component.Endpoint;
-import com.mun.controller.componentUpdate.CircuitDiagramUtil;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.CircuitDiagramI;
@@ -229,24 +229,28 @@ class MoveCommand implements Command {
     function linkMeetPortUpdate(link:Link){
         //verfy the endpoint of this link connect to a port or not while moving
         //left endpoint
-        var leftEndpointCoordinate:Coordinate = new Coordinate(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition());
-        var port_temp:Port = circuitDiagramUtil.isOnPort(leftEndpointCoordinate).get_port();
         var leftEndpointPort:Port = link.get_leftEndpoint().get_port();
-        if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
-            link.get_leftEndpoint().set_port(port_temp);
-        }else if(port_temp == null){
-            link.get_leftEndpoint().set_port(null);
+        if(leftEndpointPort == null){
+            var leftEndpointCoordinate:Coordinate = new Coordinate(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition());
+            var port_temp:Port = circuitDiagramUtil.isOnPort(leftEndpointCoordinate).get_port();
+            if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
+                link.get_leftEndpoint().set_port(port_temp);
+            }else if(port_temp == null){
+                link.get_leftEndpoint().set_port(null);
+            }
         }
 
-        var rightEndpointCoordinate:Coordinate = new Coordinate(link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
-        port_temp = circuitDiagramUtil.isOnPort(rightEndpointCoordinate).get_port();
         var rightEndpointPort:Port = link.get_rightEndpoint().get_port();
-
-        if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
-            link.get_rightEndpoint().set_port(port_temp);
-        }else if(port_temp == null){
-            link.get_rightEndpoint().set_port(null);
+        if(rightEndpointPort == null){
+            var rightEndpointCoordinate:Coordinate = new Coordinate(link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
+            var port_temp:Port = circuitDiagramUtil.isOnPort(rightEndpointCoordinate).get_port();
+            if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
+                link.get_rightEndpoint().set_port(port_temp);
+            }else if(port_temp == null){
+                link.get_rightEndpoint().set_port(null);
+            }
         }
+
     }
 
     function endpointMeetPort(endpoint:Endpoint){
