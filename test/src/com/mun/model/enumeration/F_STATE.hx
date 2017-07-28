@@ -5,5 +5,6 @@ enum F_STATE {
     PREVIOUS;
     CREATE;
     CURRENT;
+    SEARCH;
     NEXT;
 }

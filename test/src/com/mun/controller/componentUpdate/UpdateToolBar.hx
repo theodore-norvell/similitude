@@ -174,4 +174,27 @@ class UpdateToolBar {
     function linkAndComponentArrayReset(){
         linkAndComponentArray.clean();
     }
+
+    public function disableAllEvent(){
+        Browser.document.getElementById("delete").removeEventListener("click", deleteObject, false);
+        Browser.document.getElementById("undo").removeEventListener("click", undoCommand, false);
+        Browser.document.getElementById("redo").removeEventListener("click", redoCommand, false);
+        Browser.document.getElementById("name_input").removeEventListener("keyup",inputChange,false);
+        Browser.document.getElementById("north").removeEventListener("click", changeToNorth, false);
+        Browser.document.getElementById("south").removeEventListener("click", changeToSouth, false);
+        Browser.document.getElementById("west").removeEventListener("click", changeToWest, false);
+        Browser.document.getElementById("east").removeEventListener("click", changeToEast, false);
+    }
+
+    public function enableAllEvent(){
+        Browser.document.getElementById("delete").addEventListener("click", deleteObject, false);
+        Browser.document.getElementById("undo").addEventListener("click", undoCommand, false);
+        Browser.document.getElementById("redo").addEventListener("click", redoCommand, false);
+        Browser.document.getElementById("name_input").addEventListener("keyup",inputChange,false);
+        Browser.document.getElementById("north").addEventListener("click", changeToNorth, false);
+        Browser.document.getElementById("south").addEventListener("click", changeToSouth, false);
+        Browser.document.getElementById("west").addEventListener("click", changeToWest, false);
+        Browser.document.getElementById("east").addEventListener("click", changeToEast, false);
+        update(new LinkAndComponentAndEndpointAndPortArray());
+    }
 }

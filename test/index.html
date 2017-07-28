@@ -95,14 +95,43 @@
             </div>
             <div class="col-sm-2 col-md-2 col-lg-2">
                 <button id="createNewCircuitDiagram" type="button" class="btn btn-default">New CircuitDiagram</button>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
                 <button id="previouseCD" type="button" class="btn btn-default">Previouse CircuitDiagram</button>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
                 <button id="nextCD" type="button" class="btn btn-default">Next CircuitDiagram</button>
-                Circuit Diagram Name:
-                <div id = "nameofcd"></div>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
+                <span class="input-group-addon">Circuit Diagram Name:</span>
+                <input type="text" class="form-control input-lg" placeholder="Search CircuitDiagram" id="nameofcd"/>
+                <div class="alert alert-success alert-dismissible" role="alert" style="display: none" id="cd_rename_success">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>Success!</strong>.
+                </div>
+                <div class="alert alert-danger alert-dismissible" role="alert" style="display: none" id="cd_rename_failed">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong>Failed</strong> Is not a valid name.
+                </div>
+            </div>
+            </div>
+            <div class="col-md-6">
+
+                    <div class="input-group col-md-12">
+                        <input type="text" class="form-control input-lg" placeholder="Search CircuitDiagram" id="search_circuitdiagram"/>
+                    </div>
+                <div>
+                    <ul id="circuitDiagramHintList" style="display: none;">
+                        <!-- search hint list -->
+                        <li>1</li>
+                        <li>2</li>
+                        <li>3</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
 <div id="haxe:trace"></div>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

@@ -17,10 +17,9 @@ import com.mun.view.drawingImpl.ViewToWorldI;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import js.html.MouseEvent;
-import js.html.CanvasElement;
 import com.mun.model.enumeration.C_STATE;
+import com.mun.global.Constant.*;
 class ControllerCanvasContext {
-    var canvas:CanvasElement;
     var circuitDiagram:CircuitDiagramI;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var keyState:KeyState;
@@ -44,8 +43,7 @@ class ControllerCanvasContext {
 
     var hightLightLink:Link;
 
-    public function new(canvas:CanvasElement, circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, sideBar:SideBar, upateToolBar:UpdateToolBar) {
-        this.canvas = canvas;
+    public function new(circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, sideBar:SideBar, upateToolBar:UpdateToolBar) {
         this.circuitDiagram = circuitDiagram;
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.sideBar = sideBar;
@@ -65,9 +63,9 @@ class ControllerCanvasContext {
         lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
 
         //add mouse  listener
-        canvas.addEventListener("mousedown", doMouseDown,false);
-        canvas.addEventListener("mousemove", doMouseMove,false);
-        canvas.addEventListener("mouseup", doMouseUp,false);
+        CANVAS.addEventListener("mousedown", doMouseDown,false);
+        CANVAS.addEventListener("mousemove", doMouseMove,false);
+        CANVAS.addEventListener("mouseup", doMouseUp,false);
     }
 
     public function get_controllerState():C_STATE {
@@ -81,10 +79,10 @@ class ControllerCanvasContext {
     }
 
     function getPointOnCanvas(x:Float, y:Float):Coordinate {
-        var bbox = canvas.getBoundingClientRect();
+        var bbox = CANVAS.getBoundingClientRect();
         var coordinate:Coordinate = new Coordinate(0, 0);
-        coordinate.set_xPosition((x - bbox.left) * (canvas.width  / bbox.width));
-        coordinate.set_yPosition((y - bbox.top)  * (canvas.height / bbox.height));
+        coordinate.set_xPosition((x - bbox.left) * (CANVAS.width  / bbox.width));
+        coordinate.set_yPosition((y - bbox.top)  * (CANVAS.height / bbox.height));
         return coordinate;//this is view coordinate
     }
 
@@ -262,5 +260,17 @@ class ControllerCanvasContext {
         }else{
             updateToolBar.hidden();
         }
+    }
+
+    public function disableAllTheEvent(){
+        CANVAS.removeEventListener("mousedown", doMouseDown,false);
+        CANVAS.removeEventListener("mousemove", doMouseMove,false);
+        CANVAS.removeEventListener("mouseup", doMouseUp,false);
+    }
+
+    public function enableAllTheEvent(){
+        CANVAS.addEventListener("mousedown", doMouseDown,false);
+        CANVAS.addEventListener("mousemove", doMouseMove,false);
+        CANVAS.addEventListener("mouseup", doMouseUp,false);
     }
 }

@@ -11,4 +11,6 @@ interface FolderI {
     public function removeCircuitDiagram(name:String):Void;
 
     public function createNewCircuitDiagram():CircuitDiagramI;
+
+    public function changeCircuitDiagramName(oldName:String,newName:String, circuitDiagram:CircuitDiagramI):Bool;
 }

@@ -146,7 +146,7 @@ class SideBar {
         if(value.length != 0){
             var htmlString:String = "";
             for(i in gateNameArray){
-                if(i.indexOf(value.toLowerCase()) != -1 || i.indexOf(value.toUpperCase()) != -1){
+                if(i.indexOf(value.toLowerCase()) != -1 || i.indexOf(value.toUpperCase()) != -1 || i == value){
                     htmlString += "<button id=\"" + i + "\" type=\"button\" class=\"btn btn-default active\">"+ i + "</button>";
                 }
             }

@@ -54,4 +54,16 @@ class Folder implements FolderI{
         pushCircuitDiagramToMap(circuitDiagram);
         return circuitDiagram;
     }
+
+    //precondiction: the new name should not blank && is not equal to ""
+    public function changeCircuitDiagramName(oldName:String,newName:String, circuitDiagram:CircuitDiagramI):Bool{
+        if(circuitDiagramMap.exists(newName)){
+            return false;
+        }else{
+            circuitDiagram.set_name(newName);
+            circuitDiagramMap.remove(oldName);
+            circuitDiagramMap.set(newName, circuitDiagram);
+            return true;
+        }
+    }
 }
