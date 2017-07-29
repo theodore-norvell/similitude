@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.component.Port;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.controller.command.DeleteCommand;
 import com.mun.controller.command.OrientationCommand;
@@ -16,6 +17,7 @@ import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.Component;
 import com.mun.type.Coordinate;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.global.Constant.*;
 
 //all of those imports below can not be deleted, because of using Type.resolveClass
 //include all of the class under com.mun.model.gates
@@ -38,7 +40,6 @@ class UpdateCircuitDiagram {
     var circuitDiagram:CircuitDiagramI;
     var updateCanvas:UpdateCanvas;
     var commandManager:CommandManager;
-    var circuitDiagramUtil:CircuitDiagramUtil;
     var updateToolBar:UpdateToolBar;
 
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
@@ -51,7 +52,6 @@ class UpdateCircuitDiagram {
         this.circuitDiagram = circuitDiagram;
 
         commandManager = new CommandManager();
-        circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
 
         transform = Transform.identity();
     }
@@ -200,34 +200,10 @@ class UpdateCircuitDiagram {
         redrawCanvas(linkAndComponentArray);
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        
-    }
-
-    public function deleteLink(link:Link){
-        circuitDiagram.deleteLink(link);
-        //compute the size of this diagram
-        circuitDiagram.computeDiagramSize();
-        
-    }
-
-    public function getEndpoint(coordinate:Coordinate):Array<Endpoint>{
-        return circuitDiagramUtil.pointOnEndpoint(coordinate);
-    }
-
-    public function getComponent(coordinate:Coordinate):Component{
-        return circuitDiagramUtil.isInComponent(coordinate);
-    }
-
-    public function getLink(coordinate:Coordinate):Link{
-        return circuitDiagramUtil.isOnLink(coordinate);
     }
 
     public function hightLightObject(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         redrawCanvas(linkAndComponentArray);
-    }
-
-    function isOnPort(coordinate:Coordinate):Object{
-        return circuitDiagramUtil.isOnPort(coordinate);
     }
 
     public function resetCommandManagerRecordFlag(){
@@ -242,15 +218,14 @@ class UpdateCircuitDiagram {
         var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = commandManager.undo();
         redrawCanvas(linkAndComponentArray);
 
-        if((linkAndComponentArray.getComponentIteratorLength() == 0 || linkAndComponentArray.getComponentIteratorLength() >= 2)){
-            updateToolBar.hidden();
+        if(linkAndComponentArray.getComponentIteratorLength() == 1){
+            updateToolBar.visible(true);
         }else{
-            updateToolBar.visible();
+            updateToolBar.hidden();
         }
 
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        
     }
 
     public function redo(){
@@ -259,12 +234,15 @@ class UpdateCircuitDiagram {
         if(linkAndComponentArray.getComponentIteratorLength() == 0 && linkAndComponentArray.getLinkIteratorLength() == 0){
             updateToolBar.hidden();
         }else{
-            updateToolBar.visible();
+            if(linkAndComponentArray.getComponentIteratorLength() == 1){
+                updateToolBar.visible(true);
+            }else{
+                updateToolBar.visible(false);
+            }
         }
 
         //compute the size of this diagram
         circuitDiagram.computeDiagramSize();
-        
     }
 
     public function setRedoButton(){
@@ -294,7 +272,6 @@ class UpdateCircuitDiagram {
     }
 
     public function update(){
-
         for(i in circuitDiagram.get_linkIterator()){
             i.get_leftEndpoint().updatePosition();
             i.get_rightEndpoint().updatePosition();
@@ -313,5 +290,90 @@ class UpdateCircuitDiagram {
             }
         }
         return null;
+    }
+
+    /**
+    * verify this coordinate on port or not
+    * @param coordinate
+    * @return if the coordinate on the port then return the port
+    *           or  return null;
+    **/
+    function isOnPort(cooridnate:Coordinate):Object{
+        var object:Object = new Object();
+        for(i in circuitDiagram.get_componentIterator()){
+            for(j in i.get_inportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    object.set_port(j);
+                    for(k in circuitDiagram.get_linkIterator()){
+                        object.set_endPoint(isLinkOnPort(k,j));
+                        return object;
+                    }
+                }
+            }
+            for(j in i.get_outportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    object.set_port(j);
+                    for(k in circuitDiagram.get_linkIterator()){
+                        object.set_endPoint(isLinkOnPort(k,j));
+                        return object;
+                    }
+                }
+            }
+        }
+        return object;
+    }
+
+    /**
+    * verify the link on the port or not
+     * @param link
+     * @param port
+     * @return endpoint   if one of the endpoint on the port, then return this endpoint
+     *                          or return null
+    **/
+    function isLinkOnPort(link:Link, port:Port):Endpoint{
+        var endpoint:Endpoint = null;
+        //if this port has a endpoint (left)
+        if(isEndpointOnPort(link.get_leftEndpoint(), port)){
+            endpoint = link.get_leftEndpoint();
+        }
+        //if this port has a endpoint (right)
+        if(isEndpointOnPort(link.get_rightEndpoint(), port)){
+            endpoint = link.get_rightEndpoint();
+        }
+        return endpoint;
+    }
+
+    /**
+    * verify a point is in a circuit or not
+     * @param coordinate     the point need to be verified
+     * @param orignalXPosition   the circuit x position
+     * @param orignalYPosition   the circuit y position
+     * @return if in the circle, return true; otherwise, return false;
+    **/
+    function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
+        //the radius is 3
+        if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+    * verify the endpoint on the port or not
+     * @param endpoint
+     * @param port
+     * @return Bool   if the endpoint on the port, return true; otherwise, return false;
+    **/
+    function isEndpointOnPort(endpoint:Endpoint, port:Port):Bool{
+        if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

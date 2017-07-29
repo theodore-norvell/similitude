@@ -5,9 +5,9 @@ package com.mun.model.component;
  * @author wanhui
  *
  */
+import com.mun.type.HitObject;
 import com.mun.global.Constant.*;
 import com.mun.model.enumeration.MODE;
-import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.view.drawComponents.DrawLink;
@@ -19,6 +19,11 @@ class Link{
     public function new(leftEndpoint:Endpoint, rightEndpoint:Endpoint) {
         this.leftEndpoint = leftEndpoint;
         this.rightEndpoint = rightEndpoint;
+    }
+
+    public function getLinkLength():Float{
+        return Math.sqrt(Math.pow(Math.abs(leftEndpoint.get_xPosition() - rightEndpoint.get_xPosition()),2) +
+                        Math.pow(Math.abs(leftEndpoint.get_yPosition() - rightEndpoint.get_yPosition()),2));
     }
 
     public function get_leftEndpoint():Endpoint {
@@ -46,14 +51,24 @@ class Link{
         }
     }
 
-    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
+        var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
-        linkAndComponentAndEndpointAndPortArray.addLink(isOnLink(coordinate));
+        var link:Link = isOnLink(coordinate);
+        if(link != null){
+            var hitObject:HitObject = new HitObject();
+            hitObject.set_link(link);
+            hitObjectArray.push(hitObject);
+        }
 
-        linkAndComponentAndEndpointAndPortArray.addEndpoint(pointOnEndpoint(coordinate));
+        var endpoint:Endpoint = pointOnEndpoint(coordinate);
+        if(endpoint != null){
+            var hitObject:HitObject = new HitObject();
+            hitObject.set_endpoint(endpoint);
+            hitObjectArray.push(hitObject);
+        }
 
-        return linkAndComponentAndEndpointAndPortArray;
+        return hitObjectArray;
     }
 
     function pointOnEndpoint(coordinate:Coordinate):Endpoint{

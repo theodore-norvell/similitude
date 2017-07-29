@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.type.HitObject;
 import com.mun.model.enumeration.BOX;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
@@ -186,7 +187,7 @@ class Component {
         componentKind.drawComponent(drawingAdpater, highLight);
     }
 
-    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
+    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
         return componentKind.findHitList(coordinate, mode);
     }
 

@@ -1,5 +1,9 @@
 package com.mun.controller.controllerState;
 
+import com.mun.model.component.Component;
+import com.mun.type.HitObject;
+import com.mun.model.component.Port;
+import com.mun.type.WorldPoint;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Endpoint;
@@ -9,7 +13,6 @@ import com.mun.model.component.Link;
 import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.model.enumeration.M_STATE;
 import com.mun.model.enumeration.POINT_MODE;
-import com.mun.type.WorldPoint;
 import com.mun.model.enumeration.MODE;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.view.drawingImpl.ViewToWorld;
@@ -28,7 +31,8 @@ class ControllerCanvasContext {
 
     var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
     var lastClickArray:LinkAndComponentAndEndpointAndPortArray;
-    var worldPointArray:Array<WorldPoint>;
+    var hitListWorldPointArray:Array<WorldPoint>;
+    var moveWorldPointArray:Array<WorldPoint>;
     var mouseDownWorldCoordinate:Coordinate;
     var mouseMoveWorldCoordiante:Coordinate;
 
@@ -39,7 +43,6 @@ class ControllerCanvasContext {
     var controllerState:C_STATE;
     var mouseState:M_STATE;
     var mode:MODE;
-    var pointMode:POINT_MODE;
 
     var hightLightLink:Link;
 
@@ -53,7 +56,6 @@ class ControllerCanvasContext {
         lastState = C_STATE.IDLE;
 
         mode = MODE.EXCLUDE_PARENTS;
-        pointMode = POINT_MODE.ONE;
         mouseState = M_STATE.IDLE;
         transform = Transform.identity();
 
@@ -61,6 +63,8 @@ class ControllerCanvasContext {
         keyState = new KeyState();
         linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
+        hitListWorldPointArray = new Array<WorldPoint>();
+        moveWorldPointArray = new Array<WorldPoint>();
 
         //add mouse  listener
         CANVAS.addEventListener("mousedown", doMouseDown,false);
@@ -121,9 +125,27 @@ class ControllerCanvasContext {
         //translate to world coordinate
         mouseMoveWorldCoordiante = viewToWorld.convertCoordinate(mouseMoveLocation);
 
-        mouseMoveResultProcess();
+        if(controllerState == C_STATE.MOVE){
+            moveWorldPointArray = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.PATH);
 
-        mouseDownWorldCoordinate = mouseMoveWorldCoordiante;
+            var moveToOtherCircuitDiagram:Bool = true;
+            for(i in moveWorldPointArray){
+                if(i.get_circuitDiagram() == hitListWorldPointArray[0].get_circuitDiagram()){
+                    moveToOtherCircuitDiagram = false;
+                    break;
+                }
+            }
+
+            //if move out of the selected circuit diagram. Freeze the move
+            if(!moveToOtherCircuitDiagram){
+                mouseMoveResultProcess();
+                mouseDownWorldCoordinate = mouseMoveWorldCoordiante;
+            }
+        }else{
+            mouseMoveResultProcess();
+            mouseDownWorldCoordinate = mouseMoveWorldCoordiante;
+        }
+
     }
 
     function mouseDownProcess(){
@@ -181,30 +203,78 @@ class ControllerCanvasContext {
         * Priority:
         * Port > Endpoint > Component = Link
         * */
-        var hitList:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
-        //worldPointArray = circuitDiagram.findWorldPoint(worldCoordinate, pointMode);
-        if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0){
+        var hitObjectArray:Array<HitObject> = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
+        hitListWorldPointArray = circuitDiagram.findWorldPoint(mouseDownWorldCoordinate, POINT_MODE.ONE);
+        //the priority of the hit is from deepest to the outest
+        //delete all the hit object not belongs to the circuit diagram which is same as the circuit diagram of the deepest hitted object
+        var theDeepesthitObject = hitObjectArray[hitObjectArray.length - 1];
+        for(i in hitObjectArray){
+            if(i.get_circuitDiagram() != theDeepesthitObject.get_circuitDiagram()){
+                hitObjectArray.remove(i);
+            }
+        }
+
+        //caculate how many component || link || port || endpoint has been hitted
+        var componentCounter:Int = 0;
+        var linkCounter:Int = 0;
+        var portCounter:Int = 0;
+        var endpointCounter:Int = 0;
+        for(i in hitObjectArray){
+            if(i.get_component() != null){
+                componentCounter++;
+            }else if(i.get_link() != null){
+                linkCounter++;
+            }else if(i.get_port() != null){
+                portCounter++;
+            }else if(i.get_endpoint != null){
+                endpointCounter++;
+            }
+        }
+        if(portCounter != 0 && endpointCounter == 0){
             //only port slected
             controllerState = C_STATE.CREATE_LINK;
             checkState();
-        }else if(hitList.getEndppointIteratorLength() !=0 && hitList.getPortIteratorLength() != 0){//if this point on one endpoint and one port
-            var endpoint:Endpoint = hitList.getEndpointFromIndex(0);
+        }else if(endpointCounter != 0 && portCounter != 0){//if this point on one endpoint and one port
+            var endpoint:Endpoint = null;
+            for(i in hitObjectArray){
+                if(i.get_endpoint() != null){
+                    endpoint = i.get_endpoint();
+                }
+            }
+
             if(updateCircuitDiagram.findLinkThroughEndpoint(endpoint) == hightLightLink){
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
             }else{
                 controllerState = C_STATE.CREATE_LINK;
                 checkState();
             }
-        }else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() == 0){//endpoint selected
+        }else if(endpointCounter != 0 && portCounter == 0){//endpoint selected
             //only one endpoint can be selected
-            linkAndComponentAndEndpointAndPortArray.addEndpoint(hitList.getEndpointFromIndex(0));
-        }else if(hitList.getComponentIteratorLength() != 0){//component selected
-            linkAndComponentAndEndpointAndPortArray.addComponent(hitList.getComponentFromIndex(0));
-        }else if(hitList.getLinkIteratorLength() != 0){//link selected
-            var link:Link = hitList.getLinkFromIndex(0);
+            var endpoint:Endpoint = null;
+            for(i in hitObjectArray){
+                if(i.get_endpoint() != null){
+                    endpoint = i.get_endpoint();
+                }
+            }
+            linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+        }else if(componentCounter != 0){//component selected
+            var component:Component = null;
+            for(i in hitObjectArray){
+                if(i.get_component() != null){
+                    component = i.get_component();
+                }
+            }
+            linkAndComponentAndEndpointAndPortArray.addComponent(component);
+        }else if(linkCounter != 0){//link selected
+            var link:Link = null;
+            for(i in hitObjectArray){
+                if(i.get_link() != null){
+                    link = i.get_link();
+                }
+            }
             hightLightLink = link;
             linkAndComponentAndEndpointAndPortArray.addLink(link);
-        }else if(hitList.isEmpty()){
+        }else if(componentCounter == 0 && linkCounter == 0 && portCounter == 0 && endpointCounter == 0){
             controllerState = C_STATE.CREATE_LINK;
             checkState();
         }

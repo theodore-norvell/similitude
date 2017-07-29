@@ -70,17 +70,15 @@ class UpdateToolBar {
         //linkAndComponentArray may contains link and component, so when link and component both exists, then only show those things both have
 
         if(linkAndComponentArray.getComponentIteratorLength() != 0 && linkAndComponentArray.getLinkIteratorLength() == 0){
-            visible();
             setOrientation();
             if(linkAndComponentArray.getComponentIteratorLength() == 1){
+                visible(true);
                 setNameInput();
             }else{
-                component_name_div.style.visibility = "hidden";
+                visible(false);
             }
         }else{
-            visible();
-            component_name_div.style.visibility = "hidden";
-            orientation_div.style.visibility = "hidden";
+            visible(false);
         }
     }
 
@@ -143,10 +141,16 @@ class UpdateToolBar {
         updateCircuitDiagram.redo();
     }
 
-    public function visible(){
+    public function visible(allVisable:Bool){
         deleteButton.style.visibility = "visible";
-        orientation_div.style.visibility = "visible";
-        component_name_div.style.visibility = "visible";
+        if(allVisable){
+            orientation_div.style.visibility = "visible";
+            component_name_div.style.visibility = "visible";
+        }else{
+            orientation_div.style.visibility = "hidden";
+            component_name_div.style.visibility = "hidden";
+        }
+
     }
 
     public function hidden(){

@@ -1359,7 +1359,6 @@ var com_mun_controller_command_MoveCommand = function(linkAndComponentAndEndpoin
 		var i5 = i4.next();
 		this.linkAndComponentAndEndpointArray.addEndpoint(i5);
 	}
-	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
 	var i6 = 0;
 	if(linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0) {
 		var j = linkAndComponentAndEndpointArray.get_componentIterator();
@@ -1403,7 +1402,6 @@ com_mun_controller_command_MoveCommand.prototype = {
 	xDisplacement: null
 	,yDisplacement: null
 	,circuitDiagram: null
-	,circuitDiagramUtil: null
 	,recordComponentXpositionBeforeUndoArray: null
 	,recordComponentYpositionBeforeUndoArray: null
 	,recordLeftEndpointXpositionBeforeUndoArray: null
@@ -1552,7 +1550,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 		var leftEndpointPort = link.get_leftEndpoint().get_port();
 		if(leftEndpointPort == null) {
 			var leftEndpointCoordinate = new com_mun_type_Coordinate(link.get_leftEndpoint().get_xPosition(),link.get_leftEndpoint().get_yPosition());
-			var port_temp = this.circuitDiagramUtil.isOnPort(leftEndpointCoordinate).get_port();
+			var port_temp = this.isOnPort(leftEndpointCoordinate).get_port();
 			if(port_temp != null && leftEndpointPort != port_temp) {
 				link.get_leftEndpoint().set_port(port_temp);
 			} else if(port_temp == null) {
@@ -1562,7 +1560,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 		var rightEndpointPort = link.get_rightEndpoint().get_port();
 		if(rightEndpointPort == null) {
 			var rightEndpointCoordinate = new com_mun_type_Coordinate(link.get_rightEndpoint().get_xPosition(),link.get_rightEndpoint().get_yPosition());
-			var port_temp1 = this.circuitDiagramUtil.isOnPort(rightEndpointCoordinate).get_port();
+			var port_temp1 = this.isOnPort(rightEndpointCoordinate).get_port();
 			if(port_temp1 != null && rightEndpointPort != port_temp1) {
 				link.get_rightEndpoint().set_port(port_temp1);
 			} else if(port_temp1 == null) {
@@ -1572,7 +1570,7 @@ com_mun_controller_command_MoveCommand.prototype = {
 	}
 	,endpointMeetPort: function(endpoint) {
 		var coordinate = new com_mun_type_Coordinate(endpoint.get_xPosition(),endpoint.get_yPosition());
-		var newPort = this.circuitDiagramUtil.isOnPort(coordinate).get_port();
+		var newPort = this.isOnPort(coordinate).get_port();
 		if(newPort != null) {
 			var i = this.circuitDiagram.get_linkIterator();
 			while(i.hasNext()) {
@@ -1607,6 +1605,64 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var i1 = i.next();
 			i1.get_leftEndpoint().updatePosition();
 			i1.get_rightEndpoint().updatePosition();
+		}
+	}
+	,isOnPort: function(cooridnate) {
+		var object = new com_mun_type_Object();
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var j = i1.get_inportIterator();
+			while(j.hasNext()) {
+				var j1 = j.next();
+				if(this.isInCircle(cooridnate,j1.get_xPosition(),j1.get_yPosition())) {
+					object.set_port(j1);
+					var k = this.circuitDiagram.get_linkIterator();
+					while(k.hasNext()) {
+						var k1 = k.next();
+						object.set_endPoint(this.isLinkOnPort(k1,j1));
+						return object;
+					}
+				}
+			}
+			var j2 = i1.get_outportIterator();
+			while(j2.hasNext()) {
+				var j3 = j2.next();
+				if(this.isInCircle(cooridnate,j3.get_xPosition(),j3.get_yPosition())) {
+					object.set_port(j3);
+					var k2 = this.circuitDiagram.get_linkIterator();
+					while(k2.hasNext()) {
+						var k3 = k2.next();
+						object.set_endPoint(this.isLinkOnPort(k3,j3));
+						return object;
+					}
+				}
+			}
+		}
+		return object;
+	}
+	,isLinkOnPort: function(link,port) {
+		var endpoint = null;
+		if(this.isEndpointOnPort(link.get_leftEndpoint(),port)) {
+			endpoint = link.get_leftEndpoint();
+		}
+		if(this.isEndpointOnPort(link.get_rightEndpoint(),port)) {
+			endpoint = link.get_rightEndpoint();
+		}
+		return endpoint;
+	}
+	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
+		if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= com_mun_global_Constant.portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= com_mun_global_Constant.portRadius) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isEndpointOnPort: function(endpoint,port) {
+		if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	,__class__: com_mun_controller_command_MoveCommand
@@ -1704,159 +1760,6 @@ com_mun_controller_command_Stack.prototype = {
 	}
 	,__class__: com_mun_controller_command_Stack
 };
-var com_mun_controller_componentUpdate_CircuitDiagramUtil = function(circuitDiagram) {
-	this.circuitDiagram = circuitDiagram;
-};
-$hxClasses["com.mun.controller.componentUpdate.CircuitDiagramUtil"] = com_mun_controller_componentUpdate_CircuitDiagramUtil;
-com_mun_controller_componentUpdate_CircuitDiagramUtil.__name__ = ["com","mun","controller","componentUpdate","CircuitDiagramUtil"];
-com_mun_controller_componentUpdate_CircuitDiagramUtil.prototype = {
-	circuitDiagram: null
-	,isInComponent: function(coordinate) {
-		var component = null;
-		var i = this.circuitDiagram.get_componentIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			if(this.isInScope(i1.get_xPosition(),i1.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition(),i1.get_height(),i1.get_width()) == true) {
-				return i1;
-			}
-		}
-		return component;
-	}
-	,isOnLink: function(coordinate) {
-		var i = this.circuitDiagram.get_linkIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			var leftEndpoint = i1.get_leftEndpoint();
-			var rightEndpoint = i1.get_rightEndpoint();
-			if(this.pointToLine(leftEndpoint.get_xPosition(),leftEndpoint.get_yPosition(),rightEndpoint.get_xPosition(),rightEndpoint.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToLineDistance) {
-				var theDistanaceToLeftEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.get_xPosition() - i1.get_leftEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.get_yPosition() - i1.get_leftEndpoint().get_yPosition()),2));
-				var theDistanceToRightEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.get_xPosition() - i1.get_rightEndpoint().get_xPosition()),2) + Math.pow(Math.abs(coordinate.get_yPosition() - i1.get_rightEndpoint().get_yPosition()),2));
-				if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint) {
-					if(theDistanceToRightEndpoint >= com_mun_global_Constant.pointToEndpointDistance) {
-						return i1;
-					}
-				} else if(theDistanaceToLeftEndpoint >= com_mun_global_Constant.pointToEndpointDistance) {
-					return i1;
-				}
-			}
-		}
-		return null;
-	}
-	,pointToLine: function(x1,y1,x2,y2,x0,y0) {
-		var space = 0;
-		var a;
-		var b;
-		var c;
-		a = this.pointsDistance(x1,y1,x2,y2);
-		b = this.pointsDistance(x1,y1,x0,y0);
-		c = this.pointsDistance(x2,y2,x0,y0);
-		if(c + b == a) {
-			space = 0;
-			return space;
-		}
-		if(a <= 0.00001) {
-			space = b;
-			return space;
-		}
-		if(c * c > a * a + b * b) {
-			space = b;
-			return space;
-		}
-		if(b * b >= a * a + c * c) {
-			space = c;
-			return space;
-		}
-		var p = (a + b + c) / 2;
-		var s = Math.sqrt(p * (p - a) * (p - b) * (p - c));
-		space = 2 * s / a;
-		return space;
-	}
-	,pointsDistance: function(x1,y1,x2,y2) {
-		var lineLength = 0;
-		lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-		return lineLength;
-	}
-	,pointOnEndpoint: function(coordinate) {
-		var endpointArray = [];
-		var i = this.circuitDiagram.get_linkIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			if(this.pointsDistance(i1.get_leftEndpoint().get_xPosition(),i1.get_leftEndpoint().get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToEndpointDistance) {
-				endpointArray.push(i1.get_leftEndpoint());
-			}
-			if(this.pointsDistance(i1.get_rightEndpoint().get_xPosition(),i1.get_rightEndpoint().get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToEndpointDistance) {
-				endpointArray.push(i1.get_rightEndpoint());
-			}
-		}
-		return endpointArray;
-	}
-	,isOnPort: function(cooridnate) {
-		var object = new com_mun_type_Object();
-		var i = this.circuitDiagram.get_componentIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			var j = i1.get_inportIterator();
-			while(j.hasNext()) {
-				var j1 = j.next();
-				if(this.isInCircle(cooridnate,j1.get_xPosition(),j1.get_yPosition())) {
-					object.set_port(j1);
-					var k = this.circuitDiagram.get_linkIterator();
-					while(k.hasNext()) {
-						var k1 = k.next();
-						object.set_endPoint(this.isLinkOnPort(k1,j1));
-						return object;
-					}
-				}
-			}
-			var j2 = i1.get_outportIterator();
-			while(j2.hasNext()) {
-				var j3 = j2.next();
-				if(this.isInCircle(cooridnate,j3.get_xPosition(),j3.get_yPosition())) {
-					object.set_port(j3);
-					var k2 = this.circuitDiagram.get_linkIterator();
-					while(k2.hasNext()) {
-						var k3 = k2.next();
-						object.set_endPoint(this.isLinkOnPort(k3,j3));
-						return object;
-					}
-				}
-			}
-		}
-		return object;
-	}
-	,isLinkOnPort: function(link,port) {
-		var endpoint = null;
-		if(this.isEndpointOnPort(link.get_leftEndpoint(),port)) {
-			endpoint = link.get_leftEndpoint();
-		}
-		if(this.isEndpointOnPort(link.get_rightEndpoint(),port)) {
-			endpoint = link.get_rightEndpoint();
-		}
-		return endpoint;
-	}
-	,isEndpointOnPort: function(endpoint,port) {
-		if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
-		if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= com_mun_global_Constant.portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= com_mun_global_Constant.portRadius) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
-		if(mouseXPosition >= Math.abs(orignalXposition - width / 2) && orignalXposition <= orignalXposition + width / 2 && (mouseYposition >= Math.abs(orignalYposition - heigh / 2) && mouseYposition <= orignalYposition + heigh / 2)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,__class__: com_mun_controller_componentUpdate_CircuitDiagramUtil
-};
 var com_mun_controller_componentUpdate_UpdateCanvas = function(circuitDiagram,transform) {
 	this.circuitDiagram = circuitDiagram;
 	this.transform = transform;
@@ -1876,7 +1779,6 @@ var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDi
 	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.circuitDiagram = circuitDiagram;
 	this.commandManager = new com_mun_controller_command_CommandManager();
-	this.circuitDiagramUtil = new com_mun_controller_componentUpdate_CircuitDiagramUtil(circuitDiagram);
 	this.transform = com_mun_view_drawingImpl_Transform.identity();
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCircuitDiagram"] = com_mun_controller_componentUpdate_UpdateCircuitDiagram;
@@ -1885,7 +1787,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	circuitDiagram: null
 	,updateCanvas: null
 	,commandManager: null
-	,circuitDiagramUtil: null
 	,updateToolBar: null
 	,linkAndComponentArray: null
 	,transform: null
@@ -2010,24 +1911,8 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.redrawCanvas(linkAndComponentArray);
 		this.circuitDiagram.computeDiagramSize();
 	}
-	,deleteLink: function(link) {
-		this.circuitDiagram.deleteLink(link);
-		this.circuitDiagram.computeDiagramSize();
-	}
-	,getEndpoint: function(coordinate) {
-		return this.circuitDiagramUtil.pointOnEndpoint(coordinate);
-	}
-	,getComponent: function(coordinate) {
-		return this.circuitDiagramUtil.isInComponent(coordinate);
-	}
-	,getLink: function(coordinate) {
-		return this.circuitDiagramUtil.isOnLink(coordinate);
-	}
 	,hightLightObject: function(linkAndComponentArray) {
 		this.redrawCanvas(linkAndComponentArray);
-	}
-	,isOnPort: function(coordinate) {
-		return this.circuitDiagramUtil.isOnPort(coordinate);
 	}
 	,resetCommandManagerRecordFlag: function() {
 		this.commandManager.recordFlagRest();
@@ -2038,10 +1923,10 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,undo: function() {
 		var linkAndComponentArray = this.commandManager.undo();
 		this.redrawCanvas(linkAndComponentArray);
-		if(linkAndComponentArray.getComponentIteratorLength() == 0 || linkAndComponentArray.getComponentIteratorLength() >= 2) {
-			this.updateToolBar.hidden();
+		if(linkAndComponentArray.getComponentIteratorLength() == 1) {
+			this.updateToolBar.visible(true);
 		} else {
-			this.updateToolBar.visible();
+			this.updateToolBar.hidden();
 		}
 		this.circuitDiagram.computeDiagramSize();
 	}
@@ -2050,8 +1935,10 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		this.redrawCanvas(linkAndComponentArray);
 		if(linkAndComponentArray.getComponentIteratorLength() == 0 && linkAndComponentArray.getLinkIteratorLength() == 0) {
 			this.updateToolBar.hidden();
+		} else if(linkAndComponentArray.getComponentIteratorLength() == 1) {
+			this.updateToolBar.visible(true);
 		} else {
-			this.updateToolBar.visible();
+			this.updateToolBar.visible(false);
 		}
 		this.circuitDiagram.computeDiagramSize();
 	}
@@ -2096,6 +1983,64 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			}
 		}
 		return null;
+	}
+	,isOnPort: function(cooridnate) {
+		var object = new com_mun_type_Object();
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var j = i1.get_inportIterator();
+			while(j.hasNext()) {
+				var j1 = j.next();
+				if(this.isInCircle(cooridnate,j1.get_xPosition(),j1.get_yPosition())) {
+					object.set_port(j1);
+					var k = this.circuitDiagram.get_linkIterator();
+					while(k.hasNext()) {
+						var k1 = k.next();
+						object.set_endPoint(this.isLinkOnPort(k1,j1));
+						return object;
+					}
+				}
+			}
+			var j2 = i1.get_outportIterator();
+			while(j2.hasNext()) {
+				var j3 = j2.next();
+				if(this.isInCircle(cooridnate,j3.get_xPosition(),j3.get_yPosition())) {
+					object.set_port(j3);
+					var k2 = this.circuitDiagram.get_linkIterator();
+					while(k2.hasNext()) {
+						var k3 = k2.next();
+						object.set_endPoint(this.isLinkOnPort(k3,j3));
+						return object;
+					}
+				}
+			}
+		}
+		return object;
+	}
+	,isLinkOnPort: function(link,port) {
+		var endpoint = null;
+		if(this.isEndpointOnPort(link.get_leftEndpoint(),port)) {
+			endpoint = link.get_leftEndpoint();
+		}
+		if(this.isEndpointOnPort(link.get_rightEndpoint(),port)) {
+			endpoint = link.get_rightEndpoint();
+		}
+		return endpoint;
+	}
+	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
+		if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= com_mun_global_Constant.portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= com_mun_global_Constant.portRadius) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isEndpointOnPort: function(endpoint,port) {
+		if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCircuitDiagram
 };
@@ -2155,17 +2100,15 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 			}
 		}
 		if(linkAndComponentArray.getComponentIteratorLength() != 0 && linkAndComponentArray.getLinkIteratorLength() == 0) {
-			this.visible();
 			this.setOrientation();
 			if(linkAndComponentArray.getComponentIteratorLength() == 1) {
+				this.visible(true);
 				this.setNameInput();
 			} else {
-				this.component_name_div.style.visibility = "hidden";
+				this.visible(false);
 			}
 		} else {
-			this.visible();
-			this.component_name_div.style.visibility = "hidden";
-			this.orientation_div.style.visibility = "hidden";
+			this.visible(false);
 		}
 	}
 	,setOrientation: function() {
@@ -2219,10 +2162,15 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,redoCommand: function() {
 		this.updateCircuitDiagram.redo();
 	}
-	,visible: function() {
+	,visible: function(allVisable) {
 		this.deleteButton.style.visibility = "visible";
-		this.orientation_div.style.visibility = "visible";
-		this.component_name_div.style.visibility = "visible";
+		if(allVisable) {
+			this.orientation_div.style.visibility = "visible";
+			this.component_name_div.style.visibility = "visible";
+		} else {
+			this.orientation_div.style.visibility = "hidden";
+			this.component_name_div.style.visibility = "hidden";
+		}
 	}
 	,hidden: function() {
 		this.deleteButton.style.visibility = "hidden";
@@ -2277,13 +2225,14 @@ var com_mun_controller_controllerState_ControllerCanvasContext = function(circui
 	this.controllerState = com_mun_model_enumeration_C_$STATE.IDLE;
 	this.lastState = com_mun_model_enumeration_C_$STATE.IDLE;
 	this.mode = com_mun_model_enumeration_MODE.EXCLUDE_PARENTS;
-	this.pointMode = com_mun_model_enumeration_POINT_$MODE.ONE;
 	this.mouseState = com_mun_model_enumeration_M_$STATE.IDLE;
 	this.transform = com_mun_view_drawingImpl_Transform.identity();
 	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(this.transform);
 	this.keyState = new com_mun_controller_controllerState_KeyState();
 	this.linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.lastClickArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+	this.hitListWorldPointArray = [];
+	this.moveWorldPointArray = [];
 	com_mun_global_Constant.CANVAS.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
 	com_mun_global_Constant.CANVAS.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
 	com_mun_global_Constant.CANVAS.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
@@ -2298,7 +2247,8 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	,updateToolBar: null
 	,linkAndComponentAndEndpointAndPortArray: null
 	,lastClickArray: null
-	,worldPointArray: null
+	,hitListWorldPointArray: null
+	,moveWorldPointArray: null
 	,mouseDownWorldCoordinate: null
 	,mouseMoveWorldCoordiante: null
 	,viewToWorld: null
@@ -2307,7 +2257,6 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	,controllerState: null
 	,mouseState: null
 	,mode: null
-	,pointMode: null
 	,hightLightLink: null
 	,get_controllerState: function() {
 		return this.controllerState;
@@ -2345,8 +2294,27 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		var y = event.clientY;
 		var mouseMoveLocation = this.getPointOnCanvas(x,y);
 		this.mouseMoveWorldCoordiante = this.viewToWorld.convertCoordinate(mouseMoveLocation);
-		this.mouseMoveResultProcess();
-		this.mouseDownWorldCoordinate = this.mouseMoveWorldCoordiante;
+		if(this.controllerState == com_mun_model_enumeration_C_$STATE.MOVE) {
+			this.moveWorldPointArray = this.circuitDiagram.findWorldPoint(this.mouseMoveWorldCoordiante,com_mun_model_enumeration_POINT_$MODE.PATH);
+			var moveToOtherCircuitDiagram = true;
+			var _g = 0;
+			var _g1 = this.moveWorldPointArray;
+			while(_g < _g1.length) {
+				var i = _g1[_g];
+				++_g;
+				if(i.get_circuitDiagram() == this.hitListWorldPointArray[0].get_circuitDiagram()) {
+					moveToOtherCircuitDiagram = false;
+					break;
+				}
+			}
+			if(!moveToOtherCircuitDiagram) {
+				this.mouseMoveResultProcess();
+				this.mouseDownWorldCoordinate = this.mouseMoveWorldCoordiante;
+			}
+		} else {
+			this.mouseMoveResultProcess();
+			this.mouseDownWorldCoordinate = this.mouseMoveWorldCoordiante;
+		}
 	}
 	,mouseDownProcess: function() {
 		this.updateCircuitDiagram.resetCommandManagerRecordFlag();
@@ -2389,27 +2357,89 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		}
 	}
 	,checkHitList: function() {
-		var hitList = this.circuitDiagram.findHitList(this.mouseDownWorldCoordinate,this.mode);
-		if(hitList.getPortIteratorLength() != 0 && hitList.getEndppointIteratorLength() == 0) {
+		var hitObjectArray = this.circuitDiagram.findHitList(this.mouseDownWorldCoordinate,this.mode);
+		this.hitListWorldPointArray = this.circuitDiagram.findWorldPoint(this.mouseDownWorldCoordinate,com_mun_model_enumeration_POINT_$MODE.ONE);
+		var theDeepesthitObject = hitObjectArray[hitObjectArray.length - 1];
+		var _g = 0;
+		while(_g < hitObjectArray.length) {
+			var i = hitObjectArray[_g];
+			++_g;
+			if(i.get_circuitDiagram() != theDeepesthitObject.get_circuitDiagram()) {
+				HxOverrides.remove(hitObjectArray,i);
+			}
+		}
+		var componentCounter = 0;
+		var linkCounter = 0;
+		var portCounter = 0;
+		var endpointCounter = 0;
+		var _g1 = 0;
+		while(_g1 < hitObjectArray.length) {
+			var i1 = hitObjectArray[_g1];
+			++_g1;
+			if(i1.get_component() != null) {
+				++componentCounter;
+			} else if(i1.get_link() != null) {
+				++linkCounter;
+			} else if(i1.get_port() != null) {
+				++portCounter;
+			} else if($bind(i1,i1.get_endpoint) != null) {
+				++endpointCounter;
+			}
+		}
+		if(portCounter != 0 && endpointCounter == 0) {
 			this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
 			this.checkState();
-		} else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() != 0) {
-			var endpoint = hitList.getEndpointFromIndex(0);
+		} else if(endpointCounter != 0 && portCounter != 0) {
+			var endpoint = null;
+			var _g2 = 0;
+			while(_g2 < hitObjectArray.length) {
+				var i2 = hitObjectArray[_g2];
+				++_g2;
+				if(i2.get_endpoint() != null) {
+					endpoint = i2.get_endpoint();
+				}
+			}
 			if(this.updateCircuitDiagram.findLinkThroughEndpoint(endpoint) == this.hightLightLink) {
 				this.linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
 			} else {
 				this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
 				this.checkState();
 			}
-		} else if(hitList.getEndppointIteratorLength() != 0 && hitList.getPortIteratorLength() == 0) {
-			this.linkAndComponentAndEndpointAndPortArray.addEndpoint(hitList.getEndpointFromIndex(0));
-		} else if(hitList.getComponentIteratorLength() != 0) {
-			this.linkAndComponentAndEndpointAndPortArray.addComponent(hitList.getComponentFromIndex(0));
-		} else if(hitList.getLinkIteratorLength() != 0) {
-			var link = hitList.getLinkFromIndex(0);
+		} else if(endpointCounter != 0 && portCounter == 0) {
+			var endpoint1 = null;
+			var _g3 = 0;
+			while(_g3 < hitObjectArray.length) {
+				var i3 = hitObjectArray[_g3];
+				++_g3;
+				if(i3.get_endpoint() != null) {
+					endpoint1 = i3.get_endpoint();
+				}
+			}
+			this.linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint1);
+		} else if(componentCounter != 0) {
+			var component = null;
+			var _g4 = 0;
+			while(_g4 < hitObjectArray.length) {
+				var i4 = hitObjectArray[_g4];
+				++_g4;
+				if(i4.get_component() != null) {
+					component = i4.get_component();
+				}
+			}
+			this.linkAndComponentAndEndpointAndPortArray.addComponent(component);
+		} else if(linkCounter != 0) {
+			var link = null;
+			var _g5 = 0;
+			while(_g5 < hitObjectArray.length) {
+				var i5 = hitObjectArray[_g5];
+				++_g5;
+				if(i5.get_link() != null) {
+					link = i5.get_link();
+				}
+			}
 			this.hightLightLink = link;
 			this.linkAndComponentAndEndpointAndPortArray.addLink(link);
-		} else if(hitList.isEmpty()) {
+		} else if(componentCounter == 0 && linkCounter == 0 && portCounter == 0 && endpointCounter == 0) {
 			this.controllerState = com_mun_model_enumeration_C_$STATE.CREATE_LINK;
 			this.checkState();
 		}
@@ -2505,12 +2535,13 @@ var com_mun_controller_controllerState_FolderState = function() {
 	$(window.document.getElementById("nameofcd")).bind("input porpertychange",function() {
 		var success = _gthis.folder.changeCircuitDiagramName(_gthis.circuitDiagram.get_name(),$(window.document.getElementById("nameofcd")).val(),_gthis.circuitDiagram);
 		if(success) {
-			$(window.document.getElementById("cd_rename_success")).removeAttr("style");
-			window.document.getElementById("cd_rename_failed").style.display = "none";
+			$(window.document.getElementById("nameofcddiv")).removeClass("has-error").addClass("has-success");
+			window.document.getElementById("nameofcdlabel").innerText = "Success!";
+			$(window.document.getElementById("nameofcdspan1")).removeClass("glyphicon-remove").addClass("glyphicon-ok");
 		} else {
-			window.document.getElementById("cd_rename_success").style.display = "none";
-			$(window.document.getElementById("cd_rename_failed")).removeAttr("style");
-			$(window.document.getElementById("nameofcd")).val(_gthis.circuitDiagram.get_name());
+			$(window.document.getElementById("nameofcddiv")).removeClass("has-success").addClass("has-error");
+			window.document.getElementById("nameofcdlabel").innerText = "Failed!";
+			$(window.document.getElementById("nameofcdspan1")).removeClass("glyphicon-ok").addClass("glyphicon-remove");
 		}
 	});
 };
@@ -2561,6 +2592,9 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			this.createATotallyNewCircuitDiagram();
 			this.circuitDiagramArray.push(this.circuitDiagram);
 			this.currentIndex = this.circuitDiagramArray.length - 1;
+			$(window.document.getElementById("nameofcddiv")).removeClass("has-error").removeClass("has-success");
+			window.document.getElementById("nameofcdlabel").innerText = "";
+			$(window.document.getElementById("nameofcdspan1")).removeClass("glyphicon-remove").removeClass("glyphicon-ok");
 			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 			this.checkState();
 			break;
@@ -3203,52 +3237,40 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		}
 	}
 	,findHitList: function(coordinate,mode) {
-		var linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+		var hitObjectArray = [];
+		var hitLinkArray = [];
 		var _g = 0;
 		var _g1 = this.linkArray;
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			var result = i.findHitList(coordinate,mode);
-			var j = result.get_linkIterator();
-			while(j.hasNext()) {
-				var j1 = j.next();
-				linkAndComponentAndEndpointAndPortArray.addLink(j1);
-			}
-			var j2 = result.get_endpointIterator();
-			while(j2.hasNext()) {
-				var j3 = j2.next();
-				linkAndComponentAndEndpointAndPortArray.addEndpoint(j3);
+			hitLinkArray = i.findHitList(coordinate,mode);
+			var _g2 = 0;
+			while(_g2 < hitLinkArray.length) {
+				var j = hitLinkArray[_g2];
+				++_g2;
+				j.set_circuitDiagram(this);
+				hitObjectArray.push(j);
 			}
 		}
-		var _g2 = 0;
+		var result = [];
+		var _g3 = 0;
 		var _g11 = this.componentArray;
-		while(_g2 < _g11.length) {
-			var i1 = _g11[_g2];
-			++_g2;
-			var result1 = i1.findHitList(coordinate,mode);
-			var j4 = result1.get_linkIterator();
-			while(j4.hasNext()) {
-				var j5 = j4.next();
-				linkAndComponentAndEndpointAndPortArray.addLink(j5);
-			}
-			var j6 = result1.get_endpointIterator();
-			while(j6.hasNext()) {
-				var j7 = j6.next();
-				linkAndComponentAndEndpointAndPortArray.addEndpoint(j7);
-			}
-			var j8 = result1.get_componentIterator();
-			while(j8.hasNext()) {
-				var j9 = j8.next();
-				linkAndComponentAndEndpointAndPortArray.addComponent(j9);
-			}
-			var j10 = result1.get_portIterator();
-			while(j10.hasNext()) {
-				var j11 = j10.next();
-				linkAndComponentAndEndpointAndPortArray.addPort(j11);
+		while(_g3 < _g11.length) {
+			var i1 = _g11[_g3];
+			++_g3;
+			result = i1.findHitList(coordinate,mode);
+			var _g21 = 0;
+			while(_g21 < result.length) {
+				var j1 = result[_g21];
+				++_g21;
+				if(j1.get_circuitDiagram() == null) {
+					j1.set_circuitDiagram(this);
+					hitObjectArray.push(j1);
+				}
 			}
 		}
-		return linkAndComponentAndEndpointAndPortArray;
+		return hitObjectArray;
 	}
 	,findWorldPoint: function(worldCoordinate,mode) {
 		var worldPointArray = [];
@@ -3747,6 +3769,9 @@ com_mun_model_component_Link.__name__ = ["com","mun","model","component","Link"]
 com_mun_model_component_Link.prototype = {
 	leftEndpoint: null
 	,rightEndpoint: null
+	,getLinkLength: function() {
+		return Math.sqrt(Math.pow(Math.abs(this.leftEndpoint.get_xPosition() - this.rightEndpoint.get_xPosition()),2) + Math.pow(Math.abs(this.leftEndpoint.get_yPosition() - this.rightEndpoint.get_yPosition()),2));
+	}
 	,get_leftEndpoint: function() {
 		return this.leftEndpoint;
 	}
@@ -3768,10 +3793,20 @@ com_mun_model_component_Link.prototype = {
 		}
 	}
 	,findHitList: function(coordinate,mode) {
-		var linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
-		linkAndComponentAndEndpointAndPortArray.addLink(this.isOnLink(coordinate));
-		linkAndComponentAndEndpointAndPortArray.addEndpoint(this.pointOnEndpoint(coordinate));
-		return linkAndComponentAndEndpointAndPortArray;
+		var hitObjectArray = [];
+		var link = this.isOnLink(coordinate);
+		if(link != null) {
+			var hitObject = new com_mun_type_HitObject();
+			hitObject.set_link(link);
+			hitObjectArray.push(hitObject);
+		}
+		var endpoint = this.pointOnEndpoint(coordinate);
+		if(endpoint != null) {
+			var hitObject1 = new com_mun_type_HitObject();
+			hitObject1.set_endpoint(endpoint);
+			hitObjectArray.push(hitObject1);
+		}
+		return hitObjectArray;
 	}
 	,pointOnEndpoint: function(coordinate) {
 		if(this.pointsDistance(this.leftEndpoint.get_xPosition(),this.leftEndpoint.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToEndpointDistance) {
@@ -4052,17 +4087,14 @@ com_mun_model_enumeration_ORIENTATION.UNKNOW = ["UNKNOW",4];
 com_mun_model_enumeration_ORIENTATION.UNKNOW.toString = $estr;
 com_mun_model_enumeration_ORIENTATION.UNKNOW.__enum__ = com_mun_model_enumeration_ORIENTATION;
 com_mun_model_enumeration_ORIENTATION.__empty_constructs__ = [com_mun_model_enumeration_ORIENTATION.NORTH,com_mun_model_enumeration_ORIENTATION.SOUTH,com_mun_model_enumeration_ORIENTATION.WEST,com_mun_model_enumeration_ORIENTATION.EAST,com_mun_model_enumeration_ORIENTATION.UNKNOW];
-var com_mun_model_enumeration_POINT_$MODE = $hxClasses["com.mun.model.enumeration.POINT_MODE"] = { __ename__ : ["com","mun","model","enumeration","POINT_MODE"], __constructs__ : ["ONE","ALL","PATH"] };
+var com_mun_model_enumeration_POINT_$MODE = $hxClasses["com.mun.model.enumeration.POINT_MODE"] = { __ename__ : ["com","mun","model","enumeration","POINT_MODE"], __constructs__ : ["ONE","PATH"] };
 com_mun_model_enumeration_POINT_$MODE.ONE = ["ONE",0];
 com_mun_model_enumeration_POINT_$MODE.ONE.toString = $estr;
 com_mun_model_enumeration_POINT_$MODE.ONE.__enum__ = com_mun_model_enumeration_POINT_$MODE;
-com_mun_model_enumeration_POINT_$MODE.ALL = ["ALL",1];
-com_mun_model_enumeration_POINT_$MODE.ALL.toString = $estr;
-com_mun_model_enumeration_POINT_$MODE.ALL.__enum__ = com_mun_model_enumeration_POINT_$MODE;
-com_mun_model_enumeration_POINT_$MODE.PATH = ["PATH",2];
+com_mun_model_enumeration_POINT_$MODE.PATH = ["PATH",1];
 com_mun_model_enumeration_POINT_$MODE.PATH.toString = $estr;
 com_mun_model_enumeration_POINT_$MODE.PATH.__enum__ = com_mun_model_enumeration_POINT_$MODE;
-com_mun_model_enumeration_POINT_$MODE.__empty_constructs__ = [com_mun_model_enumeration_POINT_$MODE.ONE,com_mun_model_enumeration_POINT_$MODE.ALL,com_mun_model_enumeration_POINT_$MODE.PATH];
+com_mun_model_enumeration_POINT_$MODE.__empty_constructs__ = [com_mun_model_enumeration_POINT_$MODE.ONE,com_mun_model_enumeration_POINT_$MODE.PATH];
 var com_mun_model_enumeration_VALUE_$LOGIC = $hxClasses["com.mun.model.enumeration.VALUE_LOGIC"] = { __ename__ : ["com","mun","model","enumeration","VALUE_LOGIC"], __constructs__ : ["FALSE","TRUE","UNDEFINED","RISING_EDGE","DOWN_EDGE"] };
 com_mun_model_enumeration_VALUE_$LOGIC.FALSE = ["FALSE",0];
 com_mun_model_enumeration_VALUE_$LOGIC.FALSE.toString = $estr;
@@ -4193,10 +4225,20 @@ com_mun_model_gates_GateAbstract.prototype = {
 		return portArray;
 	}
 	,findHitList: function(coordinate,mode) {
-		var linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
-		linkAndComponentAndEndpointAndPortArray.addComponent(this.isInComponent(coordinate));
-		linkAndComponentAndEndpointAndPortArray.addPort(this.isOnPort(coordinate));
-		return linkAndComponentAndEndpointAndPortArray;
+		var hitObjectArray = [];
+		var component = this.isInComponent(coordinate);
+		if(component != null) {
+			var hitObject = new com_mun_type_HitObject();
+			hitObject.set_component(component);
+			hitObjectArray.push(hitObject);
+		}
+		var port = this.isOnPort(coordinate);
+		if(port != null) {
+			var hitObject1 = new com_mun_type_HitObject();
+			hitObject1.set_port(port);
+			hitObjectArray.push(hitObject1);
+		}
+		return hitObjectArray;
 	}
 	,isInComponent: function(coordinate) {
 		if(this.isInScope(this.component.get_xPosition(),this.component.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition(),this.component.get_height(),this.component.get_width()) == true) {
@@ -4238,7 +4280,7 @@ com_mun_model_gates_GateAbstract.prototype = {
 			return false;
 		}
 	}
-	,findWorldPoint: function(coordinate,mode) {
+	,findWorldPoint: function(worldCoordinate,mode) {
 		return [];
 	}
 	,getInnerCircuitDiagram: function() {
@@ -5583,6 +5625,55 @@ com_mun_type_Coordinate.prototype = {
 	,__class__: com_mun_type_Coordinate
 	,__properties__: {set_yPosition:"set_yPosition",get_yPosition:"get_yPosition",set_xPosition:"set_xPosition",get_xPosition:"get_xPosition"}
 };
+var com_mun_type_HitObject = function() {
+};
+$hxClasses["com.mun.type.HitObject"] = com_mun_type_HitObject;
+com_mun_type_HitObject.__name__ = ["com","mun","type","HitObject"];
+com_mun_type_HitObject.prototype = {
+	circuitDiagram: null
+	,component: null
+	,link: null
+	,port: null
+	,endpoint: null
+	,hitNothing: function() {
+		if(this.component == null && this.link == null && this.port == null && this.endpoint == null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,get_circuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,set_circuitDiagram: function(value) {
+		return this.circuitDiagram = value;
+	}
+	,get_component: function() {
+		return this.component;
+	}
+	,set_component: function(value) {
+		return this.component = value;
+	}
+	,get_link: function() {
+		return this.link;
+	}
+	,set_link: function(value) {
+		return this.link = value;
+	}
+	,get_port: function() {
+		return this.port;
+	}
+	,set_port: function(value) {
+		return this.port = value;
+	}
+	,get_endpoint: function() {
+		return this.endpoint;
+	}
+	,set_endpoint: function(value) {
+		return this.endpoint = value;
+	}
+	,__class__: com_mun_type_HitObject
+};
 var com_mun_type_LinkAndComponentAndEndpointAndPortArray = function() {
 	this.linkArray = [];
 	this.componentArray = [];
@@ -5754,8 +5845,8 @@ com_mun_type_Object.prototype = {
 	,__properties__: {set_port:"set_port",get_port:"get_port",set_endPoint:"set_endPoint",get_endPoint:"get_endPoint",set_component:"set_component",get_component:"get_component",set_link:"set_link",get_link:"get_link"}
 };
 var com_mun_type_WorldPoint = function(circuitDiagram,coordinate) {
-	this.set_circuitDiagram(circuitDiagram);
-	this.set_coordinate(coordinate);
+	this.circuitDiagram = circuitDiagram;
+	this.coordinate = coordinate;
 };
 $hxClasses["com.mun.type.WorldPoint"] = com_mun_type_WorldPoint;
 com_mun_type_WorldPoint.__name__ = ["com","mun","type","WorldPoint"];
@@ -5775,7 +5866,6 @@ com_mun_type_WorldPoint.prototype = {
 		return this.coordinate = value;
 	}
 	,__class__: com_mun_type_WorldPoint
-	,__properties__: {set_coordinate:"set_coordinate",get_coordinate:"get_coordinate",set_circuitDiagram:"set_circuitDiagram",get_circuitDiagram:"get_circuitDiagram"}
 };
 var com_mun_view_drawComponents_DrawComponent = function() { };
 $hxClasses["com.mun.view.drawComponents.DrawComponent"] = com_mun_view_drawComponents_DrawComponent;

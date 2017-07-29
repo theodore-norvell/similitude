@@ -7,8 +7,8 @@ package com.mun.type;
 **/
 import com.mun.model.component.CircuitDiagram;
 class WorldPoint {
-    @:isVar var circuitDiagram(get, set):CircuitDiagram;
-    @:isVar var coordinate(get, set):Coordinate;
+    var circuitDiagram:CircuitDiagram;
+    var coordinate:Coordinate;
 
     public function new(circuitDiagram:CircuitDiagram, coordinate:Coordinate) {
         this.circuitDiagram = circuitDiagram;

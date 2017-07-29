@@ -1,4 +1,5 @@
 package com.mun.model.component;
+import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
@@ -156,7 +157,7 @@ interface CircuitDiagramI {
     /**
     * find the hit list
     **/
-    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray;
+    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>;
 
     /**
     * find the world points

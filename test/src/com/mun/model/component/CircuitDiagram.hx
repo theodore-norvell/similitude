@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -334,40 +335,31 @@ class CircuitDiagram implements CircuitDiagramI{
         }
     }
 
-    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
+        var hitObjectArray:Array<HitObject> = new Array<HitObject>();
+        var hitLinkArray:Array<HitObject> = new Array<HitObject>();
         for(i in linkArray){
-            var result:LinkAndComponentAndEndpointAndPortArray = i.findHitList(coordinate, mode) ;
+            hitLinkArray = i.findHitList(coordinate, mode);
+            for(j in hitLinkArray){
+                j.set_circuitDiagram(this);
 
-            for(j in result.get_linkIterator()){
-                linkAndComponentAndEndpointAndPortArray.addLink(j);
-            }
-
-            for(j in result.get_endpointIterator()){
-                linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
+                hitObjectArray.push(j);
             }
         }
 
+        var result:Array<HitObject> = new Array<HitObject>();
         for(i in componentArray){
-            var result:LinkAndComponentAndEndpointAndPortArray = i.findHitList(coordinate, mode) ;
+            result = i.findHitList(coordinate, mode) ;
 
-            for(j in result.get_linkIterator()){
-                linkAndComponentAndEndpointAndPortArray.addLink(j);
-            }
+            for(j in result){
+                if(j.get_circuitDiagram() == null){
+                    j.set_circuitDiagram(this);
 
-            for(j in result.get_endpointIterator()){
-                linkAndComponentAndEndpointAndPortArray.addEndpoint(j);
-            }
-
-            for(j in result.get_componentIterator()){
-                linkAndComponentAndEndpointAndPortArray.addComponent(j);
-            }
-
-            for(j in result.get_portIterator()){
-                linkAndComponentAndEndpointAndPortArray.addPort(j);
+                    hitObjectArray.push(j);
+                }
             }
         }
-        return linkAndComponentAndEndpointAndPortArray;
+        return hitObjectArray;
     }
 
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{

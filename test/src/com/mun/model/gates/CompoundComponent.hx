@@ -1,5 +1,6 @@
 package com.mun.model.gates;
-import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
+import com.mun.type.HitObject;
+import com.mun.type.WorldPoint;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.view.drawComponents.DrawCompoundComponent;
 import com.mun.model.component.CircuitDiagramI;
@@ -7,7 +8,6 @@ import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.BOX;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
-import com.mun.type.WorldPoint;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.model.component.Outport;
 import com.mun.model.enumeration.IOTYPE;
@@ -157,36 +157,44 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return transform;
     }
 
-    override public function findHitList(outerWorldCoordinates:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray : LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+    override public function findHitList(outerWorldCoordinates:Coordinate, mode:MODE):Array<HitObject>{
+        var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
         var hitComponent:Component = isInComponent(outerWorldCoordinates);
         if(hitComponent == null){
-            return linkAndComponentAndEndpointAndPortArray;
+            return hitObjectArray;
         }else if(component.get_boxType() == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
-            var result:LinkAndComponentAndEndpointAndPortArray = circuitDiagram.findHitList(innerWorldCoordinates, mode);
+            var result:Array<HitObject> = circuitDiagram.findHitList(innerWorldCoordinates, mode);
+            for(i in result){
+                i.set_circuitDiagram(circuitDiagram);
+            }
 
-            if(result.isEmpty() || mode == MODE.INCLUDE_PARENTS){
-                result.addComponent(component); }
+            if(result.length == 0 || mode == MODE.INCLUDE_PARENTS){
+                var hitObject:HitObject = new HitObject();
+                hitObject.set_component(component);
+                result.push(hitObject);
+            }
             return result;
         }else{
-            return linkAndComponentAndEndpointAndPortArray.addComponent(component);
+            var hitObject:HitObject = new HitObject();
+            hitObject.set_component(component);
+            return hitObjectArray.push(hitObject);
         }
     }
 
-    override public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
+    override public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
 
-        if(isInComponent(coordinate) == null){
-            return worldPointArray.push( coordinate );
+        if(isInComponent(worldCoordinate) == null){
+            return worldPointArray;
         }else if(component.get_boxType() == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
-            var wForDiagram:Coordinate = transform.pointInvert(coordinate);
-            return circuitDiagram.findWorldPoint(wForDiagram, mode);
+            var wForDiagram:Coordinate = transform.pointInvert(worldCoordinate);
+            return circuitDiagram.findWorldPoint(new WorldPoint(circuitDiagram, wForDiagram), mode);
         }else{
-            return worldPointArray.push( coordinate );
+            return worldPointArray;
         }
 
     }

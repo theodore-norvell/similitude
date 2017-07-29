@@ -1,12 +1,13 @@
 package com.mun.controller.command;
 
-import com.mun.controller.componentUpdate.CircuitDiagramUtil;
+import com.mun.type.Object;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import com.mun.model.component.Endpoint;
 import com.mun.model.component.Link;
 import com.mun.model.component.Port;
 import com.mun.model.component.CircuitDiagramI;
+import com.mun.global.Constant.*;
 /**
 * move component
 *
@@ -19,7 +20,6 @@ class MoveCommand implements Command {
     var xDisplacement:Float;
     var yDisplacement:Float;
     var circuitDiagram:CircuitDiagramI;
-    var circuitDiagramUtil:CircuitDiagramUtil;
 
     var recordComponentXpositionBeforeUndoArray:Array<Float> = new Array<Float>();//for component
     var recordComponentYpositionBeforeUndoArray:Array<Float> = new Array<Float>();//for component
@@ -63,7 +63,6 @@ class MoveCommand implements Command {
             this.linkAndComponentAndEndpointArray.addEndpoint(i);
         }
 
-        circuitDiagramUtil = new CircuitDiagramUtil(circuitDiagram);
         var i:Int = 0;
         if(linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0){
             for(j in linkAndComponentAndEndpointArray.get_componentIterator()){
@@ -232,7 +231,7 @@ class MoveCommand implements Command {
         var leftEndpointPort:Port = link.get_leftEndpoint().get_port();
         if(leftEndpointPort == null){
             var leftEndpointCoordinate:Coordinate = new Coordinate(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition());
-            var port_temp:Port = circuitDiagramUtil.isOnPort(leftEndpointCoordinate).get_port();
+            var port_temp:Port = isOnPort(leftEndpointCoordinate).get_port();
             if(port_temp != null && leftEndpointPort != port_temp){//left endpoint met a port
                 link.get_leftEndpoint().set_port(port_temp);
             }else if(port_temp == null){
@@ -243,7 +242,7 @@ class MoveCommand implements Command {
         var rightEndpointPort:Port = link.get_rightEndpoint().get_port();
         if(rightEndpointPort == null){
             var rightEndpointCoordinate:Coordinate = new Coordinate(link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
-            var port_temp:Port = circuitDiagramUtil.isOnPort(rightEndpointCoordinate).get_port();
+            var port_temp:Port = isOnPort(rightEndpointCoordinate).get_port();
             if(port_temp != null && rightEndpointPort != port_temp){//left endpoint met a port
                 link.get_rightEndpoint().set_port(port_temp);
             }else if(port_temp == null){
@@ -255,7 +254,7 @@ class MoveCommand implements Command {
 
     function endpointMeetPort(endpoint:Endpoint){
         var coordinate:Coordinate = new Coordinate(endpoint.get_xPosition(), endpoint.get_yPosition());
-        var newPort:Port = circuitDiagramUtil.isOnPort(coordinate).get_port();
+        var newPort:Port = isOnPort(coordinate).get_port();
         if(newPort != null){
             for(i in circuitDiagram.get_linkIterator()){
                 var port:Port = null;
@@ -291,6 +290,91 @@ class MoveCommand implements Command {
         for(i in circuitDiagram.get_linkIterator()){
             i.get_leftEndpoint().updatePosition();
             i.get_rightEndpoint().updatePosition();
+        }
+    }
+
+    /**
+    * verify this coordinate on port or not
+    * @param coordinate
+    * @return if the coordinate on the port then return the port
+    *           or  return null;
+    **/
+    public function isOnPort(cooridnate:Coordinate):Object{
+        var object:Object = new Object();
+        for(i in circuitDiagram.get_componentIterator()){
+            for(j in i.get_inportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    object.set_port(j);
+                    for(k in circuitDiagram.get_linkIterator()){
+                        object.set_endPoint(isLinkOnPort(k,j));
+                        return object;
+                    }
+                }
+            }
+            for(j in i.get_outportIterator()){
+                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+                    //the mouse on the port
+                    //verify is there any link link to this port
+                    object.set_port(j);
+                    for(k in circuitDiagram.get_linkIterator()){
+                        object.set_endPoint(isLinkOnPort(k,j));
+                        return object;
+                    }
+                }
+            }
+        }
+        return object;
+    }
+
+    /**
+    * verify the link on the port or not
+     * @param link
+     * @param port
+     * @return endpoint   if one of the endpoint on the port, then return this endpoint
+     *                          or return null
+    **/
+    function isLinkOnPort(link:Link, port:Port):Endpoint{
+        var endpoint:Endpoint = null;
+        //if this port has a endpoint (left)
+        if(isEndpointOnPort(link.get_leftEndpoint(), port)){
+            endpoint = link.get_leftEndpoint();
+        }
+        //if this port has a endpoint (right)
+        if(isEndpointOnPort(link.get_rightEndpoint(), port)){
+            endpoint = link.get_rightEndpoint();
+        }
+        return endpoint;
+    }
+
+    /**
+    * verify a point is in a circuit or not
+     * @param coordinate     the point need to be verified
+     * @param orignalXPosition   the circuit x position
+     * @param orignalYPosition   the circuit y position
+     * @return if in the circle, return true; otherwise, return false;
+    **/
+    function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
+        //the radius is 3
+        if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+    * verify the endpoint on the port or not
+     * @param endpoint
+     * @param port
+     * @return Bool   if the endpoint on the port, return true; otherwise, return false;
+    **/
+    function isEndpointOnPort(endpoint:Endpoint, port:Port):Bool{
+        if(endpoint.get_xPosition() == port.get_xPosition() && endpoint.get_yPosition() == port.get_yPosition()){
+            return true;
+        }else{
+            return false;
         }
     }
 }

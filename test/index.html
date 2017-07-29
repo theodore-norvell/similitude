@@ -104,28 +104,22 @@
             </div>
             <div class="col-sm-2 col-md-2 col-lg-2">
                 <span class="input-group-addon">Circuit Diagram Name:</span>
-                <input type="text" class="form-control input-lg" placeholder="Search CircuitDiagram" id="nameofcd"/>
-                <div class="alert alert-success alert-dismissible" role="alert" style="display: none" id="cd_rename_success">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <strong>Success!</strong>.
-                </div>
-                <div class="alert alert-danger alert-dismissible" role="alert" style="display: none" id="cd_rename_failed">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <strong>Failed</strong> Is not a valid name.
+                <div class="form-group has-feedback" id="nameofcddiv">
+                    <label class="control-label" for="nameofcd" id="nameofcdlabel"></label>
+                    <input type="text" class="form-control" id="nameofcd" aria-describedby="inputStatus">
+                    <span class="glyphicon form-control-feedback" aria-hidden="true" id="nameofcdspan1"></span>
+                    <span id="inputStatus" class="sr-only"></span>
                 </div>
             </div>
             </div>
             <div class="col-md-6">
-
                     <div class="input-group col-md-12">
                         <input type="text" class="form-control input-lg" placeholder="Search CircuitDiagram" id="search_circuitdiagram"/>
                     </div>
                 <div>
                     <ul id="circuitDiagramHintList" style="display: none;">
                         <!-- search hint list -->
-                        <li>1</li>
-                        <li>2</li>
-                        <li>3</li>
+
                     </ul>
                 </div>
             </div>

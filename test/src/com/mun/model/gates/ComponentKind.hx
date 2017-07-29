@@ -1,11 +1,11 @@
 package com.mun.model.gates;
 
+import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
-import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.model.component.Port;
@@ -101,12 +101,12 @@ interface ComponentKind {
     /**
     * find the hit list
     **/
-    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray;
+    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>;
 
     /**
     * find world point
     **/
-    public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
+    public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 
     /**
     * this function just use for compound component

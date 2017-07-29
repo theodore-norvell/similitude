@@ -1,11 +1,11 @@
 package com.mun.model.gates;
+import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
-import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.Inport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.ORIENTATION;
@@ -115,14 +115,24 @@ class GateAbstract{
         return portArray;
     }
 
-    public function findHitList(coordinate:Coordinate, mode:MODE):LinkAndComponentAndEndpointAndPortArray{
-        var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
+        var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
-        linkAndComponentAndEndpointAndPortArray.addComponent(isInComponent(coordinate));
+        var component:Component = isInComponent(coordinate);
+        if(component != null){
+            var hitObject:HitObject = new HitObject();
+            hitObject.set_component(component);
+            hitObjectArray.push(hitObject);
+        }
 
-        linkAndComponentAndEndpointAndPortArray.addPort(isOnPort(coordinate));
+        var port:Port = isOnPort(coordinate);
+        if(port != null){
+            var hitObject:HitObject = new HitObject();
+            hitObject.set_port(port);
+            hitObjectArray.push(hitObject);
+        }
 
-        return linkAndComponentAndEndpointAndPortArray;
+        return hitObjectArray;
     }
 
     /**
@@ -203,9 +213,9 @@ class GateAbstract{
     }
 
     /**
-    * for all component kinds except, find world point always return a empty list
+    * for all component kinds except compound component, find world point always return a empty list
     **/
-    public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
+    public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         return new Array<WorldPoint>();
     }
 
