@@ -169,5 +169,5 @@ interface CircuitDiagramI {
     **/
     public function isEmpty():Bool;
 
-    public function createXML():Xml;
+    public function createJSon():String;
 }

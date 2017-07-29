@@ -59,5 +59,5 @@ interface Port {
     **/
     public function set_sequence(sequence:Int):Void;
 
-    public function createXML():Xml;
+    public function createJSon():String;
 }

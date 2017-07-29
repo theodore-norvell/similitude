@@ -52,17 +52,10 @@ class Endpoint {
         }
     }
 
-    public function createXML():Xml{
-        var endpointXML:Xml = Xml.createElement("Endpoint");
-
-        var xPositionXML:Xml = Xml.createElement("xPosition");
-        endpointXML.addChild(xPositionXML);
-        xPositionXML.addChild(Xml.createPCData(xPosition + ""));
-
-        var yPositionXML:Xml = Xml.createElement("yPosition");
-        endpointXML.addChild(yPositionXML);
-        yPositionXML.addChild(Xml.createPCData(yPosition + ""));
-
-        return endpointXML;
+    public function createJSon():String{
+        var jsonString:String = "{ \"xPosition\": \"" + this.xPosition + "\",";
+        jsonString += "\"yPosition\": \"" + this.yPosition + "\"";
+        jsonString += "}";
+        return jsonString;
     }
 }

@@ -56,24 +56,13 @@ class Outport implements Port {
         portDescription = IOTYPE.OUTPUT;
     }
 
-    public function createXML():Xml{
-        var OutportXML:Xml = Xml.createElement("Outport");
-        var xPositionXML:Xml = Xml.createElement("xPosition");
-        OutportXML.addChild(xPositionXML);
-        xPositionXML.addChild(Xml.createPCData(xPosition + ""));
-
-        var yPositionXML:Xml = Xml.createElement("yPosition");
-        OutportXML.addChild(yPositionXML);
-        yPositionXML.addChild(Xml.createPCData(yPosition + ""));
-
-        var portDescriptionXML:Xml = Xml.createElement("portDescription");
-        OutportXML.addChild(portDescriptionXML);
-        portDescriptionXML.addChild(Xml.createPCData(portDescription + ""));
-
-        var sequenceXML:Xml = Xml.createElement("sequence");
-        OutportXML.addChild(sequenceXML);
-        sequenceXML.addChild(Xml.createPCData(sequence + ""));
-
-        return OutportXML;
+    public function createJSon():String{
+        var jsonString:String = "{ \"xPosition\": \"" + this.xPosition + "\",";
+        jsonString += "\"yPosition\": \"" + this.yPosition + "\",";
+        jsonString += "\"portDescription\": \"" + this.portDescription + "\",";
+        jsonString += "\"value\": \"" + this.value + "\",";
+        jsonString += "\"sequence\": \"" + this.sequence + "\"";
+        jsonString += "}";
+        return jsonString;
     }
 }

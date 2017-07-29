@@ -116,5 +116,5 @@ interface ComponentKind {
     /**
     * create xml file
     **/
-    public function createXML():Xml;
+    public function createJSon():String;
 }

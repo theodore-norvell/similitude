@@ -223,12 +223,10 @@ class GateAbstract{
         return null;//for most of the componentkind it has no circuit diagram inside, except compound component
     }
 
-    public function createXML():Xml{
-        var componentKindXML:Xml = Xml.createElement("Component Kind");//root
+    public function createJSon():String{
+        var jsonString:String = "{ \"leastInportNum\": \"" + this.leastInportNum + "\",";
+        jsonString += "\"sequence\": \"" + this.sequence + "\"}";
 
-        var sequenceXML:Xml = Xml.createElement("sequence");
-        componentKindXML.addChild(sequenceXML);
-        sequenceXML.addChild(Xml.createPCData(sequence + ""));
-        return componentKindXML;
+        return jsonString;
     }
 }

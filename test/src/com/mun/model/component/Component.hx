@@ -6,7 +6,6 @@ import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
-import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.ORIENTATION;
@@ -195,62 +194,39 @@ class Component {
         return componentKind.findWorldPoint(coordinate, mode);
     }
 
-    public function createXML():Xml{
-        var componentXML:Xml = Xml.createElement("Component");//root
+    public function createJSon():String{
+        var jsonString:String = "{ \"name\": \"" + this.name + "\",";
+        jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
+        jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
+        jsonString += " \"height\": \"" + this.height + "\",";
+        jsonString += " \"width\": \"" + this.width + "\",";
+        jsonString += " \"orientation\": \"" + this.orientation + "\",";
+        jsonString += " \"delay\": \"" + this.delay + "\",";
+        jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
+        jsonString += " \"nameOfTheComponentKind\": \"" + this.nameOfTheComponentKind + "\",";
 
-        var xPositionXML:Xml = Xml.createElement("xPosition");
-        componentXML.addChild(xPositionXML);
-        xPositionXML.addChild(Xml.createPCData(xPosition + ""));
+        jsonString += "\"componentKind\":";
+        jsonString += componentKind.createJSon();
+        jsonString += ",";
 
-        var yPositionXML:Xml = Xml.createElement("yPosition");
-        componentXML.addChild(yPositionXML);
-        yPositionXML.addChild(Xml.createPCData(yPosition + ""));
-
-        var heightXML:Xml = Xml.createElement("height");
-        componentXML.addChild(heightXML);
-        heightXML.addChild(Xml.createPCData(height + ""));
-
-        var widthXML:Xml = Xml.createElement("width");
-        componentXML.addChild(widthXML);
-        widthXML.addChild(Xml.createPCData(width + ""));
-
-        var orientationXML:Xml = Xml.createElement("orientation");
-        componentXML.addChild(orientationXML);
-        orientationXML.addChild(Xml.createPCData(orientation + ""));
-
-        var nameXML:Xml = Xml.createElement("name");
-        componentXML.addChild(nameXML);
-        nameXML.addChild(Xml.createPCData(name));
-
-        var delayXML:Xml = Xml.createElement("delay");
-        componentXML.addChild(delayXML);
-        delayXML.addChild(Xml.createPCData(delay + ""));
-
-        var inportsNumXML:Xml = Xml.createElement("inportsNum");
-        componentXML.addChild(inportsNumXML);
-        inportsNumXML.addChild(Xml.createPCData(inportsNum + ""));
-
-        var nameOfTheComponentKindXML:Xml = Xml.createElement("nameOfTheComponentKind");
-        componentXML.addChild(nameOfTheComponentKindXML);
-        nameOfTheComponentKindXML.addChild(Xml.createPCData(nameOfTheComponentKind));
-
-        var boxTypeXML:Xml = Xml.createElement("boxType");
-        componentXML.addChild(boxTypeXML);
-        boxTypeXML.addChild(Xml.createPCData(boxType + ""));
-
-        var inportArrayXML:Xml = Xml.createElement("inport Array");
-        componentXML.addChild(inportArrayXML);
-        for(i in inportArray){
-            componentXML.addChild(i.createXML());
+        jsonString += "\"inportArray\":[";
+        for(i in 0...inportArray.length){
+            jsonString += inportArray[i].createJSon();
+            if(i != inportArray.length -1){
+                jsonString += ",";
+            }
         }
+        jsonString += "],";
 
-        var outportArrayXML:Xml = Xml.createElement("outport Array");
-        componentXML.addChild(outportArrayXML);
-        for(i in outportArray){
-            componentXML.addChild(i.createXML());
+        jsonString += "\"outportArray\":[";
+        for(i in 0...outportArray.length){
+            jsonString += outportArray[i].createJSon();
+            if(i != outportArray.length -1){
+                jsonString += ",";
+            }
         }
+        jsonString += "]}";
 
-        componentXML.addChild(componentKind.createXML());
-        return componentXML;
+        return jsonString;
     }
 }

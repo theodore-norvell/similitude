@@ -1258,7 +1258,7 @@ com_mun_model_drawingInterface_DrawingAdapterI.prototype = {
 	,drawLine: null
 	,__class__: com_mun_model_drawingInterface_DrawingAdapterI
 };
-var com_mun_model_enumeration_IOTYPE = $hxClasses["com.mun.model.enumeration.IOTYPE"] = { __ename__ : ["com","mun","model","enumeration","IOTYPE"], __constructs__ : ["INPUT","S","D","CLK","OUTPUT","Q","QN"] };
+var com_mun_model_enumeration_IOTYPE = $hxClasses["com.mun.controller.enumeration.IOTYPE"] = { __ename__ : ["com","mun","model","enumeration","IOTYPE"], __constructs__ : ["INPUT","S","D","CLK","OUTPUT","Q","QN"] };
 com_mun_model_enumeration_IOTYPE.INPUT = ["INPUT",0];
 com_mun_model_enumeration_IOTYPE.INPUT.toString = $estr;
 com_mun_model_enumeration_IOTYPE.INPUT.__enum__ = com_mun_model_enumeration_IOTYPE;
@@ -1281,7 +1281,7 @@ com_mun_model_enumeration_IOTYPE.QN = ["QN",6];
 com_mun_model_enumeration_IOTYPE.QN.toString = $estr;
 com_mun_model_enumeration_IOTYPE.QN.__enum__ = com_mun_model_enumeration_IOTYPE;
 com_mun_model_enumeration_IOTYPE.__empty_constructs__ = [com_mun_model_enumeration_IOTYPE.INPUT,com_mun_model_enumeration_IOTYPE.S,com_mun_model_enumeration_IOTYPE.D,com_mun_model_enumeration_IOTYPE.CLK,com_mun_model_enumeration_IOTYPE.OUTPUT,com_mun_model_enumeration_IOTYPE.Q,com_mun_model_enumeration_IOTYPE.QN];
-var com_mun_model_enumeration_Orientation = $hxClasses["com.mun.model.enumeration.Orientation"] = { __ename__ : ["com","mun","model","enumeration","Orientation"], __constructs__ : ["NORTH","SOUTH","WEST","EAST"] };
+var com_mun_model_enumeration_Orientation = $hxClasses["com.mun.controller.enumeration.Orientation"] = { __ename__ : ["com","mun","model","enumeration","Orientation"], __constructs__ : ["NORTH","SOUTH","WEST","EAST"] };
 com_mun_model_enumeration_Orientation.NORTH = ["NORTH",0];
 com_mun_model_enumeration_Orientation.NORTH.toString = $estr;
 com_mun_model_enumeration_Orientation.NORTH.__enum__ = com_mun_model_enumeration_Orientation;
@@ -1295,7 +1295,7 @@ com_mun_model_enumeration_Orientation.EAST = ["EAST",3];
 com_mun_model_enumeration_Orientation.EAST.toString = $estr;
 com_mun_model_enumeration_Orientation.EAST.__enum__ = com_mun_model_enumeration_Orientation;
 com_mun_model_enumeration_Orientation.__empty_constructs__ = [com_mun_model_enumeration_Orientation.NORTH,com_mun_model_enumeration_Orientation.SOUTH,com_mun_model_enumeration_Orientation.WEST,com_mun_model_enumeration_Orientation.EAST];
-var com_mun_model_enumeration_ValueLogic = $hxClasses["com.mun.model.enumeration.ValueLogic"] = { __ename__ : ["com","mun","model","enumeration","ValueLogic"], __constructs__ : ["FALSE","TRUE","UNDEFINED","RISING_EDGE","DOWN_EDGE"] };
+var com_mun_model_enumeration_ValueLogic = $hxClasses["com.mun.controller.enumeration.ValueLogic"] = { __ename__ : ["com","mun","model","enumeration","ValueLogic"], __constructs__ : ["FALSE","TRUE","UNDEFINED","RISING_EDGE","DOWN_EDGE"] };
 com_mun_model_enumeration_ValueLogic.FALSE = ["FALSE",0];
 com_mun_model_enumeration_ValueLogic.FALSE.toString = $estr;
 com_mun_model_enumeration_ValueLogic.FALSE.__enum__ = com_mun_model_enumeration_ValueLogic;

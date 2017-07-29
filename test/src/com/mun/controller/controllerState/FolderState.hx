@@ -1,7 +1,6 @@
 package com.mun.controller.controllerState;
 
 import js.jquery.JQuery;
-import js.jquery.JQuery;
 import js.Browser;
 import js.html.DOMElement;
 import com.mun.controller.componentUpdate.UpdateCanvas;

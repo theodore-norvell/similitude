@@ -173,10 +173,11 @@ class Link{
         return lineLength;
     }
 
-    public function createXML():Xml{
-        var linkXML:Xml = Xml.createElement("Link");
-        linkXML.addChild(leftEndpoint.createXML());
-        linkXML.addChild(rightEndpoint.createXML());
-        return linkXML;
+    public function createJSon():String{
+        var jsonString:String = "{ \"leftEndpoint\": " + leftEndpoint.createJSon() + ",";
+        jsonString += "\"rightEndpoint\": " + rightEndpoint.createJSon();
+        jsonString += "}";
+
+        return jsonString;
     }
 }

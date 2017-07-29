@@ -1,8 +1,8 @@
 package com.mun.controller.controllerState;
 
+import haxe.Json;
 import com.mun.model.component.Component;
 import com.mun.type.HitObject;
-import com.mun.model.component.Port;
 import com.mun.type.WorldPoint;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
@@ -292,6 +292,7 @@ class ControllerCanvasContext {
                 if(!(keyState.get_key() == KEY.ALT_KEY && keyState.get_keyState() == K_STATE.KEY_DOWN)){
                     linkAndComponentAndEndpointAndPortArray.clean();
                 }
+//                Json.parse(Json.stringify(circuitDiagram.createJSon()));
             };
             case C_STATE.CREATE_COMPONENT : {
                 updateCircuitDiagram.createComponentByCommand(sideBar.getComponent());

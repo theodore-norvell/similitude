@@ -198,4 +198,13 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }
 
     }
+
+    override public function createJSon():String{
+        var jsonString:String = "{ \"leastInportNum\": \"" + this.leastInportNum + "\",";
+        jsonString += "\"sequence\": \"" + this.sequence + "\",";
+        jsonString += "\"CircuitDiagram\": " + circuitDiagram.createJSon();
+        jsonString += "}";
+
+        return jsonString;
+    }
 }

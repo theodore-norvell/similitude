@@ -386,48 +386,34 @@ class CircuitDiagram implements CircuitDiagramI{
         }
     }
 
-    public function createXML():Xml{
-        var circuitDiagramXML:Xml = Xml.createElement("Circuit Diagram");//root
+    public function createJSon():String{
+        var jsonString:String = "{ \"name\": \"" + this.name + "\",";
+        jsonString += "\"diagramWidth\": \"" + this.diagramWidth + "\",";
+        jsonString += "\"diagramHeight\": \"" + this.diagramHeight + "\",";
+        jsonString += "\"margin\": \"" + this.margin + "\",";
+        jsonString += "\"leastWidthAndHeight\": \"" + this.leastWidthAndHeight + "\",";
+        jsonString += "\"xMin\": \"" + this.xMin + "\",";
+        jsonString += "\"yMin\": \"" + this.yMin + "\",";
+        jsonString += "\"xMax\": \"" + this.xMax + "\",";
+        jsonString += "\"yMax\": \"" + this.yMax + "\",";
 
-        var nameXML:Xml = Xml.createElement("name");
-        circuitDiagramXML.addChild(nameXML);
-        nameXML.addChild(Xml.createPCData(name));
-
-        var diagramWidthXML:Xml = Xml.createElement("diagramWidth");
-        circuitDiagramXML.addChild(diagramWidthXML);
-        diagramWidthXML.addChild(Xml.createPCData(diagramWidth + ""));
-
-        var diagramHeightXML:Xml = Xml.createElement("diagramHeight");
-        circuitDiagramXML.addChild(diagramHeightXML);
-        diagramHeightXML.addChild(Xml.createPCData(diagramHeight + ""));
-
-        var xMinXML:Xml = Xml.createElement("xMin");
-        circuitDiagramXML.addChild(xMinXML);
-        xMinXML.addChild(Xml.createPCData(xMin + ""));
-
-        var xMaxXML:Xml = Xml.createElement("xMax");
-        circuitDiagramXML.addChild(xMaxXML);
-        xMaxXML.addChild(Xml.createPCData(xMax + ""));
-
-        var yMinXML:Xml = Xml.createElement("xMax");
-        circuitDiagramXML.addChild(yMinXML);
-        yMinXML.addChild(Xml.createPCData(yMin + ""));
-
-        var yMaxXML:Xml = Xml.createElement("yMax");
-        circuitDiagramXML.addChild(yMaxXML);
-        yMaxXML.addChild(Xml.createPCData(yMax + ""));
-
-        var componentArrayXML:Xml = Xml.createElement("Component Array");
-        circuitDiagramXML.addChild(componentArrayXML);
-        for(i in componentArray){
-            circuitDiagramXML.addChild(i.createXML());
+        jsonString += "\"ComponentArray\":[";
+        for(i in 0...componentArray.length){
+            jsonString += componentArray[i].createJSon();
+            if(i != componentArray.length -1){
+                jsonString += ",";
+            }
         }
+        jsonString += "],";
 
-        var linkArrayXML:Xml = Xml.createElement("Link Array");
-        circuitDiagramXML.addChild(linkArrayXML);
-        for(i in linkArray){
-            circuitDiagramXML.addChild(i.createXML());
+        jsonString += "\"LinkArray\":[";
+        for(i in 0...linkArray.length){
+            jsonString += linkArray[i].createJSon();
+            if(i != linkArray.length -1){
+                jsonString += ",";
+            }
         }
-        return circuitDiagramXML;
+        jsonString += "]}";
+        return jsonString;
     }
 }
