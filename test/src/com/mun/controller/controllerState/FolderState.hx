@@ -1,5 +1,9 @@
 package com.mun.controller.controllerState;
 
+import js.Browser;
+import js.html.Blob;
+import js.html.URL;
+import haxe.Json;
 import js.jquery.JQuery;
 import js.Browser;
 import js.html.DOMElement;
@@ -60,24 +64,35 @@ class FolderState {
             currentState = F_STATE.NEXT;
             checkState();
         };
-        new JQuery(Browser.document.getElementById("search_circuitdiagram")).bind('input porpertychange', function(){
+        new JQuery("#search_circuitdiagram").bind('input porpertychange', function(){
             searchName = new JQuery(Browser.document.getElementById("search_circuitdiagram")).val();
 
             currentState = F_STATE.SEARCH;
             checkState();
         });
-        new JQuery(Browser.document.getElementById("nameofcd")).bind('input porpertychange', function(){
-                var success:Bool = folder.changeCircuitDiagramName(circuitDiagram.get_name(),new JQuery(Browser.document.getElementById("nameofcd")).val(), circuitDiagram);
-                if(success){
-                    new JQuery(Browser.document.getElementById("nameofcddiv")).removeClass("has-error").addClass("has-success");
-                    Browser.document.getElementById("nameofcdlabel").innerText = "Success!";
-                    new JQuery(Browser.document.getElementById("nameofcdspan1")).removeClass("glyphicon-remove").addClass("glyphicon-ok");
-                }else{
-                    new JQuery(Browser.document.getElementById("nameofcddiv")).removeClass("has-success").addClass("has-error");
-                    Browser.document.getElementById("nameofcdlabel").innerText = "Failed!";
-                    new JQuery(Browser.document.getElementById("nameofcdspan1")).removeClass("glyphicon-ok").addClass("glyphicon-remove");
-                }
+        new JQuery("#nameofcd").bind('input porpertychange', function(){
+            var success:Bool = folder.changeCircuitDiagramName(circuitDiagram.get_name(),new JQuery(Browser.document.getElementById("nameofcd")).val(), circuitDiagram);
+            if(success){
+                new JQuery("#nameofcddiv").removeClass("has-error").addClass("has-success");
+                Browser.document.getElementById("nameofcdlabel").innerText = "Success!";
+                new JQuery("#nameofcdspan1").removeClass("glyphicon-remove").addClass("glyphicon-ok");
+            }else{
+                new JQuery("#nameofcddiv").removeClass("has-success").addClass("has-error");
+                Browser.document.getElementById("nameofcdlabel").innerText = "Failed!";
+                new JQuery("#nameofcdspan1").removeClass("glyphicon-ok").addClass("glyphicon-remove");
+            }
         });
+
+        Browser.document.getElementById("download").onclick = function(){
+            var blob:Blob = new Blob([Json.stringify(circuitDiagram.createJSon())], {type: "application/json"});
+            var a:DOMElement = Browser.document.createAnchorElement();
+            var url = URL.createObjectURL(blob);
+            var filename = circuitDiagram.get_name()+'.json';
+            a.setAttribute("href", url);
+            a.setAttribute("download", filename);
+            a.click();
+            URL.revokeObjectURL(url);
+        };
     }
 
     function checkState(){
@@ -129,9 +144,9 @@ class FolderState {
                 currentIndex = circuitDiagramArray.length - 1;
 
                 //reset the alert
-                new JQuery(Browser.document.getElementById("nameofcddiv")).removeClass("has-error").removeClass("has-success");
+                new JQuery("#nameofcddiv").removeClass("has-error").removeClass("has-success");
                 Browser.document.getElementById("nameofcdlabel").innerText = "";
-                new JQuery(Browser.document.getElementById("nameofcdspan1")).removeClass("glyphicon-remove").removeClass("glyphicon-ok");
+                new JQuery("#nameofcdspan1").removeClass("glyphicon-remove").removeClass("glyphicon-ok");
 
                 currentState = F_STATE.CURRENT;
 

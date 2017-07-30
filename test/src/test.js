@@ -2206,7 +2206,6 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			if(!(this.keyState.get_key() == com_mun_model_enumeration_KEY.ALT_KEY && this.keyState.get_keyState() == com_mun_model_enumeration_K_$STATE.KEY_DOWN)) {
 				this.linkAndComponentAndEndpointAndPortArray.clean();
 			}
-			haxe_Log.trace(JSON.parse(JSON.stringify(this.circuitDiagram.createJSon())),{ fileName : "ControllerCanvasContext.hx", lineNumber : 295, className : "com.mun.controller.controllerState.ControllerCanvasContext", methodName : "checkState"});
 			break;
 		case 1:
 			this.updateCircuitDiagram.createComponentByCommand(this.sideBar.getComponent());
@@ -2279,24 +2278,34 @@ var com_mun_controller_controllerState_FolderState = function() {
 		_gthis.currentState = com_mun_model_enumeration_F_$STATE.NEXT;
 		_gthis.checkState();
 	};
-	$(window.document.getElementById("search_circuitdiagram")).bind("input porpertychange",function() {
+	$("#search_circuitdiagram").bind("input porpertychange",function() {
 		var tmp = window.document.getElementById("search_circuitdiagram");
 		_gthis.searchName = $(tmp).val();
 		_gthis.currentState = com_mun_model_enumeration_F_$STATE.SEARCH;
 		_gthis.checkState();
 	});
-	$(window.document.getElementById("nameofcd")).bind("input porpertychange",function() {
+	$("#nameofcd").bind("input porpertychange",function() {
 		var success = _gthis.folder.changeCircuitDiagramName(_gthis.circuitDiagram.get_name(),$(window.document.getElementById("nameofcd")).val(),_gthis.circuitDiagram);
 		if(success) {
-			$(window.document.getElementById("nameofcddiv")).removeClass("has-error").addClass("has-success");
+			$("#nameofcddiv").removeClass("has-error").addClass("has-success");
 			window.document.getElementById("nameofcdlabel").innerText = "Success!";
-			$(window.document.getElementById("nameofcdspan1")).removeClass("glyphicon-remove").addClass("glyphicon-ok");
+			$("#nameofcdspan1").removeClass("glyphicon-remove").addClass("glyphicon-ok");
 		} else {
-			$(window.document.getElementById("nameofcddiv")).removeClass("has-success").addClass("has-error");
+			$("#nameofcddiv").removeClass("has-success").addClass("has-error");
 			window.document.getElementById("nameofcdlabel").innerText = "Failed!";
-			$(window.document.getElementById("nameofcdspan1")).removeClass("glyphicon-ok").addClass("glyphicon-remove");
+			$("#nameofcdspan1").removeClass("glyphicon-ok").addClass("glyphicon-remove");
 		}
 	});
+	window.document.getElementById("download").onclick = function() {
+		var blob = new Blob([JSON.stringify(_gthis.circuitDiagram.createJSon())],{ type : "application/json"});
+		var a = window.document.createElement("a");
+		var url = URL.createObjectURL(blob);
+		var filename = _gthis.circuitDiagram.get_name() + ".json";
+		a.setAttribute("href",url);
+		a.setAttribute("download",filename);
+		a.click();
+		URL.revokeObjectURL(url);
+	};
 };
 $hxClasses["com.mun.controller.controllerState.FolderState"] = com_mun_controller_controllerState_FolderState;
 com_mun_controller_controllerState_FolderState.__name__ = ["com","mun","controller","controllerState","FolderState"];
@@ -2345,9 +2354,9 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			this.createATotallyNewCircuitDiagram();
 			this.circuitDiagramArray.push(this.circuitDiagram);
 			this.currentIndex = this.circuitDiagramArray.length - 1;
-			$(window.document.getElementById("nameofcddiv")).removeClass("has-error").removeClass("has-success");
+			$("#nameofcddiv").removeClass("has-error").removeClass("has-success");
 			window.document.getElementById("nameofcdlabel").innerText = "";
-			$(window.document.getElementById("nameofcdspan1")).removeClass("glyphicon-remove").removeClass("glyphicon-ok");
+			$("#nameofcdspan1").removeClass("glyphicon-remove").removeClass("glyphicon-ok");
 			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 			this.checkState();
 			break;
@@ -7564,15 +7573,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };
