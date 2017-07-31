@@ -1,11 +1,11 @@
 package com.mun.controller.controllerState;
 
+import haxe.Json;
+import js.html.FileReader;
 import js.Browser;
 import js.html.Blob;
 import js.html.URL;
-import haxe.Json;
 import js.jquery.JQuery;
-import js.Browser;
 import js.html.DOMElement;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateToolBar;
@@ -92,6 +92,21 @@ class FolderState {
             a.setAttribute("download", filename);
             a.click();
             URL.revokeObjectURL(url);
+        };
+
+        Browser.document.getElementById("import").onclick = function(){
+            var files = untyped document.getElementById('selectFiles').files;
+
+            var fr:FileReader = new FileReader();
+
+            fr.onload = function(e) {
+                var result = Json.parse(e.target.result);
+                var formatted = Json.stringify(result, null, "2");
+                formatted = Json.parse(formatted);
+                Browser.window.console.log(formatted);
+            }
+
+            fr.readAsText(files.item(0));
         };
     }
 

@@ -2306,6 +2306,17 @@ var com_mun_controller_controllerState_FolderState = function() {
 		a.click();
 		URL.revokeObjectURL(url);
 	};
+	window.document.getElementById("import").onclick = function() {
+		var files = document.getElementById("selectFiles").files;
+		var fr = new FileReader();
+		fr.onload = function(e) {
+			var result = JSON.parse(e.target.result);
+			var formatted = JSON.stringify(result,null,"2");
+			formatted = JSON.parse(formatted);
+			window.console.log(formatted);
+		};
+		fr.readAsText(files.item(0));
+	};
 };
 $hxClasses["com.mun.controller.controllerState.FolderState"] = com_mun_controller_controllerState_FolderState;
 com_mun_controller_controllerState_FolderState.__name__ = ["com","mun","controller","controllerState","FolderState"];
