@@ -76,38 +76,48 @@
 <h2>Domain model and definitions</h2>
 <dl>
   <dt>Circuit</dt>
-  <dd>A circuit is&nbsp;a named arrangement of components and links. Copies of circuits exist on one or more clients and on the server</dd>
+  <dd>A circuit is&nbsp;a named arrangement of components and links. Copies of circuits exist on one or more clients and on the server. Each Circuit&nbsp;has a unique name.</dd>
   <dt>Component</dt>
-  <dd>A&nbsp; component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of attributes that can be edited. Attributes of components include a position (x,y), size (w, h),  orientation.&nbsp; (North, South, East, West), and flip (Up or Down). Depending on the component kind, components may have other attributes. For example, a component whose kind is and-gate would have attribute indicating the number of inputs. A component whose component kind is compound&nbsp;has an attribute saying whether it is white-box or black-box.&nbsp; Most primitive components have an attribute for the delay.&nbsp; A flip-flop component might have attributes for set-up and hold times. (Implementation note: the state of a Component does not include any information associated with Simulations.)</dd>
+  <dd>A&nbsp; component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of Attributes that can be edited.(Implementation note: the state of a Component does not include any information associated with Simulations.)  </dd>
   <dt>Component kind</dt>
-  <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound components, q.v.)</dd>
+  <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound Component Kind, q.v.)</dd>
   <dt>Primitive Component&nbsp;Kind</dt>
-  <dd>Primitive component kinds&nbsp;are things such and gate, not&nbsp;gates, adders,&nbsp;etc., that are build in.</dd>
+  <dd>Primitive component kinds&nbsp;are things such and gates, not&nbsp;gates, adders,&nbsp;flip-flops, that are build in.&nbsp; Primitive components also include input terminals, output terminals and </dd>
   <dt>Compound Component Kind</dt>
-  <dd>Compound component kinds are little other than references to circuits. For each Circuit there is a corresponding component kind.&nbsp; When the circuit&nbsp;that a compound component refers to changes, the compound component kind changes implicitly. See discussion below: in <a href="onCompoundComponentKinds">section On Compound Component Kinds.</a> </dd>
+  <dd>Compound component kinds are little other than references to circuits. For each Circuit there is a corresponding component kind.&nbsp; When the circuit&nbsp;that a compound component refers to changes, the compound component kind changes implicitly. See discussion below: in <a href="onCompoundComponentKinds">section On Compound Component Kinds.</a> A component whose kind is a white box compound component kind&nbsp;is displayed by displaying the circuit inside the outline of the component. If c is the component and its kind's circuit is d, then c is displayed as a black rectangle and inside the rectangle the components and links of d are drawn, scaled, translated, and rotated appropriately.&nbsp; Assuming no rotation, the scaling and translating is such that the top left corner of d (d.minX, d.minY) maps to the top-left corner of c&nbsp;and the bottom right corner of d (d.maxX, d.maxY) maps to the bottom-right corner of c.&nbsp;If the orientation of c is not East, then these corners change appropriately.</dd>
+  <dt>Attribute;</dt>
+  <dd>Attributes of components include a position (x,y), size (w, h),  orientation.  (North, South, East, West), and flip (Up or Down). Depending on the component kind, components may have other attributes. The set of Attributes that a component has and the types of those attributes is determined by the component's Kind. For example, a component whose kind is and-gate would have attribute indicating the number of inputs (a nonnegative number) and a propagation delay (a time).  A component whose kind is D-flip-flop would have a propagation time, a set-up time, and a hold-time (all of type time). A component whose component kind is compound has an attribute saying whether it is white-box or black-box (boolean).</dd>
   <dt>Port</dt>
-  <dd>A Port is the representation of an input or output to a component. Each Port is associated with a component.&nbsp; Each Port is either an in port or an outport.&nbsp; Ports may have names.&nbsp;The number of input and output ports and their names are generally determined by the component kind.&nbsp; For example any D-flip-flop would have two Input Ports named D and CLK and one Output Port named Q. However some Component&nbsp;Kinds will allow variable numbers&nbsp;of Input or Output Ports: for example a gate would allow a variable number of Input Ports with a minumum of 2.&nbsp; The location of a port is determined by the Kind and the Component.&nbsp;For example the Kind might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.) Ports that are not Connected to anything links could be displayed in dark orange.</dd>
+  <dd>A Port is the representation of an input or output to a component. Each Port is associated with a component.&nbsp; Each Port is an Input Port, an Output Port, or a Bidirectional Port.&nbsp; Ports may have names.&nbsp;The number of input, output, and bidirectional ports and their names are generally determined by the component kind. For example any D-flip-flop would have two Input Ports named D and CLK and one Output Port named Q. However some Component&nbsp;Kinds will allow variable numbers&nbsp;of Input or Output Ports: for example a gate would allow a variable number of Input Ports with a minumum of 2.&nbsp; The location of a port is determined by the Kind and the Component.&nbsp;For example the Kind might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.) Ports may be negated or not.&nbsp; Unnegated ports are uually not drawn. (However, it might be good to draw a&nbsp;coloured square when the mouse hovers over an unnegated port.)&nbsp; Negated ports are drawn as black circles with white fill.</dd>
   <dt>Input Port</dt>
-  <dd>A Port used for input.&nbsp; Input ports might be represented by small squares&nbsp;with black stroke and white fills. </dd>
+  <dd>A Port used for input.&nbsp; Input ports might be represented by small triangles&nbsp;with black stroke and white fills&nbsp;pointed into the component.</dd>
   <dd>&nbsp;</dd>
   <dt>Output Port</dt>
-  <dd>A Port used for output. Output ports might be represented by small squares with black stroke and gray fill.</dd>
+  <dd>A Port used for output. Output ports might be represented by small  triangles&nbsp;with black stroke and white fills&nbsp;pointed into the component.</dd>
+  <dt>Bidirectional Port</dt>
+  <dd>A Port used for both input and output. Bidirectional ports might be represented by small diamonds with black stroke and white fill.</dd>
   <dt>Links</dt>
-  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles, unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation.</dd>
+  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles (black input and black fill), unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
   <dt>Connected</dt>
-  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
+  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is Connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
   <dt>Net</dt>
   <dd>A maximal set of Ports and Links that are all connected to each other is called a Net.&nbsp; Note that each Port and Link is a member of exactly one Net. (Implementation note:&nbsp; There is no need to represent Nets explicitely. However, it will be useful for simulation if we can calculate the Net of a Port or Link.</dd>
   <dt>World coordinates</dt>
-  <dd>Each Circuit Diagram is laid out on a rectagle of the real plane.&nbsp; This rectangle has x coordinates from 0 to W and y coordinates from 0 to H.</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
-  <dt>abc</dt>
-  <dd>def</dd>
+  <dd>Each Circuit is laid out on the real plane.&nbsp; Each circuit diagram has a minium and a maximum x&nbsp;and a minimum&nbsp;and maximum y, although these may change as componenst and links are added, moved, and removed.&nbsp;Let d be a Circuit and c&nbsp; is a component or link belonging to that circuit. The following invariants should be observed:
+    <ul>
+      <li>d.minX &lt; c.minX &lt; c.maxX &lt; d.maxX </li>
+      <li>d.minY &lt; c.minY &lt; c.maxY &lt; c.maxY  </li>
+    </ul>
+    A world coordinate is 
+  really a pair (d, (x,y)) where d is a Circuit and (x, y) is a point on the plane.</dd>
+  <dt>View coordinates</dt>
+  <dd>The coordinates of the canvas on which the circuit is displayed.</dd>
+  <dt>Folder</dt>
+  <dd>A folder is a collection of Files and Folders. Folders form a Tree such that each Folder (apart from the root) has&nbsp;a parent Folder&nbsp;and each File is in one Folder</dd>
+  <dt>Home Folder</dt>
+  <dd>Each User has a home folder, as does each Course.</dd>
+  <dt>File</dt>
+  <dd>A file is one of the following: A Saved Circuit, an Unsaved Circuit, a Saved Test, an Unsaved Test.</dd>
   <dt>abc</dt>
   <dd>def</dd>
   <dt>abc</dt>
@@ -118,10 +128,10 @@
 <h4>Main screen</h4>
 <p>Along the top&nbsp;of the client screen is tool bar that contains buttons for the various command.</p>
 <p>To the right is a tool bar (or pallette) that contains icons representing various tools. This will include tools for the most common component kinds.</p>
-<p>In the middle, is the drawing canvas containing a visualization of the circuit being edited.&nbsp;Above the canvas is the name of the current circuit. The canvas is surrounded by four buttons for scrolling the canvas.</p>
+<p>In the middle, is the drawing canvas containing a visualization of the circuit being edited.&nbsp;Above the canvas is the name of the current circuit. The canvas is surrounded by four buttons for panning (i.e. scrolling) the canvas.&nbsp; The</p>
 <p>During simulation, the bottom part of the main screen contains the simulation panel.</p>
 <h3>Selection model</h3>
-<p>At each point in time a set of components and links on each  diagram are considered selected.</p>
+<p>At each point in time a set of components and links on each  diagram are considered selected. Selected components are displayed in a distinctive colour. Selected components may belong to diagrams that are inside of compound components, so it is possible that not all selected components and links belong to the same diagram.</p>
 <h3>Use cases for editing</h3>
 <h4>Add component by drag and drop</h4>
 <p>Requirements: Add components to a circuit diagram.</p>
@@ -135,6 +145,7 @@
   <li>User: Drags mouse to the drawing canvas.</li>
   <li>Client: As long as the mouse is over the palette or drawing canvas, as preview of the component is shown.</li>
   <li>User: Releases the mouse over the drawing canvas.</li>
+  <li>Optionally,&nbsp;the user is asked to fill in values of any properties that are required by the kind, but that don't have default values. In particular, if the circuit is a compound circuit, the user must choose the Circuit Diagram associated with the component.</li>
   <li>Client: Adds the component to the diagram.</li>
   <li>Client: The newly added component becomes the selected component.</li>
 </ol>
@@ -142,54 +153,144 @@
 <ul>
   <li>In step 2 the palette items should light up as the mouse passes over them.</li>
   <li>The component might actually be added to the drawing as soon as the mouse moves over the canvas.</li>
-  <li>On a touch device, the drag may be done with touch event rather than mouse events.</li>
+  <li>On a touch device, the drag may be done with touch event rather than mouse events.'</li>
+  <li>In step 5, if the drop is on top of a compound compononent and the compound component&nbsp;is &quot;white-box&quot;, then the new component is added to the diagram associated with that compond component.</li>
 </ul>
-<h4>Add component by click or tap</h4>
-<p>Requirements: Add components to a circuit diagram.</p>
+<p></p>
+<h4>Add a new link by dragging</h4>
+<p>Requirements: Add links</p>
 <p>Actors: The user and the client</p>
 <p>Precondition: The client is in editing mode.</p>
 <p>Postcondition: The client is in editing mode.</p>
 <p>Basic Flow</p>
 <ol>
-  <li>User: May scroll the palette so that the appropriate item is displayed.</li>
-  <li>User: Moves mouse over a palette item&nbsp;and clicks with the mouse.</li>
-  <li>Client: Adds the component to the diagram&nbsp;at world coordinates that correspond to the center of the view coordinates.</li>
-  <li>Client: The newly added component becomes the selected component.</li>
-</ol>
-<p>Notes:</p>
-<ul>
-  <li>In step 2 the palette items should light up as the mouse passes over them.</li>
-  <li>On a touch device, as tap can be used instead of a mouse click.</li>
-</ul>
-<h4>Move components, links, and endpoints by drag</h4>
-<p>Requirements: Move components around the circuit diagram.</p>
-<p>Actors: The user and the client</p>
-<p>Precondition: The client is in editing mode.</p>
-<p>Postcondition: The client is in editing mode.</p>
-<p>Basic Flow</p>
-<ol>
-  <li>User: Depresses mouse button over a component, link, or endpoint.</li>
+  <li>User: Depresses mouse button at a place <em>x</em> somewhere on the diagram such that it does not hit a&nbsp;selected component or link.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>If the component, link, or&nbsp;the link that the endpoint belongs to is in the current selection:
+  <li>If&nbsp;<em>x</em>, is on or sufficiently close to&nbsp;a component.
     <ol>
-      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
-      <li>When the mouse is released the selection is unchanged</li>
+      <li>A  link is added starting from the position of closest port on the component&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
     </ol>
   </li>
   <li>Otherwise
     <ol>
-      <li>Client: As the mouse moves, the component, link, or endpoint moves.</li>
-      <li>When the mouse is released, the component, link, or the link that the endpoint belongs to become the only&nbsp;selected thing.</li>
-      <li>When a component moves, all endpoints connected to its ports should also move.</li>
+      <li>A link is added starting from place <em>x</em> (converted into world coordinates)&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
     </ol>
   </li>
+  <li>User continues to move the mouse.</li>
+  <li>Client: As the mouse moves, the ending endpoint of the link is updated.</li>
+  <li>Client releases the mouse or the mouse moves to where it can no longer be converted to a suitable world coordinate.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>On a touch device, touch events can be used.</li>
+  <li>If <em>x</em> hits a selected component or link, then the use case for moves applies.</li>
+  <li>If the original point <em>x</em> is within a compound component <em>c</em>&nbsp;(not in the current selection) and the compound component is has a white-box view, then there is an ambiguity as to whether the link should be added to the outer circuit (the circuit that the component is a part of, or the inner circuit (the circuit the component contains). The best way to decide is probably based on whether <em>x</em> is close to the edge&nbsp;of <em>c</em>. </li>
+</ul>
+<h4>Add to the selection or clear the selection.</h4>
+<p>Requirements: None</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Clicks on the canvas</li>
+  <li>If the click is on a component or link which is not in the current selection, that component or link is unioned to the set of selected objects.</li>
+  <li>If the click is on a component or link which is in the current selection, that component or link is removed from the current selection.</li>
+  <li>Otherwise the set of selected objects becomes empty.  </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>On a touch device, touch events can be used.</li>
+  <li>Disambiguating a mouse down should be done as follows: Links, then components.</li>
+  <li>If the mouse hits a component inside a compound component (in whitebox view), the inner component is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
+</ul>
+<p></p>
+<h4>Move components, links, and endpoints by drag</h4>
+<p>Requirements:</p>
+<ul>
+  <li>Move components around the circuit diagram.</li>
+  <li>Move an endpoint of a link</li>
+</ul>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and the selection is not empty.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Depresses mouse button over a component or link or endpoint, <em>x</em> that is in the current selection.</li>
+  <li>User: Moves mouse to another part of the diagram.</li>
+  <li>If the <em>x</em>  is a link or component in the current selection:
+    <ol>
+      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
+      <li>Note: When a component moves, all endpoints connected to its ports should also move. However when a link moves,&nbsp;ports and components connected to its endpoints only move if they are in the current selection.</li>
+    </ol>
+  </li>
+  <li>Otherwise, <em>x</em> is the endpoint of a currently selected link.
+    <ol>
+      <li>Client: As the mouse moves, <em>x</em> moves.</li>
+      <li>Note: Only the endpoint moves.</li>
+    </ol>
+  </li>
+  <li>User: Releases the mouse.</li>
 </ol>
 <p>Notes:</p>
 <ul>
   <li>On a touch device, touch events can be used.</li>
   <li>Disambiguating a mouse down should be done as follows: Endpoints have top priority, then links, then components.</li>
+  <li>It may be that when the mouse is depressed, it is over a number of endpoints. If any of those endpoints' links are in the current selection, this use case applies, and all the endpoints whose links are in the current selection move together.</li>
+  <li>Moving an endpoint or link may make new connections or break existing connections.</li>
+  <li>Everything that moves, moves the same amount&nbsp;in terms of world coordinates.&nbsp; (This might not make a whole lot of sense when the Selection contains things from different circuits, but I'm not concerned about that anomalous case.)</li>
+  <li>In particular suppose&nbsp;<em>x</em> is in a circuit associated with compound component. The mouse coordinates will cease to mean anything once the mouse leaves the compound component. So the last coordinates that were in the component can be used in that case&nbsp;to calculate the amount of the move.</li>
 </ul>
-<p>&nbsp;</p>
+<h4>Rotate components</h4>
+<p>Requirements: Rotate components.</p>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and at least one component is selected</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Clicks on the rotate-clockwise or rotate-counter-clockwise button.</li>
+  <li>Client: Rotates all selected components in the appropriate direction.  </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>As a component rotates, its ports move and any endpoints connected to those ports should also move.</li>
+</ul>
+<h4>Delete components and links</h4>
+<p>Requirements: </p>
+<ul>
+  <li>Delete components from a circuit diagram.</li>
+  <li>Delete links</li>
+</ul>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and at least one component or link is selected</p>
+<p>Postcondition: The client is in editing mode. The selection is empty.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Clicks on the Cut button.</li>
+  <li>Client: Deletes all selected components and links.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>None.</li>
+</ul>
+<h4>Create a new circuit</h4>
+<p>Requirements: </p>
+<ul>
+  <li>Delete components from a circuit diagram.</li>
+  <li>Delete links</li>
+</ul>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and at least one component or link is selected</p>
+<p>Postcondition: The client is in editing mode. The selection is empty.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Clicks on the Cut button.</li>
+  <li>Client: Deletes all selected components and links.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>None.</li>
+</ul>
 <p></p>
 <p>&nbsp;</p>
 <h2>Discussion</h2>
