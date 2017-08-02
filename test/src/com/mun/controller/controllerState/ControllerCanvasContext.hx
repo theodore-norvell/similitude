@@ -1,7 +1,6 @@
 package com.mun.controller.controllerState;
 
 import js.html.CanvasElement;
-import js.jquery.JQuery;
 import com.mun.model.component.Component;
 import com.mun.type.HitObject;
 import com.mun.type.WorldPoint;

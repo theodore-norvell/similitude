@@ -86,6 +86,12 @@ class FolderState {
                     new JQuery("#nameofcddiv").removeClass("has-error").addClass("has-success");
 
                     changeNameForHTMLStuff(oldname, newName);
+                    for(i in sideBarMap.iterator()){
+                        if(i.isGateNameExist(oldname)){
+                            i.removeCompoundComponentToGateNameArray(oldname);
+                            i.pushCompoundComponentToGateNameArray(newName);
+                        }
+                    }
 
                 }else{
                     new JQuery("#nameofcddiv").removeClass("has-success").addClass("has-error");
@@ -212,7 +218,7 @@ class FolderState {
                     var recordSearchResultList:Array<CircuitDiagramI> = new Array<CircuitDiagramI>();
                     if(circuitDiagramArray.length != 0){
                         for(i in circuitDiagramArray){
-                            if(i.get_name().indexOf(searchName.toLowerCase()) != -1 || i.get_name().indexOf(searchName.toUpperCase()) != -1 || i.get_name() == searchName){
+                            if(i.get_name().toLowerCase().indexOf(searchName.toLowerCase()) != -1 || i.get_name().toUpperCase().indexOf(searchName.toUpperCase()) != -1 || i.get_name().indexOf(searchName) != -1){
                                 html += "<li><a id=\""+ i.get_name() +"\"> " + i.get_name() +"</a></li>";
                                 recordSearchResultList.push(i);
                             }
@@ -223,10 +229,15 @@ class FolderState {
                     Browser.document.getElementById("circuitDiagramHintList").style.display = "table";
 
                     for(i in recordSearchResultList){
-                        Browser.document.getElementById(i.get_name()).onclick = function(){
+                        Browser.document.getElementById(i.get_name()).onclick = function(event:Event){
+                            var id:String = untyped event.target.id;
+                            trace(id);
                             previouseCircuitDiagramArray.push(circuitDiagram);
 
                             setToCurrentCircuitDiagram(i.get_name());
+                            new JQuery(".tab-pane[id$='-panel']").removeClass("active");
+                            new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
+                            new JQuery(".tab-pane[id^='"+id+"']").addClass("active");
 
                             currentIndex = circuitDiagramArray.indexOf(i);
 
@@ -346,11 +357,11 @@ class FolderState {
             id = id.substring(0, id.indexOf("-"));
 
             previouseCircuitDiagramArray.push(circuitDiagram);
-
             setToCurrentCircuitDiagram(id);
             new JQuery(".tab-pane[id$='-panel']").removeClass("active");
             new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
-            new JQuery(".tab-pane[id^='"+id+"']").addClass("active");
+            new JQuery(".tab-pane[id^='"+id+"-panel']").addClass("active");
+            new JQuery(".tab-pane[id^='"+id+"-sidebar']").addClass("active");
 
             currentIndex = circuitDiagramArray.indexOf(circuitDiagram);
 

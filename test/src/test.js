@@ -1929,27 +1929,6 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,linkAndComponentArrayReset: function() {
 		this.linkAndComponentArray.clean();
 	}
-	,disableAllEvent: function() {
-		window.document.getElementById("delete").removeEventListener("click",$bind(this,this.deleteObject),false);
-		window.document.getElementById("undo").removeEventListener("click",$bind(this,this.undoCommand),false);
-		window.document.getElementById("redo").removeEventListener("click",$bind(this,this.redoCommand),false);
-		window.document.getElementById("name_input").removeEventListener("keyup",$bind(this,this.inputChange),false);
-		window.document.getElementById("north").removeEventListener("click",$bind(this,this.changeToNorth),false);
-		window.document.getElementById("south").removeEventListener("click",$bind(this,this.changeToSouth),false);
-		window.document.getElementById("west").removeEventListener("click",$bind(this,this.changeToWest),false);
-		window.document.getElementById("east").removeEventListener("click",$bind(this,this.changeToEast),false);
-	}
-	,enableAllEvent: function() {
-		window.document.getElementById("delete").addEventListener("click",$bind(this,this.deleteObject),false);
-		window.document.getElementById("undo").addEventListener("click",$bind(this,this.undoCommand),false);
-		window.document.getElementById("redo").addEventListener("click",$bind(this,this.redoCommand),false);
-		window.document.getElementById("name_input").addEventListener("keyup",$bind(this,this.inputChange),false);
-		window.document.getElementById("north").addEventListener("click",$bind(this,this.changeToNorth),false);
-		window.document.getElementById("south").addEventListener("click",$bind(this,this.changeToSouth),false);
-		window.document.getElementById("west").addEventListener("click",$bind(this,this.changeToWest),false);
-		window.document.getElementById("east").addEventListener("click",$bind(this,this.changeToEast),false);
-		this.update(new com_mun_type_LinkAndComponentAndEndpointAndPortArray());
-	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
 var com_mun_controller_controllerState_ControllerCanvasContext = function(circuitDiagram,updateCircuitDiagram,sideBar,upateToolBar,canvas) {
@@ -2265,6 +2244,14 @@ var com_mun_controller_controllerState_FolderState = function() {
 			if(success) {
 				$("#nameofcddiv").removeClass("has-error").addClass("has-success");
 				_gthis.changeNameForHTMLStuff(oldname,newName);
+				var i = _gthis.sideBarMap.iterator();
+				while(i.hasNext()) {
+					var i1 = i.next();
+					if(i1.isGateNameExist(oldname)) {
+						i1.removeCompoundComponentToGateNameArray(oldname);
+						i1.pushCompoundComponentToGateNameArray(newName);
+					}
+				}
 			} else {
 				$("#nameofcddiv").removeClass("has-success").addClass("has-error");
 			}
@@ -2407,7 +2394,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 					while(_g2 < _g12.length) {
 						var i2 = _g12[_g2];
 						++_g2;
-						if(i2.get_name().indexOf(this.searchName.toLowerCase()) != -1 || i2.get_name().indexOf(this.searchName.toUpperCase()) != -1 || i2.get_name() == this.searchName) {
+						if(i2.get_name().toLowerCase().indexOf(this.searchName.toLowerCase()) != -1 || i2.get_name().toUpperCase().indexOf(this.searchName.toUpperCase()) != -1 || i2.get_name().indexOf(this.searchName) != -1) {
 							html += "<li><a id=\"" + i2.get_name() + "\"> " + i2.get_name() + "</a></li>";
 							recordSearchResultList.push(i2);
 						}
@@ -2420,10 +2407,15 @@ com_mun_controller_controllerState_FolderState.prototype = {
 					var i3 = [recordSearchResultList[_g3]];
 					++_g3;
 					window.document.getElementById(i3[0].get_name()).onclick = (function(i4) {
-						return function() {
+						return function(event) {
+							var id = event.target.id;
+							haxe_Log.trace(id,{ fileName : "FolderState.hx", lineNumber : 234, className : "com.mun.controller.controllerState.FolderState", methodName : "checkState"});
 							_gthis.previouseCircuitDiagramArray.push(_gthis.circuitDiagram);
 							var tmp = i4[0].get_name();
 							_gthis.setToCurrentCircuitDiagram(tmp);
+							$(".tab-pane[id$='-panel']").removeClass("active");
+							$(".tab-pane[id$='-sidebar']").removeClass("active");
+							$(".tab-pane[id^='" + id + "']").addClass("active");
 							_gthis.currentIndex = _gthis.circuitDiagramArray.indexOf(i4[0]);
 							window.document.getElementById("circuitDiagramHintList").style.display = "none";
 							$(window.document.getElementById("search_circuitdiagram")).val("");
@@ -2506,7 +2498,8 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			_gthis.setToCurrentCircuitDiagram(id);
 			$(".tab-pane[id$='-panel']").removeClass("active");
 			$(".tab-pane[id$='-sidebar']").removeClass("active");
-			$(".tab-pane[id^='" + id + "']").addClass("active");
+			$(".tab-pane[id^='" + id + "-panel']").addClass("active");
+			$(".tab-pane[id^='" + id + "-sidebar']").addClass("active");
 			_gthis.currentIndex = _gthis.circuitDiagramArray.indexOf(_gthis.circuitDiagram);
 			_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 			_gthis.checkState();
@@ -2551,7 +2544,6 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.canvasMap.remove(this.circuitDiagram);
 		this.contextMap.remove(this.circuitDiagram);
 		HxOverrides.remove(this.previouseCircuitDiagramArray,tempCd);
-		$(name + "-li").unbind();
 	}
 	,createNewCanvas: function(name) {
 		var canvasElement = window.document.getElementById("canvas-" + this.circuitDiagram.get_name());
@@ -2667,11 +2659,21 @@ com_mun_controller_controllerState_SideBar.prototype = {
 	,buttonGroupList: null
 	,gateNameArray: null
 	,pushCompoundComponentToGateNameArray: function(name) {
-		this.gateNameArray.push(name);
-		this.resetSideBarButtons();
+		if(this.gateNameArray.indexOf(name) == -1) {
+			this.gateNameArray.push(name);
+			this.resetSideBarButtons();
+		}
 	}
 	,removeCompoundComponentToGateNameArray: function(name) {
 		HxOverrides.remove(this.gateNameArray,name);
+		this.resetSideBarButtons();
+	}
+	,isGateNameExist: function(name) {
+		if(this.gateNameArray.indexOf(name) != -1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	,bandingOnClick: function() {
 		var _gthis = this;
@@ -3051,6 +3053,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
 	,draw: function(drawingAdapter,linkAndComponentArray) {
+		haxe_Log.trace(this.name,{ fileName : "CircuitDiagram.hx", lineNumber : 299, className : "com.mun.model.component.CircuitDiagram", methodName : "draw"});
 		var drawFlag = false;
 		var _g = 0;
 		var _g1 = this.componentArray;
@@ -7899,6 +7902,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };

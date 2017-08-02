@@ -59,12 +59,23 @@ class SideBar {
     }
 
     public function pushCompoundComponentToGateNameArray(name:String){
-        gateNameArray.push(name);
-        resetSideBarButtons();
+        if(gateNameArray.indexOf(name) ==-1){
+            gateNameArray.push(name);
+            resetSideBarButtons();
+        }
     }
 
     public function removeCompoundComponentToGateNameArray(name:String){
         gateNameArray.remove(name);
+        resetSideBarButtons();
+    }
+
+    public function isGateNameExist(name:String):Bool{
+        if(gateNameArray.indexOf(name) != -1){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     function bandingOnClick(){
