@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import js.html.KeyboardEvent;
 import js.jquery.Event;
 import js.html.CanvasRenderingContext2D;
 import js.html.CanvasElement;
@@ -76,12 +77,19 @@ class FolderState {
             currentState = F_STATE.SEARCH;
             checkState();
         });
-        new JQuery("#nameofcd").bind('input porpertychange', function(){
-            var success:Bool = folder.changeCircuitDiagramName(circuitDiagram.get_name(),new JQuery("#nameofcd").val(), circuitDiagram);
-            if(success){
-                new JQuery("#nameofcddiv").removeClass("has-error").addClass("has-success");
-            }else{
-                new JQuery("#nameofcddiv").removeClass("has-success").addClass("has-error");
+        new JQuery("#nameofcd").bind('keydown', function(key:KeyboardEvent){
+            if(key.keyCode == 13){
+                var oldname:String = circuitDiagram.get_name();
+                var newName:String = new JQuery("#nameofcd").val();
+                var success:Bool = folder.changeCircuitDiagramName(oldname, newName, circuitDiagram);
+                if(success){
+                    new JQuery("#nameofcddiv").removeClass("has-error").addClass("has-success");
+
+                    changeNameForHTMLStuff(oldname, newName);
+
+                }else{
+                    new JQuery("#nameofcddiv").removeClass("has-success").addClass("has-error");
+                }
             }
         });
 
@@ -242,7 +250,6 @@ class FolderState {
                 //go back to the previouse circuit diagram
                 if(previouseCircuitDiagramArray.length != 0){
                     var cd:CircuitDiagramI = previouseCircuitDiagramArray.pop();
-
                     while(cd == circuitDiagram){
                         cd = previouseCircuitDiagramArray.pop();
                     }
@@ -262,14 +269,12 @@ class FolderState {
     }
 
     function setToCurrentCircuitDiagram(name:String){
-
         circuitDiagram = folder.findCircuitDiagram(name);
         updateCircuitDiagram = updateCircuitDiagramMap[circuitDiagram];
         updateToolBar = updateToolBarMap[circuitDiagram];
         updateCanvas = updateCanvasMap[circuitDiagram];
         sideBar = sideBarMap[circuitDiagram];
         controllerCanvasContext = controllerCanvasContextMap[circuitDiagram];
-//        com.mun.global.Constant.CANVAS = canvasMap[circuitDiagram];
     }
 
     function createATotallyNewCircuitDiagram(){
@@ -295,6 +300,31 @@ class FolderState {
         pushToMap();
     }
 
+    function changeNameForHTMLStuff(oldName:String,newName:String){
+        Browser.document.getElementById(oldName+"-a").innerHTML = ""+newName+"<span id=\""+newName+"-close\" class=\"glyphicon glyphicon-remove\"></span>";
+        registerCloseButton(newName);
+
+        Browser.document.getElementById(oldName+"-a").setAttribute("href", newName+"-panel");
+        Browser.document.getElementById(oldName+"-a").setAttribute("id", newName+"-a");
+        Browser.document.getElementById(oldName+"-li").setAttribute("id", newName+"-li");
+
+        Browser.document.getElementById(oldName+"-panel").setAttribute("id", newName+"-panel");
+        Browser.document.getElementById("canvas-" + oldName).setAttribute("id", "canvas-"+newName);
+
+        Browser.document.getElementById("flist-" + oldName).setAttribute("id", "flist-" + newName);
+        Browser.document.getElementById(oldName+"-buttonGroupList").setAttribute("id", newName+"-buttonGroupList");
+        Browser.document.getElementById("list-" + oldName).setAttribute("id", "list-" + newName);
+
+        Browser.document.getElementById(oldName+"-fileList").setAttribute("href", "flist-" + newName);
+        Browser.document.getElementById(oldName+"-fileList").setAttribute("id", newName+"-fileList");
+
+        Browser.document.getElementById(oldName+"-buttonList").setAttribute("href", "list-" + newName);
+        Browser.document.getElementById(oldName+"-buttonList").setAttribute("id", newName+"-buttonList");
+
+        Browser.document.getElementById(oldName+"-search").setAttribute("id", newName+"-search");
+        Browser.document.getElementById(oldName+"-sidebar").setAttribute("id", newName+"-sidebar");
+    }
+
     function addNewCicruitDiagramTab(){
 
         var liHtmlString:String = "<li role=\"presentation\" id=\""+circuitDiagram.get_name()+ "-li\" class=\"active\"><a id=\""+circuitDiagram.get_name()+ "-a\" href=\"#"+circuitDiagram.get_name()+"-panel\" data-toggle=\"tab\">"+ circuitDiagram.get_name() + "<span id=\""+circuitDiagram.get_name()+"-close\" class=\"glyphicon glyphicon-remove\"></span></a></li>";
@@ -314,7 +344,9 @@ class FolderState {
         Browser.document.getElementById(circuitDiagram.get_name()+"-li").onclick = function(event:Event){
             var id:String = untyped event.target.id;
             id = id.substring(0, id.indexOf("-"));
+
             previouseCircuitDiagramArray.push(circuitDiagram);
+
             setToCurrentCircuitDiagram(id);
             new JQuery(".tab-pane[id$='-panel']").removeClass("active");
             new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
@@ -326,29 +358,34 @@ class FolderState {
             checkState();
         };
 
-        Browser.document.getElementById(circuitDiagram.get_name()+"-close").onclick = function(){
+        registerCloseButton(circuitDiagram.get_name());
+    }
+
+    function registerCloseButton(closeButtonNamePrefix:String){
+        Browser.document.getElementById(closeButtonNamePrefix+"-close").onclick = function(event:Event){
             if(Browser.window.confirm("Close this Diagram means delete it forever, do you still want to do it?")){
                 var id:String = untyped event.target.id;
                 id = id.substring(0, id.indexOf("-"));
-                new JQuery("[id^='"+id+"']").remove();
+                Browser.document.getElementById(id+"-li").remove();
+                Browser.document.getElementById(id+"-panel").remove();
+                Browser.document.getElementById(id+"-sidebar").remove();
 
                 //all of the html stuff has been deleted.
                 deleteCircuitDiagram(id);
 
                 if(circuitDiagramArray.length == 0){
+                    circuitDiagram = null;
                     currentState = F_STATE.CREATE;
                     checkState();
                 }else{
                     currentState = F_STATE.PREVIOUS;
                     checkState();
-
-                    new JQuery("[id^='"+id+"']").addClass("active");
+                    new JQuery("[id^='"+circuitDiagram.get_name()+"']").addClass("active");
 
                     currentState = F_STATE.CURRENT;
                     checkState();
                 }
             }
-
         };
     }
 
@@ -357,6 +394,17 @@ class FolderState {
         folder.removeCircuitDiagram(name);
         circuitDiagramArray.remove(tempCd);
         sideBar.removeCompoundComponentToGateNameArray(name);
+
+        sideBarMap.remove(tempCd);
+        updateCircuitDiagramMap.remove(circuitDiagram);
+        updateToolBarMap.remove(circuitDiagram);
+        updateCanvasMap.remove(circuitDiagram);
+        sideBarMap.remove(circuitDiagram);
+        controllerCanvasContextMap.remove(circuitDiagram);
+        canvasMap.remove(circuitDiagram);
+        contextMap.remove(circuitDiagram);
+
+        previouseCircuitDiagramArray.remove(tempCd);
     }
 
     function createNewCanvas(name:String){

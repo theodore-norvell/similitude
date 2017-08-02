@@ -2257,12 +2257,17 @@ var com_mun_controller_controllerState_FolderState = function() {
 		_gthis.currentState = com_mun_model_enumeration_F_$STATE.SEARCH;
 		_gthis.checkState();
 	});
-	$("#nameofcd").bind("input porpertychange",function() {
-		var success = _gthis.folder.changeCircuitDiagramName(_gthis.circuitDiagram.get_name(),$("#nameofcd").val(),_gthis.circuitDiagram);
-		if(success) {
-			$("#nameofcddiv").removeClass("has-error").addClass("has-success");
-		} else {
-			$("#nameofcddiv").removeClass("has-success").addClass("has-error");
+	$("#nameofcd").bind("keydown",function(key) {
+		if(key.keyCode == 13) {
+			var oldname = _gthis.circuitDiagram.get_name();
+			var newName = $("#nameofcd").val();
+			var success = _gthis.folder.changeCircuitDiagramName(oldname,newName,_gthis.circuitDiagram);
+			if(success) {
+				$("#nameofcddiv").removeClass("has-error").addClass("has-success");
+				_gthis.changeNameForHTMLStuff(oldname,newName);
+			} else {
+				$("#nameofcddiv").removeClass("has-success").addClass("has-error");
+			}
 		}
 	});
 	$("#nameofcd").bind("focusout",function() {
@@ -2468,6 +2473,24 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.sideBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.pushToMap();
 	}
+	,changeNameForHTMLStuff: function(oldName,newName) {
+		window.document.getElementById(oldName + "-a").innerHTML = "" + newName + "<span id=\"" + newName + "-close\" class=\"glyphicon glyphicon-remove\"></span>";
+		this.registerCloseButton(newName);
+		window.document.getElementById(oldName + "-a").setAttribute("href",newName + "-panel");
+		window.document.getElementById(oldName + "-a").setAttribute("id",newName + "-a");
+		window.document.getElementById(oldName + "-li").setAttribute("id",newName + "-li");
+		window.document.getElementById(oldName + "-panel").setAttribute("id",newName + "-panel");
+		window.document.getElementById("canvas-" + oldName).setAttribute("id","canvas-" + newName);
+		window.document.getElementById("flist-" + oldName).setAttribute("id","flist-" + newName);
+		window.document.getElementById(oldName + "-buttonGroupList").setAttribute("id",newName + "-buttonGroupList");
+		window.document.getElementById("list-" + oldName).setAttribute("id","list-" + newName);
+		window.document.getElementById(oldName + "-fileList").setAttribute("href","flist-" + newName);
+		window.document.getElementById(oldName + "-fileList").setAttribute("id",newName + "-fileList");
+		window.document.getElementById(oldName + "-buttonList").setAttribute("href","list-" + newName);
+		window.document.getElementById(oldName + "-buttonList").setAttribute("id",newName + "-buttonList");
+		window.document.getElementById(oldName + "-search").setAttribute("id",newName + "-search");
+		window.document.getElementById(oldName + "-sidebar").setAttribute("id",newName + "-sidebar");
+	}
 	,addNewCicruitDiagramTab: function() {
 		var _gthis = this;
 		var liHtmlString = "<li role=\"presentation\" id=\"" + this.circuitDiagram.get_name() + "-li\" class=\"active\"><a id=\"" + this.circuitDiagram.get_name() + "-a\" href=\"#" + this.circuitDiagram.get_name() + "-panel\" data-toggle=\"tab\">" + this.circuitDiagram.get_name() + "<span id=\"" + this.circuitDiagram.get_name() + "-close\" class=\"glyphicon glyphicon-remove\"></span></a></li>";
@@ -2488,19 +2511,26 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 			_gthis.checkState();
 		};
-		window.document.getElementById(this.circuitDiagram.get_name() + "-close").onclick = function() {
+		this.registerCloseButton(this.circuitDiagram.get_name());
+	}
+	,registerCloseButton: function(closeButtonNamePrefix) {
+		var _gthis = this;
+		window.document.getElementById(closeButtonNamePrefix + "-close").onclick = function(event) {
 			if(window.confirm("Close this Diagram means delete it forever, do you still want to do it?")) {
-				var id1 = event.target.id;
-				id1 = id1.substring(0,id1.indexOf("-"));
-				$("[id^='" + id1 + "']").remove();
-				_gthis.deleteCircuitDiagram(id1);
+				var id = event.target.id;
+				id = id.substring(0,id.indexOf("-"));
+				window.document.getElementById(id + "-li").remove();
+				window.document.getElementById(id + "-panel").remove();
+				window.document.getElementById(id + "-sidebar").remove();
+				_gthis.deleteCircuitDiagram(id);
 				if(_gthis.circuitDiagramArray.length == 0) {
+					_gthis.circuitDiagram = null;
 					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
 					_gthis.checkState();
 				} else {
 					_gthis.currentState = com_mun_model_enumeration_F_$STATE.PREVIOUS;
 					_gthis.checkState();
-					$("[id^='" + id1 + "']").addClass("active");
+					$("[id^='" + _gthis.circuitDiagram.get_name() + "']").addClass("active");
 					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 					_gthis.checkState();
 				}
@@ -2512,6 +2542,16 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.folder.removeCircuitDiagram(name);
 		HxOverrides.remove(this.circuitDiagramArray,tempCd);
 		this.sideBar.removeCompoundComponentToGateNameArray(name);
+		this.sideBarMap.remove(tempCd);
+		this.updateCircuitDiagramMap.remove(this.circuitDiagram);
+		this.updateToolBarMap.remove(this.circuitDiagram);
+		this.updateCanvasMap.remove(this.circuitDiagram);
+		this.sideBarMap.remove(this.circuitDiagram);
+		this.controllerCanvasContextMap.remove(this.circuitDiagram);
+		this.canvasMap.remove(this.circuitDiagram);
+		this.contextMap.remove(this.circuitDiagram);
+		HxOverrides.remove(this.previouseCircuitDiagramArray,tempCd);
+		$(name + "-li").unbind();
 	}
 	,createNewCanvas: function(name) {
 		var canvasElement = window.document.getElementById("canvas-" + this.circuitDiagram.get_name());
