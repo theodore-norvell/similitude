@@ -109,6 +109,10 @@ class UpdateCircuitDiagram {
         return component_;
     }
 
+    public function createCompoundComponent(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:ORIENTATION, inportNum:Int, circuitDiagram:CircuitDiagramI):Component{
+        return null;
+    }
+
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
         var object:Object = new Object();
         object = isOnPort(coordinateFrom);

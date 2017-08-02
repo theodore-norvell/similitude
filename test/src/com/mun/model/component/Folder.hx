@@ -66,4 +66,8 @@ class Folder implements FolderI{
             return true;
         }
     }
+
+    public function deleteCircuitDiagram(name:String){
+        circuitDiagramMap.remove(name);
+    }
 }

@@ -6,8 +6,6 @@ class Constant {
     public static var pointToLineDistance:Int = 5;
     public static var pointToEndpointDistance:Int = 3;
     public static var PIXELRATIO:Int = 1;
-    public static var CANVAS:CanvasElement;
-    public static var CONTEXT:CanvasRenderingContext2D;
     public function new() {
     }
 }

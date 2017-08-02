@@ -19,37 +19,37 @@ class Test {
     static var cxt:CanvasRenderingContext2D;
 
     static public function main() {
-        canvas = cast Browser.document.getElementById("canvas");
-        cxt = untyped canvas.getContext("2d");
-
-        var backingStoreRatioDynamic : Dynamic = Reflect.field( cxt, "webKitBackingStorePixelRatio" ) ;
-        if( backingStoreRatioDynamic == null )
-            backingStoreRatioDynamic = Reflect.field( cxt, "mozBackingStorePixelRatio" ) ;
-        if( backingStoreRatioDynamic == null )
-            backingStoreRatioDynamic = Reflect.field( cxt, "msBackingStorePixelRatio" ) ;
-        if( backingStoreRatioDynamic == null )
-            backingStoreRatioDynamic = Reflect.field( cxt, "oBackingStorePixelRatio" ) ;
-        if( backingStoreRatioDynamic == null )
-            backingStoreRatioDynamic = Reflect.field( cxt, "backingStorePixelRatio" ) ;
-        var backingStoreRatio : Float =
-        if( backingStoreRatioDynamic == null ) 1.0
-        else cast( backingStoreRatioDynamic, Float ) ;
-
-        var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
-        var oldWidth:Int = cast Browser.window.innerWidth * 0.81;
-        var oldHeight:Int =cast Browser.window.innerHeight * 0.81;
-        canvas.width = oldWidth * pixelRatio;
-        canvas.height = oldHeight * pixelRatio;
-        canvas.style.width = oldWidth + 'px';
-        canvas.style.height = oldHeight + 'px';
-        // now scale the context to counter
-        // the fact that we've manually scaled
-        // our canvas element
-        cxt.scale(pixelRatio, pixelRatio);
-
-        CONTEXT = cxt;
-        PIXELRATIO = pixelRatio;
-        CANVAS = canvas;
+//        canvas = cast Browser.document.getElementById("canvas");
+//        cxt = untyped canvas.getContext("2d");
+//
+//        var backingStoreRatioDynamic : Dynamic = Reflect.field( cxt, "webKitBackingStorePixelRatio" ) ;
+//        if( backingStoreRatioDynamic == null )
+//            backingStoreRatioDynamic = Reflect.field( cxt, "mozBackingStorePixelRatio" ) ;
+//        if( backingStoreRatioDynamic == null )
+//            backingStoreRatioDynamic = Reflect.field( cxt, "msBackingStorePixelRatio" ) ;
+//        if( backingStoreRatioDynamic == null )
+//            backingStoreRatioDynamic = Reflect.field( cxt, "oBackingStorePixelRatio" ) ;
+//        if( backingStoreRatioDynamic == null )
+//            backingStoreRatioDynamic = Reflect.field( cxt, "backingStorePixelRatio" ) ;
+//        var backingStoreRatio : Float =
+//        if( backingStoreRatioDynamic == null ) 1.0
+//        else cast( backingStoreRatioDynamic, Float ) ;
+//
+//        var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
+//        var oldWidth:Int = cast Browser.window.innerWidth * 0.81;
+//        var oldHeight:Int =cast Browser.window.innerHeight * 0.81;
+//        canvas.width = oldWidth * pixelRatio;
+//        canvas.height = oldHeight * pixelRatio;
+//        canvas.style.width = oldWidth + 'px';
+//        canvas.style.height = oldHeight + 'px';
+//        // now scale the context to counter
+//        // the fact that we've manually scaled
+//        // our canvas element
+//        cxt.scale(pixelRatio, pixelRatio);
+//
+//        CONTEXT = cxt;
+//        PIXELRATIO = pixelRatio;
+//        CANVAS = canvas;
 
         var folderState:FolderState = new FolderState();
 //        var folder:FolderI = new Folder();

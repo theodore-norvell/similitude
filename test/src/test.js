@@ -664,33 +664,6 @@ Test.__name__ = ["Test"];
 Test.canvas = null;
 Test.cxt = null;
 Test.main = function() {
-	Test.canvas = window.document.getElementById("canvas");
-	Test.cxt = Test.canvas.getContext("2d");
-	var backingStoreRatioDynamic = Reflect.field(Test.cxt,"webKitBackingStorePixelRatio");
-	if(backingStoreRatioDynamic == null) {
-		backingStoreRatioDynamic = Reflect.field(Test.cxt,"mozBackingStorePixelRatio");
-	}
-	if(backingStoreRatioDynamic == null) {
-		backingStoreRatioDynamic = Reflect.field(Test.cxt,"msBackingStorePixelRatio");
-	}
-	if(backingStoreRatioDynamic == null) {
-		backingStoreRatioDynamic = Reflect.field(Test.cxt,"oBackingStorePixelRatio");
-	}
-	if(backingStoreRatioDynamic == null) {
-		backingStoreRatioDynamic = Reflect.field(Test.cxt,"backingStorePixelRatio");
-	}
-	var backingStoreRatio = backingStoreRatioDynamic == null ? 1.0 : js_Boot.__cast(backingStoreRatioDynamic , Float);
-	var pixelRatio = window.devicePixelRatio / backingStoreRatio;
-	var oldWidth = window.innerWidth * 0.81;
-	var oldHeight = window.innerHeight * 0.81;
-	Test.canvas.width = oldWidth * pixelRatio;
-	Test.canvas.height = oldHeight * pixelRatio;
-	Test.canvas.style.width = oldWidth + "px";
-	Test.canvas.style.height = oldHeight + "px";
-	Test.cxt.scale(pixelRatio,pixelRatio);
-	com_mun_global_Constant.CONTEXT = Test.cxt;
-	com_mun_global_Constant.PIXELRATIO = pixelRatio;
-	com_mun_global_Constant.CANVAS = Test.canvas;
 	var folderState = new com_mun_controller_controllerState_FolderState();
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
@@ -1512,18 +1485,22 @@ com_mun_controller_command_Stack.prototype = {
 	}
 	,__class__: com_mun_controller_command_Stack
 };
-var com_mun_controller_componentUpdate_UpdateCanvas = function(circuitDiagram,transform) {
+var com_mun_controller_componentUpdate_UpdateCanvas = function(circuitDiagram,transform,canvas,context) {
 	this.circuitDiagram = circuitDiagram;
 	this.transform = transform;
+	this.canvas = canvas;
+	this.context = context;
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCanvas"] = com_mun_controller_componentUpdate_UpdateCanvas;
 com_mun_controller_componentUpdate_UpdateCanvas.__name__ = ["com","mun","controller","componentUpdate","UpdateCanvas"];
 com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	circuitDiagram: null
 	,transform: null
+	,canvas: null
+	,context: null
 	,update: function(linkAndComponentArray) {
-		com_mun_global_Constant.CANVAS.width = com_mun_global_Constant.CANVAS.width;
-		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(this.transform),linkAndComponentArray);
+		this.canvas.width = this.canvas.width;
+		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(this.transform,this.context),linkAndComponentArray);
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
@@ -1582,6 +1559,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 			}
 		}
 		return component_;
+	}
+	,createCompoundComponent: function(name,xPosition,yPosition,width,height,orientation,inportNum,circuitDiagram) {
+		return null;
 	}
 	,addLink: function(coordinateFrom,coordinateTo) {
 		var object = new com_mun_type_Object();
@@ -1969,11 +1949,12 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
-var com_mun_controller_controllerState_ControllerCanvasContext = function(circuitDiagram,updateCircuitDiagram,sideBar,upateToolBar) {
+var com_mun_controller_controllerState_ControllerCanvasContext = function(circuitDiagram,updateCircuitDiagram,sideBar,upateToolBar,canvas) {
 	this.circuitDiagram = circuitDiagram;
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.sideBar = sideBar;
 	this.updateToolBar = upateToolBar;
+	this.canvas = canvas;
 	this.controllerState = com_mun_model_enumeration_C_$STATE.IDLE;
 	this.lastState = com_mun_model_enumeration_C_$STATE.IDLE;
 	this.mode = com_mun_model_enumeration_MODE.EXCLUDE_PARENTS;
@@ -1985,9 +1966,9 @@ var com_mun_controller_controllerState_ControllerCanvasContext = function(circui
 	this.lastClickArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.hitListWorldPointArray = [];
 	this.moveWorldPointArray = [];
-	com_mun_global_Constant.CANVAS.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
-	com_mun_global_Constant.CANVAS.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
-	com_mun_global_Constant.CANVAS.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
+	this.canvas.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
+	this.canvas.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
+	this.canvas.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
 };
 $hxClasses["com.mun.controller.controllerState.ControllerCanvasContext"] = com_mun_controller_controllerState_ControllerCanvasContext;
 com_mun_controller_controllerState_ControllerCanvasContext.__name__ = ["com","mun","controller","controllerState","ControllerCanvasContext"];
@@ -2010,6 +1991,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	,mouseState: null
 	,mode: null
 	,hightLightLink: null
+	,canvas: null
 	,get_controllerState: function() {
 		return this.controllerState;
 	}
@@ -2019,10 +2001,10 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		this.checkState();
 	}
 	,getPointOnCanvas: function(x,y) {
-		var bbox = com_mun_global_Constant.CANVAS.getBoundingClientRect();
+		var bbox = this.canvas.getBoundingClientRect();
 		var coordinate = new com_mun_type_Coordinate(0,0);
-		coordinate.set_xPosition((x - bbox.left) * (com_mun_global_Constant.CANVAS.width / bbox.width));
-		coordinate.set_yPosition((y - bbox.top) * (com_mun_global_Constant.CANVAS.height / bbox.height));
+		coordinate.set_xPosition((x - bbox.left) * (this.canvas.width / bbox.width));
+		coordinate.set_yPosition((y - bbox.top) * (this.canvas.height / bbox.height));
 		return coordinate;
 	}
 	,doMouseDown: function(event) {
@@ -2241,16 +2223,6 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			this.updateToolBar.hidden();
 		}
 	}
-	,disableAllTheEvent: function() {
-		com_mun_global_Constant.CANVAS.removeEventListener("mousedown",$bind(this,this.doMouseDown),false);
-		com_mun_global_Constant.CANVAS.removeEventListener("mousemove",$bind(this,this.doMouseMove),false);
-		com_mun_global_Constant.CANVAS.removeEventListener("mouseup",$bind(this,this.doMouseUp),false);
-	}
-	,enableAllTheEvent: function() {
-		com_mun_global_Constant.CANVAS.addEventListener("mousedown",$bind(this,this.doMouseDown),false);
-		com_mun_global_Constant.CANVAS.addEventListener("mousemove",$bind(this,this.doMouseMove),false);
-		com_mun_global_Constant.CANVAS.addEventListener("mouseup",$bind(this,this.doMouseUp),false);
-	}
 	,__class__: com_mun_controller_controllerState_ControllerCanvasContext
 };
 var com_mun_controller_controllerState_FolderState = function() {
@@ -2261,15 +2233,13 @@ var com_mun_controller_controllerState_FolderState = function() {
 	this.updateCanvasMap = new haxe_ds_ObjectMap();
 	this.sideBarMap = new haxe_ds_ObjectMap();
 	this.controllerCanvasContextMap = new haxe_ds_ObjectMap();
+	this.canvasMap = new haxe_ds_ObjectMap();
+	this.contextMap = new haxe_ds_ObjectMap();
 	this.circuitDiagramArray = [];
 	this.previouseCircuitDiagramArray = [];
 	this.folder = new com_mun_model_component_Folder();
 	this.currentState = com_mun_model_enumeration_F_$STATE.IDLE;
 	this.checkState();
-	window.document.getElementById("createNewCircuitDiagram").onclick = function() {
-		_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
-		_gthis.checkState();
-	};
 	window.document.getElementById("previouseCD").onclick = function() {
 		_gthis.currentState = com_mun_model_enumeration_F_$STATE.PREVIOUS;
 		_gthis.checkState();
@@ -2285,16 +2255,16 @@ var com_mun_controller_controllerState_FolderState = function() {
 		_gthis.checkState();
 	});
 	$("#nameofcd").bind("input porpertychange",function() {
-		var success = _gthis.folder.changeCircuitDiagramName(_gthis.circuitDiagram.get_name(),$(window.document.getElementById("nameofcd")).val(),_gthis.circuitDiagram);
+		var success = _gthis.folder.changeCircuitDiagramName(_gthis.circuitDiagram.get_name(),$("#nameofcd").val(),_gthis.circuitDiagram);
 		if(success) {
 			$("#nameofcddiv").removeClass("has-error").addClass("has-success");
-			window.document.getElementById("nameofcdlabel").innerText = "Success!";
-			$("#nameofcdspan1").removeClass("glyphicon-remove").addClass("glyphicon-ok");
 		} else {
 			$("#nameofcddiv").removeClass("has-success").addClass("has-error");
-			window.document.getElementById("nameofcdlabel").innerText = "Failed!";
-			$("#nameofcdspan1").removeClass("glyphicon-ok").addClass("glyphicon-remove");
 		}
+	});
+	$("#nameofcd").bind("focusout",function() {
+		$("#nameofcd").val(_gthis.circuitDiagram.get_name());
+		$("#nameofcddiv").removeClass("has-error");
 	});
 	window.document.getElementById("download").onclick = function() {
 		var blob = new Blob([JSON.stringify(_gthis.circuitDiagram.createJSon())],{ type : "application/json"});
@@ -2317,6 +2287,13 @@ var com_mun_controller_controllerState_FolderState = function() {
 		};
 		fr.readAsText(files.item(0));
 	};
+	window.document.getElementById("createNewCircuitDiagram").onclick = function() {
+		$("li[id$='-li']").removeClass("active");
+		$(".tab-pane[id$='-panel']").removeClass("active");
+		$(".tab-pane[id$='-sidebar']").removeClass("active");
+		_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
+		_gthis.checkState();
+	};
 };
 $hxClasses["com.mun.controller.controllerState.FolderState"] = com_mun_controller_controllerState_FolderState;
 com_mun_controller_controllerState_FolderState.__name__ = ["com","mun","controller","controllerState","FolderState"];
@@ -2329,11 +2306,15 @@ com_mun_controller_controllerState_FolderState.prototype = {
 	,updateCanvas: null
 	,sideBar: null
 	,controllerCanvasContext: null
+	,canvas: null
+	,context: null
 	,updateCircuitDiagramMap: null
 	,updateToolBarMap: null
 	,updateCanvasMap: null
 	,sideBarMap: null
 	,controllerCanvasContextMap: null
+	,canvasMap: null
+	,contextMap: null
 	,circuitDiagramArray: null
 	,previouseCircuitDiagramArray: null
 	,currentIndex: null
@@ -2363,10 +2344,9 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				this.previouseCircuitDiagramArray.push(this.circuitDiagram);
 			}
 			this.createATotallyNewCircuitDiagram();
-			this.circuitDiagramArray.push(this.circuitDiagram);
+			this.sideBar.pushCompoundComponentToGateNameArray(this.circuitDiagram.get_name());
 			this.currentIndex = this.circuitDiagramArray.length - 1;
 			$("#nameofcddiv").removeClass("has-error").removeClass("has-success");
-			window.document.getElementById("nameofcdlabel").innerText = "";
 			$("#nameofcdspan1").removeClass("glyphicon-remove").removeClass("glyphicon-ok");
 			this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 			this.checkState();
@@ -2450,37 +2430,102 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		}
 	}
 	,setToCurrentCircuitDiagram: function(name) {
-		var i = this.controllerCanvasContextMap.iterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			i1.disableAllTheEvent();
-		}
-		var i2 = this.updateToolBarMap.iterator();
-		while(i2.hasNext()) {
-			var i3 = i2.next();
-			i3.disableAllEvent();
-		}
 		this.circuitDiagram = this.folder.findCircuitDiagram(name);
 		this.updateCircuitDiagram = this.updateCircuitDiagramMap.h[this.circuitDiagram.__id__];
 		this.updateToolBar = this.updateToolBarMap.h[this.circuitDiagram.__id__];
-		this.updateToolBar.enableAllEvent();
 		this.updateCanvas = this.updateCanvasMap.h[this.circuitDiagram.__id__];
 		this.sideBar = this.sideBarMap.h[this.circuitDiagram.__id__];
 		this.controllerCanvasContext = this.controllerCanvasContextMap.h[this.circuitDiagram.__id__];
-		this.controllerCanvasContext.enableAllTheEvent();
 	}
 	,createATotallyNewCircuitDiagram: function() {
 		this.circuitDiagram = this.folder.createNewCircuitDiagram();
+		this.circuitDiagramArray.push(this.circuitDiagram);
+		this.addNewCicruitDiagramTab();
+		this.createNewCanvas(this.circuitDiagram.get_name());
 		this.updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(this.circuitDiagram);
 		this.circuitDiagram.set_commandManager(this.updateCircuitDiagram.get_commandManager());
 		this.updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(this.updateCircuitDiagram);
 		this.updateCircuitDiagram.setUpdateToolBar(this.updateToolBar);
-		this.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(this.circuitDiagram,this.updateCircuitDiagram.get_transform());
+		this.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(this.circuitDiagram,this.updateCircuitDiagram.get_transform(),this.canvas,this.context);
 		this.updateCircuitDiagram.setUpdateCanvas(this.updateCanvas);
-		this.sideBar = new com_mun_controller_controllerState_SideBar(this.updateCircuitDiagram);
-		this.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(this.circuitDiagram,this.updateCircuitDiagram,this.sideBar,this.updateToolBar);
+		this.sideBar = new com_mun_controller_controllerState_SideBar(this.updateCircuitDiagram,this.circuitDiagram);
+		this.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(this.circuitDiagram,this.updateCircuitDiagram,this.sideBar,this.updateToolBar,this.canvas);
 		this.sideBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.pushToMap();
+	}
+	,addNewCicruitDiagramTab: function() {
+		var _gthis = this;
+		var liHtmlString = "<li role=\"presentation\" id=\"" + this.circuitDiagram.get_name() + "-li\" class=\"active\"><a id=\"" + this.circuitDiagram.get_name() + "-a\" href=\"#" + this.circuitDiagram.get_name() + "-panel\" data-toggle=\"tab\">" + this.circuitDiagram.get_name() + "<span id=\"" + this.circuitDiagram.get_name() + "-close\" class=\"glyphicon glyphicon-remove\"></span></a></li>";
+		var canvasHTMLString = "<div class=\"tab-pane active\" id=\"" + this.circuitDiagram.get_name() + "-panel\"><canvas id=\"canvas-" + this.circuitDiagram.get_name() + "\" style=\"border: 1px solid;\">update your browser to enjoy canvas</canvas></div>";
+		var lefdiveHTML = "<div class=\"tab-pane active\" id=\"" + this.circuitDiagram.get_name() + "-sidebar\"><div class=\"col-sm-12 col-md-12 col-lg-12\">\n        <form class=\"form-search\"><input class=\"input-medium search-query\" type=\"text\" id=\"" + this.circuitDiagram.get_name() + "-search\" placeholder=\"Search...\" style=\"width: 100%\"/>\n        </form></div><div class=\"tabbable col-sm-12 col-md-12 col-lg-12\"><ul class=\"nav nav-tabs\"><li role=\"presentation\" class=\"active\"><a href=\"#list-" + this.circuitDiagram.get_name() + "\" data-toggle=\"tab\" id=\"" + this.circuitDiagram.get_name() + "-buttonList\">Button List</a>\n        </li><li role=\"presentation\"><a href=\"#flist-" + this.circuitDiagram.get_name() + "\" data-toggle=\"tab\" id=\"" + this.circuitDiagram.get_name() + "-fileList\">File List</a></li></ul>\n        <div class=\"tab-content pre-scrollable\"><div class=\"tab-pane active\" id=\"list-" + this.circuitDiagram.get_name() + "\"><div id=\"" + this.circuitDiagram.get_name() + "-buttonGroupList\" class=\"btn-group-vertical\" role=\"group\" aria-label=\"...\" style=\"border: 1px solid\">\n        </div></div><div class=\"tab-pane\" id=\"flist-" + this.circuitDiagram.get_name() + "\"><p>Files</p></div></div></div></div>";
+		$("#leftdivsidebartabcontent").append(lefdiveHTML);
+		$("#circuitdiagramul").append(liHtmlString);
+		$("#circuitdiagramcanvas").append(canvasHTMLString);
+		window.document.getElementById(this.circuitDiagram.get_name() + "-li").onclick = function(event) {
+			var id = event.target.id;
+			id = id.substring(0,id.indexOf("-"));
+			_gthis.previouseCircuitDiagramArray.push(_gthis.circuitDiagram);
+			_gthis.setToCurrentCircuitDiagram(id);
+			$(".tab-pane[id$='-panel']").removeClass("active");
+			$(".tab-pane[id$='-sidebar']").removeClass("active");
+			$(".tab-pane[id^='" + id + "']").addClass("active");
+			_gthis.currentIndex = _gthis.circuitDiagramArray.indexOf(_gthis.circuitDiagram);
+			_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+			_gthis.checkState();
+		};
+		window.document.getElementById(this.circuitDiagram.get_name() + "-close").onclick = function() {
+			if(window.confirm("Close this Diagram means delete it forever, do you still want to do it?")) {
+				var id1 = event.target.id;
+				id1 = id1.substring(0,id1.indexOf("-"));
+				$("[id^='" + id1 + "']").remove();
+				_gthis.deleteCircuitDiagram(id1);
+				if(_gthis.circuitDiagramArray.length == 0) {
+					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
+					_gthis.checkState();
+				} else {
+					_gthis.currentState = com_mun_model_enumeration_F_$STATE.PREVIOUS;
+					_gthis.checkState();
+					$("[id^='" + id1 + "']").addClass("active");
+					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+					_gthis.checkState();
+				}
+			}
+		};
+	}
+	,deleteCircuitDiagram: function(name) {
+		var tempCd = this.folder.findCircuitDiagram(name);
+		this.folder.removeCircuitDiagram(name);
+		HxOverrides.remove(this.circuitDiagramArray,tempCd);
+		this.sideBar.removeCompoundComponentToGateNameArray(name);
+	}
+	,createNewCanvas: function(name) {
+		var canvasElement = window.document.getElementById("canvas-" + this.circuitDiagram.get_name());
+		var canvasContext = canvasElement.getContext("2d");
+		var backingStoreRatioDynamic = Reflect.field(canvasElement,"webKitBackingStorePixelRatio");
+		if(backingStoreRatioDynamic == null) {
+			backingStoreRatioDynamic = Reflect.field(canvasElement,"mozBackingStorePixelRatio");
+		}
+		if(backingStoreRatioDynamic == null) {
+			backingStoreRatioDynamic = Reflect.field(canvasElement,"msBackingStorePixelRatio");
+		}
+		if(backingStoreRatioDynamic == null) {
+			backingStoreRatioDynamic = Reflect.field(canvasElement,"oBackingStorePixelRatio");
+		}
+		if(backingStoreRatioDynamic == null) {
+			backingStoreRatioDynamic = Reflect.field(canvasElement,"backingStorePixelRatio");
+		}
+		var backingStoreRatio = backingStoreRatioDynamic == null ? 1.0 : js_Boot.__cast(backingStoreRatioDynamic , Float);
+		var pixelRatio = window.devicePixelRatio / backingStoreRatio;
+		var oldWidth = window.innerWidth;
+		var oldHeight = window.innerHeight;
+		canvasElement.width = oldWidth * pixelRatio;
+		canvasElement.height = oldHeight * pixelRatio;
+		canvasElement.style.width = oldWidth + "px";
+		canvasElement.style.height = oldHeight + "px";
+		canvasContext.scale(pixelRatio,pixelRatio);
+		com_mun_global_Constant.PIXELRATIO = pixelRatio;
+		this.canvas = canvasElement;
+		this.context = canvasContext;
 	}
 	,pushToMap: function() {
 		this.updateCircuitDiagramMap.set(this.circuitDiagram,this.updateCircuitDiagram);
@@ -2488,6 +2533,8 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.updateCanvasMap.set(this.circuitDiagram,this.updateCanvas);
 		this.sideBarMap.set(this.circuitDiagram,this.sideBar);
 		this.controllerCanvasContextMap.set(this.circuitDiagram,this.controllerCanvasContext);
+		this.canvasMap.set(this.circuitDiagram,this.canvas);
+		this.contextMap.set(this.circuitDiagram,this.context);
 	}
 	,setButtonDisability: function(button,disable) {
 		if(disable) {
@@ -2528,26 +2575,27 @@ com_mun_controller_controllerState_KeyState.prototype = {
 	}
 	,__class__: com_mun_controller_controllerState_KeyState
 };
-var com_mun_controller_controllerState_SideBar = function(updateCircuitDiagram) {
+var com_mun_controller_controllerState_SideBar = function(updateCircuitDiagram,circuitDiagram) {
 	this.updateCircuitDiagram = updateCircuitDiagram;
+	this.circuitDiagram = circuitDiagram;
 	this.gateNameArray = [];
-	this.buttonGroupList = window.document.getElementById("buttonGroupList");
+	this.buttonGroupList = window.document.getElementById(circuitDiagram.get_name() + "-buttonGroupList");
+	this.gateNameArray.push("AND");
+	this.gateNameArray.push("FLIPFLOP");
+	this.gateNameArray.push("INPUT");
+	this.gateNameArray.push("MUX");
+	this.gateNameArray.push("NAND");
+	this.gateNameArray.push("NOR");
+	this.gateNameArray.push("NOT");
+	this.gateNameArray.push("OR");
+	this.gateNameArray.push("OUTPUT");
+	this.gateNameArray.push("XOR");
 	this.initialButtonGroupList();
 	this.bandingOnClick();
-	this.pushGateName("AND");
-	this.pushGateName("FLIPFLOP");
-	this.pushGateName("INPUT");
-	this.pushGateName("MUX");
-	this.pushGateName("NAND");
-	this.pushGateName("NOR");
-	this.pushGateName("NOT");
-	this.pushGateName("OR");
-	this.pushGateName("OUTPUT");
-	this.pushGateName("XOR");
-	this.searchElement = window.document.getElementById("search");
+	this.searchElement = window.document.getElementById(circuitDiagram.get_name() + "-search");
 	this.searchElement.onkeyup = $bind(this,this.search);
-	window.document.getElementById("buttonList").onclick = $bind(this,this.buttonList);
-	window.document.getElementById("fileList").onclick = $bind(this,this.fileList);
+	window.document.getElementById(circuitDiagram.get_name() + "-buttonList").onclick = $bind(this,this.buttonList);
+	window.document.getElementById(circuitDiagram.get_name() + "-fileList").onclick = $bind(this,this.fileList);
 	this.buttonOrFileList = true;
 };
 $hxClasses["com.mun.controller.controllerState.SideBar"] = com_mun_controller_controllerState_SideBar;
@@ -2557,44 +2605,46 @@ com_mun_controller_controllerState_SideBar.prototype = {
 	,component: null
 	,controllerCanavasContext: null
 	,buttonOrFileList: null
+	,circuitDiagram: null
 	,searchElement: null
 	,buttonGroupList: null
 	,gateNameArray: null
-	,bandingOnClick: function() {
-		if(window.document.getElementById("AND") != null) {
-			window.document.getElementById("AND").onmousedown = $bind(this,this.andOnClick);
-		}
-		if(window.document.getElementById("FLIPFLOP") != null) {
-			window.document.getElementById("FLIPFLOP").onmousedown = $bind(this,this.flipFlopOnClick);
-		}
-		if(window.document.getElementById("INPUT") != null) {
-			window.document.getElementById("INPUT").onmousedown = $bind(this,this.inputOnClick);
-		}
-		if(window.document.getElementById("MUX") != null) {
-			window.document.getElementById("MUX").onmousedown = $bind(this,this.muxOnClick);
-		}
-		if(window.document.getElementById("NAND") != null) {
-			window.document.getElementById("NAND").onmousedown = $bind(this,this.nandOnClick);
-		}
-		if(window.document.getElementById("NOR") != null) {
-			window.document.getElementById("NOR").onmousedown = $bind(this,this.norOnClick);
-		}
-		if(window.document.getElementById("NOT") != null) {
-			window.document.getElementById("NOT").onmousedown = $bind(this,this.notOnClick);
-		}
-		if(window.document.getElementById("OR") != null) {
-			window.document.getElementById("OR").onmousedown = $bind(this,this.orOnClick);
-		}
-		if(window.document.getElementById("OUTPUT") != null) {
-			window.document.getElementById("OUTPUT").onmousedown = $bind(this,this.outputOnClick);
-		}
-		if(window.document.getElementById("XOR") != null) {
-			window.document.getElementById("XOR").onmousedown = $bind(this,this.xorOnClick);
-		}
+	,pushCompoundComponentToGateNameArray: function(name) {
+		this.gateNameArray.push(name);
 	}
-	,pushGateName: function(name) {
-		if(name.length != 0) {
-			this.gateNameArray.push(name);
+	,removeCompoundComponentToGateNameArray: function(name) {
+		HxOverrides.remove(this.gateNameArray,name);
+	}
+	,bandingOnClick: function() {
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-AND") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-AND").onmousedown = $bind(this,this.andOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-FLIPFLOP") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-FLIPFLOP").onmousedown = $bind(this,this.flipFlopOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-INPUT") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-INPUT").onmousedown = $bind(this,this.inputOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-MUX") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-MUX").onmousedown = $bind(this,this.muxOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-NAND") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-NAND").onmousedown = $bind(this,this.nandOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-NOR") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-NOR").onmousedown = $bind(this,this.norOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-NOT") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-NOT").onmousedown = $bind(this,this.notOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-OR") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-OR").onmousedown = $bind(this,this.orOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-OUTPUT") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-OUTPUT").onmousedown = $bind(this,this.outputOnClick);
+		}
+		if(window.document.getElementById(this.circuitDiagram.get_name() + "-XOR") != null) {
+			window.document.getElementById(this.circuitDiagram.get_name() + "-XOR").onmousedown = $bind(this,this.xorOnClick);
 		}
 	}
 	,setControllerCanvasContext: function(controllerCanvasContext) {
@@ -2655,7 +2705,7 @@ com_mun_controller_controllerState_SideBar.prototype = {
 				var i = _g1[_g];
 				++_g;
 				if(i.indexOf(value.toLowerCase()) != -1 || i.indexOf(value.toUpperCase()) != -1 || i == value) {
-					htmlString += "<button id=\"" + i + "\" type=\"button\" class=\"btn btn-default active\">" + i + "</button>";
+					htmlString += "<button id=\"" + this.circuitDiagram.get_name() + "-" + i + "\" type=\"button\" class=\"btn btn-default active\">" + i + "</button>";
 				}
 			}
 			this.buttonGroupList.innerHTML = htmlString;
@@ -2671,7 +2721,11 @@ com_mun_controller_controllerState_SideBar.prototype = {
 		this.buttonOrFileList = false;
 	}
 	,initialButtonGroupList: function() {
-		this.buttonGroupList.innerHTML = "<button id=\"AND\" type=\"button\" class=\"btn btn-default active\">AND</button>\n            <button id=\"OR\" type=\"button\" class=\"btn btn-default active\">OR</button>\n            <button id=\"NOT\" type=\"button\" class=\"btn btn-default active\">NOT</button>\n            <button id=\"NOR\" type=\"button\" class=\"btn btn-default active\">NOR</button>\n            <button id=\"NAND\" type=\"button\" class=\"btn btn-default active\">NAND</button>\n            <button id=\"XOR\" type=\"button\" class=\"btn btn-default active\">XOR</button>\n            <button id=\"MUX\" type=\"button\" class=\"btn btn-default active\">MUX</button>\n            <button id=\"FLIPFLOP\" type=\"button\" class=\"btn btn-default active\">FlipFlop</button>\n            <button id=\"INPUT\" type=\"button\" class=\"btn btn-default active\">INPUT</button>\n            <button id=\"OUTPUT\" type=\"button\" class=\"btn btn-default active\">OUTPUT</button>";
+		var tmp = "<button id=\"" + this.circuitDiagram.get_name() + "-AND\" type=\"button\" class=\"btn btn-default active\">AND</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-OR\" type=\"button\" class=\"btn btn-default active\">OR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NOT\" type=\"button\" class=\"btn btn-default active\">NOT</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NOR\" type=\"button\" class=\"btn btn-default active\">NOR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NAND\" type=\"button\" class=\"btn btn-default active\">NAND</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-XOR\" type=\"button\" class=\"btn btn-default active\">XOR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-MUX\" type=\"button\" class=\"btn btn-default active\">MUX</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-FLIPFLOP\" type=\"button\" class=\"btn btn-default active\">FlipFlop</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-INPUT\" type=\"button\" class=\"btn btn-default active\">INPUT</button>\n            <button id=\"" + this.circuitDiagram.get_name();
+		this.buttonGroupList.innerHTML = tmp + "-OUTPUT\" type=\"button\" class=\"btn btn-default active\">OUTPUT</button>";
+	}
+	,appendButtonGroupList: function(name) {
+		$(this.buttonGroupList).append("<button id=\"" + name + "-cc\" type=\"button\" class=\"btn btn-default active\">AND</button>");
 	}
 	,__class__: com_mun_controller_controllerState_SideBar
 };
@@ -2679,8 +2733,6 @@ var com_mun_global_Constant = function() {
 };
 $hxClasses["com.mun.global.Constant"] = com_mun_global_Constant;
 com_mun_global_Constant.__name__ = ["com","mun","global","Constant"];
-com_mun_global_Constant.CANVAS = null;
-com_mun_global_Constant.CONTEXT = null;
 com_mun_global_Constant.prototype = {
 	__class__: com_mun_global_Constant
 };
@@ -3421,6 +3473,9 @@ com_mun_model_component_Folder.prototype = {
 			}
 			return true;
 		}
+	}
+	,deleteCircuitDiagram: function(name) {
+		this.circuitDiagramMap.remove(name);
 	}
 	,__class__: com_mun_model_component_Folder
 };
@@ -6138,14 +6193,14 @@ com_mun_view_drawingImpl_Box.prototype = {
 	}
 	,__class__: com_mun_view_drawingImpl_Box
 };
-var com_mun_view_drawingImpl_DrawingAdapter = function(transform) {
+var com_mun_view_drawingImpl_DrawingAdapter = function(transform,context) {
 	this.font = "8px serif";
 	this.lineWidth = 1.0;
 	this.textColor = "black";
 	this.fillColor = "gray";
 	this.strokeColor = "black";
 	this.worldToView = new com_mun_view_drawingImpl_WorldToView(transform);
-	this.cxt = com_mun_global_Constant.CONTEXT;
+	this.cxt = context;
 };
 $hxClasses["com.mun.view.drawingImpl.DrawingAdapter"] = com_mun_view_drawingImpl_DrawingAdapter;
 com_mun_view_drawingImpl_DrawingAdapter.__name__ = ["com","mun","view","drawingImpl","DrawingAdapter"];
@@ -6187,7 +6242,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt = value;
 	}
 	,transform: function(transform) {
-		return new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.worldToView.get_transform()));
+		return new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.worldToView.get_transform()),this.cxt);
 	}
 	,drawAndShape: function(x,y,width,height,orientation) {
 		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
