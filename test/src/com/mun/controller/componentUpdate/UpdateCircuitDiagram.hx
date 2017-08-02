@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.gates.CompoundComponent;
 import com.mun.model.component.Port;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.controller.command.DeleteCommand;
@@ -110,7 +111,10 @@ class UpdateCircuitDiagram {
     }
 
     public function createCompoundComponent(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:ORIENTATION, inportNum:Int, circuitDiagram:CircuitDiagramI):Component{
-        return null;
+        var componentkind_:ComponentKind = new CompoundComponent(circuitDiagram);
+        var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
+        component_.setNameOfTheComponentKind(name);
+        return component_;
     }
 
     public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{

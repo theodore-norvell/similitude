@@ -170,7 +170,13 @@ class FolderState {
 
                 createATotallyNewCircuitDiagram();
 
-                sideBar.pushCompoundComponentToGateNameArray(circuitDiagram.get_name());
+                for(i in sideBarMap.iterator()){
+                    for(j in circuitDiagramArray){
+                        if(i.getCircuitDiagram() != j){
+                            i.pushCompoundComponentToGateNameArray(j.get_name());
+                        }
+                    }
+                }
 
                 currentIndex = circuitDiagramArray.length - 1;
 
@@ -281,7 +287,7 @@ class FolderState {
         updateCanvas = new UpdateCanvas(circuitDiagram, updateCircuitDiagram.get_transform(), canvas, context);
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
-        sideBar = new SideBar(updateCircuitDiagram, circuitDiagram);
+        sideBar = new SideBar(updateCircuitDiagram, circuitDiagram, folder);
 
         controllerCanvasContext = new ControllerCanvasContext(circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar, canvas);
         sideBar.setControllerCanvasContext(controllerCanvasContext);

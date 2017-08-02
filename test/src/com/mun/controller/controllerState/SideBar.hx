@@ -1,5 +1,7 @@
 package com.mun.controller.controllerState;
 
+import com.mun.model.component.FolderI;
+import js.html.Event;
 import com.mun.model.component.CircuitDiagramI;
 import js.jquery.JQuery;
 import js.html.DOMElement;
@@ -16,15 +18,17 @@ class SideBar {
     var controllerCanavasContext:ControllerCanvasContext;
     var buttonOrFileList:Bool;//button = true;   file = false
     var circuitDiagram:CircuitDiagramI;
+    var folder:FolderI;
 
     var searchElement:DOMElement;
     var buttonGroupList:DOMElement;
 
     var gateNameArray:Array<String>;
 
-    public function new(updateCircuitDiagram:UpdateCircuitDiagram, circuitDiagram:CircuitDiagramI) {
+    public function new(updateCircuitDiagram:UpdateCircuitDiagram, circuitDiagram:CircuitDiagramI,folder:FolderI) {
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.circuitDiagram = circuitDiagram;
+        this.folder = folder;
 
         gateNameArray = new Array<String>();
 
@@ -56,6 +60,7 @@ class SideBar {
 
     public function pushCompoundComponentToGateNameArray(name:String){
         gateNameArray.push(name);
+        resetSideBarButtons();
     }
 
     public function removeCompoundComponentToGateNameArray(name:String){
@@ -63,36 +68,31 @@ class SideBar {
     }
 
     function bandingOnClick(){
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-AND") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-AND").onmousedown = andOnClick;
+        for(i in gateNameArray){
+            if(i == "AND" ||  i == "OR" ||  i == "NOT" ||  i == "NOR" ||  i == "NAND" ||  i == "XOR" ||  i == "MUX" ||  i == "FLIPFLOP" ||  i == "INPUT" ||  i == "OUTPUT"){
+                if(Browser.document.getElementById(circuitDiagram.get_name() + "-" + i) != null){
+                    Browser.document.getElementById(circuitDiagram.get_name() + "-" + i).onmousedown = function(event:Event){
+                        var id:String = untyped event.target.id;
+                        id = id.substring(id.indexOf("-") + 1, id.length);
+                        component = updateCircuitDiagram.createComponent(id,250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
+                        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
+                    };
+                }
+            }else{
+                if(Browser.document.getElementById(circuitDiagram.get_name() + "-" + i) != null){
+                    Browser.document.getElementById(circuitDiagram.get_name() + "-" + i).onmousedown = function(event:Event){
+                        var id:String = untyped event.target.id;
+                        id = id.substring(id.indexOf("-") + 1, id.length);
+                        component = updateCircuitDiagram.createCompoundComponent(id,250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2, folder.findCircuitDiagram(id));
+                        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
+                    }
+                }
+            }
         }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-FLIPFLOP") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-FLIPFLOP").onmousedown = flipFlopOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-INPUT") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-INPUT").onmousedown = inputOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-MUX") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-MUX").onmousedown = muxOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-NAND") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-NAND").onmousedown = nandOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-NOR") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-NOR").onmousedown = norOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-NOT") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-NOT").onmousedown = notOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-OR") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-OR").onmousedown = orOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-OUTPUT") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-OUTPUT").onmousedown = outputOnClick;
-        }
-        if(Browser.document.getElementById(circuitDiagram.get_name() + "-XOR") != null){
-            Browser.document.getElementById(circuitDiagram.get_name() + "-XOR").onmousedown = xorOnClick;
-        }
+    }
+
+    public function getCircuitDiagram():CircuitDiagramI{
+        return circuitDiagram;
     }
 
     public function setControllerCanvasContext(controllerCanvasContext:ControllerCanvasContext){
@@ -103,49 +103,20 @@ class SideBar {
         return component;
     }
 
-    function andOnClick(){
-        component = updateCircuitDiagram.createComponent("AND",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function flipFlopOnClick(){
-        component = updateCircuitDiagram.createComponent("FlipFlop",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function inputOnClick(){
-        component = updateCircuitDiagram.createComponent("Input",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function muxOnClick(){
-        component = updateCircuitDiagram.createComponent("MUX",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function nandOnClick(){
-        component = updateCircuitDiagram.createComponent("NAND",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function norOnClick(){
-        component = updateCircuitDiagram.createComponent("NOR",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function notOnClick(){
-        component = updateCircuitDiagram.createComponent("NOT",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function orOnClick(){
-        component = updateCircuitDiagram.createComponent("OR",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function outputOnClick(){
-        component = updateCircuitDiagram.createComponent("Output",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-    function xorOnClick(){
-        component = updateCircuitDiagram.createComponent("XOR",250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2);
-        controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
-    }
-
     function compoundComponentOnClick(){
         //TODO
+    }
+
+    function resetSideBarButtons(){
+        initialButtonGroupList();
+        for(i in gateNameArray){
+            if(i != "AND" &&  i != "OR" &&  i != "NOT" &&  i != "NOR"
+                &&  i != "NAND" &&  i != "XOR" &&  i != "MUX" &&  i != "FLIPFLOP"
+                &&  i != "INPUT" &&  i != "OUTPUT"){
+                appendButtonGroupList(i);
+            }
+        }
+        bandingOnClick();
     }
 
     function search(){
@@ -155,12 +126,14 @@ class SideBar {
             for(i in gateNameArray){
                 if(i.indexOf(value.toLowerCase()) != -1 || i.indexOf(value.toUpperCase()) != -1 || i == value){
                     htmlString += "<button id=\""+circuitDiagram.get_name() + "-" + i + "\" type=\"button\" class=\"btn btn-default active\">"+ i + "</button>";
+
                 }
             }
             buttonGroupList.innerHTML = htmlString;
             bandingOnClick();
         }else{
             initialButtonGroupList();
+            bandingOnClick();
         }
     }
 
@@ -186,6 +159,6 @@ class SideBar {
     }
 
     function appendButtonGroupList(name){
-        new JQuery(buttonGroupList).append("<button id=\""+name+"-cc\" type=\"button\" class=\"btn btn-default active\">AND</button>");
+        new JQuery(buttonGroupList).append("<button id=\""+circuitDiagram.get_name()+"-"+name+"\" type=\"button\" class=\"btn btn-default active\">"+name+"</button>");
     }
 }

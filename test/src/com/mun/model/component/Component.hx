@@ -49,6 +49,7 @@ class Component {
         this.componentKind = componentKind;
         this.componentKind.set_component(this);
         this.inportsNum = inportNum;
+        this.boxType = BOX.WHITE_BOX;
 
         this.delay = 0;//init is zero
 

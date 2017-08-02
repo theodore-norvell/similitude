@@ -12,7 +12,6 @@ import com.mun.view.drawingImpl.Transform;
 import com.mun.model.component.Outport;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.component.Inport;
-import com.mun.model.component.CircuitDiagram;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.ORIENTATION;
@@ -22,10 +21,10 @@ import com.mun.global.Constant.*;
 * compound Component
 **/
 class CompoundComponent implements ComponentKind extends GateAbstract{
-    var circuitDiagram:CircuitDiagram;
+    var circuitDiagram:CircuitDiagramI;
     var outputCounter:Int;
 
-    public function new(circuitDiagram:CircuitDiagram) {
+    public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
 
         var inputCounter:Int = 0;
@@ -46,10 +45,10 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
     }
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
-        return ; //TODO
+        return null; //TODO
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, inportNum:Int):Array<Port> {
+    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         //find how many inputs gate in the sub-circuit diagram
         switch(orientation){
@@ -106,7 +105,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                     }
                 }
             };
-            case orientation.WEST : {
+            case ORIENTATION.WEST : {
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
@@ -151,9 +150,9 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
 
     function makeTransform():Transform{
         var transform:Transform = Transform.identity();
-        transform = transform.translate(component.get_xPosition(), component.get_yPosition()) *
-                    transform.scale(component.get_width()/circuitDiagram.get_diagramWidth(), component.get_height()/circuitDiagram.get_diagramHeight()) *
-                    transform.translate(-circuitDiagram.get_xMin(), -circuitDiagram.get_yMin());
+        transform = transform.translate(component.get_xPosition(), component.get_yPosition())
+                    .scale(component.get_width()/circuitDiagram.get_diagramWidth(), component.get_height()/circuitDiagram.get_diagramHeight())
+                    .translate(-circuitDiagram.get_xMin(), -circuitDiagram.get_yMin());
         return transform;
     }
 
@@ -180,7 +179,8 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }else{
             var hitObject:HitObject = new HitObject();
             hitObject.set_component(component);
-            return hitObjectArray.push(hitObject);
+            hitObjectArray.push(hitObject);
+            return hitObjectArray;
         }
     }
 
@@ -192,7 +192,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }else if(component.get_boxType() == BOX.WHITE_BOX){
             var transform:Transform = makeTransform();
             var wForDiagram:Coordinate = transform.pointInvert(worldCoordinate);
-            return circuitDiagram.findWorldPoint(new WorldPoint(circuitDiagram, wForDiagram), mode);
+            return circuitDiagram.findWorldPoint(wForDiagram, mode);
         }else{
             return worldPointArray;
         }

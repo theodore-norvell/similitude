@@ -19,7 +19,7 @@ class DrawCompoundComponent implements DrawComponent{
             strokeColor = "black";
         }
         drawingAdapter.setStrokeColor(strokeColor);
-
+        drawingAdapter.setFillColor("white");
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.setTextColor("black");
         drawingAdapter.drawText(component.get_name(), component.get_xPosition() - 8, component.get_yPosition(), component.get_width() - 2);
