@@ -2630,14 +2630,14 @@ var com_mun_controller_controllerState_SideBar = function(updateCircuitDiagram,c
 	this.gateNameArray = [];
 	this.buttonGroupList = window.document.getElementById(circuitDiagram.get_name() + "-buttonGroupList");
 	this.gateNameArray.push("AND");
-	this.gateNameArray.push("FLIPFLOP");
-	this.gateNameArray.push("INPUT");
+	this.gateNameArray.push("FlipFlop");
+	this.gateNameArray.push("Input");
 	this.gateNameArray.push("MUX");
 	this.gateNameArray.push("NAND");
 	this.gateNameArray.push("NOR");
 	this.gateNameArray.push("NOT");
 	this.gateNameArray.push("OR");
-	this.gateNameArray.push("OUTPUT");
+	this.gateNameArray.push("Output");
 	this.gateNameArray.push("XOR");
 	this.initialButtonGroupList();
 	this.bandingOnClick();
@@ -2683,7 +2683,7 @@ com_mun_controller_controllerState_SideBar.prototype = {
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			if(i == "AND" || i == "OR" || i == "NOT" || i == "NOR" || i == "NAND" || i == "XOR" || i == "MUX" || i == "FLIPFLOP" || i == "INPUT" || i == "OUTPUT") {
+			if(i == "AND" || i == "OR" || i == "NOT" || i == "NOR" || i == "NAND" || i == "XOR" || i == "MUX" || i == "FlipFlop" || i == "Input" || i == "Output") {
 				if(window.document.getElementById(this.circuitDiagram.get_name() + "-" + i) != null) {
 					window.document.getElementById(this.circuitDiagram.get_name() + "-" + i).onmousedown = function(event) {
 						var id = event.target.id;
@@ -2724,7 +2724,7 @@ com_mun_controller_controllerState_SideBar.prototype = {
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			if(i != "AND" && i != "OR" && i != "NOT" && i != "NOR" && i != "NAND" && i != "XOR" && i != "MUX" && i != "FLIPFLOP" && i != "INPUT" && i != "OUTPUT") {
+			if(i != "AND" && i != "OR" && i != "NOT" && i != "NOR" && i != "NAND" && i != "XOR" && i != "MUX" && i != "FlipFlop" && i != "Input" && i != "Output") {
 				this.appendButtonGroupList(i);
 			}
 		}
@@ -2757,8 +2757,8 @@ com_mun_controller_controllerState_SideBar.prototype = {
 		this.buttonOrFileList = false;
 	}
 	,initialButtonGroupList: function() {
-		var tmp = "<button id=\"" + this.circuitDiagram.get_name() + "-AND\" type=\"button\" class=\"btn btn-default active\">AND</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-OR\" type=\"button\" class=\"btn btn-default active\">OR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NOT\" type=\"button\" class=\"btn btn-default active\">NOT</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NOR\" type=\"button\" class=\"btn btn-default active\">NOR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NAND\" type=\"button\" class=\"btn btn-default active\">NAND</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-XOR\" type=\"button\" class=\"btn btn-default active\">XOR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-MUX\" type=\"button\" class=\"btn btn-default active\">MUX</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-FLIPFLOP\" type=\"button\" class=\"btn btn-default active\">FlipFlop</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-INPUT\" type=\"button\" class=\"btn btn-default active\">INPUT</button>\n            <button id=\"" + this.circuitDiagram.get_name();
-		this.buttonGroupList.innerHTML = tmp + "-OUTPUT\" type=\"button\" class=\"btn btn-default active\">OUTPUT</button>";
+		var tmp = "<button id=\"" + this.circuitDiagram.get_name() + "-AND\" type=\"button\" class=\"btn btn-default active\">AND</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-OR\" type=\"button\" class=\"btn btn-default active\">OR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NOT\" type=\"button\" class=\"btn btn-default active\">NOT</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NOR\" type=\"button\" class=\"btn btn-default active\">NOR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-NAND\" type=\"button\" class=\"btn btn-default active\">NAND</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-XOR\" type=\"button\" class=\"btn btn-default active\">XOR</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-MUX\" type=\"button\" class=\"btn btn-default active\">MUX</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-FlipFlop\" type=\"button\" class=\"btn btn-default active\">FlipFlop</button>\n            <button id=\"" + this.circuitDiagram.get_name() + "-Input\" type=\"button\" class=\"btn btn-default active\">INPUT</button>\n            <button id=\"" + this.circuitDiagram.get_name();
+		this.buttonGroupList.innerHTML = tmp + "-Output\" type=\"button\" class=\"btn btn-default active\">OUTPUT</button>";
 	}
 	,appendButtonGroupList: function(name) {
 		$(this.buttonGroupList).append("<button id=\"" + this.circuitDiagram.get_name() + "-" + name + "\" type=\"button\" class=\"btn btn-default active\">" + name + "</button>");

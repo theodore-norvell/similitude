@@ -35,14 +35,14 @@ class SideBar {
         buttonGroupList = Browser.document.getElementById(circuitDiagram.get_name() + "-buttonGroupList");
 
         gateNameArray.push("AND");
-        gateNameArray.push("FLIPFLOP");
-        gateNameArray.push("INPUT");
+        gateNameArray.push("FlipFlop");
+        gateNameArray.push("Input");
         gateNameArray.push("MUX");
         gateNameArray.push("NAND");
         gateNameArray.push("NOR");
         gateNameArray.push("NOT");
         gateNameArray.push("OR");
-        gateNameArray.push("OUTPUT");
+        gateNameArray.push("Output");
         gateNameArray.push("XOR");
 
         initialButtonGroupList();
@@ -80,7 +80,7 @@ class SideBar {
 
     function bandingOnClick(){
         for(i in gateNameArray){
-            if(i == "AND" ||  i == "OR" ||  i == "NOT" ||  i == "NOR" ||  i == "NAND" ||  i == "XOR" ||  i == "MUX" ||  i == "FLIPFLOP" ||  i == "INPUT" ||  i == "OUTPUT"){
+            if(i == "AND" ||  i == "OR" ||  i == "NOT" ||  i == "NOR" ||  i == "NAND" ||  i == "XOR" ||  i == "MUX" ||  i == "FlipFlop" ||  i == "Input" ||  i == "Output"){
                 if(Browser.document.getElementById(circuitDiagram.get_name() + "-" + i) != null){
                     Browser.document.getElementById(circuitDiagram.get_name() + "-" + i).onmousedown = function(event:Event){
                         var id:String = untyped event.target.id;
@@ -122,8 +122,8 @@ class SideBar {
         initialButtonGroupList();
         for(i in gateNameArray){
             if(i != "AND" &&  i != "OR" &&  i != "NOT" &&  i != "NOR"
-                &&  i != "NAND" &&  i != "XOR" &&  i != "MUX" &&  i != "FLIPFLOP"
-                &&  i != "INPUT" &&  i != "OUTPUT"){
+                &&  i != "NAND" &&  i != "XOR" &&  i != "MUX" &&  i != "FlipFlop"
+                &&  i != "Input" &&  i != "Output"){
                 appendButtonGroupList(i);
             }
         }
@@ -164,9 +164,9 @@ class SideBar {
             <button id=\""+circuitDiagram.get_name()+"-NAND\" type=\"button\" class=\"btn btn-default active\">NAND</button>
             <button id=\""+circuitDiagram.get_name()+"-XOR\" type=\"button\" class=\"btn btn-default active\">XOR</button>
             <button id=\""+circuitDiagram.get_name()+"-MUX\" type=\"button\" class=\"btn btn-default active\">MUX</button>
-            <button id=\""+circuitDiagram.get_name()+"-FLIPFLOP\" type=\"button\" class=\"btn btn-default active\">FlipFlop</button>
-            <button id=\""+circuitDiagram.get_name()+"-INPUT\" type=\"button\" class=\"btn btn-default active\">INPUT</button>
-            <button id=\""+circuitDiagram.get_name()+"-OUTPUT\" type=\"button\" class=\"btn btn-default active\">OUTPUT</button>";
+            <button id=\""+circuitDiagram.get_name()+"-FlipFlop\" type=\"button\" class=\"btn btn-default active\">FlipFlop</button>
+            <button id=\""+circuitDiagram.get_name()+"-Input\" type=\"button\" class=\"btn btn-default active\">INPUT</button>
+            <button id=\""+circuitDiagram.get_name()+"-Output\" type=\"button\" class=\"btn btn-default active\">OUTPUT</button>";
     }
 
     function appendButtonGroupList(name){
