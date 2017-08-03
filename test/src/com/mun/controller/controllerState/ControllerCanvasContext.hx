@@ -301,6 +301,7 @@ class ControllerCanvasContext {
             case C_STATE.CREATE_LINK : {
                 var link:Link = updateCircuitDiagram.addLink(mouseDownWorldCoordinate,mouseDownWorldCoordinate);
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(link.get_rightEndpoint());
+                hightLightLink = link;
             };
             case C_STATE.MOVE : {
                 if(!linkAndComponentAndEndpointAndPortArray.isEmpty()){

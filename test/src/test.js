@@ -2178,6 +2178,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		case 2:
 			var link = this.updateCircuitDiagram.addLink(this.mouseDownWorldCoordinate,this.mouseDownWorldCoordinate);
 			this.linkAndComponentAndEndpointAndPortArray.addEndpoint(link.get_rightEndpoint());
+			this.hightLightLink = link;
 			break;
 		case 3:
 			if(!this.linkAndComponentAndEndpointAndPortArray.isEmpty()) {
@@ -3053,7 +3054,6 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
 	,draw: function(drawingAdapter,linkAndComponentArray) {
-		haxe_Log.trace(this.name,{ fileName : "CircuitDiagram.hx", lineNumber : 299, className : "com.mun.model.component.CircuitDiagram", methodName : "draw"});
 		var drawFlag = false;
 		var _g = 0;
 		var _g1 = this.componentArray;
@@ -9191,7 +9191,7 @@ if(typeof($) != "undefined" && $.fn != null) {
 StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
 com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
-com_mun_global_Constant.pointToEndpointDistance = 3;
+com_mun_global_Constant.pointToEndpointDistance = 6;
 com_mun_global_Constant.PIXELRATIO = 1;
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
