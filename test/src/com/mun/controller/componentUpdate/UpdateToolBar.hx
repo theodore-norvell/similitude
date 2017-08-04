@@ -178,4 +178,30 @@ class UpdateToolBar {
     function linkAndComponentArrayReset(){
         linkAndComponentArray.clean();
     }
+
+    public function unbindEventListener(){
+        nameInput.removeEventListener("keyup",inputChange);
+        deleteButton.removeEventListener("click", deleteObject);
+        undo.removeEventListener("click", undoCommand);
+        redo.removeEventListener("click", redoCommand);
+        Browser.document.getElementById("north").removeEventListener("click", changeToNorth);
+        Browser.document.getElementById("south").removeEventListener("click", changeToSouth);
+        Browser.document.getElementById("west").removeEventListener("click", changeToWest);
+        Browser.document.getElementById("east").removeEventListener("click", changeToEast);
+
+        toolBar.removeEventListener("focus", onfocus);
+    }
+
+    public function bindEventListener(){
+        nameInput.addEventListener("keyup",inputChange,false);
+        deleteButton.onclick = deleteObject;
+        undo.onclick = undoCommand;
+        redo.onclick = redoCommand;
+        Browser.document.getElementById("north").onclick = changeToNorth;
+        Browser.document.getElementById("south").onclick = changeToSouth;
+        Browser.document.getElementById("west").onclick = changeToWest;
+        Browser.document.getElementById("east").onclick = changeToEast;
+
+        toolBar.onfocus = onfocus;
+    }
 }

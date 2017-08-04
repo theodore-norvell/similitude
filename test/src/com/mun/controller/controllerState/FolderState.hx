@@ -219,7 +219,7 @@ class FolderState {
                     if(circuitDiagramArray.length != 0){
                         for(i in circuitDiagramArray){
                             if(i.get_name().toLowerCase().indexOf(searchName.toLowerCase()) != -1 || i.get_name().toUpperCase().indexOf(searchName.toUpperCase()) != -1 || i.get_name().indexOf(searchName) != -1){
-                                html += "<li><a id=\""+ i.get_name() +"\"> " + i.get_name() +"</a></li>";
+                                html += "<li><a id=\""+ i.get_name() +"-searchCircuitDiagram\"> " + i.get_name() +"</a></li>";
                                 recordSearchResultList.push(i);
                             }
                         }
@@ -229,17 +229,19 @@ class FolderState {
                     Browser.document.getElementById("circuitDiagramHintList").style.display = "table";
 
                     for(i in recordSearchResultList){
-                        Browser.document.getElementById(i.get_name()).onclick = function(event:Event){
+                        Browser.document.getElementById(i.get_name() + "-searchCircuitDiagram").onclick = function(event:Event){
                             var id:String = untyped event.target.id;
-                            trace(id);
+                            id = id.substring(0, id.indexOf("-"));
                             previouseCircuitDiagramArray.push(circuitDiagram);
 
-                            setToCurrentCircuitDiagram(i.get_name());
+                            setToCurrentCircuitDiagram(id);
+                            new JQuery("li[id$='-li']").removeClass("active");
                             new JQuery(".tab-pane[id$='-panel']").removeClass("active");
                             new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
                             new JQuery(".tab-pane[id^='"+id+"']").addClass("active");
+                            new JQuery("li[id^='"+id+"']").addClass("active");
 
-                            currentIndex = circuitDiagramArray.indexOf(i);
+                            currentIndex = circuitDiagramArray.indexOf(folder.findCircuitDiagram(id));
 
                             Browser.document.getElementById("circuitDiagramHintList").style.display = "none";
                             new JQuery(Browser.document.getElementById("search_circuitdiagram")).val("");
@@ -282,7 +284,9 @@ class FolderState {
     function setToCurrentCircuitDiagram(name:String){
         circuitDiagram = folder.findCircuitDiagram(name);
         updateCircuitDiagram = updateCircuitDiagramMap[circuitDiagram];
+        updateToolBar.unbindEventListener();
         updateToolBar = updateToolBarMap[circuitDiagram];
+        updateToolBar.bindEventListener();
         updateCanvas = updateCanvasMap[circuitDiagram];
         sideBar = sideBarMap[circuitDiagram];
         controllerCanvasContext = controllerCanvasContextMap[circuitDiagram];

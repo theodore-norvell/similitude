@@ -1929,6 +1929,28 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,linkAndComponentArrayReset: function() {
 		this.linkAndComponentArray.clean();
 	}
+	,unbindEventListener: function() {
+		this.nameInput.removeEventListener("keyup",$bind(this,this.inputChange));
+		this.deleteButton.removeEventListener("click",$bind(this,this.deleteObject));
+		this.undo.removeEventListener("click",$bind(this,this.undoCommand));
+		this.redo.removeEventListener("click",$bind(this,this.redoCommand));
+		window.document.getElementById("north").removeEventListener("click",$bind(this,this.changeToNorth));
+		window.document.getElementById("south").removeEventListener("click",$bind(this,this.changeToSouth));
+		window.document.getElementById("west").removeEventListener("click",$bind(this,this.changeToWest));
+		window.document.getElementById("east").removeEventListener("click",$bind(this,this.changeToEast));
+		this.toolBar.removeEventListener("focus",$bind(this,this.onfocus));
+	}
+	,bindEventListener: function() {
+		this.nameInput.addEventListener("keyup",$bind(this,this.inputChange),false);
+		this.deleteButton.onclick = $bind(this,this.deleteObject);
+		this.undo.onclick = $bind(this,this.undoCommand);
+		this.redo.onclick = $bind(this,this.redoCommand);
+		window.document.getElementById("north").onclick = $bind(this,this.changeToNorth);
+		window.document.getElementById("south").onclick = $bind(this,this.changeToSouth);
+		window.document.getElementById("west").onclick = $bind(this,this.changeToWest);
+		window.document.getElementById("east").onclick = $bind(this,this.changeToEast);
+		this.toolBar.onfocus = $bind(this,this.onfocus);
+	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
 var com_mun_controller_controllerState_ControllerCanvasContext = function(circuitDiagram,updateCircuitDiagram,sideBar,upateToolBar,canvas) {
@@ -2396,7 +2418,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 						var i2 = _g12[_g2];
 						++_g2;
 						if(i2.get_name().toLowerCase().indexOf(this.searchName.toLowerCase()) != -1 || i2.get_name().toUpperCase().indexOf(this.searchName.toUpperCase()) != -1 || i2.get_name().indexOf(this.searchName) != -1) {
-							html += "<li><a id=\"" + i2.get_name() + "\"> " + i2.get_name() + "</a></li>";
+							html += "<li><a id=\"" + i2.get_name() + "-searchCircuitDiagram\"> " + i2.get_name() + "</a></li>";
 							recordSearchResultList.push(i2);
 						}
 					}
@@ -2405,25 +2427,26 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				window.document.getElementById("circuitDiagramHintList").style.display = "table";
 				var _g3 = 0;
 				while(_g3 < recordSearchResultList.length) {
-					var i3 = [recordSearchResultList[_g3]];
+					var i3 = recordSearchResultList[_g3];
 					++_g3;
-					window.document.getElementById(i3[0].get_name()).onclick = (function(i4) {
-						return function(event) {
-							var id = event.target.id;
-							haxe_Log.trace(id,{ fileName : "FolderState.hx", lineNumber : 234, className : "com.mun.controller.controllerState.FolderState", methodName : "checkState"});
-							_gthis.previouseCircuitDiagramArray.push(_gthis.circuitDiagram);
-							var tmp = i4[0].get_name();
-							_gthis.setToCurrentCircuitDiagram(tmp);
-							$(".tab-pane[id$='-panel']").removeClass("active");
-							$(".tab-pane[id$='-sidebar']").removeClass("active");
-							$(".tab-pane[id^='" + id + "']").addClass("active");
-							_gthis.currentIndex = _gthis.circuitDiagramArray.indexOf(i4[0]);
-							window.document.getElementById("circuitDiagramHintList").style.display = "none";
-							$(window.document.getElementById("search_circuitdiagram")).val("");
-							_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
-							_gthis.checkState();
-						};
-					})(i3);
+					window.document.getElementById(i3.get_name() + "-searchCircuitDiagram").onclick = function(event) {
+						var id = event.target.id;
+						id = id.substring(0,id.indexOf("-"));
+						_gthis.previouseCircuitDiagramArray.push(_gthis.circuitDiagram);
+						_gthis.setToCurrentCircuitDiagram(id);
+						$("li[id$='-li']").removeClass("active");
+						$(".tab-pane[id$='-panel']").removeClass("active");
+						$(".tab-pane[id$='-sidebar']").removeClass("active");
+						$(".tab-pane[id^='" + id + "']").addClass("active");
+						$("li[id^='" + id + "']").addClass("active");
+						var _gthis1 = _gthis.circuitDiagramArray;
+						var tmp = _gthis.folder.findCircuitDiagram(id);
+						_gthis.currentIndex = _gthis1.indexOf(tmp);
+						window.document.getElementById("circuitDiagramHintList").style.display = "none";
+						$(window.document.getElementById("search_circuitdiagram")).val("");
+						_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+						_gthis.checkState();
+					};
 				}
 			} else {
 				window.document.getElementById("circuitDiagramHintList").style.display = "none";
@@ -2445,7 +2468,9 @@ com_mun_controller_controllerState_FolderState.prototype = {
 	,setToCurrentCircuitDiagram: function(name) {
 		this.circuitDiagram = this.folder.findCircuitDiagram(name);
 		this.updateCircuitDiagram = this.updateCircuitDiagramMap.h[this.circuitDiagram.__id__];
+		this.updateToolBar.unbindEventListener();
 		this.updateToolBar = this.updateToolBarMap.h[this.circuitDiagram.__id__];
+		this.updateToolBar.bindEventListener();
 		this.updateCanvas = this.updateCanvasMap.h[this.circuitDiagram.__id__];
 		this.sideBar = this.sideBarMap.h[this.circuitDiagram.__id__];
 		this.controllerCanvasContext = this.controllerCanvasContextMap.h[this.circuitDiagram.__id__];
@@ -7902,15 +7927,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };
