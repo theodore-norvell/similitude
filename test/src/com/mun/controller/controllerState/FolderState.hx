@@ -311,6 +311,7 @@ class FolderState {
 
         controllerCanvasContext = new ControllerCanvasContext(circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar, canvas);
         sideBar.setControllerCanvasContext(controllerCanvasContext);
+        updateToolBar.setControllerCanvasContext(controllerCanvasContext);
 
         pushToMap();
     }

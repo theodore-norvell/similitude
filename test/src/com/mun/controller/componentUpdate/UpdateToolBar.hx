@@ -1,5 +1,7 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.enumeration.C_STATE;
+import com.mun.controller.controllerState.ControllerCanvasContext;
 import js.jquery.JQuery;
 import com.mun.model.enumeration.ORIENTATION;
 import js.html.DOMElement;
@@ -19,6 +21,7 @@ class UpdateToolBar {
     var component_name_div:DOMElement;
     var undo:DOMElement;
     var redo:DOMElement;
+    var controllerCanvasContext:ControllerCanvasContext;
 
     public function new(updateCircuitDiagram:UpdateCircuitDiagram) {
         linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
@@ -36,16 +39,11 @@ class UpdateToolBar {
         redo = Browser.document.getElementById("redo");
         redo.style.visibility = "visible";
 
-        nameInput.addEventListener("keyup",inputChange,false);
-        deleteButton.onclick = deleteObject;
-        undo.onclick = undoCommand;
-        redo.onclick = redoCommand;
-        Browser.document.getElementById("north").onclick = changeToNorth;
-        Browser.document.getElementById("south").onclick = changeToSouth;
-        Browser.document.getElementById("west").onclick = changeToWest;
-        Browser.document.getElementById("east").onclick = changeToEast;
+        bindEventListener();
+    }
 
-        toolBar.onfocus = onfocus;
+    public function setControllerCanvasContext(controllerCanvasContext:ControllerCanvasContext){
+        this.controllerCanvasContext = controllerCanvasContext;
     }
 
     function onfocus(){
@@ -68,7 +66,6 @@ class UpdateToolBar {
         }
 
         //linkAndComponentArray may contains link and component, so when link and component both exists, then only show those things both have
-
         if(linkAndComponentArray.getComponentIteratorLength() != 0 && linkAndComponentArray.getLinkIteratorLength() == 0){
             setOrientation();
             if(linkAndComponentArray.getComponentIteratorLength() == 1){
@@ -79,6 +76,16 @@ class UpdateToolBar {
             }
         }else{
             visible(false);
+        }
+        if(linkAndComponentArray.getComponentIteratorLength() == 0 && linkAndComponentArray.getLinkIteratorLength() == 0){
+            Browser.document.getElementById("copy").setAttribute("disabled", "disabled");
+            if(updateCircuitDiagram.isCopyStackEmpty()){
+                Browser.document.getElementById("paste").setAttribute("disabled", "disabled");
+            }else{
+                new JQuery("#paste").removeAttr("disabled");
+            }
+        }else{
+            new JQuery("#copy").removeAttr("disabled");
         }
     }
 
@@ -141,6 +148,19 @@ class UpdateToolBar {
         updateCircuitDiagram.redo();
     }
 
+    function copy(){
+        new JQuery("#paste").removeAttr("disabled");
+        updateCircuitDiagram.get_commandManager().recordFlagSetTrue();
+        updateCircuitDiagram.copy(linkAndComponentArray);
+        updateCircuitDiagram.get_commandManager().recordFlagRest();
+    }
+
+    function paste(){
+        Browser.document.getElementById("copy").setAttribute("disabled", "disabled");
+        Browser.document.getElementById("paste").setAttribute("disabled", "disabled");
+        controllerCanvasContext.set_controllerState(C_STATE.PASTE);
+    }
+
     public function visible(allVisable:Bool){
         deleteButton.style.visibility = "visible";
         if(allVisable){
@@ -188,7 +208,8 @@ class UpdateToolBar {
         Browser.document.getElementById("south").removeEventListener("click", changeToSouth);
         Browser.document.getElementById("west").removeEventListener("click", changeToWest);
         Browser.document.getElementById("east").removeEventListener("click", changeToEast);
-
+        Browser.document.getElementById("copy").removeEventListener("click", copy);
+        Browser.document.getElementById("paste").removeEventListener("click", paste);
         toolBar.removeEventListener("focus", onfocus);
     }
 
@@ -201,7 +222,8 @@ class UpdateToolBar {
         Browser.document.getElementById("south").onclick = changeToSouth;
         Browser.document.getElementById("west").onclick = changeToWest;
         Browser.document.getElementById("east").onclick = changeToEast;
-
+        Browser.document.getElementById("copy").onclick = copy;
+        Browser.document.getElementById("paste").onclick = paste;
         toolBar.onfocus = onfocus;
     }
 }

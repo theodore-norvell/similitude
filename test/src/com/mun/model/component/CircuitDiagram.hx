@@ -220,16 +220,8 @@ class CircuitDiagram implements CircuitDiagramI{
         componentArray.remove(component);
     }
 
-    public function clearCopyStack():Void{
-        copyStack.clearStack();
-    }
-
-    public function pushLinkToCopyStack(link:Link):Void{
-        copyStack.pushLink(link);
-    }
-
-    public function pushComponentToCopyStack(component:Component):Void{
-        copyStack.pushComponent(component);
+    public function getCopyStack():Stack{
+        return copyStack;
     }
 
     public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void{

@@ -18,7 +18,7 @@ class CopyCommand implements Command {
     }
 
     public function undo():LinkAndComponentAndEndpointAndPortArray {
-        circuitDiagram.clearCopyStack();
+        circuitDiagram.getCopyStack().clearStack();
         return linkAndComponentAndEndpointAndPortArray;
     }
 
@@ -30,13 +30,13 @@ class CopyCommand implements Command {
     public function execute():Void {
         if (linkAndComponentAndEndpointAndPortArray.getLinkIteratorLength() != 0) {
             for (i in linkAndComponentAndEndpointAndPortArray.get_linkIterator()) {
-                circuitDiagram.pushLinkToCopyStack(i);
+                circuitDiagram.getCopyStack().pushLink(i);
             }
         }
 
         if (linkAndComponentAndEndpointAndPortArray.getComponentIteratorLength() != 0) {
             for (i in linkAndComponentAndEndpointAndPortArray.get_componentIterator()) {
-                circuitDiagram.pushComponentToCopyStack(i);
+                circuitDiagram.getCopyStack().pushComponent(i);
             }
         }
     }

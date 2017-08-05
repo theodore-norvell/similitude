@@ -196,6 +196,12 @@ class ControllerCanvasContext {
             lastState = controllerState;
             controllerState = C_STATE.MOVE;
             checkState();
+        }else if(controllerState == C_STATE.PASTE){
+            lastState = controllerState;
+            controllerState = C_STATE.MOVE;
+            checkState();
+
+            controllerState = C_STATE.PASTE;
         }
     }
 
@@ -293,6 +299,16 @@ class ControllerCanvasContext {
                 if(!(keyState.get_key() == KEY.ALT_KEY && keyState.get_keyState() == K_STATE.KEY_DOWN)){
                     linkAndComponentAndEndpointAndPortArray.clean();
                 }
+
+                //check is any link is not enough long: link at least need have 10 pixel long
+                for(i in circuitDiagram.get_linkIterator()){
+                    var linkLength:Float = Math.sqrt(Math.pow(Math.abs(i.get_rightEndpoint().get_xPosition() - i.get_leftEndpoint().get_xPosition()), 2) + Math.pow(Math.abs(i.get_rightEndpoint().get_yPosition() - i.get_leftEndpoint().get_yPosition()), 2));
+
+                    if(linkLength < 10){
+                        circuitDiagram.get_commandManager().undo();
+                        circuitDiagram.get_commandManager().popRedoStack();
+                    }
+                }
             };
             case C_STATE.CREATE_COMPONENT : {
                 updateCircuitDiagram.createComponentByCommand(sideBar.getComponent());
@@ -307,10 +323,17 @@ class ControllerCanvasContext {
                 if(!linkAndComponentAndEndpointAndPortArray.isEmpty()){
                     if(lastState == C_STATE.CREATE_COMPONENT){
                         updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
+                    }else if(lastState == C_STATE.PASTE){
+                        updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseDownWorldCoordinate, false);
                     }else{
                         updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseDownWorldCoordinate, false);
                     }
                 }
+            };
+            case C_STATE.PASTE : {
+                linkAndComponentAndEndpointAndPortArray.clean();
+                linkAndComponentAndEndpointAndPortArray.setArray(updateCircuitDiagram.paste(mouseMoveWorldCoordiante));
+                updateCircuitDiagram.resetCommandManagerRecordFlag();
             };
             case C_STATE.MULTI_SELECTION : {
                 linkAndComponentAndEndpointAndPortArray.setArray(lastClickArray);

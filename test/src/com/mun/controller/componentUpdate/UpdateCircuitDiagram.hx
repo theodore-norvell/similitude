@@ -1,5 +1,8 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.controller.command.PasteCommand;
+import com.mun.controller.command.CopyCommand;
+import com.mun.model.component.Component;
 import com.mun.model.gates.CompoundComponent;
 import com.mun.model.component.Port;
 import com.mun.view.drawingImpl.Transform;
@@ -146,6 +149,88 @@ class UpdateCircuitDiagram {
         circuitDiagram.computeDiagramSize();
         
         return object.get_link();
+    }
+
+    function copyLink(link:Link, linkandComponentArray:LinkAndComponentAndEndpointAndPortArray, newCreated:LinkAndComponentAndEndpointAndPortArray):Link{
+        var leftEndpoint:Endpoint;
+        var rightEndpoint:Endpoint;
+
+        if(link.get_leftEndpoint().get_port() == null){
+            leftEndpoint = new Endpoint(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition());
+        }else{
+            leftEndpoint = new Endpoint(link.get_leftEndpoint().get_xPosition(), link.get_leftEndpoint().get_yPosition());
+            leftEndpoint.set_port(checkEndpointOnPort(leftEndpoint, newCreated.get_componentIterator()));
+        }
+
+        if(link.get_rightEndpoint().get_port() == null){
+            rightEndpoint = new Endpoint(link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
+        }else{
+            rightEndpoint = new Endpoint(link.get_rightEndpoint().get_xPosition(), link.get_rightEndpoint().get_yPosition());
+            rightEndpoint.set_port(checkEndpointOnPort(rightEndpoint, newCreated.get_componentIterator()));
+        }
+
+        return new Link(leftEndpoint, rightEndpoint);
+    }
+
+    function checkEndpointOnPort(endpoint:Endpoint, componentIterator:Iterator<Component>):Port{
+        for(i in componentIterator){
+            for(j in i.get_inportIterator()){
+                if(isEndpointOnPort(endpoint, j)){
+                    return j;
+                }
+            }
+
+            for(j in i.get_outportIterator()){
+                if(isEndpointOnPort(endpoint, j)){
+                    return j;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public function copy(linkandComponentArray:LinkAndComponentAndEndpointAndPortArray):LinkAndComponentAndEndpointAndPortArray{
+        var result:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+        for(i in linkandComponentArray.get_componentIterator()){
+            var component:Component = createComponent(i.getNameOfTheComponentKind(), i.get_xPosition(), i.get_yPosition(), i.get_width(), i.get_height(), i.get_orientation(), i.get_inportsNum());
+            result.addComponent(component);
+        }
+
+        for(i in linkandComponentArray.get_linkIterator()){
+            var link:Link = copyLink(i, linkandComponentArray, result);
+
+            result.addLink(link);
+        }
+        var command:Command = new CopyCommand(result, circuitDiagram);
+        commandManager.execute(command);
+
+        return result;
+    }
+
+    public function paste(mouseLocation:Coordinate):LinkAndComponentAndEndpointAndPortArray{
+        var linkandComponentArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+
+        var command:Command = new PasteCommand(mouseLocation.get_xPosition(), mouseLocation.get_yPosition(), circuitDiagram);
+        commandManager.execute(command);
+
+        for(i in circuitDiagram.getCopyStack().getLinkArray()){
+            linkandComponentArray.addLink(i);
+        }
+
+        for(i in circuitDiagram.getCopyStack().getComponentArray()){
+            linkandComponentArray.addComponent(i);
+        }
+        circuitDiagram.getCopyStack().clearStack();
+        return linkandComponentArray;
+    }
+
+    public function isCopyStackEmpty():Bool{
+        if(circuitDiagram.getCopyStack().isStackEmpty()){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function moveSelectedObjects(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointAndPortArray, currentMouseLocation:Coordinate, mouseDownLocation:Coordinate, mouseLocationFlag:Bool){

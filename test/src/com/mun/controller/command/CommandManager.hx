@@ -51,6 +51,14 @@ class CommandManager {
         return linkAndComponentAndEndpointAndPortArray;
     }
 
+    public function popUndoStack(){
+        undoStack.pop();
+    }
+
+    public function popRedoStack(){
+        redoStack.pop();
+    }
+
     public function recordFlagRest(){
         recordFlag = false;
     }

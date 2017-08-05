@@ -34,4 +34,12 @@ class Stack {
         linkArray = new Array<Link>();
         componentArray = new Array<Component>();
     }
+
+    public function isStackEmpty():Bool{
+        if(linkArray.length == 0 && componentArray.length == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

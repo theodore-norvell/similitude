@@ -1,4 +1,5 @@
 package com.mun.model.component;
+import com.mun.controller.command.Stack;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
@@ -75,20 +76,7 @@ interface CircuitDiagramI {
     **/
     public function removeComponent(component:Component):Void;
 
-    /**
-    * clear the copy stack
-    **/
-    public function clearCopyStack():Void;
-
-    /**
-    * push link to the copy stack
-    **/
-    public function pushLinkToCopyStack(link:Link):Void;
-
-    /**
-    * push component to the copy stack
-    **/
-    public function pushComponentToCopyStack(component:Component):Void;
+    public function getCopyStack():Stack;
 
     /**
     * set new orientation for one component
