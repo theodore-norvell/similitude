@@ -1559,7 +1559,17 @@ com_mun_controller_command_PasteCommand.prototype = {
 		return this.linkAndComponentArray;
 	}
 	,redo: function() {
-		this.execute();
+		var i = this.linkAndComponentArray.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			this.circuitDiagram.addLink(i1);
+		}
+		var i2 = this.linkAndComponentArray.get_componentIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			this.circuitDiagram.addComponent(i3);
+		}
+		this.circuitDiagram.getCopyStack().clearStack();
 		return this.linkAndComponentArray;
 	}
 	,execute: function() {
@@ -1571,9 +1581,10 @@ com_mun_controller_command_PasteCommand.prototype = {
 		while(_g < linkArray.length) {
 			var i = linkArray[_g];
 			++_g;
-			var offsetCoordinate = this.calculateLinkOffsetCoordinate(i,centerCoordinate.get_xPosition(),centerCoordinate.get_yPosition());
+			var offsetCoordinate = this.calculateEndpointOffsetCoordinate(i.get_rightEndpoint(),centerCoordinate.get_xPosition(),centerCoordinate.get_yPosition());
 			i.get_rightEndpoint().set_xPosition(this.xPosition - offsetCoordinate.get_xPosition());
 			i.get_rightEndpoint().set_yPosition(this.yPosition - offsetCoordinate.get_yPosition());
+			offsetCoordinate = this.calculateEndpointOffsetCoordinate(i.get_leftEndpoint(),centerCoordinate.get_xPosition(),centerCoordinate.get_yPosition());
 			i.get_leftEndpoint().set_xPosition(this.xPosition - offsetCoordinate.get_xPosition());
 			i.get_leftEndpoint().set_yPosition(this.yPosition - offsetCoordinate.get_yPosition());
 			this.linkAndComponentArray.addLink(i);
@@ -1612,7 +1623,7 @@ com_mun_controller_command_PasteCommand.prototype = {
 				max_y = i.get_rightEndpoint().get_yPosition();
 			}
 			if(i.get_rightEndpoint().get_yPosition() < min_y) {
-				min_y = i.get_rightEndpoint().get_xPosition();
+				min_y = i.get_rightEndpoint().get_yPosition();
 			}
 			if(i.get_leftEndpoint().get_xPosition() > max_x) {
 				max_x = i.get_leftEndpoint().get_xPosition();
@@ -1624,7 +1635,7 @@ com_mun_controller_command_PasteCommand.prototype = {
 				max_y = i.get_leftEndpoint().get_yPosition();
 			}
 			if(i.get_leftEndpoint().get_yPosition() < min_y) {
-				min_y = i.get_leftEndpoint().get_xPosition();
+				min_y = i.get_leftEndpoint().get_yPosition();
 			}
 		}
 		var _g1 = 0;
@@ -1650,23 +1661,9 @@ com_mun_controller_command_PasteCommand.prototype = {
 		}
 		return new com_mun_type_Coordinate((max_x - min_x) / 2 + min_x,(max_y - min_y) / 2 + min_y);
 	}
-	,calculateLinkOffsetCoordinate: function(link,xPosition,yPosition) {
-		var newXPosition = 0;
-		var newYPosition = 0;
-		var xOffset;
-		var yOffset;
-		if(link.get_leftEndpoint().get_xPosition() > link.get_rightEndpoint().get_xPosition()) {
-			newXPosition = (link.get_leftEndpoint().get_xPosition() - link.get_rightEndpoint().get_xPosition()) / 2 + link.get_rightEndpoint().get_xPosition();
-		} else {
-			newXPosition = (link.get_rightEndpoint().get_xPosition() - link.get_leftEndpoint().get_xPosition()) / 2 + link.get_leftEndpoint().get_xPosition();
-		}
-		if(link.get_leftEndpoint().get_yPosition() > link.get_rightEndpoint().get_yPosition()) {
-			newYPosition = (link.get_leftEndpoint().get_yPosition() - link.get_rightEndpoint().get_yPosition()) / 2 + link.get_rightEndpoint().get_yPosition();
-		} else {
-			newYPosition = (link.get_rightEndpoint().get_yPosition() - link.get_leftEndpoint().get_yPosition()) / 2 + link.get_leftEndpoint().get_yPosition();
-		}
-		xOffset = xPosition - newXPosition;
-		yOffset = yPosition - newYPosition;
+	,calculateEndpointOffsetCoordinate: function(endpoint,xPosition,yPosition) {
+		var xOffset = xPosition - endpoint.get_xPosition();
+		var yOffset = yPosition - endpoint.get_yPosition();
 		return new com_mun_type_Coordinate(xOffset,yOffset);
 	}
 	,__class__: com_mun_controller_command_PasteCommand
@@ -1862,8 +1859,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		while(i2.hasNext()) {
 			var i3 = i2.next();
 			var link = this.copyLink(i3,linkandComponentArray,result);
-			haxe_Log.trace(link,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 202, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "copy"});
-			haxe_Log.trace(i3,{ fileName : "UpdateCircuitDiagram.hx", lineNumber : 203, className : "com.mun.controller.componentUpdate.UpdateCircuitDiagram", methodName : "copy"});
 			result.addLink(link);
 		}
 		var command = new com_mun_controller_command_CopyCommand(result,this.circuitDiagram);
@@ -2557,7 +2552,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		case 4:
 			this.linkAndComponentAndEndpointAndPortArray.clean();
 			this.linkAndComponentAndEndpointAndPortArray.setArray(this.updateCircuitDiagram.paste(this.mouseMoveWorldCoordiante));
-			this.updateCircuitDiagram.resetCommandManagerRecordFlag();
+			this.updateCircuitDiagram.get_commandManager().recordFlagSetTrue();
 			break;
 		case 5:
 			this.linkAndComponentAndEndpointAndPortArray.setArray(this.lastClickArray);
@@ -8271,15 +8266,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };

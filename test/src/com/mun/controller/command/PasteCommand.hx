@@ -1,5 +1,7 @@
 package com.mun.controller.command;
 
+import com.mun.model.component.Endpoint;
+import com.mun.type.Object;
 import com.mun.type.Coordinate;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.CircuitDiagramI;
@@ -56,7 +58,16 @@ class PasteCommand implements Command {
     }
 
     public function redo():LinkAndComponentAndEndpointAndPortArray {
-        execute();
+        for(i in linkAndComponentArray.get_linkIterator()){
+            circuitDiagram.addLink(i);
+        }
+
+        for(i in linkAndComponentArray.get_componentIterator()){
+            circuitDiagram.addComponent(i);
+        }
+
+        circuitDiagram.getCopyStack().clearStack();
+
         return linkAndComponentArray;
     }
 
@@ -67,11 +78,11 @@ class PasteCommand implements Command {
 
         linkAndComponentArray.clean();
         for(i in linkArray){
-            var offsetCoordinate:Coordinate = calculateLinkOffsetCoordinate(i, centerCoordinate.get_xPosition(), centerCoordinate.get_yPosition());
-
+            var offsetCoordinate:Coordinate = calculateEndpointOffsetCoordinate(i.get_rightEndpoint(), centerCoordinate.get_xPosition(), centerCoordinate.get_yPosition());
             i.get_rightEndpoint().set_xPosition(xPosition - offsetCoordinate.get_xPosition());
             i.get_rightEndpoint().set_yPosition(yPosition - offsetCoordinate.get_yPosition());
 
+            offsetCoordinate = calculateEndpointOffsetCoordinate(i.get_leftEndpoint(), centerCoordinate.get_xPosition(), centerCoordinate.get_yPosition());
             i.get_leftEndpoint().set_xPosition(xPosition - offsetCoordinate.get_xPosition());
             i.get_leftEndpoint().set_yPosition(yPosition - offsetCoordinate.get_yPosition());
 
@@ -113,7 +124,7 @@ class PasteCommand implements Command {
                 max_y = i.get_rightEndpoint().get_yPosition();
             }
             if(i.get_rightEndpoint().get_yPosition() < min_y){
-                min_y = i.get_rightEndpoint().get_xPosition();
+                min_y = i.get_rightEndpoint().get_yPosition();
             }
 
             if(i.get_leftEndpoint().get_xPosition() > max_x){
@@ -127,7 +138,7 @@ class PasteCommand implements Command {
                 max_y = i.get_leftEndpoint().get_yPosition();
             }
             if(i.get_leftEndpoint().get_yPosition() < min_y){
-                min_y = i.get_leftEndpoint().get_xPosition();
+                min_y = i.get_leftEndpoint().get_yPosition();
             }
         }
 
@@ -158,27 +169,10 @@ class PasteCommand implements Command {
         return new Coordinate( (max_x - min_x)/2+min_x , (max_y - min_y)/2+min_y);
     }
 
-    function calculateLinkOffsetCoordinate(link:Link, xPosition:Float, yPosition:Float):Coordinate {
-        var newXPosition:Float = 0;
-        var newYPosition:Float = 0;
-        var xOffset:Float;
-        var yOffset:Float;
+    function calculateEndpointOffsetCoordinate(endpoint:Endpoint, xPosition:Float, yPosition:Float):Coordinate {
 
-        if(link.get_leftEndpoint().get_xPosition() > link.get_rightEndpoint().get_xPosition()){
-            newXPosition = (link.get_leftEndpoint().get_xPosition() - link.get_rightEndpoint().get_xPosition())/2 + link.get_rightEndpoint().get_xPosition();
-        }else{
-            newXPosition = (link.get_rightEndpoint().get_xPosition() - link.get_leftEndpoint().get_xPosition())/2 + link.get_leftEndpoint().get_xPosition();
-        }
-
-        if(link.get_leftEndpoint().get_yPosition() > link.get_rightEndpoint().get_yPosition()){
-            newYPosition = (link.get_leftEndpoint().get_yPosition() - link.get_rightEndpoint().get_yPosition())/2 + link.get_rightEndpoint().get_yPosition();
-        }else{
-            newYPosition = (link.get_rightEndpoint().get_yPosition() - link.get_leftEndpoint().get_yPosition())/2 + link.get_leftEndpoint().get_yPosition();
-        }
-
-        //compare
-        xOffset = xPosition - newXPosition;
-        yOffset = yPosition - newYPosition;
+        var xOffset:Float = xPosition - endpoint.get_xPosition();
+        var yOffset:Float = yPosition - endpoint.get_yPosition();
 
         return new Coordinate(xOffset, yOffset);
     }

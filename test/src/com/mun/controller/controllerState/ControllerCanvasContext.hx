@@ -333,7 +333,7 @@ class ControllerCanvasContext {
             case C_STATE.PASTE : {
                 linkAndComponentAndEndpointAndPortArray.clean();
                 linkAndComponentAndEndpointAndPortArray.setArray(updateCircuitDiagram.paste(mouseMoveWorldCoordiante));
-                updateCircuitDiagram.resetCommandManagerRecordFlag();
+                updateCircuitDiagram.get_commandManager().recordFlagSetTrue();
             };
             case C_STATE.MULTI_SELECTION : {
                 linkAndComponentAndEndpointAndPortArray.setArray(lastClickArray);
