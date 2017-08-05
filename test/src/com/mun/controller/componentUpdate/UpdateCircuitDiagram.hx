@@ -18,7 +18,6 @@ import com.mun.controller.command.CommandManager;
 import com.mun.model.gates.ComponentKind;
 import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.component.CircuitDiagramI;
-import com.mun.model.component.Component;
 import com.mun.type.Coordinate;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.global.Constant.*;

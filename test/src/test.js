@@ -661,8 +661,6 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 var Test = function() { };
 $hxClasses["Test"] = Test;
 Test.__name__ = ["Test"];
-Test.canvas = null;
-Test.cxt = null;
 Test.main = function() {
 	var folderState = new com_mun_controller_controllerState_FolderState();
 };
@@ -4703,6 +4701,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 	}
 	,drawComponent: function(drawingAdapter,hightLight) {
 		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter);
+		haxe_Log.trace("compound component shape position: " + this.component.get_xPosition() + ",    " + this.component.get_yPosition(),{ fileName : "CompoundComponent.hx", lineNumber : 137, className : "com.mun.model.gates.CompoundComponent", methodName : "drawComponent"});
 		if(hightLight) {
 			drawComponent.drawCorrespondingComponent("red");
 		} else {
@@ -6869,9 +6868,11 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt = value;
 	}
 	,transform: function(transform) {
-		return new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.worldToView.get_transform()),this.cxt);
+		var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.worldToView.get_transform()),this.cxt);
+		return drawingAdapter;
 	}
 	,drawAndShape: function(x,y,width,height,orientation) {
+		haxe_Log.trace("and shape position: " + x + ",    " + y,{ fileName : "DrawingAdapter.hx", lineNumber : 72, className : "com.mun.view.drawingImpl.DrawingAdapter", methodName : "drawAndShape"});
 		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
@@ -8266,6 +8267,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };

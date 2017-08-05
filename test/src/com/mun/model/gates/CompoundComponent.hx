@@ -16,7 +16,6 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
 import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.component.Port;
-import com.mun.global.Constant.*;
 /**
 * compound Component
 **/
@@ -135,6 +134,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
 
     public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool):Void {
         var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter);
+        trace("compound component shape position: " + component.get_xPosition() + ",    " + component.get_yPosition());
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
         }else{

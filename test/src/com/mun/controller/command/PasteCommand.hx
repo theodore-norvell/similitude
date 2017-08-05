@@ -1,7 +1,6 @@
 package com.mun.controller.command;
 
 import com.mun.model.component.Endpoint;
-import com.mun.type.Object;
 import com.mun.type.Coordinate;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.model.component.CircuitDiagramI;

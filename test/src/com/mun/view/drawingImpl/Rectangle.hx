@@ -15,13 +15,6 @@ class Rectangle implements RectangleI{
     * Precondition: corner0.yPosition != corner1.yPosition
     **/
     public function new(corner0:Coordinate, corner1:Coordinate) {
-        //Assert.check( corner0.xPosition != corner1.xPosition ) ;
-        //Assert.check( corner0.yPosition != corner1.yPosition ) ;
-//        this.minCoordinate = { "xPosition" : Math.min( corner0.xPosition, corner1.xPosition ),
-//                               "yPosition" : Math.min( corner0.yPosition, corner1.yPosition )};
-//
-//        this.maxCoordinate = { "xPosition" : Math.max( corner0.xPosition, corner1.xPosition ),
-//                               "yPosition" : Math.max( corner0.yPosition, corner1.yPosition )};
         this.minCoordinate = new Coordinate(Math.min( corner0.get_xPosition(), corner1.get_xPosition() ),  Math.min( corner0.get_yPosition(), corner1.get_yPosition() ));
 
         this.maxCoordinate =  new Coordinate(Math.max( corner0.get_xPosition(), corner1.get_xPosition() ),  Math.max( corner0.get_yPosition(), corner1.get_yPosition() ));

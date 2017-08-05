@@ -64,10 +64,12 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function transform(transform:Transform):DrawingAdapterI{
-        return new DrawingAdapter(transform.compose(worldToView.get_transform()), cxt);
+        var drawingAdapter:DrawingAdapterI = new DrawingAdapter(transform.compose(worldToView.get_transform()), cxt);
+        return drawingAdapter;
     }
 
     public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+        trace("and shape position: " + x + ",    " + y);
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
