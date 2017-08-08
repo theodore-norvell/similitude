@@ -137,6 +137,8 @@ interface CircuitDiagramI {
     **/
     public function get_yMax():Float;
 
+    public function getCircuitDiagramCenterPoint():Coordinate;
+
     /**
     * draw the circuit diagram itself
     **/

@@ -443,10 +443,10 @@ class FolderState {
         var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
         var oldWidth:Int = cast Browser.window.innerWidth;
         var oldHeight:Int =cast Browser.window.innerHeight;
-        canvasElement.width = oldWidth * pixelRatio;
-        canvasElement.height = oldHeight * pixelRatio;
-        canvasElement.style.width = oldWidth + 'px';
-        canvasElement.style.height = oldHeight + 'px';
+        canvasElement.width = cast oldWidth * pixelRatio * 0.8;
+        canvasElement.height = cast oldHeight * pixelRatio  * 0.8;
+        canvasElement.style.width = oldWidth  * 0.8 + 'px';
+        canvasElement.style.height = oldHeight  * 0.8 + 'px';
         // now scale the context to counter
         // the fact that we've manually scaled
         // our canvas element

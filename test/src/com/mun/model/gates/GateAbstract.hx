@@ -1,4 +1,5 @@
 package com.mun.model.gates;
+import com.mun.model.component.Outport;
 import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.enumeration.POINT_MODE;
@@ -39,6 +40,10 @@ class GateAbstract{
 
     public function addInPort():Port {
         return new Inport();
+    }
+
+    public function addOutPort():Port {
+        return new Outport();
     }
 
     public function get_sequence():Int {
@@ -228,5 +233,12 @@ class GateAbstract{
         jsonString += "\"sequence\": \"" + this.sequence + "\"}";
 
         return jsonString;
+    }
+
+    /**
+    * for all component kinds except compound component, this function always return false; False means their is no change
+    **/
+    public function checkInnerCircuitDiagramPortsChange():Bool{
+        return false;
     }
 }

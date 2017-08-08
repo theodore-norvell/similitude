@@ -111,6 +111,13 @@ class Component {
     public function get_inportIterator():Iterator<Port> {
         return inportArray.iterator();
     }
+    public function get_inportIteratorLength():Int {
+        return inportArray.length;
+    }
+
+    public function get_outportIteratorLength():Int {
+        return outportArray.length;
+    }
 
     public function get_outportIterator():Iterator<Port> {
         return outportArray.iterator();
@@ -184,6 +191,74 @@ class Component {
     }
 
     public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool){
+        if(componentKind.checkInnerCircuitDiagramPortsChange()){
+            var theNumberOfInput:Int = 0;
+            var theNumberOfOutput:Int = 0;
+
+            for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
+                var inputFlag:Bool = false;
+                var outputFlag:Bool = false;
+                for(j in inportArray){
+                    if(i.getNameOfTheComponentKind() == "Input"){
+                        if(i.get_componentKind().get_sequence() == j.get_sequence()){
+                            inputFlag = true;
+                        }
+                        theNumberOfInput++;
+                    }
+                }
+
+                for(j in outportArray){
+                    if(i.getNameOfTheComponentKind() == "Output"){
+                        if(i.get_componentKind().get_sequence() == j.get_sequence()){
+                            outputFlag = true;
+                        }
+                        theNumberOfOutput++;
+                    }
+                }
+
+                if(!inputFlag && !outputFlag){
+                    if(i.getNameOfTheComponentKind() == "Input"){
+                        inportArray.push(componentKind.addInPort());
+                    }else{
+                        outportArray.push(componentKind.addOutPort());
+                    }
+                }
+
+                //if innercircuit delete some input or output
+                if(theNumberOfInput < inportArray.length){//the inner circuit diagram has delete some of input components
+                    for(i in inportArray){
+                        var flag:Bool = false;//false means this inport do not exist
+                        for(j in componentKind.getInnerCircuitDiagram().get_componentIterator()){
+                            if(j.getNameOfTheComponentKind() == "Input" && i.get_sequence() == j.get_componentKind().get_sequence()){
+                                flag = true;
+                            }
+                        }
+
+                        if(!flag){
+                            inportArray.remove(i);
+                        }
+                    }
+                }
+
+                if(theNumberOfOutput < outportArray.length){
+                    for(i in outportArray){
+                        var flag:Bool = false;//false means this inport do not exist
+                        for(j in componentKind.getInnerCircuitDiagram().get_componentIterator()){
+                            if(j.getNameOfTheComponentKind() == "Output" && i.get_sequence() == j.get_componentKind().get_sequence()){
+                                flag = true;
+                            }
+                        }
+
+                        if(!flag){
+                            outportArray.remove(i);
+                        }
+                    }
+                }
+            }
+            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
+        }
+
         componentKind.drawComponent(drawingAdpater, highLight);
     }
 

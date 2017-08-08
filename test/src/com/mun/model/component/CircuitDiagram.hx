@@ -23,16 +23,18 @@ class CircuitDiagram implements CircuitDiagramI{
     //circuit diagram has its width height
     var diagramWidth:Float;
     var diagramHeight:Float;
-    var margin:Float = 100;
-    var leastWidthAndHeight:Int = 500;
     //initial the margin
     var xMin:Float;
     var yMin:Float;
     var xMax:Float;
     var yMax:Float;
+    var margin:Int;
+    var circuitDiagramCenter:Coordinate;
 
     public function new() {
         copyStack = new Stack();
+        circuitDiagramCenter = new Coordinate(0, 0);
+        this.margin = 200;
     }
 
     public function computeDiagramSize():Void{
@@ -94,36 +96,43 @@ class CircuitDiagram implements CircuitDiagramI{
             }
         }
 
-        //$d.width() = d.xmax() - d.xmin() $
-        //$d.height() = d.ymax() - d.ymin() $
-        diagramWidth = xMax - xMin + margin;
-        diagramHeight = yMax - yMin + margin;
-
-        xMax = xMax + margin/2;
-        xMin = xMin - margin/2;
-
-        yMax = yMax + margin/2;
-        yMin = yMin - margin/2;
-
-        //set the least width and height for diagram
-        if(diagramWidth < leastWidthAndHeight){
-            //width
-            var displacement = leastWidthAndHeight - diagramWidth;
-            yMax = yMax + displacement/2;
-            yMin = yMin - displacement/2;
-
-            diagramWidth = leastWidthAndHeight;
+        if(xMin < 0){
+            xMin = 0;
+            xMax = xMax + margin;
+        }else{
+            if(xMin < margin/2){
+                var offset:Float = margin/2 - xMin;
+                xMin = 0;
+                xMax = xMax + offset + margin/2;
+            }else{
+                xMin = xMin - margin/2;
+                xMax = xMax + margin/2;
+            }
         }
 
-        if(diagramHeight < leastWidthAndHeight){
-
-            //height
-            var displacement = leastWidthAndHeight - diagramHeight;
-            xMax = xMax + displacement/2;
-            xMin = xMin - displacement/2;
-
-            diagramHeight = leastWidthAndHeight;
+        if(yMin < 0){
+            yMin = 0;
+            yMax = yMax + margin;
+        }else{
+            if(yMin < margin/2){
+                var offset:Float = margin/2 - yMin;
+                yMin = 0;
+                yMax = yMax + offset + margin/2;
+            }else{
+                yMin = yMin - margin/2;
+                yMax = yMax + margin/2;
+            }
         }
+
+        diagramWidth = xMax - xMin;
+        diagramHeight = yMax - yMin;
+
+        circuitDiagramCenter.set_xPosition(xMin + diagramWidth/2);
+        circuitDiagramCenter.set_yPosition(yMin + diagramHeight/2);
+    }
+
+    public function getCircuitDiagramCenterPoint():Coordinate{
+        return circuitDiagramCenter;
     }
 
     public function get_diagramWidth():Float {
@@ -382,8 +391,6 @@ class CircuitDiagram implements CircuitDiagramI{
         var jsonString:String = "{ \"name\": \"" + this.name + "\",";
         jsonString += "\"diagramWidth\": \"" + this.diagramWidth + "\",";
         jsonString += "\"diagramHeight\": \"" + this.diagramHeight + "\",";
-        jsonString += "\"margin\": \"" + this.margin + "\",";
-        jsonString += "\"leastWidthAndHeight\": \"" + this.leastWidthAndHeight + "\",";
         jsonString += "\"xMin\": \"" + this.xMin + "\",";
         jsonString += "\"yMin\": \"" + this.yMin + "\",";
         jsonString += "\"xMax\": \"" + this.xMax + "\",";

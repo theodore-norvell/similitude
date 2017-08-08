@@ -15,7 +15,7 @@ class WorldToView implements WorldToViewI {
 	 * @return
 	 */
     public function convertCoordinate(coordinate:Coordinate):Coordinate{
-        return transform.pointInvert(coordinate);
+        return transform.pointConvert(coordinate);
     }
 
     public function get_transform():Transform {

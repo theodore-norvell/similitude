@@ -69,8 +69,10 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        trace("and shape position: " + x + ",    " + y);
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
+
+        var vCenterCoordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -84,13 +86,13 @@ class DrawingAdapter implements DrawingAdapterI {
         //draw the ellipse
         switch (orientation){
             case ORIENTATION.NORTH : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 180 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 180 * Math.PI / 180, 0, 1 * Math.PI);}
             case ORIENTATION.EAST : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 270 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 270 * Math.PI / 180, 0, 1 * Math.PI);}
             case ORIENTATION.SOUTH : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 0 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 0 * Math.PI / 180, 0, 1 * Math.PI);}
             case ORIENTATION.WEST : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2, 90 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 90 * Math.PI / 180, 0, 1 * Math.PI);}
             default : {
                 //noting. Orientation only have four values
             }
@@ -106,6 +108,7 @@ class DrawingAdapter implements DrawingAdapterI {
 
     public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var vCenterCoordinate = worldToView.convertCoordinate(new Coordinate(x, y));
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -125,13 +128,13 @@ class DrawingAdapter implements DrawingAdapterI {
         //draw the ellipse
         switch (orientation){
             case ORIENTATION.NORTH : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 180 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 180 * Math.PI / 180, 0, 1 * Math.PI);}
             case ORIENTATION.EAST : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 270 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 270 * Math.PI / 180, 0, 1 * Math.PI);}
             case ORIENTATION.SOUTH : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 0 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 0 * Math.PI / 180, 0, 1 * Math.PI);}
             case ORIENTATION.WEST : {
-                cxt.ellipse(x, y, (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 90 * Math.PI / 180, 0, 1 * Math.PI);}
+                cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 90 * Math.PI / 180, 0, 1 * Math.PI);}
             default : {
                 //noting. Orientation only have four values
             }
@@ -139,8 +142,8 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineTo(r.get_xd(), r.get_yd());
         cxt.closePath();
 
-        cxt.moveTo(x + (cymax - cymin) / 2 - 2 * radius, y);
-        cxt.arc(x + (cymax - cymin) / 2 - 2 * radius, y, radius, 0, 2 * Math.PI, false);
+        cxt.moveTo(x + (cymax - cymin) / 2 - 2 * radius, vCenterCoordinate.get_yPosition());
+        cxt.arc(x + (cymax - cymin) / 2 - 2 * radius, vCenterCoordinate.get_yPosition(), radius, 0, 2 * Math.PI, false);
         cxt.closePath();
 
         cxt.fillStyle = fillColor;
@@ -248,6 +251,7 @@ class DrawingAdapter implements DrawingAdapterI {
 
     public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var vCenterCoordinate = worldToView.convertCoordinate(new Coordinate(x, y));
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
 
@@ -265,20 +269,20 @@ class DrawingAdapter implements DrawingAdapterI {
         // Curve from (a+d)/8 to (a+d)/8 * 7
         switch (orientation){
             case ORIENTATION.NORTH : {
-                cxt.moveTo(r.get_xa() + width / 8, r.get_ya());
-                cxt.quadraticCurveTo(x,y  + height/7, r.get_xa() + width / 8 * 7, r.get_ya());
+                cxt.moveTo(r.get_xa() + (r.get_xb() - r.get_xa()) / 8, r.get_ya());
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y  + (r.get_yc() - r.get_yb())/7, r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
             };
             case ORIENTATION.SOUTH : {
-                cxt.moveTo(r.get_xa() - width / 8, r.get_ya());
-                cxt.quadraticCurveTo(x,y  - height/7, r.get_xa() - width / 8 * 7, r.get_ya());
+                cxt.moveTo(r.get_xa() - (r.get_xb() - r.get_xa()) / 8, r.get_ya());
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y  - (r.get_yc() - r.get_yb())/7, r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
             };
             case ORIENTATION.WEST : {
-                cxt.moveTo(r.get_xa(), r.get_ya() - width / 8);
-                cxt.quadraticCurveTo(x + width/7,y, r.get_xa(), r.get_ya() - width / 8 * 7);
+                cxt.moveTo(r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8);
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa())/7,y, r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
             };
             case ORIENTATION.EAST : {
-                cxt.moveTo(r.get_xa(), r.get_ya() + width / 8);
-                cxt.quadraticCurveTo(x - width/7,y, r.get_xa(), r.get_ya() + width / 8 * 7);
+                cxt.moveTo(r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8);
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa())/7,y, r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
             };
             default : {
                 //do nothing
@@ -288,12 +292,16 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawRect(x:Float, y:Float, width:Float, height:Float):Void {
-        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+        var wnw:Coordinate = new Coordinate(x - width/2, y - height/2);
+        var wse:Coordinate = new Coordinate(x + width/2, y + height/2);
 
-        var x0:Float = coordinate.get_xPosition() - width / 2;
-        var y0:Float = coordinate.get_yPosition() - height / 2;
-        var x1:Float = coordinate.get_xPosition() + width / 2;
-        var y1:Float = coordinate.get_yPosition() + height / 2;
+        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
+        var vse:Coordinate = worldToView.convertCoordinate(wse);
+
+        var x0:Float = vnw.get_xPosition();
+        var y0:Float = vnw.get_yPosition();
+        var x1:Float = vse.get_xPosition();
+        var y1:Float = vse.get_yPosition();
         cxt.rect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
         cxt.lineWidth = lineWidth;
         cxt.fillStyle = fillColor;
@@ -303,10 +311,14 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawText(str:String, x:Float, y:Float, width:Float):Void {
-        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+        var wnw:Coordinate = new Coordinate(x - width/2, y);
+        var wse:Coordinate = new Coordinate(x + width/2, y);
 
-        var x0:Float = coordinate.get_xPosition();
-        var y0:Float = coordinate.get_yPosition();
+        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
+        var vse:Coordinate = worldToView.convertCoordinate(wse);
+
+        var x0:Float = (wse.get_xPosition() - vnw.get_xPosition())/2 + vnw.get_xPosition();
+        var y0:Float = vse.get_yPosition();
 
         cxt.lineWidth = lineWidth;
         cxt.font = font;
@@ -316,10 +328,17 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawCricle(x:Float, y:Float, radius:Float):Void {
-        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+        var wnw:Coordinate = new Coordinate(x - radius, y);
+        var wse:Coordinate = new Coordinate(x + radius, y);
 
-        var x0:Float = coordinate.get_xPosition();
-        var y0:Float = coordinate.get_yPosition();
+        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
+        var vse:Coordinate = worldToView.convertCoordinate(wse);
+
+        radius = (vse.get_xPosition() - vnw.get_xPosition())/2;
+
+        var x0:Float = vnw.get_xPosition() + radius;
+        var y0:Float = vse.get_yPosition();
+
         cxt.beginPath();
         cxt.arc(x0, y0, radius, 0, 2 * Math.PI, false);
         cxt.closePath;

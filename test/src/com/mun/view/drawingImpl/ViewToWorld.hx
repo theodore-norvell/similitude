@@ -8,7 +8,7 @@ class ViewToWorld implements ViewToWorldI{
     }
 
     public function convertCoordinate(coordinate:Coordinate):Coordinate {
-        return transform.pointConvert(coordinate);
+        return transform.pointInvert(coordinate);
     }
 
     public function get_transform():Transform {

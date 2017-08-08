@@ -94,7 +94,7 @@ class SideBar {
                     Browser.document.getElementById(circuitDiagram.get_name() + "-" + i).onmousedown = function(event:Event){
                         var id:String = untyped event.target.id;
                         id = id.substring(id.indexOf("-") + 1, id.length);
-                        component = updateCircuitDiagram.createCompoundComponent(id,250, 50, 40 * PIXELRATIO, 40 * PIXELRATIO, ORIENTATION.EAST, 2, folder.findCircuitDiagram(id));
+                        component = updateCircuitDiagram.createCompoundComponent(id,250, 50, 100 * PIXELRATIO, 100 * PIXELRATIO, ORIENTATION.EAST, 2, folder.findCircuitDiagram(id));
                         controllerCanavasContext.set_controllerState(C_STATE.CREATE_COMPONENT);
                     }
                 }

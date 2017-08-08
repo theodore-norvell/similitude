@@ -2933,10 +2933,10 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		var pixelRatio = window.devicePixelRatio / backingStoreRatio;
 		var oldWidth = window.innerWidth;
 		var oldHeight = window.innerHeight;
-		canvasElement.width = oldWidth * pixelRatio;
-		canvasElement.height = oldHeight * pixelRatio;
-		canvasElement.style.width = oldWidth + "px";
-		canvasElement.style.height = oldHeight + "px";
+		canvasElement.width = oldWidth * pixelRatio * 0.8;
+		canvasElement.height = oldHeight * pixelRatio * 0.8;
+		canvasElement.style.width = oldWidth * 0.8 + "px";
+		canvasElement.style.height = oldHeight * 0.8 + "px";
 		canvasContext.scale(pixelRatio,pixelRatio);
 		com_mun_global_Constant.PIXELRATIO = pixelRatio;
 		this.canvas = canvasElement;
@@ -3064,8 +3064,8 @@ com_mun_controller_controllerState_SideBar.prototype = {
 					var id1 = event1.target.id;
 					id1 = id1.substring(id1.indexOf("-") + 1,id1.length);
 					var _gthis1 = _gthis.updateCircuitDiagram;
-					var tmp = 40 * com_mun_global_Constant.PIXELRATIO;
-					var tmp1 = 40 * com_mun_global_Constant.PIXELRATIO;
+					var tmp = 100 * com_mun_global_Constant.PIXELRATIO;
+					var tmp1 = 100 * com_mun_global_Constant.PIXELRATIO;
 					var tmp2 = _gthis.folder.findCircuitDiagram(id1);
 					_gthis.component = _gthis1.createCompoundComponent(id1,250,50,tmp,tmp1,com_mun_model_enumeration_ORIENTATION.EAST,2,tmp2);
 					_gthis.controllerCanavasContext.set_controllerState(com_mun_model_enumeration_C_$STATE.CREATE_COMPONENT);
@@ -3167,6 +3167,7 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,get_yMin: null
 	,get_xMax: null
 	,get_yMax: null
+	,getCircuitDiagramCenterPoint: null
 	,draw: null
 	,findHitList: null
 	,findWorldPoint: null
@@ -3175,13 +3176,13 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,__class__: com_mun_model_component_CircuitDiagramI
 };
 var com_mun_model_component_CircuitDiagram = function() {
-	this.leastWidthAndHeight = 500;
-	this.margin = 100;
 	this.linkArrayReverseFlag = false;
 	this.componentArrayReverseFlag = false;
 	this.linkArray = [];
 	this.componentArray = [];
 	this.copyStack = new com_mun_controller_command_Stack();
+	this.circuitDiagramCenter = new com_mun_type_Coordinate(0,0);
+	this.margin = 200;
 };
 $hxClasses["com.mun.model.component.CircuitDiagram"] = com_mun_model_component_CircuitDiagram;
 com_mun_model_component_CircuitDiagram.__name__ = ["com","mun","model","component","CircuitDiagram"];
@@ -3196,12 +3197,12 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,linkArrayReverseFlag: null
 	,diagramWidth: null
 	,diagramHeight: null
-	,margin: null
-	,leastWidthAndHeight: null
 	,xMin: null
 	,yMin: null
 	,xMax: null
 	,yMax: null
+	,margin: null
+	,circuitDiagramCenter: null
 	,computeDiagramSize: function() {
 		this.xMin = 99999999;
 		this.yMin = 99999999;
@@ -3255,24 +3256,35 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				this.yMax = i1.get_rightEndpoint().get_yPosition();
 			}
 		}
-		this.diagramWidth = this.xMax - this.xMin + this.margin;
-		this.diagramHeight = this.yMax - this.yMin + this.margin;
-		this.xMax += this.margin / 2;
-		this.xMin -= this.margin / 2;
-		this.yMax += this.margin / 2;
-		this.yMin -= this.margin / 2;
-		if(this.diagramWidth < this.leastWidthAndHeight) {
-			var displacement = this.leastWidthAndHeight - this.diagramWidth;
-			this.yMax += displacement / 2;
-			this.yMin -= displacement / 2;
-			this.diagramWidth = this.leastWidthAndHeight;
+		if(this.xMin < 0) {
+			this.xMin = 0;
+			this.xMax += this.margin;
+		} else if(this.xMin < this.margin / 2) {
+			var offset = this.margin / 2 - this.xMin;
+			this.xMin = 0;
+			this.xMax = this.xMax + offset + this.margin / 2;
+		} else {
+			this.xMin -= this.margin / 2;
+			this.xMax += this.margin / 2;
 		}
-		if(this.diagramHeight < this.leastWidthAndHeight) {
-			var displacement1 = this.leastWidthAndHeight - this.diagramHeight;
-			this.xMax += displacement1 / 2;
-			this.xMin -= displacement1 / 2;
-			this.diagramHeight = this.leastWidthAndHeight;
+		if(this.yMin < 0) {
+			this.yMin = 0;
+			this.yMax += this.margin;
+		} else if(this.yMin < this.margin / 2) {
+			var offset1 = this.margin / 2 - this.yMin;
+			this.yMin = 0;
+			this.yMax = this.yMax + offset1 + this.margin / 2;
+		} else {
+			this.yMin -= this.margin / 2;
+			this.yMax += this.margin / 2;
 		}
+		this.diagramWidth = this.xMax - this.xMin;
+		this.diagramHeight = this.yMax - this.yMin;
+		this.circuitDiagramCenter.set_xPosition(this.xMin + this.diagramWidth / 2);
+		this.circuitDiagramCenter.set_yPosition(this.yMin + this.diagramHeight / 2);
+	}
+	,getCircuitDiagramCenterPoint: function() {
+		return this.circuitDiagramCenter;
 	}
 	,get_diagramWidth: function() {
 		return this.diagramWidth;
@@ -3520,8 +3532,6 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		var jsonString = "{ \"name\": \"" + this.name + "\",";
 		jsonString += "\"diagramWidth\": \"" + this.diagramWidth + "\",";
 		jsonString += "\"diagramHeight\": \"" + this.diagramHeight + "\",";
-		jsonString += "\"margin\": \"" + this.margin + "\",";
-		jsonString += "\"leastWidthAndHeight\": \"" + this.leastWidthAndHeight + "\",";
 		jsonString += "\"xMin\": \"" + this.xMin + "\",";
 		jsonString += "\"yMin\": \"" + this.yMin + "\",";
 		jsonString += "\"xMax\": \"" + this.xMax + "\",";
@@ -3629,6 +3639,12 @@ com_mun_model_component_Component.prototype = {
 	,get_inportIterator: function() {
 		return HxOverrides.iter(this.inportArray);
 	}
+	,get_inportIteratorLength: function() {
+		return this.inportArray.length;
+	}
+	,get_outportIteratorLength: function() {
+		return this.outportArray.length;
+	}
 	,get_outportIterator: function() {
 		return HxOverrides.iter(this.outportArray);
 	}
@@ -3690,6 +3706,87 @@ com_mun_model_component_Component.prototype = {
 		return this;
 	}
 	,drawComponent: function(drawingAdpater,highLight) {
+		if(this.componentKind.checkInnerCircuitDiagramPortsChange()) {
+			var theNumberOfInput = 0;
+			var theNumberOfOutput = 0;
+			var i = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				var inputFlag = false;
+				var outputFlag = false;
+				var _g = 0;
+				var _g1 = this.inportArray;
+				while(_g < _g1.length) {
+					var j = _g1[_g];
+					++_g;
+					if(i1.getNameOfTheComponentKind() == "Input") {
+						if(i1.get_componentKind().get_sequence() == j.get_sequence()) {
+							inputFlag = true;
+						}
+						++theNumberOfInput;
+					}
+				}
+				var _g2 = 0;
+				var _g11 = this.outportArray;
+				while(_g2 < _g11.length) {
+					var j1 = _g11[_g2];
+					++_g2;
+					if(i1.getNameOfTheComponentKind() == "Output") {
+						if(i1.get_componentKind().get_sequence() == j1.get_sequence()) {
+							outputFlag = true;
+						}
+						++theNumberOfOutput;
+					}
+				}
+				if(!inputFlag && !outputFlag) {
+					if(i1.getNameOfTheComponentKind() == "Input") {
+						this.inportArray.push(this.componentKind.addInPort());
+					} else {
+						this.outportArray.push(this.componentKind.addOutPort());
+					}
+				}
+				if(theNumberOfInput < this.inportArray.length) {
+					var _g3 = 0;
+					var _g12 = this.inportArray;
+					while(_g3 < _g12.length) {
+						var i2 = _g12[_g3];
+						++_g3;
+						var flag = false;
+						var j2 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+						while(j2.hasNext()) {
+							var j3 = j2.next();
+							if(j3.getNameOfTheComponentKind() == "Input" && i2.get_sequence() == j3.get_componentKind().get_sequence()) {
+								flag = true;
+							}
+						}
+						if(!flag) {
+							HxOverrides.remove(this.inportArray,i2);
+						}
+					}
+				}
+				if(theNumberOfOutput < this.outportArray.length) {
+					var _g4 = 0;
+					var _g13 = this.outportArray;
+					while(_g4 < _g13.length) {
+						var i3 = _g13[_g4];
+						++_g4;
+						var flag1 = false;
+						var j4 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+						while(j4.hasNext()) {
+							var j5 = j4.next();
+							if(j5.getNameOfTheComponentKind() == "Output" && i3.get_sequence() == j5.get_componentKind().get_sequence()) {
+								flag1 = true;
+							}
+						}
+						if(!flag1) {
+							HxOverrides.remove(this.outportArray,i3);
+						}
+					}
+				}
+			}
+			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
+			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
+		}
 		this.componentKind.drawComponent(drawingAdpater,highLight);
 	}
 	,findHitList: function(coordinate,mode) {
@@ -4318,6 +4415,9 @@ com_mun_model_gates_GateAbstract.prototype = {
 	,addInPort: function() {
 		return new com_mun_model_component_Inport();
 	}
+	,addOutPort: function() {
+		return new com_mun_model_component_Outport();
+	}
 	,get_sequence: function() {
 		return this.sequence;
 	}
@@ -4475,6 +4575,9 @@ com_mun_model_gates_GateAbstract.prototype = {
 		jsonString += "\"sequence\": \"" + this.sequence + "\"}";
 		return jsonString;
 	}
+	,checkInnerCircuitDiagramPortsChange: function() {
+		return false;
+	}
 	,__class__: com_mun_model_gates_GateAbstract
 };
 var com_mun_model_gates_ComponentKind = function() { };
@@ -4484,7 +4587,9 @@ com_mun_model_gates_ComponentKind.prototype = {
 	getLeastInportNumber: null
 	,algorithm: null
 	,createPorts: null
+	,checkInnerCircuitDiagramPortsChange: null
 	,addInPort: null
+	,addOutPort: null
 	,updateInPortPosition: null
 	,updateOutPortPosition: null
 	,drawComponent: null
@@ -4621,6 +4726,25 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 	,algorithm: function(portArray) {
 		return null;
 	}
+	,checkInnerCircuitDiagramPortsChange: function() {
+		var inputNumberTemp = 0;
+		var outputNumberTemp = 0;
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(i1.getNameOfTheComponentKind() == "Input") {
+				++inputNumberTemp;
+			}
+			if(i1.getNameOfTheComponentKind() == "Output") {
+				++outputNumberTemp;
+			}
+		}
+		if(inputNumberTemp == this.component.get_inportIteratorLength() && outputNumberTemp == this.component.get_outportIteratorLength()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
 		var portArray = [];
 		switch(orientation[1]) {
@@ -4630,12 +4754,10 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 				var i1 = i.next();
 				if(i1.getNameOfTheComponentKind() == "Input") {
 					var inport_1 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (this.leastInportNum + 1) * (i1.get_componentKind().get_sequence() + 1),height + height / 2);
-					inport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 					inport_1.set_sequence(i1.get_componentKind().get_sequence());
 					portArray.push(inport_1);
 				} else if(i1.getNameOfTheComponentKind() == "Output") {
 					var outport_ = new com_mun_model_component_Outport(xPosition - width / 2 + width / (this.outputCounter + 1) * (i1.get_componentKind().get_sequence() + 1),height - height / 2);
-					outport_.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
 					outport_.set_sequence(i1.get_componentKind().get_sequence());
 					portArray.push(outport_);
 				}
@@ -4647,12 +4769,10 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 				var i3 = i2.next();
 				if(i3.getNameOfTheComponentKind() == "Input") {
 					var inport_11 = new com_mun_model_component_Inport(xPosition - width / 2 + width / (this.leastInportNum + 1) * (i3.get_componentKind().get_sequence() + 1),height - height / 2);
-					inport_11.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 					inport_11.set_sequence(i3.get_componentKind().get_sequence());
 					portArray.push(inport_11);
 				} else if(i3.getNameOfTheComponentKind() == "Output") {
 					var outport_1 = new com_mun_model_component_Outport(xPosition - width / 2 + width / (this.outputCounter + 1) * (i3.get_componentKind().get_sequence() + 1),height + height / 2);
-					outport_1.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
 					outport_1.set_sequence(i3.get_componentKind().get_sequence());
 					portArray.push(outport_1);
 				}
@@ -4664,12 +4784,10 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 				var i5 = i4.next();
 				if(i5.getNameOfTheComponentKind() == "Input") {
 					var inport_12 = new com_mun_model_component_Inport(xPosition + width / 2,height / (this.leastInportNum + 1) * (i5.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
-					inport_12.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 					inport_12.set_sequence(i5.get_componentKind().get_sequence());
 					portArray.push(inport_12);
 				} else if(i5.getNameOfTheComponentKind() == "Output") {
 					var outport_2 = new com_mun_model_component_Outport(xPosition - width / 2,height / (this.outputCounter + 1) * (i5.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
-					outport_2.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
 					outport_2.set_sequence(i5.get_componentKind().get_sequence());
 					portArray.push(outport_2);
 				}
@@ -4681,12 +4799,10 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 				var i7 = i6.next();
 				if(i7.getNameOfTheComponentKind() == "Input") {
 					var inport_13 = new com_mun_model_component_Inport(xPosition - width / 2,height / (this.leastInportNum + 1) * (i7.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
-					inport_13.set_portDescription(com_mun_model_enumeration_IOTYPE.INPUT);
 					inport_13.set_sequence(i7.get_componentKind().get_sequence());
 					portArray.push(inport_13);
 				} else if(i7.getNameOfTheComponentKind() == "Output") {
 					var outport_3 = new com_mun_model_component_Outport(xPosition + width / 2,height / (this.outputCounter + 1) * (i7.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
-					outport_3.set_portDescription(com_mun_model_enumeration_IOTYPE.OUTPUT);
 					outport_3.set_sequence(i7.get_componentKind().get_sequence());
 					portArray.push(outport_3);
 				}
@@ -4696,12 +4812,8 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 		}
 		return portArray;
 	}
-	,addInPort: function() {
-		return null;
-	}
 	,drawComponent: function(drawingAdapter,hightLight) {
 		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter);
-		haxe_Log.trace("compound component shape position: " + this.component.get_xPosition() + ",    " + this.component.get_yPosition(),{ fileName : "CompoundComponent.hx", lineNumber : 137, className : "com.mun.model.gates.CompoundComponent", methodName : "drawComponent"});
 		if(hightLight) {
 			drawComponent.drawCorrespondingComponent("red");
 		} else {
@@ -4714,7 +4826,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 	}
 	,makeTransform: function() {
 		var transform = com_mun_view_drawingImpl_Transform.identity();
-		transform = transform.translate(this.component.get_xPosition(),this.component.get_yPosition()).scale(this.component.get_width() / this.circuitDiagram.get_diagramWidth(),this.component.get_height() / this.circuitDiagram.get_diagramHeight()).translate(-this.circuitDiagram.get_xMin(),-this.circuitDiagram.get_yMin());
+		transform = transform.translate(-this.circuitDiagram.getCircuitDiagramCenterPoint().get_xPosition(),-this.circuitDiagram.getCircuitDiagramCenterPoint().get_yPosition()).scale(this.component.get_width() / this.circuitDiagram.get_diagramWidth(),this.component.get_height() / this.circuitDiagram.get_diagramHeight()).translate(this.component.get_xPosition(),this.component.get_yPosition());
 		return transform;
 	}
 	,findHitList: function(outerWorldCoordinates,mode) {
@@ -6733,11 +6845,14 @@ com_mun_view_drawComponents_DrawXOR.prototype = {
 	,__class__: com_mun_view_drawComponents_DrawXOR
 };
 var com_mun_view_drawingImpl_Box = function(x_position,y_position,width,height,orientation,worldToView) {
-	var coordinate = worldToView.convertCoordinate(new com_mun_type_Coordinate(x_position,y_position));
-	var x0 = coordinate.get_xPosition() - width / 2;
-	var y0 = coordinate.get_yPosition() - height / 2;
-	var x1 = coordinate.get_xPosition() + width / 2;
-	var y1 = coordinate.get_yPosition() + height / 2;
+	var wnw = new com_mun_type_Coordinate(x_position - width / 2,y_position - height / 2);
+	var wse = new com_mun_type_Coordinate(x_position + width / 2,y_position + height / 2);
+	var vnw = worldToView.convertCoordinate(wnw);
+	var vse = worldToView.convertCoordinate(wse);
+	var x0 = vnw.get_xPosition();
+	var y0 = vnw.get_yPosition();
+	var x1 = vse.get_xPosition();
+	var y1 = vse.get_yPosition();
 	switch(orientation[1]) {
 	case 0:
 		this.xb = x0;
@@ -6872,8 +6987,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		return drawingAdapter;
 	}
 	,drawAndShape: function(x,y,width,height,orientation) {
-		haxe_Log.trace("and shape position: " + x + ",    " + y,{ fileName : "DrawingAdapter.hx", lineNumber : 72, className : "com.mun.view.drawingImpl.DrawingAdapter", methodName : "drawAndShape"});
 		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var vCenterCoordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.lineTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2);
@@ -6883,16 +6998,16 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		var cymax = Math.max(Math.max(r.get_ya(),r.get_yb()),Math.max(r.get_yc(),r.get_yd()));
 		switch(orientation[1]) {
 		case 0:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2,180 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,180 * Math.PI / 180,0,Math.PI);
 			break;
 		case 1:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2,0 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,0 * Math.PI / 180,0,Math.PI);
 			break;
 		case 2:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2,90 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,90 * Math.PI / 180,0,Math.PI);
 			break;
 		case 3:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2,270 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,270 * Math.PI / 180,0,Math.PI);
 			break;
 		default:
 		}
@@ -6906,6 +7021,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	}
 	,drawNAndShape: function(x,y,width,height,orientation) {
 		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var vCenterCoordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.lineTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2);
@@ -6919,23 +7035,23 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		var radius = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 20;
 		switch(orientation[1]) {
 		case 0:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,180 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,180 * Math.PI / 180,0,Math.PI);
 			break;
 		case 1:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,0 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,0 * Math.PI / 180,0,Math.PI);
 			break;
 		case 2:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,90 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,90 * Math.PI / 180,0,Math.PI);
 			break;
 		case 3:
-			this.cxt.ellipse(x,y,(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,270 * Math.PI / 180,0,Math.PI);
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,270 * Math.PI / 180,0,Math.PI);
 			break;
 		default:
 		}
 		this.cxt.lineTo(r.get_xd(),r.get_yd());
 		this.cxt.closePath();
-		this.cxt.moveTo(x + (cymax - cymin) / 2 - 2 * radius,y);
-		this.cxt.arc(x + (cymax - cymin) / 2 - 2 * radius,y,radius,0,2 * Math.PI,false);
+		this.cxt.moveTo(x + (cymax - cymin) / 2 - 2 * radius,vCenterCoordinate.get_yPosition());
+		this.cxt.arc(x + (cymax - cymin) / 2 - 2 * radius,vCenterCoordinate.get_yPosition(),radius,0,2 * Math.PI,false);
 		this.cxt.closePath();
 		this.cxt.fillStyle = this.fillColor;
 		this.cxt.strokeStyle = this.strokeColor;
@@ -7018,6 +7134,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	}
 	,drawXorShape: function(x,y,width,height,orientation) {
 		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var vCenterCoordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.quadraticCurveTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2,(r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
@@ -7030,31 +7147,34 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.fill();
 		switch(orientation[1]) {
 		case 0:
-			this.cxt.moveTo(r.get_xa() + width / 8,r.get_ya());
-			this.cxt.quadraticCurveTo(x,y + height / 7,r.get_xa() + width / 8 * 7,r.get_ya());
+			this.cxt.moveTo(r.get_xa() + (r.get_xb() - r.get_xa()) / 8,r.get_ya());
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y + (r.get_yc() - r.get_yb()) / 7,r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
 			break;
 		case 1:
-			this.cxt.moveTo(r.get_xa() - width / 8,r.get_ya());
-			this.cxt.quadraticCurveTo(x,y - height / 7,r.get_xa() - width / 8 * 7,r.get_ya());
+			this.cxt.moveTo(r.get_xa() - (r.get_xb() - r.get_xa()) / 8,r.get_ya());
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y - (r.get_yc() - r.get_yb()) / 7,r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
 			break;
 		case 2:
-			this.cxt.moveTo(r.get_xa(),r.get_ya() - width / 8);
-			this.cxt.quadraticCurveTo(x + width / 7,y,r.get_xa(),r.get_ya() - width / 8 * 7);
+			this.cxt.moveTo(r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8);
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa()) / 7,y,r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
 			break;
 		case 3:
-			this.cxt.moveTo(r.get_xa(),r.get_ya() + width / 8);
-			this.cxt.quadraticCurveTo(x - width / 7,y,r.get_xa(),r.get_ya() + width / 8 * 7);
+			this.cxt.moveTo(r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8);
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa()) / 7,y,r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
 			break;
 		default:
 		}
 		this.cxt.stroke();
 	}
 	,drawRect: function(x,y,width,height) {
-		var coordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
-		var x0 = coordinate.get_xPosition() - width / 2;
-		var y0 = coordinate.get_yPosition() - height / 2;
-		var x1 = coordinate.get_xPosition() + width / 2;
-		var y1 = coordinate.get_yPosition() + height / 2;
+		var wnw = new com_mun_type_Coordinate(x - width / 2,y - height / 2);
+		var wse = new com_mun_type_Coordinate(x + width / 2,y + height / 2);
+		var vnw = this.worldToView.convertCoordinate(wnw);
+		var vse = this.worldToView.convertCoordinate(wse);
+		var x0 = vnw.get_xPosition();
+		var y0 = vnw.get_yPosition();
+		var x1 = vse.get_xPosition();
+		var y1 = vse.get_yPosition();
 		this.cxt.rect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.fillStyle = this.fillColor;
@@ -7063,9 +7183,12 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawText: function(str,x,y,width) {
-		var coordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
-		var x0 = coordinate.get_xPosition();
-		var y0 = coordinate.get_yPosition();
+		var wnw = new com_mun_type_Coordinate(x - width / 2,y);
+		var wse = new com_mun_type_Coordinate(x + width / 2,y);
+		var vnw = this.worldToView.convertCoordinate(wnw);
+		var vse = this.worldToView.convertCoordinate(wse);
+		var x0 = (wse.get_xPosition() - vnw.get_xPosition()) / 2 + vnw.get_xPosition();
+		var y0 = vse.get_yPosition();
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.font = this.font;
 		this.cxt.fillStyle = this.textColor;
@@ -7073,9 +7196,13 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.fillText(str,x0,y0,width);
 	}
 	,drawCricle: function(x,y,radius) {
-		var coordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
-		var x0 = coordinate.get_xPosition();
-		var y0 = coordinate.get_yPosition();
+		var wnw = new com_mun_type_Coordinate(x - radius,y);
+		var wse = new com_mun_type_Coordinate(x + radius,y);
+		var vnw = this.worldToView.convertCoordinate(wnw);
+		var vse = this.worldToView.convertCoordinate(wse);
+		radius = (vse.get_xPosition() - vnw.get_xPosition()) / 2;
+		var x0 = vnw.get_xPosition() + radius;
+		var y0 = vse.get_yPosition();
 		this.cxt.beginPath();
 		this.cxt.arc(x0,y0,radius,0,2 * Math.PI,false);
 		this.cxt.lineWidth = this.lineWidth;
@@ -7249,7 +7376,7 @@ com_mun_view_drawingImpl_ViewToWorld.__interfaces__ = [com_mun_view_drawingImpl_
 com_mun_view_drawingImpl_ViewToWorld.prototype = {
 	transform: null
 	,convertCoordinate: function(coordinate) {
-		return this.transform.pointConvert(coordinate);
+		return this.transform.pointInvert(coordinate);
 	}
 	,get_transform: function() {
 		return this.transform;
@@ -7273,7 +7400,7 @@ com_mun_view_drawingImpl_WorldToView.__interfaces__ = [com_mun_view_drawingImpl_
 com_mun_view_drawingImpl_WorldToView.prototype = {
 	transform: null
 	,convertCoordinate: function(coordinate) {
-		return this.get_transform().pointInvert(coordinate);
+		return this.get_transform().pointConvert(coordinate);
 	}
 	,get_transform: function() {
 		return this.transform;
@@ -8267,15 +8394,6 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
-};
-var haxe_Log = function() { };
-$hxClasses["haxe.Log"] = haxe_Log;
-haxe_Log.__name__ = ["haxe","Log"];
-haxe_Log.trace = function(v,infos) {
-	js_Boot.__trace(v,infos);
-};
-haxe_Log.clear = function() {
-	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };
