@@ -151,7 +151,7 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var r:Box = new Box(x, y, width, height, orientation, worldToView);
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
 

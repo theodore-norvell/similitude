@@ -14,12 +14,15 @@ class Box {
 
     public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:ORIENTATION, worldToView:WorldToViewI) {
 
-        var coordinate:Coordinate = worldToView.convertCoordinate(new Coordinate(x_position, y_position));
+        var wne = new Coordinate( x_position - width/2.0, y_position - height / 2.0 ) ;
+        var wsw = new Coordinate( x_position + width/2.0, y_position + height / 2.0 ) ;
+        var vne:Coordinate = worldToView.convertCoordinate( wne ) ;
+        var vsw:Coordinate = worldToView.convertCoordinate( wsw ) ;
 
-        var x0:Float = coordinate.get_xPosition() - width / 2;
-        var y0:Float = coordinate.get_yPosition() - height / 2;
-        var x1:Float = coordinate.get_xPosition() + width / 2;
-        var y1:Float = coordinate.get_yPosition() + height / 2;
+        var x0:Float = vne.get_xPosition() ;
+        var y0:Float = vne.get_yPosition() ;
+        var x1:Float = vsw.get_xPosition() ;
+        var y1:Float = vsw.get_yPosition() ;
         switch (orientation){
             case ORIENTATION.EAST : {
                 xa = x0; ya = y0;
