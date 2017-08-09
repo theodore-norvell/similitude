@@ -12,13 +12,13 @@ class Box {
     var xd:Float;
     var yd:Float;
 
-    public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:ORIENTATION, worldToView:WorldToViewI) {
+    public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:ORIENTATION, transform:Transform) {
 
         var wnw:Coordinate = new Coordinate(x_position - width/2, y_position - height/2);
         var wse:Coordinate = new Coordinate(x_position + width/2, y_position + height/2);
 
-        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
-        var vse:Coordinate = worldToView.convertCoordinate(wse);
+        var vnw:Coordinate = transform.pointConvert(wnw);
+        var vse:Coordinate = transform.pointConvert(wse);
 
         var x0:Float = vnw.get_xPosition();
         var y0:Float = vnw.get_yPosition();

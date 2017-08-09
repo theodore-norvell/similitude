@@ -1,6 +1,7 @@
 package com.mun.model.gates;
 
 
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.view.drawComponents.DrawMUX;
@@ -223,7 +224,7 @@ class MUX implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawMUX(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

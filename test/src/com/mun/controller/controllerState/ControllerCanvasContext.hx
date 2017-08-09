@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import com.mun.controller.componentUpdate.UpdateCanvas;
 import js.html.CanvasElement;
 import com.mun.model.component.Component;
 import com.mun.type.HitObject;
@@ -14,9 +15,6 @@ import com.mun.controller.componentUpdate.UpdateCircuitDiagram;
 import com.mun.model.enumeration.M_STATE;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
-import com.mun.view.drawingImpl.Transform;
-import com.mun.view.drawingImpl.ViewToWorld;
-import com.mun.view.drawingImpl.ViewToWorldI;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.Coordinate;
 import js.html.MouseEvent;
@@ -24,6 +22,7 @@ import com.mun.model.enumeration.C_STATE;
 class ControllerCanvasContext {
     var circuitDiagram:CircuitDiagramI;
     var updateCircuitDiagram:UpdateCircuitDiagram;
+    var updateCanvas:UpdateCanvas;
     var keyState:KeyState;
     var sideBar:SideBar;
     var updateToolBar:UpdateToolBar;
@@ -35,8 +34,6 @@ class ControllerCanvasContext {
     var mouseDownWorldCoordinate:Coordinate;
     var mouseMoveWorldCoordiante:Coordinate;
 
-    var viewToWorld:ViewToWorldI;
-    var transform:Transform;
 
     var lastState:C_STATE;
     var controllerState:C_STATE;
@@ -46,21 +43,20 @@ class ControllerCanvasContext {
     var hightLightLink:Link;
     var canvas:CanvasElement;
 
-    public function new(circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, sideBar:SideBar, upateToolBar:UpdateToolBar, canvas:CanvasElement) {
+    public function new(circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, sideBar:SideBar, upateToolBar:UpdateToolBar, canvas:CanvasElement, updateCanvas:UpdateCanvas) {
         this.circuitDiagram = circuitDiagram;
         this.updateCircuitDiagram = updateCircuitDiagram;
         this.sideBar = sideBar;
         this.updateToolBar = upateToolBar;
         this.canvas = canvas;
+        this.updateCanvas = updateCanvas;
 
         controllerState = C_STATE.IDLE;
         lastState = C_STATE.IDLE;
 
         mode = MODE.EXCLUDE_PARENTS;
         mouseState = M_STATE.IDLE;
-        transform = Transform.identity();
 
-        viewToWorld = new ViewToWorld(transform);
         keyState = new KeyState();
         linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
@@ -97,7 +93,7 @@ class ControllerCanvasContext {
         var mouseDownLocation:Coordinate = getPointOnCanvas(x,y);
 
         //translate view coordinate to world coordinate
-        mouseDownWorldCoordinate = viewToWorld.convertCoordinate(mouseDownLocation);
+        mouseDownWorldCoordinate = updateCanvas.getTransform().pointInvert(mouseDownLocation);
 
         mouseState = M_STATE.MOUSE_DOWN;
 
@@ -124,7 +120,7 @@ class ControllerCanvasContext {
         var mouseMoveLocation:Coordinate = getPointOnCanvas(x,y);
 
         //translate to world coordinate
-        mouseMoveWorldCoordiante = viewToWorld.convertCoordinate(mouseMoveLocation);
+        mouseMoveWorldCoordiante = updateCanvas.getTransform().pointInvert(mouseMoveLocation);
 
         if(controllerState == C_STATE.MOVE){
             moveWorldPointArray = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.PATH);

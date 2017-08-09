@@ -2,7 +2,6 @@ package com.mun.view.drawingImpl;
 
 import com.mun.view.drawingImpl.DrawingAdapter;
 import com.mun.type.Coordinate;
-import com.mun.view.drawingImpl.WorldToView;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.ORIENTATION;
 import js.html.CanvasRenderingContext2D;
@@ -19,10 +18,10 @@ class DrawingAdapter implements DrawingAdapterI {
     var textColor:String = "black";//default text color is black
     var lineWidth:Float = 1.0;//because the defalut line width is 1.0
     var font:String = "8px serif";//initial is 8
-    var worldToView:WorldToViewI;
+    var trans:Transform;
 
     public function new(transform:Transform, context:CanvasRenderingContext2D) {
-        worldToView = new WorldToView(transform);
+        this.trans = transform;
 
         this.cxt = context;
     }
@@ -64,14 +63,14 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function transform(transform:Transform):DrawingAdapterI{
-        var drawingAdapter:DrawingAdapterI = new DrawingAdapter(transform.compose(worldToView.get_transform()), cxt);
+        var drawingAdapter:DrawingAdapterI = new DrawingAdapter(transform.compose(trans), cxt);
         return drawingAdapter;
     }
 
     public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var r:Box = new Box(x, y, width, height, orientation,trans);
 
-        var vCenterCoordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+        var vCenterCoordinate:Coordinate = trans.pointConvert(new Coordinate(x, y));
 
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
@@ -107,8 +106,8 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
-        var vCenterCoordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+        var r:Box = new Box(x, y, width, height, orientation,trans);
+        var vCenterCoordinate:Coordinate = trans.pointConvert(new Coordinate(x, y));
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -154,7 +153,7 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var r:Box = new Box(x, y, width, height, orientation,trans);
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
 
@@ -174,7 +173,7 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var r:Box = new Box(x, y, width, height, orientation,trans);
         var radius:Float = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10 ;
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -195,7 +194,7 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var r:Box = new Box(x, y, width, height, orientation,trans);
         cxt.beginPath();
         // Start at point a
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -213,7 +212,7 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
+        var r:Box = new Box(x, y, width, height, orientation,trans);
         // Start at point a
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -250,8 +249,8 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
-        var r:Box = new Box(x, y, width, height, orientation,worldToView);
-        var vCenterCoordinate = worldToView.convertCoordinate(new Coordinate(x, y));
+        var r:Box = new Box(x, y, width, height, orientation,trans);
+        var vCenterCoordinate:Coordinate = trans.pointConvert(new Coordinate(x, y));
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
 
@@ -295,8 +294,8 @@ class DrawingAdapter implements DrawingAdapterI {
         var wnw:Coordinate = new Coordinate(x - width/2, y - height/2);
         var wse:Coordinate = new Coordinate(x + width/2, y + height/2);
 
-        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
-        var vse:Coordinate = worldToView.convertCoordinate(wse);
+        var vnw:Coordinate = trans.pointConvert(wnw);
+        var vse:Coordinate = trans.pointConvert(wse);
 
         var x0:Float = vnw.get_xPosition();
         var y0:Float = vnw.get_yPosition();
@@ -314,8 +313,8 @@ class DrawingAdapter implements DrawingAdapterI {
         var wnw:Coordinate = new Coordinate(x - width/2, y);
         var wse:Coordinate = new Coordinate(x + width/2, y);
 
-        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
-        var vse:Coordinate = worldToView.convertCoordinate(wse);
+        var vnw:Coordinate = trans.pointConvert(wnw);
+        var vse:Coordinate = trans.pointConvert(wse);
 
         var x0:Float = (wse.get_xPosition() - vnw.get_xPosition())/2 + vnw.get_xPosition();
         var y0:Float = vse.get_yPosition();
@@ -331,8 +330,8 @@ class DrawingAdapter implements DrawingAdapterI {
         var wnw:Coordinate = new Coordinate(x - radius, y);
         var wse:Coordinate = new Coordinate(x + radius, y);
 
-        var vnw:Coordinate = worldToView.convertCoordinate(wnw);
-        var vse:Coordinate = worldToView.convertCoordinate(wse);
+        var vnw:Coordinate = trans.pointConvert(wnw);
+        var vse:Coordinate = trans.pointConvert(wse);
 
         radius = (vse.get_xPosition() - vnw.get_xPosition())/2;
 
@@ -350,8 +349,8 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawLine(x0:Float, y0:Float, x1:Float, y1:Float):Void {
-        var coordinate0:Coordinate = worldToView.convertCoordinate(new Coordinate(x0, y0));
-        var coordinate1:Coordinate = worldToView.convertCoordinate(new Coordinate(x1, y1));
+        var coordinate0:Coordinate = trans.pointConvert(new Coordinate(x0, y0));
+        var coordinate1:Coordinate = trans.pointConvert(new Coordinate(x1, y1));
 
         var x0:Float = coordinate0.get_xPosition();
         var y0:Float = coordinate0.get_yPosition();

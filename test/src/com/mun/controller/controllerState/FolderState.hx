@@ -287,7 +287,9 @@ class FolderState {
         updateToolBar.unbindEventListener();
         updateToolBar = updateToolBarMap[circuitDiagram];
         updateToolBar.bindEventListener();
+        updateCanvas.unbindEventListener();
         updateCanvas = updateCanvasMap[circuitDiagram];
+        updateCanvas.bindEventListener();
         sideBar = sideBarMap[circuitDiagram];
         controllerCanvasContext = controllerCanvasContextMap[circuitDiagram];
     }
@@ -304,12 +306,12 @@ class FolderState {
         updateToolBar = new UpdateToolBar(updateCircuitDiagram);
         updateCircuitDiagram.setUpdateToolBar(updateToolBar);
 
-        updateCanvas = new UpdateCanvas(circuitDiagram, updateCircuitDiagram.get_transform(), canvas, context);
+        updateCanvas = new UpdateCanvas(circuitDiagram, canvas, context);
         updateCircuitDiagram.setUpdateCanvas(updateCanvas);
 
         sideBar = new SideBar(updateCircuitDiagram, circuitDiagram, folder);
 
-        controllerCanvasContext = new ControllerCanvasContext(circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar, canvas);
+        controllerCanvasContext = new ControllerCanvasContext(circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar, canvas, updateCanvas);
         sideBar.setControllerCanvasContext(controllerCanvasContext);
         updateToolBar.setControllerCanvasContext(controllerCanvasContext);
 
@@ -443,10 +445,10 @@ class FolderState {
         var pixelRatio:Int = cast Browser.window.devicePixelRatio/backingStoreRatio;
         var oldWidth:Int = cast Browser.window.innerWidth;
         var oldHeight:Int =cast Browser.window.innerHeight;
-        canvasElement.width = cast oldWidth * pixelRatio * 0.8;
-        canvasElement.height = cast oldHeight * pixelRatio  * 0.8;
-        canvasElement.style.width = oldWidth  * 0.8 + 'px';
-        canvasElement.style.height = oldHeight  * 0.8 + 'px';
+        canvasElement.width = cast oldWidth * pixelRatio * 0.62;
+        canvasElement.height = cast oldHeight * pixelRatio  * 0.62;
+        canvasElement.style.width = oldWidth  * 0.62 + 'px';
+        canvasElement.style.height = oldHeight  * 0.62 + 'px';
         // now scale the context to counter
         // the fact that we've manually scaled
         // our canvas element
@@ -454,6 +456,10 @@ class FolderState {
         PIXELRATIO = pixelRatio;
         this.canvas = canvasElement;
         this.context = canvasContext;
+
+        //fix div height for HTML
+        Browser.document.getElementById("left").style.height = oldHeight  * 0.62 + 'px';
+        Browser.document.getElementById("right").style.height = oldHeight  * 0.62 + 'px';
     }
 
     function pushToMap(){

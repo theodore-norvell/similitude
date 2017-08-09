@@ -47,20 +47,12 @@ class UpdateCircuitDiagram {
 
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
 
-    var transform:Transform;
-
     public function new(circuitDiagram:CircuitDiagramI) {
         linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
 
         this.circuitDiagram = circuitDiagram;
 
         commandManager = new CommandManager();
-
-        transform = Transform.identity();
-    }
-
-    public function get_transform():Transform {
-        return transform;
     }
 
     public function get_commandManager():CommandManager {
@@ -115,7 +107,7 @@ class UpdateCircuitDiagram {
     public function createCompoundComponent(name:String, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:ORIENTATION, inportNum:Int, circuitDiagram:CircuitDiagramI):Component{
         var componentkind_:ComponentKind = new CompoundComponent(circuitDiagram);
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
-        component_.setNameOfTheComponentKind(name);
+        component_.setNameOfTheComponentKind("CC");
         return component_;
     }
 

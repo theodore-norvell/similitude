@@ -1,5 +1,6 @@
 package com.mun.model.gates;
 
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.view.drawComponents.DrawNOR;
@@ -118,7 +119,7 @@ class NOR implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawNOR(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

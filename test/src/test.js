@@ -1700,11 +1700,12 @@ com_mun_controller_command_Stack.prototype = {
 	}
 	,__class__: com_mun_controller_command_Stack
 };
-var com_mun_controller_componentUpdate_UpdateCanvas = function(circuitDiagram,transform,canvas,context) {
+var com_mun_controller_componentUpdate_UpdateCanvas = function(circuitDiagram,canvas,context) {
 	this.circuitDiagram = circuitDiagram;
-	this.transform = transform;
+	this.transform = com_mun_view_drawingImpl_Transform.identity();
 	this.canvas = canvas;
 	this.context = context;
+	this.bindEventListener();
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCanvas"] = com_mun_controller_componentUpdate_UpdateCanvas;
 com_mun_controller_componentUpdate_UpdateCanvas.__name__ = ["com","mun","controller","componentUpdate","UpdateCanvas"];
@@ -1713,9 +1714,60 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	,transform: null
 	,canvas: null
 	,context: null
+	,getTransform: function() {
+		return this.transform;
+	}
 	,update: function(linkAndComponentArray) {
 		this.canvas.width = this.canvas.width;
 		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(this.transform,this.context),linkAndComponentArray);
+	}
+	,bindEventListener: function() {
+		window.document.getElementById("left").onmousedown = $bind(this,this.left);
+		window.document.getElementById("right").onmousedown = $bind(this,this.right);
+		window.document.getElementById("up").onmousedown = $bind(this,this.up);
+		window.document.getElementById("down").onmousedown = $bind(this,this.down);
+		window.document.getElementById("zoom_in").onmousedown = $bind(this,this.zoomIn);
+		window.document.getElementById("zoom_out").onmousedown = $bind(this,this.zoomOut);
+		window.document.getElementById("o").onmousedown = $bind(this,this.o);
+		window.document.getElementById("f").onmousedown = $bind(this,this.f);
+	}
+	,unbindEventListener: function() {
+		window.document.getElementById("left").removeEventListener("mousedown",$bind(this,this.left));
+		window.document.getElementById("right").removeEventListener("mousedown",$bind(this,this.right));
+		window.document.getElementById("up").removeEventListener("mousedown",$bind(this,this.up));
+		window.document.getElementById("down").removeEventListener("mousedown",$bind(this,this.down));
+		window.document.getElementById("zoom_in").removeEventListener("mousedown",$bind(this,this.zoomIn));
+		window.document.getElementById("zoom_out").removeEventListener("mousedown",$bind(this,this.zoomOut));
+		window.document.getElementById("o").removeEventListener("mousedown",$bind(this,this.o));
+		window.document.getElementById("f").removeEventListener("mousedown",$bind(this,this.f));
+	}
+	,left: function() {
+		this.transform = this.transform.compose(com_mun_view_drawingImpl_Transform.identity().translate(-com_mun_global_Constant.TRANSFORM_X_DELTA,0));
+		this.update();
+	}
+	,right: function() {
+		this.transform = this.transform.compose(com_mun_view_drawingImpl_Transform.identity().translate(com_mun_global_Constant.TRANSFORM_X_DELTA,0));
+		this.update();
+	}
+	,up: function() {
+		this.transform = this.transform.compose(com_mun_view_drawingImpl_Transform.identity().translate(0,-com_mun_global_Constant.TRANSFORM_Y_DELTA));
+		this.update();
+	}
+	,down: function() {
+		this.transform = this.transform.compose(com_mun_view_drawingImpl_Transform.identity().translate(0,com_mun_global_Constant.TRANSFORM_Y_DELTA));
+		this.update();
+	}
+	,zoomIn: function() {
+		this.transform = this.transform.compose(com_mun_view_drawingImpl_Transform.identity().scale(com_mun_global_Constant.TRANSFORM_ZOOM_IN_RATE,com_mun_global_Constant.TRANSFORM_ZOOM_IN_RATE));
+		this.update();
+	}
+	,zoomOut: function() {
+		this.transform = this.transform.compose(com_mun_view_drawingImpl_Transform.identity().scale(com_mun_global_Constant.TRANSFORM_ZOOM_OUT_RATE,com_mun_global_Constant.TRANSFORM_ZOOM_OUT_RATE));
+		this.update();
+	}
+	,o: function() {
+	}
+	,f: function() {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateCanvas
 };
@@ -1723,7 +1775,6 @@ var com_mun_controller_componentUpdate_UpdateCircuitDiagram = function(circuitDi
 	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.circuitDiagram = circuitDiagram;
 	this.commandManager = new com_mun_controller_command_CommandManager();
-	this.transform = com_mun_view_drawingImpl_Transform.identity();
 };
 $hxClasses["com.mun.controller.componentUpdate.UpdateCircuitDiagram"] = com_mun_controller_componentUpdate_UpdateCircuitDiagram;
 com_mun_controller_componentUpdate_UpdateCircuitDiagram.__name__ = ["com","mun","controller","componentUpdate","UpdateCircuitDiagram"];
@@ -1733,10 +1784,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,commandManager: null
 	,updateToolBar: null
 	,linkAndComponentArray: null
-	,transform: null
-	,get_transform: function() {
-		return this.transform;
-	}
 	,get_commandManager: function() {
 		return this.commandManager;
 	}
@@ -1778,7 +1825,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,createCompoundComponent: function(name,xPosition,yPosition,width,height,orientation,inportNum,circuitDiagram) {
 		var componentkind_ = new com_mun_model_gates_CompoundComponent(circuitDiagram);
 		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
-		component_.setNameOfTheComponentKind(name);
+		component_.setNameOfTheComponentKind("CC");
 		return component_;
 	}
 	,addLink: function(coordinateFrom,coordinateTo) {
@@ -2273,18 +2320,17 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,__class__: com_mun_controller_componentUpdate_UpdateToolBar
 };
-var com_mun_controller_controllerState_ControllerCanvasContext = function(circuitDiagram,updateCircuitDiagram,sideBar,upateToolBar,canvas) {
+var com_mun_controller_controllerState_ControllerCanvasContext = function(circuitDiagram,updateCircuitDiagram,sideBar,upateToolBar,canvas,updateCanvas) {
 	this.circuitDiagram = circuitDiagram;
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.sideBar = sideBar;
 	this.updateToolBar = upateToolBar;
 	this.canvas = canvas;
+	this.updateCanvas = updateCanvas;
 	this.controllerState = com_mun_model_enumeration_C_$STATE.IDLE;
 	this.lastState = com_mun_model_enumeration_C_$STATE.IDLE;
 	this.mode = com_mun_model_enumeration_MODE.EXCLUDE_PARENTS;
 	this.mouseState = com_mun_model_enumeration_M_$STATE.IDLE;
-	this.transform = com_mun_view_drawingImpl_Transform.identity();
-	this.viewToWorld = new com_mun_view_drawingImpl_ViewToWorld(this.transform);
 	this.keyState = new com_mun_controller_controllerState_KeyState();
 	this.linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.lastClickArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
@@ -2299,6 +2345,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.__name__ = ["com","mu
 com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	circuitDiagram: null
 	,updateCircuitDiagram: null
+	,updateCanvas: null
 	,keyState: null
 	,sideBar: null
 	,updateToolBar: null
@@ -2308,8 +2355,6 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	,moveWorldPointArray: null
 	,mouseDownWorldCoordinate: null
 	,mouseMoveWorldCoordiante: null
-	,viewToWorld: null
-	,transform: null
 	,lastState: null
 	,controllerState: null
 	,mouseState: null
@@ -2335,7 +2380,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		var x = event.clientX;
 		var y = event.clientY;
 		var mouseDownLocation = this.getPointOnCanvas(x,y);
-		this.mouseDownWorldCoordinate = this.viewToWorld.convertCoordinate(mouseDownLocation);
+		this.mouseDownWorldCoordinate = this.updateCanvas.getTransform().pointInvert(mouseDownLocation);
 		this.mouseState = com_mun_model_enumeration_M_$STATE.MOUSE_DOWN;
 		this.mouseDownProcess();
 	}
@@ -2351,7 +2396,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		var x = event.clientX;
 		var y = event.clientY;
 		var mouseMoveLocation = this.getPointOnCanvas(x,y);
-		this.mouseMoveWorldCoordiante = this.viewToWorld.convertCoordinate(mouseMoveLocation);
+		this.mouseMoveWorldCoordiante = this.updateCanvas.getTransform().pointInvert(mouseMoveLocation);
 		if(this.controllerState == com_mun_model_enumeration_C_$STATE.MOVE) {
 			this.moveWorldPointArray = this.circuitDiagram.findWorldPoint(this.mouseMoveWorldCoordiante,com_mun_model_enumeration_POINT_$MODE.PATH);
 			var moveToOtherCircuitDiagram = true;
@@ -2812,7 +2857,9 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.updateToolBar.unbindEventListener();
 		this.updateToolBar = this.updateToolBarMap.h[this.circuitDiagram.__id__];
 		this.updateToolBar.bindEventListener();
+		this.updateCanvas.unbindEventListener();
 		this.updateCanvas = this.updateCanvasMap.h[this.circuitDiagram.__id__];
+		this.updateCanvas.bindEventListener();
 		this.sideBar = this.sideBarMap.h[this.circuitDiagram.__id__];
 		this.controllerCanvasContext = this.controllerCanvasContextMap.h[this.circuitDiagram.__id__];
 	}
@@ -2825,10 +2872,10 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.circuitDiagram.set_commandManager(this.updateCircuitDiagram.get_commandManager());
 		this.updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(this.updateCircuitDiagram);
 		this.updateCircuitDiagram.setUpdateToolBar(this.updateToolBar);
-		this.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(this.circuitDiagram,this.updateCircuitDiagram.get_transform(),this.canvas,this.context);
+		this.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(this.circuitDiagram,this.canvas,this.context);
 		this.updateCircuitDiagram.setUpdateCanvas(this.updateCanvas);
 		this.sideBar = new com_mun_controller_controllerState_SideBar(this.updateCircuitDiagram,this.circuitDiagram,this.folder);
-		this.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(this.circuitDiagram,this.updateCircuitDiagram,this.sideBar,this.updateToolBar,this.canvas);
+		this.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(this.circuitDiagram,this.updateCircuitDiagram,this.sideBar,this.updateToolBar,this.canvas,this.updateCanvas);
 		this.sideBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.updateToolBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.pushToMap();
@@ -2933,14 +2980,16 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		var pixelRatio = window.devicePixelRatio / backingStoreRatio;
 		var oldWidth = window.innerWidth;
 		var oldHeight = window.innerHeight;
-		canvasElement.width = oldWidth * pixelRatio * 0.8;
-		canvasElement.height = oldHeight * pixelRatio * 0.8;
-		canvasElement.style.width = oldWidth * 0.8 + "px";
-		canvasElement.style.height = oldHeight * 0.8 + "px";
+		canvasElement.width = oldWidth * pixelRatio * 0.62;
+		canvasElement.height = oldHeight * pixelRatio * 0.62;
+		canvasElement.style.width = oldWidth * 0.62 + "px";
+		canvasElement.style.height = oldHeight * 0.62 + "px";
 		canvasContext.scale(pixelRatio,pixelRatio);
 		com_mun_global_Constant.PIXELRATIO = pixelRatio;
 		this.canvas = canvasElement;
 		this.context = canvasContext;
+		window.document.getElementById("left").style.height = oldHeight * 0.62 + "px";
+		window.document.getElementById("right").style.height = oldHeight * 0.62 + "px";
 	}
 	,pushToMap: function() {
 		this.updateCircuitDiagramMap.set(this.circuitDiagram,this.updateCircuitDiagram);
@@ -3213,16 +3262,16 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			if(i.get_xPosition() < this.xMin) {
+			if(i.get_xPosition() - i.get_width() / 2 < this.xMin) {
 				this.xMin = i.get_xPosition() - i.get_width() / 2;
 			}
-			if(i.get_xPosition() > this.xMax) {
+			if(i.get_xPosition() + i.get_width() / 2 > this.xMax) {
 				this.xMax = i.get_xPosition() + i.get_width() / 2;
 			}
-			if(i.get_yPosition() < this.yMin) {
+			if(i.get_yPosition() - i.get_height() / 2 < this.yMin) {
 				this.yMin = i.get_yPosition() - i.get_height() / 2;
 			}
-			if(i.get_yPosition() > this.yMax) {
+			if(i.get_yPosition() + i.get_height() / 2 > this.yMax) {
 				this.yMax = i.get_yPosition() + i.get_height() / 2;
 			}
 		}
@@ -3247,7 +3296,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				this.xMin = i1.get_rightEndpoint().get_xPosition();
 			}
 			if(i1.get_rightEndpoint().get_xPosition() > this.xMax) {
-				this.xMax = i1.get_leftEndpoint().get_xPosition();
+				this.xMax = i1.get_rightEndpoint().get_xPosition();
 			}
 			if(i1.get_rightEndpoint().get_yPosition() < this.yMin) {
 				this.yMin = i1.get_rightEndpoint().get_yPosition();
@@ -3442,7 +3491,11 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				}
 			}
 			if(!drawFlag) {
-				i.drawComponent(drawingAdapter,false);
+				if(i.getNameOfTheComponentKind() != "CC") {
+					i.drawComponent(drawingAdapter,false);
+				} else {
+					i.drawComponent(drawingAdapter,false,linkAndComponentArray);
+				}
 			}
 			drawFlag = false;
 		}
@@ -3498,8 +3551,8 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				++_g21;
 				if(j1.get_circuitDiagram() == null) {
 					j1.set_circuitDiagram(this);
-					hitObjectArray.push(j1);
 				}
+				hitObjectArray.push(j1);
 			}
 		}
 		return hitObjectArray;
@@ -3511,7 +3564,13 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			worldPointArray.concat(i.findWorldPoint(worldCoordinate,mode));
+			var tempWorldPointArray = i.findWorldPoint(worldCoordinate,mode);
+			var _g2 = 0;
+			while(_g2 < tempWorldPointArray.length) {
+				var j = tempWorldPointArray[_g2];
+				++_g2;
+				worldPointArray.push(j);
+			}
 			if(worldPointArray.length != 0) {
 				break;
 			}
@@ -3705,7 +3764,7 @@ com_mun_model_component_Component.prototype = {
 		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
 		return this;
 	}
-	,drawComponent: function(drawingAdpater,highLight) {
+	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray) {
 		if(this.componentKind.checkInnerCircuitDiagramPortsChange()) {
 			var theNumberOfInput = 0;
 			var theNumberOfOutput = 0;
@@ -3787,7 +3846,11 @@ com_mun_model_component_Component.prototype = {
 			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
 			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
 		}
-		this.componentKind.drawComponent(drawingAdpater,highLight);
+		if(this.nameOfTheComponentKind != "CC") {
+			this.componentKind.drawComponent(drawingAdpater,highLight);
+		} else {
+			this.componentKind.drawComponent(drawingAdpater,highLight,linkAndComponentArray);
+		}
 	}
 	,findHitList: function(coordinate,mode) {
 		return this.componentKind.findHitList(coordinate,mode);
@@ -4688,7 +4751,7 @@ com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawAND(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -4812,7 +4875,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,hightLight) {
+	,drawComponent: function(drawingAdapter,hightLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter);
 		if(hightLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -4821,7 +4884,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 		}
 		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
 			drawingAdapter = drawingAdapter.transform(this.makeTransform());
-			this.circuitDiagram.draw(drawingAdapter);
+			this.circuitDiagram.draw(drawingAdapter,linkAndComponentArray);
 		}
 	}
 	,makeTransform: function() {
@@ -4838,12 +4901,6 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 			var transform = this.makeTransform();
 			var innerWorldCoordinates = transform.pointInvert(outerWorldCoordinates);
 			var result = this.circuitDiagram.findHitList(innerWorldCoordinates,mode);
-			var _g = 0;
-			while(_g < result.length) {
-				var i = result[_g];
-				++_g;
-				i.set_circuitDiagram(this.circuitDiagram);
-			}
 			if(result.length == 0 || mode == com_mun_model_enumeration_MODE.INCLUDE_PARENTS) {
 				var hitObject = new com_mun_type_HitObject();
 				hitObject.set_component(this.component);
@@ -5122,7 +5179,7 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawFlipFlop(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5249,7 +5306,7 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawInput(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5437,7 +5494,7 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawMUX(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5535,7 +5592,7 @@ com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.pr
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawNAND(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5633,7 +5690,7 @@ com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawNOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5733,7 +5790,7 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawNOT(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5831,7 +5888,7 @@ com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prot
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5955,7 +6012,7 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawOutput(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6058,7 +6115,7 @@ com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
 		var drawComponent = new com_mun_view_drawComponents_DrawXOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6844,11 +6901,11 @@ com_mun_view_drawComponents_DrawXOR.prototype = {
 	}
 	,__class__: com_mun_view_drawComponents_DrawXOR
 };
-var com_mun_view_drawingImpl_Box = function(x_position,y_position,width,height,orientation,worldToView) {
+var com_mun_view_drawingImpl_Box = function(x_position,y_position,width,height,orientation,transform) {
 	var wnw = new com_mun_type_Coordinate(x_position - width / 2,y_position - height / 2);
 	var wse = new com_mun_type_Coordinate(x_position + width / 2,y_position + height / 2);
-	var vnw = worldToView.convertCoordinate(wnw);
-	var vse = worldToView.convertCoordinate(wse);
+	var vnw = transform.pointConvert(wnw);
+	var vse = transform.pointConvert(wse);
 	var x0 = vnw.get_xPosition();
 	var y0 = vnw.get_yPosition();
 	var x1 = vse.get_xPosition();
@@ -6940,7 +6997,7 @@ var com_mun_view_drawingImpl_DrawingAdapter = function(transform,context) {
 	this.textColor = "black";
 	this.fillColor = "gray";
 	this.strokeColor = "black";
-	this.worldToView = new com_mun_view_drawingImpl_WorldToView(transform);
+	this.trans = transform;
 	this.cxt = context;
 };
 $hxClasses["com.mun.view.drawingImpl.DrawingAdapter"] = com_mun_view_drawingImpl_DrawingAdapter;
@@ -6953,7 +7010,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	,textColor: null
 	,lineWidth: null
 	,font: null
-	,worldToView: null
+	,trans: null
 	,resetDrawingParam: function() {
 		this.strokeColor = "black";
 		this.fillColor = "gray";
@@ -6983,12 +7040,12 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt = value;
 	}
 	,transform: function(transform) {
-		var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.worldToView.get_transform()),this.cxt);
+		var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.trans),this.cxt);
 		return drawingAdapter;
 	}
 	,drawAndShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
-		var vCenterCoordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
+		var vCenterCoordinate = this.trans.pointConvert(new com_mun_type_Coordinate(x,y));
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.lineTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2);
@@ -7020,8 +7077,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawNAndShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
-		var vCenterCoordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
+		var vCenterCoordinate = this.trans.pointConvert(new com_mun_type_Coordinate(x,y));
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.lineTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2);
@@ -7060,7 +7117,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawOrShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.quadraticCurveTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2,(r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
@@ -7074,7 +7131,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawNOrShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
 		var radius = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10;
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
@@ -7089,7 +7146,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawBufferShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.lineTo((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
@@ -7102,7 +7159,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawNotShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.lineTo((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
@@ -7133,8 +7190,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawXorShape: function(x,y,width,height,orientation) {
-		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.worldToView);
-		var vCenterCoordinate = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x,y));
+		var r = new com_mun_view_drawingImpl_Box(x,y,width,height,orientation,this.trans);
+		var vCenterCoordinate = this.trans.pointConvert(new com_mun_type_Coordinate(x,y));
 		this.cxt.beginPath();
 		this.cxt.moveTo(r.get_xa(),r.get_ya());
 		this.cxt.quadraticCurveTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2,(r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
@@ -7169,8 +7226,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	,drawRect: function(x,y,width,height) {
 		var wnw = new com_mun_type_Coordinate(x - width / 2,y - height / 2);
 		var wse = new com_mun_type_Coordinate(x + width / 2,y + height / 2);
-		var vnw = this.worldToView.convertCoordinate(wnw);
-		var vse = this.worldToView.convertCoordinate(wse);
+		var vnw = this.trans.pointConvert(wnw);
+		var vse = this.trans.pointConvert(wse);
 		var x0 = vnw.get_xPosition();
 		var y0 = vnw.get_yPosition();
 		var x1 = vse.get_xPosition();
@@ -7185,8 +7242,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	,drawText: function(str,x,y,width) {
 		var wnw = new com_mun_type_Coordinate(x - width / 2,y);
 		var wse = new com_mun_type_Coordinate(x + width / 2,y);
-		var vnw = this.worldToView.convertCoordinate(wnw);
-		var vse = this.worldToView.convertCoordinate(wse);
+		var vnw = this.trans.pointConvert(wnw);
+		var vse = this.trans.pointConvert(wse);
 		var x0 = (wse.get_xPosition() - vnw.get_xPosition()) / 2 + vnw.get_xPosition();
 		var y0 = vse.get_yPosition();
 		this.cxt.lineWidth = this.lineWidth;
@@ -7198,8 +7255,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	,drawCricle: function(x,y,radius) {
 		var wnw = new com_mun_type_Coordinate(x - radius,y);
 		var wse = new com_mun_type_Coordinate(x + radius,y);
-		var vnw = this.worldToView.convertCoordinate(wnw);
-		var vse = this.worldToView.convertCoordinate(wse);
+		var vnw = this.trans.pointConvert(wnw);
+		var vse = this.trans.pointConvert(wse);
 		radius = (vse.get_xPosition() - vnw.get_xPosition()) / 2;
 		var x0 = vnw.get_xPosition() + radius;
 		var y0 = vse.get_yPosition();
@@ -7212,8 +7269,8 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.stroke();
 	}
 	,drawLine: function(x0,y0,x1,y1) {
-		var coordinate0 = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x0,y0));
-		var coordinate1 = this.worldToView.convertCoordinate(new com_mun_type_Coordinate(x1,y1));
+		var coordinate0 = this.trans.pointConvert(new com_mun_type_Coordinate(x0,y0));
+		var coordinate1 = this.trans.pointConvert(new com_mun_type_Coordinate(x1,y1));
 		var x01 = coordinate0.get_xPosition();
 		var y01 = coordinate0.get_yPosition();
 		var x11 = coordinate1.get_xPosition();
@@ -7358,55 +7415,6 @@ com_mun_view_drawingImpl_Transform.prototype = {
 		return tempArray;
 	}
 	,__class__: com_mun_view_drawingImpl_Transform
-};
-var com_mun_view_drawingImpl_ViewToWorldI = function() { };
-$hxClasses["com.mun.view.drawingImpl.ViewToWorldI"] = com_mun_view_drawingImpl_ViewToWorldI;
-com_mun_view_drawingImpl_ViewToWorldI.__name__ = ["com","mun","view","drawingImpl","ViewToWorldI"];
-com_mun_view_drawingImpl_ViewToWorldI.prototype = {
-	convertCoordinate: null
-	,get_transform: null
-	,__class__: com_mun_view_drawingImpl_ViewToWorldI
-};
-var com_mun_view_drawingImpl_ViewToWorld = function(transform) {
-	this.transform = transform;
-};
-$hxClasses["com.mun.view.drawingImpl.ViewToWorld"] = com_mun_view_drawingImpl_ViewToWorld;
-com_mun_view_drawingImpl_ViewToWorld.__name__ = ["com","mun","view","drawingImpl","ViewToWorld"];
-com_mun_view_drawingImpl_ViewToWorld.__interfaces__ = [com_mun_view_drawingImpl_ViewToWorldI];
-com_mun_view_drawingImpl_ViewToWorld.prototype = {
-	transform: null
-	,convertCoordinate: function(coordinate) {
-		return this.transform.pointInvert(coordinate);
-	}
-	,get_transform: function() {
-		return this.transform;
-	}
-	,__class__: com_mun_view_drawingImpl_ViewToWorld
-};
-var com_mun_view_drawingImpl_WorldToViewI = function() { };
-$hxClasses["com.mun.view.drawingImpl.WorldToViewI"] = com_mun_view_drawingImpl_WorldToViewI;
-com_mun_view_drawingImpl_WorldToViewI.__name__ = ["com","mun","view","drawingImpl","WorldToViewI"];
-com_mun_view_drawingImpl_WorldToViewI.prototype = {
-	convertCoordinate: null
-	,get_transform: null
-	,__class__: com_mun_view_drawingImpl_WorldToViewI
-};
-var com_mun_view_drawingImpl_WorldToView = function(transform) {
-	this.transform = transform;
-};
-$hxClasses["com.mun.view.drawingImpl.WorldToView"] = com_mun_view_drawingImpl_WorldToView;
-com_mun_view_drawingImpl_WorldToView.__name__ = ["com","mun","view","drawingImpl","WorldToView"];
-com_mun_view_drawingImpl_WorldToView.__interfaces__ = [com_mun_view_drawingImpl_WorldToViewI];
-com_mun_view_drawingImpl_WorldToView.prototype = {
-	transform: null
-	,convertCoordinate: function(coordinate) {
-		return this.get_transform().pointConvert(coordinate);
-	}
-	,get_transform: function() {
-		return this.transform;
-	}
-	,__class__: com_mun_view_drawingImpl_WorldToView
-	,__properties__: {get_transform:"get_transform"}
 };
 var haxe_IMap = function() { };
 $hxClasses["haxe.IMap"] = haxe_IMap;
@@ -9676,6 +9684,10 @@ com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
 com_mun_global_Constant.pointToEndpointDistance = 6;
 com_mun_global_Constant.PIXELRATIO = 1;
+com_mun_global_Constant.TRANSFORM_X_DELTA = 5;
+com_mun_global_Constant.TRANSFORM_Y_DELTA = 5;
+com_mun_global_Constant.TRANSFORM_ZOOM_IN_RATE = 1.2;
+com_mun_global_Constant.TRANSFORM_ZOOM_OUT_RATE = 0.8;
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
 };

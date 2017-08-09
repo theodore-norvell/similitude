@@ -1,4 +1,5 @@
 package com.mun.model.gates;
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.type.WorldPoint;
 import com.mun.view.drawComponents.DrawComponent;
@@ -10,7 +11,6 @@ import com.mun.model.enumeration.MODE;
 import com.mun.type.Coordinate;
 import com.mun.view.drawingImpl.Transform;
 import com.mun.model.component.Outport;
-import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.component.Inport;
 import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.component.Component;
@@ -138,7 +138,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool):Void {
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void {
         var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter);
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
@@ -149,7 +149,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         if(component.get_boxType() == BOX.WHITE_BOX){
             //compound component need to draw all the components in ComponentArray, which should make a new transfrom
             drawingAdapter = drawingAdapter.transform(makeTransform());
-            circuitDiagram.draw(drawingAdapter);
+            circuitDiagram.draw(drawingAdapter, linkAndComponentArray);
         }
     }
 
@@ -172,9 +172,6 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
             var transform:Transform = makeTransform();
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
             var result:Array<HitObject> = circuitDiagram.findHitList(innerWorldCoordinates, mode);
-            for(i in result){
-                i.set_circuitDiagram(circuitDiagram);
-            }
 
             if(result.length == 0 || mode == MODE.INCLUDE_PARENTS){
                 var hitObject:HitObject = new HitObject();

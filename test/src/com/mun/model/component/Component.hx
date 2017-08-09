@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.BOX;
 import com.mun.model.enumeration.POINT_MODE;
@@ -190,7 +191,7 @@ class Component {
         return this;
     }
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         if(componentKind.checkInnerCircuitDiagramPortsChange()){
             var theNumberOfInput:Int = 0;
             var theNumberOfOutput:Int = 0;
@@ -258,8 +259,11 @@ class Component {
             componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
             componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
         }
-
-        componentKind.drawComponent(drawingAdpater, highLight);
+        if(nameOfTheComponentKind != "CC"){
+            componentKind.drawComponent(drawingAdpater, highLight);
+        }else{
+            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray);
+        }
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{

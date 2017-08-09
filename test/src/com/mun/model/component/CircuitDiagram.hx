@@ -44,19 +44,19 @@ class CircuitDiagram implements CircuitDiagramI{
         yMax = 0 ;
 
         for(i in componentArray){
-            if(i.get_xPosition() < xMin){
+            if(i.get_xPosition() - i.get_width()/2 < xMin){
                 xMin = i.get_xPosition() - i.get_width()/2;
             }
 
-            if(i.get_xPosition() > xMax){
+            if(i.get_xPosition() + i.get_width()/2 > xMax){
                 xMax = i.get_xPosition() + i.get_width()/2;
             }
 
-            if(i.get_yPosition() < yMin){
+            if(i.get_yPosition() - i.get_height()/2 < yMin){
                 yMin = i.get_yPosition() - i.get_height()/2;
             }
 
-            if(i.get_yPosition() > yMax){
+            if(i.get_yPosition() + i.get_height()/2 > yMax){
                 yMax = i.get_yPosition() + i.get_height()/2;
             }
         }
@@ -84,7 +84,7 @@ class CircuitDiagram implements CircuitDiagramI{
             }
 
             if(i.get_rightEndpoint().get_xPosition() > xMax){
-                xMax = i.get_leftEndpoint().get_xPosition();
+                xMax = i.get_rightEndpoint().get_xPosition();
             }
 
             if(i.get_rightEndpoint().get_yPosition() < yMin){
@@ -310,7 +310,11 @@ class CircuitDiagram implements CircuitDiagramI{
             }
 
             if(!drawFlag){
-                i.drawComponent(drawingAdapter, false);
+                if(i.getNameOfTheComponentKind() != "CC"){
+                    i.drawComponent(drawingAdapter, false);
+                }else{
+                    i.drawComponent(drawingAdapter, false, linkAndComponentArray);
+                }
             }
 
             drawFlag = false;
@@ -355,9 +359,8 @@ class CircuitDiagram implements CircuitDiagramI{
             for(j in result){
                 if(j.get_circuitDiagram() == null){
                     j.set_circuitDiagram(this);
-
-                    hitObjectArray.push(j);
                 }
+                hitObjectArray.push(j);
             }
         }
         return hitObjectArray;
@@ -367,7 +370,10 @@ class CircuitDiagram implements CircuitDiagramI{
         var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
 
         for(i in componentArray){
-            worldPointArray.concat(i.findWorldPoint(worldCoordinate, mode));
+            var tempWorldPointArray:Array<WorldPoint> = i.findWorldPoint(worldCoordinate, mode);
+            for(j in tempWorldPointArray){
+                worldPointArray.push(j);
+            }
             if(worldPointArray.length != 0){
                 break;
             }
