@@ -300,7 +300,7 @@ class FolderState {
         addNewCicruitDiagramTab();
         createNewCanvas(circuitDiagram.get_name());
 
-        updateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram);
+        updateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram, folder);
         circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
 
         updateToolBar = new UpdateToolBar(updateCircuitDiagram);

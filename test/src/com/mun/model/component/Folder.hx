@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.type.Object;
 class Folder implements FolderI{
     var name:String;
     //use the name of circuit diagram to find the circuit diagram
@@ -69,5 +70,50 @@ class Folder implements FolderI{
 
     public function deleteCircuitDiagram(name:String){
         circuitDiagramMap.remove(name);
+    }
+
+    /**
+    * precondiction: The component or link or endpoint or port should belong to one exist circuit diagram
+    **/
+    public function findObjectBelongsToWhichCircuitDiagram(object:Object):CircuitDiagramI{
+        for(i in circuitDiagramMap.iterator()){
+            if(object.get_component() != null){
+                for(j in i.get_componentIterator()){
+                    if(j == object.get_component()){
+                        return i;
+                    }
+
+                    if(object.get_port() != null){
+                        for(k in j.get_inportIterator()){
+                            if(object.get_port() == k){
+                                return i;
+                            }
+                        }
+
+                        for(k in j.get_outportIterator()){
+                            if(object.get_port() == k){
+                                return i;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(object.get_link() != null || object.get_endPoint() != null){
+                for(j in i.get_linkIterator()){
+                    if(object.get_link() != null && object.get_link() == j){
+                        return i;
+                    }
+
+                    if(object.get_endPoint() != null){
+                        if(object.get_endPoint() == j.get_rightEndpoint() || object.get_endPoint() == j.get_leftEndpoint()){
+                            return i;
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;//this line should never happen
     }
 }

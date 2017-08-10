@@ -1,5 +1,7 @@
 package com.mun.controller.controllerState;
 
+import com.mun.type.Object;
+import com.mun.type.WorldPoint;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import js.html.CanvasElement;
 import com.mun.model.component.Component;
@@ -29,16 +31,14 @@ class ControllerCanvasContext {
 
     var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
     var lastClickArray:LinkAndComponentAndEndpointAndPortArray;
-    var hitListWorldPointArray:Array<WorldPoint>;
-    var moveWorldPointArray:Array<WorldPoint>;
-    var mouseDownWorldCoordinate:Coordinate;
-    var mouseMoveWorldCoordiante:Coordinate;
+    var hitListWorldPoint:WorldPoint;
 
+    var mouseMoveWorldCoordiante:Coordinate;
+    var mouseDownWorldCoordinate:Coordinate;
 
     var lastState:C_STATE;
     var controllerState:C_STATE;
     var mouseState:M_STATE;
-    var mode:MODE;
 
     var hightLightLink:Link;
     var canvas:CanvasElement;
@@ -54,14 +54,11 @@ class ControllerCanvasContext {
         controllerState = C_STATE.IDLE;
         lastState = C_STATE.IDLE;
 
-        mode = MODE.EXCLUDE_PARENTS;
         mouseState = M_STATE.IDLE;
 
         keyState = new KeyState();
         linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
-        hitListWorldPointArray = new Array<WorldPoint>();
-        moveWorldPointArray = new Array<WorldPoint>();
 
         //add mouse  listener
         this.canvas.addEventListener("mousedown", doMouseDown,false);
@@ -123,12 +120,14 @@ class ControllerCanvasContext {
         mouseMoveWorldCoordiante = updateCanvas.getTransform().pointInvert(mouseMoveLocation);
 
         if(controllerState == C_STATE.MOVE){
-            moveWorldPointArray = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.PATH);
+
+            var moveWorldPointArray:Array<WorldPoint> = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.PATH);
 
             var moveToOtherCircuitDiagram:Bool = true;
             for(i in moveWorldPointArray){
-                if(i.get_circuitDiagram() == hitListWorldPointArray[0].get_circuitDiagram()){
+                if(i.get_circuitDiagram() == hitListWorldPoint.get_circuitDiagram()){
                     moveToOtherCircuitDiagram = false;
+                    mouseMoveWorldCoordiante = i.get_coordinate();
                     break;
                 }
             }
@@ -137,8 +136,10 @@ class ControllerCanvasContext {
             if(!moveToOtherCircuitDiagram){
                 mouseMoveResultProcess();
                 mouseDownWorldCoordinate = mouseMoveWorldCoordiante;
+            }else{
+                mouseMoveWorldCoordiante = mouseDownWorldCoordinate;
             }
-        }else{
+        }else{//for create component
             mouseMoveResultProcess();
             mouseDownWorldCoordinate = mouseMoveWorldCoordiante;
         }
@@ -201,21 +202,16 @@ class ControllerCanvasContext {
         }
     }
 
-    function checkHitList(){//
+    function checkHitList(){
         /**
         * Priority:
         * Port > Endpoint > Component = Link
         * */
-        var hitObjectArray:Array<HitObject> = circuitDiagram.findHitList(mouseDownWorldCoordinate,mode);
-        hitListWorldPointArray = circuitDiagram.findWorldPoint(mouseDownWorldCoordinate, POINT_MODE.ONE);
-        //the priority of the hit is from deepest to the outest
-        //delete all the hit object not belongs to the circuit diagram which is same as the circuit diagram of the deepest hitted object
-        var theDeepesthitObject = hitObjectArray[hitObjectArray.length - 1];
-        for(i in hitObjectArray){
-            if(i.get_circuitDiagram() != theDeepesthitObject.get_circuitDiagram()){
-                hitObjectArray.remove(i);
-            }
-        }
+        var hitObjectArray:Array<HitObject> = circuitDiagram.findHitList(mouseDownWorldCoordinate, MODE.EXCLUDE_PARENTS);
+        //make sure all of the selected objects in the same circuit diagram, it should be the deepest circuit diagram
+        hitListWorldPoint = circuitDiagram.findWorldPoint(mouseDownWorldCoordinate, POINT_MODE.ONE)[0];
+
+        mouseDownWorldCoordinate = hitListWorldPoint.get_coordinate();
 
         //caculate how many component || link || port || endpoint has been hitted
         var componentCounter:Int = 0;
@@ -246,7 +242,11 @@ class ControllerCanvasContext {
             }
 
             if(updateCircuitDiagram.findLinkThroughEndpoint(endpoint) == hightLightLink){
-                linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+                var object:Object = new Object();
+                object.set_endPoint(endpoint);
+                if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
+                    linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+                }
             }else{
                 controllerState = C_STATE.CREATE_LINK;
                 checkState();
@@ -259,7 +259,11 @@ class ControllerCanvasContext {
                     endpoint = i.get_endpoint();
                 }
             }
-            linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+            var object:Object = new Object();
+            object.set_endPoint(endpoint);
+            if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
+                linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+            }
         }else if(componentCounter != 0){//component selected
             var component:Component = null;
             for(i in hitObjectArray){
@@ -267,7 +271,11 @@ class ControllerCanvasContext {
                     component = i.get_component();
                 }
             }
-            linkAndComponentAndEndpointAndPortArray.addComponent(component);
+            var object:Object = new Object();
+            object.set_component(component);
+            if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
+                linkAndComponentAndEndpointAndPortArray.addComponent(component);
+            }
         }else if(linkCounter != 0){//link selected
             var link:Link = null;
             for(i in hitObjectArray){
@@ -276,7 +284,11 @@ class ControllerCanvasContext {
                 }
             }
             hightLightLink = link;
-            linkAndComponentAndEndpointAndPortArray.addLink(link);
+            var object:Object = new Object();
+            object.set_link(link);
+            if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
+                linkAndComponentAndEndpointAndPortArray.addLink(link);
+            }
         }else if(componentCounter == 0 && linkCounter == 0 && portCounter == 0 && endpointCounter == 0){
             controllerState = C_STATE.CREATE_LINK;
             checkState();
@@ -311,7 +323,7 @@ class ControllerCanvasContext {
                 linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
             };
             case C_STATE.CREATE_LINK : {
-                var link:Link = updateCircuitDiagram.addLink(mouseDownWorldCoordinate,mouseDownWorldCoordinate);
+                var link:Link = updateCircuitDiagram.addLink(mouseDownWorldCoordinate,mouseDownWorldCoordinate, hitListWorldPoint.get_circuitDiagram());
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(link.get_rightEndpoint());
                 hightLightLink = link;
             };

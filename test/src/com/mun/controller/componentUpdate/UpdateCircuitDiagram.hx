@@ -1,11 +1,12 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.model.component.CircuitDiagramI;
+import com.mun.model.component.FolderI;
 import com.mun.controller.command.PasteCommand;
 import com.mun.controller.command.CopyCommand;
 import com.mun.model.component.Component;
 import com.mun.model.gates.CompoundComponent;
 import com.mun.model.component.Port;
-import com.mun.view.drawingImpl.Transform;
 import com.mun.controller.command.DeleteCommand;
 import com.mun.controller.command.OrientationCommand;
 import com.mun.model.component.Endpoint;
@@ -17,7 +18,6 @@ import com.mun.controller.command.AddCommand;
 import com.mun.controller.command.CommandManager;
 import com.mun.model.gates.ComponentKind;
 import com.mun.model.enumeration.ORIENTATION;
-import com.mun.model.component.CircuitDiagramI;
 import com.mun.type.Coordinate;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.global.Constant.*;
@@ -44,11 +44,13 @@ class UpdateCircuitDiagram {
     var updateCanvas:UpdateCanvas;
     var commandManager:CommandManager;
     var updateToolBar:UpdateToolBar;
+    var folder:FolderI;
 
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
 
-    public function new(circuitDiagram:CircuitDiagramI) {
+    public function new(circuitDiagram:CircuitDiagramI, folder:FolderI) {
         linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
+        this.folder = folder;
 
         this.circuitDiagram = circuitDiagram;
 
@@ -111,7 +113,7 @@ class UpdateCircuitDiagram {
         return component_;
     }
 
-    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate):Link{
+    public function addLink(coordinateFrom:Coordinate, coordinateTo:Coordinate, hitCircuitDiagram:CircuitDiagramI):Link{
         var object:Object = new Object();
         object = isOnPort(coordinateFrom);
         if(object.get_port() != null){
@@ -128,7 +130,7 @@ class UpdateCircuitDiagram {
             var link:Link = new Link(leftEndpoint,rightEndpoint);
             object.set_link(link);
         }
-        var command:Command = new AddCommand(object,circuitDiagram);
+        var command:Command = new AddCommand(object,hitCircuitDiagram);
         commandManager.execute(command);
 
         linkAndComponentArrayReset();
@@ -224,6 +226,33 @@ class UpdateCircuitDiagram {
         }
     }
 
+    public function findObjectInWhichCircuitDiagram(object:Object):CircuitDiagramI{
+        return folder.findObjectBelongsToWhichCircuitDiagram(object);
+    }
+
+    function getTheOperateCircuitDiagram(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointAndPortArray):CircuitDiagramI{
+        var object:Object = new Object();
+        for(i in linkAndComponentAndEndpointArray.get_componentIterator()){
+            object.set_component(i);
+            break;
+        }
+
+        for(i in linkAndComponentAndEndpointArray.get_linkIterator()){
+            object.set_link(i);
+            break;
+        }
+
+        for(i in linkAndComponentAndEndpointArray.get_endpointIterator()){
+            object.set_endPoint(i);
+            break;
+        }
+
+        return folder.findObjectBelongsToWhichCircuitDiagram(object);
+    }
+
+    /**
+    * precondiction:  all of the stuff in the linkAndComponentAndEndpointArray should belongs to one circuit diagram
+    **/
     public function moveSelectedObjects(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointAndPortArray, currentMouseLocation:Coordinate, mouseDownLocation:Coordinate, mouseLocationFlag:Bool){
 
         var xMoveDistance:Float = currentMouseLocation.get_xPosition() - mouseDownLocation.get_xPosition();
@@ -234,7 +263,9 @@ class UpdateCircuitDiagram {
             linkAndComponentAndEndpointArray.getComponentFromIndex(0).set_yPosition(currentMouseLocation.get_yPosition());
         }
 
-        var command:Command = new MoveCommand(linkAndComponentAndEndpointArray, xMoveDistance, yMoveDistance, circuitDiagram);
+        var moveCircuit:CircuitDiagramI = getTheOperateCircuitDiagram(linkAndComponentAndEndpointArray);
+
+        var command:Command = new MoveCommand(linkAndComponentAndEndpointArray, xMoveDistance, yMoveDistance, moveCircuit);
         commandManager.execute(command);
         //those wires which link to this component should move either, which automactilly completed while move endpoint
         linkAndComponentArray.clean();

@@ -401,6 +401,8 @@ class CircuitDiagram implements CircuitDiagramI{
         jsonString += "\"yMin\": \"" + this.yMin + "\",";
         jsonString += "\"xMax\": \"" + this.xMax + "\",";
         jsonString += "\"yMax\": \"" + this.yMax + "\",";
+        jsonString += "\"circuitDiagramCenter\": \"" + this.circuitDiagramCenter + "\",";
+
 
         jsonString += "\"ComponentArray\":[";
         for(i in 0...componentArray.length){
