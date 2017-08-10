@@ -120,7 +120,6 @@ class ControllerCanvasContext {
         mouseMoveWorldCoordiante = updateCanvas.getTransform().pointInvert(mouseMoveLocation);
 
         if(controllerState == C_STATE.MOVE){
-
             var moveWorldPointArray:Array<WorldPoint> = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.PATH);
 
             var moveToOtherCircuitDiagram:Bool = true;

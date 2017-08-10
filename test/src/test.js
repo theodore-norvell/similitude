@@ -3807,8 +3807,6 @@ com_mun_model_component_Component.prototype = {
 	}
 	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray) {
 		if(this.componentKind.checkInnerCircuitDiagramPortsChange()) {
-			var theNumberOfInput = 0;
-			var theNumberOfOutput = 0;
 			var i = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
 			while(i.hasNext()) {
 				var i1 = i.next();
@@ -3823,7 +3821,6 @@ com_mun_model_component_Component.prototype = {
 						if(i1.get_componentKind().get_sequence() == j.get_sequence()) {
 							inputFlag = true;
 						}
-						++theNumberOfInput;
 					}
 				}
 				var _g2 = 0;
@@ -3835,53 +3832,52 @@ com_mun_model_component_Component.prototype = {
 						if(i1.get_componentKind().get_sequence() == j1.get_sequence()) {
 							outputFlag = true;
 						}
-						++theNumberOfOutput;
 					}
 				}
 				if(!inputFlag && !outputFlag) {
 					if(i1.getNameOfTheComponentKind() == "Input") {
-						this.inportArray.push(this.componentKind.addInPort());
+						var port = this.componentKind.addInPort();
+						port.set_sequence(i1.get_componentKind().get_sequence());
+						this.inportArray.push(port);
 					} else {
-						this.outportArray.push(this.componentKind.addOutPort());
+						var port1 = this.componentKind.addOutPort();
+						port1.set_sequence(i1.get_componentKind().get_sequence());
+						this.outportArray.push(port1);
 					}
 				}
-				if(theNumberOfInput < this.inportArray.length) {
-					var _g3 = 0;
-					var _g12 = this.inportArray;
-					while(_g3 < _g12.length) {
-						var i2 = _g12[_g3];
-						++_g3;
-						var flag = false;
-						var j2 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
-						while(j2.hasNext()) {
-							var j3 = j2.next();
-							if(j3.getNameOfTheComponentKind() == "Input" && i2.get_sequence() == j3.get_componentKind().get_sequence()) {
-								flag = true;
-							}
-						}
-						if(!flag) {
-							HxOverrides.remove(this.inportArray,i2);
-						}
+			}
+			var _g3 = 0;
+			var _g12 = this.inportArray;
+			while(_g3 < _g12.length) {
+				var i2 = _g12[_g3];
+				++_g3;
+				var flag_delete = true;
+				var j2 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+				while(j2.hasNext()) {
+					var j3 = j2.next();
+					if(i2.get_sequence() == j3.get_componentKind().get_sequence() && j3.getNameOfTheComponentKind() == "Input") {
+						flag_delete = false;
 					}
 				}
-				if(theNumberOfOutput < this.outportArray.length) {
-					var _g4 = 0;
-					var _g13 = this.outportArray;
-					while(_g4 < _g13.length) {
-						var i3 = _g13[_g4];
-						++_g4;
-						var flag1 = false;
-						var j4 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
-						while(j4.hasNext()) {
-							var j5 = j4.next();
-							if(j5.getNameOfTheComponentKind() == "Output" && i3.get_sequence() == j5.get_componentKind().get_sequence()) {
-								flag1 = true;
-							}
-						}
-						if(!flag1) {
-							HxOverrides.remove(this.outportArray,i3);
-						}
+				if(flag_delete) {
+					HxOverrides.remove(this.inportArray,i2);
+				}
+			}
+			var _g4 = 0;
+			var _g13 = this.outportArray;
+			while(_g4 < _g13.length) {
+				var i3 = _g13[_g4];
+				++_g4;
+				var flag_delete1 = true;
+				var j4 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+				while(j4.hasNext()) {
+					var j5 = j4.next();
+					if(i3.get_sequence() == j5.get_componentKind().get_sequence() && j5.getNameOfTheComponentKind() == "Output") {
+						flag_delete1 = false;
 					}
+				}
+				if(flag_delete1) {
+					HxOverrides.remove(this.outportArray,i3);
 				}
 			}
 			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
