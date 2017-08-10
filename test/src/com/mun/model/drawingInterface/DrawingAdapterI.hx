@@ -51,6 +51,7 @@ interface DrawingAdapterI {
     **/
     public function set_cxt(value:CanvasRenderingContext2D):Void;
 
+    public function getTransform():Transform;
     /**
     * make a new drawing Adapter
     **/

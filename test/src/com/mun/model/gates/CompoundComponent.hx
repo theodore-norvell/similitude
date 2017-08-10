@@ -139,29 +139,19 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
     }
 
     public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void {
-        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter);
+        var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform());
+
+        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans);
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
         }else{
             drawComponent.drawCorrespondingComponent("black");
         }
 
-
-//        for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
-//            if(j.getNameOfTheComponentKind() == "Output"){
-//
-//                if(i.get_sequence() == j.get_componentKind().get_sequence()){
-//                    for(k in j.get_outportIterator()){
-//                        //draw a line
-//                        drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), k.get_xPosition(), k.get_yPosition());
-//                    }
-//                }
-//            }
-//        }
         if(component.get_boxType() == BOX.WHITE_BOX){
             //compound component need to draw all the components in ComponentArray, which should make a new transfrom
-            drawingAdapter = drawingAdapter.transform(makeTransform());
-            circuitDiagram.draw(drawingAdapter, linkAndComponentArray);
+            //drawingAdapterTrans = drawingAdapter.transform(makeTransform());
+            circuitDiagram.draw(drawingAdapterTrans, linkAndComponentArray);
         }
     }
 

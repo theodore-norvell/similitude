@@ -127,6 +127,21 @@ class CircuitDiagram implements CircuitDiagramI{
         diagramWidth = xMax - xMin;
         diagramHeight = yMax - yMin;
 
+        //make sure the shape of each diagram has the same height and width, or the subcircuit diagram will draw incorrect
+        if(diagramHeight != diagramWidth){
+            if(diagramHeight > diagramWidth){
+                var offset:Float = diagramHeight - diagramWidth;
+                xMax = xMax + offset;
+            }else{
+                var offset:Float = diagramWidth - diagramHeight;
+                yMax = yMax + offset;
+            }
+
+        }
+
+        diagramWidth = xMax - xMin;
+        diagramHeight = yMax - yMin;
+
         circuitDiagramCenter.set_xPosition(xMin + diagramWidth/2);
         circuitDiagramCenter.set_yPosition(yMin + diagramHeight/2);
     }

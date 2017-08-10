@@ -88,20 +88,16 @@ class UpdateCircuitDiagram {
         component_.setNameOfTheComponentKind(name);
 
         if(component_.getNameOfTheComponentKind() == "Input" || component_.getNameOfTheComponentKind() == "Output"){
-            var inputCounter:Int = 0 ;
-            var outputCounter:Int = 0 ;
-
-            for(i in circuitDiagram.get_componentIterator()){
-                if(i.getNameOfTheComponentKind() == "Input"){
-                    i.get_componentKind().set_sequence(inputCounter);
-                    inputCounter++;
-                }else if(i.getNameOfTheComponentKind() == "Output"){
-                    i.get_componentKind().set_sequence(outputCounter);
-                    outputCounter++;
-                }else {
-                    //other component doesn't need this parameter
-                }
-            }
+            //generate a sequence id for every input and ouput component
+            var idString:String = Date.now().getFullYear() + "";
+            idString += Date.now().getMonth()+ "";
+            idString += Date.now().getDay()+ "";
+            idString += Date.now().getHours()+ "";
+            idString += Date.now().getMinutes()+ "";
+            idString += Date.now().getSeconds()+ "";
+            idString += Std.random(1000) + "";
+            var id:Int = cast idString;
+            componentkind_.set_sequence(id);
         }
         return component_;
     }

@@ -22,7 +22,6 @@ class DrawingAdapter implements DrawingAdapterI {
 
     public function new(transform:Transform, context:CanvasRenderingContext2D) {
         this.trans = transform;
-
         this.cxt = context;
     }
 
@@ -60,6 +59,10 @@ class DrawingAdapter implements DrawingAdapterI {
 
     public function set_cxt(value:CanvasRenderingContext2D):Void {
         this.cxt = value;
+    }
+
+    public function getTransform():Transform{
+        return this.trans;
     }
 
     public function transform(transform:Transform):DrawingAdapterI{

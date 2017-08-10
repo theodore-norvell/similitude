@@ -1808,19 +1808,15 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
 		component_.setNameOfTheComponentKind(name);
 		if(component_.getNameOfTheComponentKind() == "Input" || component_.getNameOfTheComponentKind() == "Output") {
-			var inputCounter = 0;
-			var outputCounter = 0;
-			var i = this.circuitDiagram.get_componentIterator();
-			while(i.hasNext()) {
-				var i1 = i.next();
-				if(i1.getNameOfTheComponentKind() == "Input") {
-					i1.get_componentKind().set_sequence(inputCounter);
-					++inputCounter;
-				} else if(i1.getNameOfTheComponentKind() == "Output") {
-					i1.get_componentKind().set_sequence(outputCounter);
-					++outputCounter;
-				}
-			}
+			var idString = new Date().getFullYear() + "";
+			idString += new Date().getMonth() + "";
+			idString += new Date().getDay() + "";
+			idString += new Date().getHours() + "";
+			idString += new Date().getMinutes() + "";
+			idString += new Date().getSeconds() + "";
+			idString += Std.random(1000) + "";
+			var id = idString;
+			componentkind_.set_sequence(id);
 		}
 		return component_;
 	}
@@ -3362,6 +3358,17 @@ com_mun_model_component_CircuitDiagram.prototype = {
 		}
 		this.diagramWidth = this.xMax - this.xMin;
 		this.diagramHeight = this.yMax - this.yMin;
+		if(this.diagramHeight != this.diagramWidth) {
+			if(this.diagramHeight > this.diagramWidth) {
+				var offset2 = this.diagramHeight - this.diagramWidth;
+				this.xMax += offset2;
+			} else {
+				var offset3 = this.diagramWidth - this.diagramHeight;
+				this.yMax += offset3;
+			}
+		}
+		this.diagramWidth = this.xMax - this.xMin;
+		this.diagramHeight = this.yMax - this.yMin;
 		this.circuitDiagramCenter.set_xPosition(this.xMin + this.diagramWidth / 2);
 		this.circuitDiagramCenter.set_yPosition(this.yMin + this.diagramHeight / 2);
 	}
@@ -4369,6 +4376,7 @@ com_mun_model_drawingInterface_DrawingAdapterI.prototype = {
 	,setLineWidth: null
 	,get_cxt: null
 	,set_cxt: null
+	,getTransform: null
 	,transform: null
 	,resetDrawingParam: null
 	,drawAndShape: null
@@ -4958,15 +4966,15 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 		return portArray;
 	}
 	,drawComponent: function(drawingAdapter,hightLight,linkAndComponentArray) {
-		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter);
+		var drawingAdapterTrans = drawingAdapter.transform(this.makeTransform());
+		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter,drawingAdapterTrans);
 		if(hightLight) {
 			drawComponent.drawCorrespondingComponent("red");
 		} else {
 			drawComponent.drawCorrespondingComponent("black");
 		}
 		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
-			drawingAdapter = drawingAdapter.transform(this.makeTransform());
-			this.circuitDiagram.draw(drawingAdapter,linkAndComponentArray);
+			this.circuitDiagram.draw(drawingAdapterTrans,linkAndComponentArray);
 		}
 	}
 	,makeTransform: function() {
@@ -6514,9 +6522,10 @@ com_mun_view_drawComponents_DrawAND.prototype = {
 	}
 	,__class__: com_mun_view_drawComponents_DrawAND
 };
-var com_mun_view_drawComponents_DrawCompoundComponent = function(component,drawingAdapter) {
+var com_mun_view_drawComponents_DrawCompoundComponent = function(component,drawingAdapter,drawingAdapterTrans) {
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
+	this.drawingAdapterTrans = drawingAdapterTrans;
 };
 $hxClasses["com.mun.view.drawComponents.DrawCompoundComponent"] = com_mun_view_drawComponents_DrawCompoundComponent;
 com_mun_view_drawComponents_DrawCompoundComponent.__name__ = ["com","mun","view","drawComponents","DrawCompoundComponent"];
@@ -6524,13 +6533,14 @@ com_mun_view_drawComponents_DrawCompoundComponent.__interfaces__ = [com_mun_view
 com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 	drawingAdapter: null
 	,component: null
+	,drawingAdapterTrans: null
 	,drawCorrespondingComponent: function(strokeColor) {
 		if(strokeColor == null || strokeColor == "") {
 			strokeColor = "black";
 		}
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.setFillColor("white");
-		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width() + 20,this.component.get_height() + 20);
+		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		this.drawingAdapter.setTextColor("black");
 		this.drawingAdapter.drawText(this.component.get_name(),this.component.get_xPosition() - 8,this.component.get_yPosition(),this.component.get_width() - 2);
 		var i = this.component.get_inportIterator();
@@ -6539,23 +6549,6 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 			var port = i1;
 			this.drawingAdapter.setFillColor("black");
 			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),com_mun_global_Constant.portRadius);
-			this.drawingAdapter.setTextColor("black");
-			var _g = this.component.get_orientation();
-			switch(_g[1]) {
-			case 0:
-				this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 4);
-				break;
-			case 1:
-				this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 4);
-				break;
-			case 2:
-				this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 4);
-				break;
-			case 3:
-				this.drawingAdapter.drawText(port.get_sequence() + "",port.get_xPosition() - 2,port.get_yPosition() - 5,this.component.get_width() - 4);
-				break;
-			default:
-			}
 			var j = this.component.get_componentKind().getInnerCircuitDiagram().get_componentIterator();
 			while(j.hasNext()) {
 				var j1 = j.next();
@@ -6564,7 +6557,9 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 						var k = j1.get_inportIterator();
 						while(k.hasNext()) {
 							var k1 = k.next();
-							this.drawingAdapter.drawLine(i1.get_xPosition(),i1.get_yPosition(),k1.get_xPosition(),k1.get_yPosition());
+							var coordinate = this.drawingAdapterTrans.getTransform().pointConvert(new com_mun_type_Coordinate(k1.get_xPosition(),k1.get_yPosition()));
+							coordinate = this.drawingAdapter.getTransform().pointInvert(coordinate);
+							this.drawingAdapter.drawLine(i1.get_xPosition(),i1.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition());
 						}
 					}
 				}
@@ -6584,7 +6579,9 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 						var k2 = j3.get_outportIterator();
 						while(k2.hasNext()) {
 							var k3 = k2.next();
-							this.drawingAdapter.drawLine(i3.get_xPosition(),i3.get_yPosition(),k3.get_xPosition(),k3.get_yPosition());
+							var coordinate1 = this.drawingAdapterTrans.getTransform().pointConvert(new com_mun_type_Coordinate(k3.get_xPosition(),k3.get_yPosition()));
+							coordinate1 = this.drawingAdapter.getTransform().pointInvert(coordinate1);
+							this.drawingAdapter.drawLine(i3.get_xPosition(),i3.get_yPosition(),coordinate1.get_xPosition(),coordinate1.get_yPosition());
 						}
 					}
 				}
@@ -7146,6 +7143,9 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 	}
 	,set_cxt: function(value) {
 		this.cxt = value;
+	}
+	,getTransform: function() {
+		return this.trans;
 	}
 	,transform: function(transform) {
 		var drawingAdapter = new com_mun_view_drawingImpl_DrawingAdapter(transform.compose(this.trans),this.cxt);
@@ -9792,10 +9792,10 @@ com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
 com_mun_global_Constant.pointToEndpointDistance = 6;
 com_mun_global_Constant.PIXELRATIO = 1;
-com_mun_global_Constant.TRANSFORM_X_DELTA = 5;
-com_mun_global_Constant.TRANSFORM_Y_DELTA = 5;
-com_mun_global_Constant.TRANSFORM_ZOOM_IN_RATE = 1.2;
-com_mun_global_Constant.TRANSFORM_ZOOM_OUT_RATE = 0.8;
+com_mun_global_Constant.TRANSFORM_X_DELTA = 30;
+com_mun_global_Constant.TRANSFORM_Y_DELTA = 30;
+com_mun_global_Constant.TRANSFORM_ZOOM_IN_RATE = 1.5;
+com_mun_global_Constant.TRANSFORM_ZOOM_OUT_RATE = 0.5;
 haxe__$Int32_Int32_$Impl_$._mul = Math.imul != null ? Math.imul : function(a,b) {
 	return a * (b & 65535) + (a * (b >>> 16) << 16 | 0) | 0;
 };
