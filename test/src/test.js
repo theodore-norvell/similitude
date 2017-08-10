@@ -1824,6 +1824,7 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 		var componentkind_ = new com_mun_model_gates_CompoundComponent(circuitDiagram);
 		var component_ = new com_mun_model_component_Component(xPosition,yPosition,height,width,orientation,componentkind_,inportNum);
 		component_.setNameOfTheComponentKind("CC");
+		component_.set_name(name);
 		return component_;
 	}
 	,addLink: function(coordinateFrom,coordinateTo,hitCircuitDiagram) {
@@ -2600,6 +2601,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 					this.circuitDiagram.get_commandManager().popRedoStack();
 				}
 			}
+			this.boxTypeList();
 			break;
 		case 1:
 			this.updateCircuitDiagram.createComponentByCommand(this.sideBar.getComponent());
@@ -2641,6 +2643,45 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			this.updateToolBar.update(this.linkAndComponentAndEndpointAndPortArray);
 		} else {
 			this.updateToolBar.hidden();
+		}
+	}
+	,boxTypeList: function() {
+		var _gthis = this;
+		var boxTypeSelectionHTML = "";
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(i1.getNameOfTheComponentKind() == "CC") {
+				if(i1.get_boxType() == com_mun_model_enumeration_BOX.BLACK_BOX) {
+					boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">" + i1.get_name() + "<button type=\"button\" class=\"btn btn-primary btn-sm\" id=\"BoxType-" + i1.get_name() + "-BoxType\">Black Box</button></div>";
+				} else {
+					boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">" + i1.get_name() + "<button type=\"button\" class=\"btn btn-primary btn-sm active\" id=\"BoxType-" + i1.get_name() + "-BoxType\">White Box</button></div>";
+				}
+			}
+		}
+		window.document.getElementById("compoundComponentBoxSelection").innerHTML = boxTypeSelectionHTML;
+		var i2 = this.circuitDiagram.get_componentIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			if(i3.getNameOfTheComponentKind() == "CC") {
+				window.document.getElementById("BoxType-" + i3.get_name() + "-BoxType").onclick = function(event) {
+					var id = event.target.id;
+					id = id.substring(id.indexOf("-") + 1,id.lastIndexOf("-"));
+					var i4 = _gthis.circuitDiagram.get_componentIterator();
+					while(i4.hasNext()) {
+						var i5 = i4.next();
+						if(i5.getNameOfTheComponentKind() == "CC" && i5.get_name() == id) {
+							if(i5.get_boxType() == com_mun_model_enumeration_BOX.BLACK_BOX) {
+								i5.set_boxType(com_mun_model_enumeration_BOX.WHITE_BOX);
+							} else {
+								i5.set_boxType(com_mun_model_enumeration_BOX.BLACK_BOX);
+							}
+						}
+					}
+					_gthis.boxTypeList();
+					_gthis.updateCanvas.update();
+				};
+			}
 		}
 	}
 	,__class__: com_mun_controller_controllerState_ControllerCanvasContext

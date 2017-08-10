@@ -1,12 +1,14 @@
 package com.mun.controller.controllerState;
 
+import com.mun.model.enumeration.BOX;
+import js.jquery.Event;
+import js.Browser;
 import com.mun.type.Object;
 import com.mun.type.WorldPoint;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import js.html.CanvasElement;
 import com.mun.model.component.Component;
 import com.mun.type.HitObject;
-import com.mun.type.WorldPoint;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.controller.componentUpdate.UpdateToolBar;
 import com.mun.model.component.Endpoint;
@@ -316,6 +318,8 @@ class ControllerCanvasContext {
                         circuitDiagram.get_commandManager().popRedoStack();
                     }
                 }
+
+                boxTypeList();
             };
             case C_STATE.CREATE_COMPONENT : {
                 updateCircuitDiagram.createComponentByCommand(sideBar.getComponent());
@@ -361,6 +365,42 @@ class ControllerCanvasContext {
             updateToolBar.update(linkAndComponentAndEndpointAndPortArray);
         }else{
             updateToolBar.hidden();
+        }
+    }
+
+    function boxTypeList(){
+        var boxTypeSelectionHTML = "";
+
+        for(i in circuitDiagram.get_componentIterator()){
+            if(i.getNameOfTheComponentKind() == "CC"){
+                if(i.get_boxType() == BOX.BLACK_BOX){
+                    boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">"+i.get_name()+"<button type=\"button\" class=\"btn btn-primary btn-sm\" id=\"BoxType-"+i.get_name()+"-BoxType\">Black Box</button></div>";
+                }else{
+                    boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">"+i.get_name()+"<button type=\"button\" class=\"btn btn-primary btn-sm active\" id=\"BoxType-"+i.get_name()+"-BoxType\">White Box</button></div>";
+                }
+            }
+        }
+        Browser.document.getElementById("compoundComponentBoxSelection").innerHTML = boxTypeSelectionHTML;
+
+        for(i in circuitDiagram.get_componentIterator()){
+            if(i.getNameOfTheComponentKind() == "CC"){
+                Browser.document.getElementById("BoxType-" + i.get_name() + "-BoxType").onclick = function (event:Event){
+                    var id:String = untyped event.target.id;
+                    id = id.substring(id.indexOf("-") + 1, id.lastIndexOf("-"));
+                    for(i in circuitDiagram.get_componentIterator()){
+                        if(i.getNameOfTheComponentKind() == "CC" && i.get_name() == id){
+                            if(i.get_boxType() == BOX.BLACK_BOX){
+                                i.set_boxType(BOX.WHITE_BOX);
+                            }else{
+                                i.set_boxType(BOX.BLACK_BOX);
+                            }
+                        }
+                    }
+
+                    boxTypeList();
+                    updateCanvas.update();
+                }
+            }
         }
     }
 }

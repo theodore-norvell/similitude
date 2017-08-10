@@ -106,6 +106,7 @@ class UpdateCircuitDiagram {
         var componentkind_:ComponentKind = new CompoundComponent(circuitDiagram);
         var component_:Component = new Component(xPosition, yPosition, height, width, orientation, componentkind_, inportNum);
         component_.setNameOfTheComponentKind("CC");
+        component_.set_name(name);
         return component_;
     }
 
