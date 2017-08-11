@@ -69,16 +69,16 @@ class UpdateCircuitDiagram {
         this.updateToolBar = updateToolBar;
     }
 
-    public function createComponentByCommand(component:Component){
+    public function createComponentByCommand(component:Component, createToCircuitDiagram:CircuitDiagramI){
         var object:Object = new Object();
         object.set_component(component);
 
-        var command:Command = new AddCommand(object,circuitDiagram);
+        var command:Command = new AddCommand(object,createToCircuitDiagram);
         commandManager.execute(command);
         linkAndComponentArrayReset();
 
         //compute the size of this diagram
-        circuitDiagram.computeDiagramSize();
+        createToCircuitDiagram.computeDiagramSize();
         
     }
 
@@ -136,7 +136,7 @@ class UpdateCircuitDiagram {
         updateToolBar.update(linkAndComponentArray);
         hightLightObject(linkAndComponentArray);
         //compute the size of this diagram
-        circuitDiagram.computeDiagramSize();
+        hitCircuitDiagram.computeDiagramSize();
         
         return object.get_link();
     }

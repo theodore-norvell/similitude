@@ -1,4 +1,5 @@
 package com.mun.view.drawComponents;
+import com.mun.model.enumeration.BOX;
 import com.mun.type.Coordinate;
 import com.mun.model.component.Port;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -21,10 +22,19 @@ class DrawCompoundComponent implements DrawComponent{
             strokeColor = "black";
         }
         drawingAdapter.setStrokeColor(strokeColor);
-        drawingAdapter.setFillColor("white");
+
+        if(component.get_boxType() == BOX.WHITE_BOX ){
+            drawingAdapter.setFillColor("white");
+        }else{
+            drawingAdapter.setFillColor("gray");
+        }
+
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
-        drawingAdapter.setTextColor("black");
-        drawingAdapter.drawText(component.get_name(), component.get_xPosition() - 8, component.get_yPosition(), component.get_width() - 2);
+
+        if(component.get_boxType() == BOX.BLACK_BOX ){
+            drawingAdapter.setTextColor("black");
+            drawingAdapter.drawText(component.get_name(), component.get_xPosition(), component.get_yPosition(), component.get_width());
+        }
 
         //draw inport
         for (i in component.get_inportIterator()) {
@@ -32,15 +42,17 @@ class DrawCompoundComponent implements DrawComponent{
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
 
-            for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
-                if(j.getNameOfTheComponentKind() == "Input"){
-                    if(i.get_sequence() == j.get_componentKind().get_sequence()){
-                        for(k in j.get_inportIterator()){
-                            //draw a line
-                            var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
-                            coordinate = drawingAdapter.getTransform().pointInvert(coordinate);
-                            drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
+            if(component.get_boxType() == BOX.WHITE_BOX ){
+                for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
+                    if(j.getNameOfTheComponentKind() == "Input"){
+                        if(i.get_sequence() == j.get_componentKind().get_sequence()){
+                            for(k in j.get_inportIterator()){
+                                //draw a line
+                                var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
+                                coordinate = drawingAdapter.getTransform().pointInvert(coordinate);
+                                drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
 
+                            }
                         }
                     }
                 }
@@ -54,15 +66,17 @@ class DrawCompoundComponent implements DrawComponent{
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
 
-            for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
-                if(j.getNameOfTheComponentKind() == "Output"){
-                    if(i.get_sequence() == j.get_componentKind().get_sequence()){
-                        for(k in j.get_outportIterator()){
-                            //draw a line
-                            var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
-                            coordinate = drawingAdapter.getTransform().pointInvert(coordinate);
-                            drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
+            if(component.get_boxType() == BOX.WHITE_BOX){
+                for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
+                    if(j.getNameOfTheComponentKind() == "Output"){
+                        if(i.get_sequence() == j.get_componentKind().get_sequence()){
+                            for(k in j.get_outportIterator()){
+                                //draw a line
+                                var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
+                                coordinate = drawingAdapter.getTransform().pointInvert(coordinate);
+                                drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
 
+                            }
                         }
                     }
                 }

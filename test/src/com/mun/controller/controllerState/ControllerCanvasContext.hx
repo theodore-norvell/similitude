@@ -35,6 +35,8 @@ class ControllerCanvasContext {
     var lastClickArray:LinkAndComponentAndEndpointAndPortArray;
     var hitListWorldPoint:WorldPoint;
 
+    var createToCircuitDiagram:CircuitDiagramI;
+
     var mouseMoveWorldCoordiante:Coordinate;
     var mouseDownWorldCoordinate:Coordinate;
 
@@ -44,6 +46,8 @@ class ControllerCanvasContext {
 
     var hightLightLink:Link;
     var canvas:CanvasElement;
+
+    var createComponent:Bool;
 
     public function new(circuitDiagram:CircuitDiagramI, updateCircuitDiagram:UpdateCircuitDiagram, sideBar:SideBar, upateToolBar:UpdateToolBar, canvas:CanvasElement, updateCanvas:UpdateCanvas) {
         this.circuitDiagram = circuitDiagram;
@@ -62,10 +66,13 @@ class ControllerCanvasContext {
         linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
         lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
 
+        createComponent = false;
+
         //add mouse  listener
         this.canvas.addEventListener("mousedown", doMouseDown,false);
         this.canvas.addEventListener("mousemove", doMouseMove,false);
         this.canvas.addEventListener("mouseup", doMouseUp,false);
+        this.canvas.addEventListener("mouseenter", doMouseEnter,false);
     }
 
     public function get_controllerState():C_STATE {
@@ -84,6 +91,28 @@ class ControllerCanvasContext {
         coordinate.set_xPosition((x - bbox.left) * (canvas.width  / bbox.width));
         coordinate.set_yPosition((y - bbox.top)  * (canvas.height / bbox.height));
         return coordinate;//this is view coordinate
+    }
+
+    function doMouseEnter(event:MouseEvent){
+        if(createComponent && controllerState == C_STATE.CREATE_COMPONENT){
+            linkAndComponentAndEndpointAndPortArray.clean();
+
+            var x:Float = event.clientX;
+            var y:Float = event.clientY;
+            var mouseMoveLocation:Coordinate = getPointOnCanvas(x,y);
+
+            //translate to world coordinate
+            mouseMoveWorldCoordiante = updateCanvas.getTransform().pointInvert(mouseMoveLocation);
+
+            var moveWorldPointArray:Array<WorldPoint> = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.ONE);
+
+            createToCircuitDiagram = moveWorldPointArray[0].get_circuitDiagram();
+
+            updateCircuitDiagram.createComponentByCommand(sideBar.getComponent(), createToCircuitDiagram);
+            linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
+
+            createComponent = false;
+        }
     }
 
     function doMouseDown(event:MouseEvent){
@@ -141,10 +170,12 @@ class ControllerCanvasContext {
                 mouseMoveWorldCoordiante = mouseDownWorldCoordinate;
             }
         }else{//for create component
+            if(createToCircuitDiagram != null && createToCircuitDiagram != circuitDiagram){
+                mouseMoveWorldCoordiante = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.ONE)[0].get_coordinate();
+            }
             mouseMoveResultProcess();
             mouseDownWorldCoordinate = mouseMoveWorldCoordiante;
         }
-
     }
 
     function mouseDownProcess(){
@@ -221,7 +252,15 @@ class ControllerCanvasContext {
         var endpointCounter:Int = 0;
         for(i in hitObjectArray){
             if(i.get_component() != null){
-                componentCounter++;
+                if(i.get_component().getNameOfTheComponentKind() == "CC"){
+                    var object:Object = new Object();
+                    object.set_component(i.get_component());
+                    if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
+                        componentCounter++;
+                    }
+                }else{
+                    componentCounter++;
+                }
             }else if(i.get_link() != null){
                 linkCounter++;
             }else if(i.get_port() != null){
@@ -322,10 +361,12 @@ class ControllerCanvasContext {
                 boxTypeList();
             };
             case C_STATE.CREATE_COMPONENT : {
-                updateCircuitDiagram.createComponentByCommand(sideBar.getComponent());
-                linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
+
+                createComponent = true;
+
             };
             case C_STATE.CREATE_LINK : {
+                linkAndComponentAndEndpointAndPortArray.clean();
                 var link:Link = updateCircuitDiagram.addLink(mouseDownWorldCoordinate,mouseDownWorldCoordinate, hitListWorldPoint.get_circuitDiagram());
                 linkAndComponentAndEndpointAndPortArray.addEndpoint(link.get_rightEndpoint());
                 hightLightLink = link;
@@ -368,7 +409,7 @@ class ControllerCanvasContext {
         }
     }
 
-    function boxTypeList(){
+    public function boxTypeList(){
         var boxTypeSelectionHTML = "";
 
         for(i in circuitDiagram.get_componentIterator()){
@@ -381,7 +422,6 @@ class ControllerCanvasContext {
             }
         }
         Browser.document.getElementById("compoundComponentBoxSelection").innerHTML = boxTypeSelectionHTML;
-
         for(i in circuitDiagram.get_componentIterator()){
             if(i.getNameOfTheComponentKind() == "CC"){
                 Browser.document.getElementById("BoxType-" + i.get_name() + "-BoxType").onclick = function (event:Event){

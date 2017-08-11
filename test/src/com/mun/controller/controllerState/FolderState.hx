@@ -292,6 +292,7 @@ class FolderState {
         updateCanvas.bindEventListener();
         sideBar = sideBarMap[circuitDiagram];
         controllerCanvasContext = controllerCanvasContextMap[circuitDiagram];
+        controllerCanvasContext.boxTypeList();
     }
 
     function createATotallyNewCircuitDiagram(){
