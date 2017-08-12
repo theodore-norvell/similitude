@@ -125,13 +125,15 @@ class SideBar {
             if(i != "AND" &&  i != "OR" &&  i != "NOT" &&  i != "NOR"
                 &&  i != "NAND" &&  i != "XOR" &&  i != "MUX" &&  i != "FlipFlop"
                 &&  i != "Input" &&  i != "Output"){
+                var addFlag:Bool = true;
                 var circuitDiagramForCheck:CircuitDiagramI = folder.findCircuitDiagram(i);
                 for(j in circuitDiagramForCheck.get_componentIterator()){
                     if(j.getNameOfTheComponentKind() == "CC" && j.get_componentKind().getInnerCircuitDiagram().get_name() == i){
-                        continue;
-                    }else{
-                        appendButtonGroupList(i);
+                        addFlag = false;
                     }
+                }
+                if(addFlag){
+                    appendButtonGroupList(i);
                 }
             }
         }

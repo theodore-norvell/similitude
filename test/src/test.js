@@ -3279,15 +3279,17 @@ com_mun_controller_controllerState_SideBar.prototype = {
 			var i = _g1[_g];
 			++_g;
 			if(i != "AND" && i != "OR" && i != "NOT" && i != "NOR" && i != "NAND" && i != "XOR" && i != "MUX" && i != "FlipFlop" && i != "Input" && i != "Output") {
+				var addFlag = true;
 				var circuitDiagramForCheck = this.folder.findCircuitDiagram(i);
 				var j = circuitDiagramForCheck.get_componentIterator();
 				while(j.hasNext()) {
 					var j1 = j.next();
 					if(j1.getNameOfTheComponentKind() == "CC" && j1.get_componentKind().getInnerCircuitDiagram().get_name() == i) {
-						continue;
-					} else {
-						this.appendButtonGroupList(i);
+						addFlag = false;
 					}
+				}
+				if(addFlag) {
+					this.appendButtonGroupList(i);
 				}
 			}
 		}
