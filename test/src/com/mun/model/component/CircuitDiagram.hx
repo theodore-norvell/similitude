@@ -29,12 +29,12 @@ class CircuitDiagram implements CircuitDiagramI{
     var xMax:Float;
     var yMax:Float;
     var margin:Int;
-    var circuitDiagramCenter:Coordinate;
+    var componentAndLinkCenter:Coordinate;
 
     public function new() {
         copyStack = new Stack();
-        circuitDiagramCenter = new Coordinate(0, 0);
-        this.margin = 200;
+        componentAndLinkCenter = new Coordinate(0, 0);
+        this.margin = 50;
     }
 
     public function computeDiagramSize():Void{
@@ -96,58 +96,21 @@ class CircuitDiagram implements CircuitDiagramI{
             }
         }
 
-        if(xMin < 0){
-            xMin = 0;
-            xMax = xMax + margin;
+        componentAndLinkCenter.set_xPosition((xMin + xMax)/2);
+        componentAndLinkCenter.set_yPosition((yMin + yMax)/2);
+
+        diagramWidth = xMax - xMin + margin;
+        diagramHeight = yMax - yMin + margin;
+
+        if(diagramHeight > diagramWidth){
+            diagramWidth = diagramHeight;
         }else{
-            if(xMin < margin/2){
-                var offset:Float = margin/2 - xMin;
-                xMin = 0;
-                xMax = xMax + offset + margin/2;
-            }else{
-                xMin = xMin - margin/2;
-                xMax = xMax + margin/2;
-            }
+            diagramHeight = diagramWidth;
         }
-
-        if(yMin < 0){
-            yMin = 0;
-            yMax = yMax + margin;
-        }else{
-            if(yMin < margin/2){
-                var offset:Float = margin/2 - yMin;
-                yMin = 0;
-                yMax = yMax + offset + margin/2;
-            }else{
-                yMin = yMin - margin/2;
-                yMax = yMax + margin/2;
-            }
-        }
-
-        diagramWidth = xMax - xMin;
-        diagramHeight = yMax - yMin;
-
-        //make sure the shape of each diagram has the same height and width, or the subcircuit diagram will draw incorrect
-        if(diagramHeight != diagramWidth){
-            if(diagramHeight > diagramWidth){
-                var offset:Float = diagramHeight - diagramWidth;
-                xMax = xMax + offset;
-            }else{
-                var offset:Float = diagramWidth - diagramHeight;
-                yMax = yMax + offset;
-            }
-
-        }
-
-        diagramWidth = xMax - xMin;
-        diagramHeight = yMax - yMin;
-
-        circuitDiagramCenter.set_xPosition(xMin + diagramWidth/2);
-        circuitDiagramCenter.set_yPosition(yMin + diagramHeight/2);
     }
 
-    public function getCircuitDiagramCenterPoint():Coordinate{
-        return circuitDiagramCenter;
+    public function getComponentAndLinkCenterCoordinate():Coordinate{
+        return componentAndLinkCenter;
     }
 
     public function get_diagramWidth():Float {
@@ -416,8 +379,6 @@ class CircuitDiagram implements CircuitDiagramI{
         jsonString += "\"yMin\": \"" + this.yMin + "\",";
         jsonString += "\"xMax\": \"" + this.xMax + "\",";
         jsonString += "\"yMax\": \"" + this.yMax + "\",";
-        jsonString += "\"circuitDiagramCenter\": \"" + this.circuitDiagramCenter + "\",";
-
 
         jsonString += "\"ComponentArray\":[";
         for(i in 0...componentArray.length){

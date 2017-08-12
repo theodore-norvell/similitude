@@ -313,14 +313,12 @@ class DrawingAdapter implements DrawingAdapterI {
     }
 
     public function drawText(str:String, x:Float, y:Float, width:Float):Void {
-        var wnw:Coordinate = new Coordinate(x - width/2, y);
-        var wse:Coordinate = new Coordinate(x + width/2, y);
+        var coordinate:Coordinate = new Coordinate(x, y);
 
-        var vnw:Coordinate = trans.pointConvert(wnw);
-        var vse:Coordinate = trans.pointConvert(wse);
+        var vCoordinate:Coordinate = trans.pointConvert(coordinate);
 
-        var x0:Float = (wse.get_xPosition() - vnw.get_xPosition())/2 + vnw.get_xPosition();
-        var y0:Float = vse.get_yPosition();
+        var x0:Float = vCoordinate.get_xPosition();
+        var y0:Float = vCoordinate.get_yPosition();
 
         cxt.lineWidth = lineWidth;
         cxt.font = font;

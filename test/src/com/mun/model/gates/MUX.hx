@@ -85,11 +85,9 @@ class MUX implements ComponentKind extends GateAbstract {
                 portArray.push(inport_S);
                 var inport_1:Port = new Inport(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_1.set_portDescription(IOTYPE.INPUT);
-//                inport_1.set_sequence(0);
                 portArray.push(inport_1);
                 var inport_2:Port = new Inport(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
                 inport_2.set_portDescription(IOTYPE.INPUT);
-//                inport_2.set_sequence(1);
                 portArray.push(inport_2);
                 //outport
                 var outport_:Port = new Outport(xPosition + width / 2, yPosition);
@@ -103,11 +101,9 @@ class MUX implements ComponentKind extends GateAbstract {
                 portArray.push(inport_S);
                 var inport_1:Port = new Inport(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_1.set_portDescription(IOTYPE.INPUT);
-//                inport_1.set_sequence(0);
                 portArray.push(inport_1);
                 var inport_2:Port = new Inport(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
                 inport_2.set_portDescription(IOTYPE.INPUT);
-//                inport_2.set_sequence(1);
                 portArray.push(inport_2);
                 //outport
                 var outport_:Port = new Outport(xPosition - width / 2, yPosition);
@@ -121,11 +117,9 @@ class MUX implements ComponentKind extends GateAbstract {
                 portArray.push(inport_S);
                 var inport_1:Port = new Inport(xPosition - width / 2 + height / 3 * 2, yPosition - height / 2);
                 inport_1.set_portDescription(IOTYPE.INPUT);
-//                inport_1.set_sequence(0);
                 portArray.push(inport_1);
                 var inport_2:Port = new Inport(xPosition - width / 2 + width / 3, yPosition - height / 2);
                 inport_2.set_portDescription(IOTYPE.INPUT);
-//                inport_2.set_sequence(1);
                 portArray.push(inport_2);
                 //outport
                 var outport_:Port = new Outport(xPosition, yPosition + height / 2);
@@ -139,11 +133,9 @@ class MUX implements ComponentKind extends GateAbstract {
                 portArray.push(inport_S);
                 var inport_1:Port = new Inport(xPosition - width / 2 + height / 3 * 2, yPosition + height / 2);
                 inport_1.set_portDescription(IOTYPE.INPUT);
-//                inport_1.set_sequence(0);
                 portArray.push(inport_1);
                 var inport_2:Port = new Inport(xPosition - width / 2 + width / 3, yPosition + height / 2);
                 inport_2.set_portDescription(IOTYPE.INPUT);
-//                inport_2.set_sequence(1);
                 portArray.push(inport_2);
                 //outport
                 var outport_:Port = new Outport(xPosition, yPosition - height / 2);
@@ -166,9 +158,6 @@ class MUX implements ComponentKind extends GateAbstract {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition - width / 2);
                         portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-//                        if (portArray[i].get_sequence() == -1) {
-//                            portArray[i].set_sequence(i);
-//                        }
                     }else{//IOTYPE.S
                         portArray[i].set_xPosition(xPosition);
                         portArray[i].set_yPosition(yPosition - height/2);
@@ -180,9 +169,6 @@ class MUX implements ComponentKind extends GateAbstract {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
                         portArray[i].set_yPosition(yPosition + height / 2);
-//                        if (portArray[i].get_sequence() == -1) {
-//                            portArray[i].set_sequence(i);
-//                        }
                     }else{//IOTYPE.S
                         portArray[i].set_xPosition(xPosition - width/2);
                         portArray[i].set_yPosition(yPosition);
@@ -194,9 +180,6 @@ class MUX implements ComponentKind extends GateAbstract {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
                         portArray[i].set_yPosition(yPosition - height / 2);
-//                        if (portArray[i].get_sequence() == -1) {
-//                            portArray[i].set_sequence(i);
-//                        }
                     }else{//IOTYPE.S
                         portArray[i].set_xPosition(xPosition + width/2);
                         portArray[i].set_yPosition(yPosition);
@@ -208,9 +191,6 @@ class MUX implements ComponentKind extends GateAbstract {
                     if (portArray[i].get_portDescription() != IOTYPE.S) {
                         portArray[i].set_xPosition(xPosition + width / 2);
                         portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-//                        if (portArray[i].get_sequence() == -1) {
-//                            portArray[i].set_sequence(i);
-//                        }
                     }else{//IOTYPE.S
                         portArray[i].set_xPosition(xPosition);
                         portArray[i].set_yPosition(yPosition - height/2);

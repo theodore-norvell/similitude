@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import js.jquery.JQuery;
 import com.mun.model.enumeration.BOX;
 import js.jquery.Event;
 import js.Browser;
@@ -107,11 +108,16 @@ class ControllerCanvasContext {
             var moveWorldPointArray:Array<WorldPoint> = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.ONE);
 
             createToCircuitDiagram = moveWorldPointArray[0].get_circuitDiagram();
+            if(sideBar.getComponent().getNameOfTheComponentKind() == "CC" && sideBar.getComponent().get_componentKind().getInnerCircuitDiagram() == createToCircuitDiagram){
 
-            updateCircuitDiagram.createComponentByCommand(sideBar.getComponent(), createToCircuitDiagram);
-            linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
+                Browser.window.alert("You cannot add a compound Component in itself!");
+                createComponent = false;
 
-            createComponent = false;
+            }else{
+                updateCircuitDiagram.createComponentByCommand(sideBar.getComponent(), createToCircuitDiagram);
+                linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
+                createComponent = false;
+            }
         }
     }
 
@@ -315,6 +321,12 @@ class ControllerCanvasContext {
             object.set_component(component);
             if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
                 linkAndComponentAndEndpointAndPortArray.addComponent(component);
+
+                if(component.getNameOfTheComponentKind() == "CC"){
+                    new JQuery("#compoundComponentBoxSelection").append(setSetComponentBoxTypeDiv(component));
+
+                    setComponentBoxTypeButtonListener(component);
+                }
             }
         }else if(linkCounter != 0){//link selected
             var link:Link = null;
@@ -409,37 +421,47 @@ class ControllerCanvasContext {
         }
     }
 
+    function setSetComponentBoxTypeDiv(component:Component):String{
+        var boxTypeSelectionHTML = "";
+        if(component.get_boxType() == BOX.BLACK_BOX){
+            boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">"+component.get_name()+"<button type=\"button\" class=\"btn btn-primary btn-sm\" id=\"BoxType-"+component.get_name()+"-BoxType\">Black Box</button></div>";
+        }else{
+            boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">"+component.get_name()+"<button type=\"button\" class=\"btn btn-primary btn-sm active\" id=\"BoxType-"+component.get_name()+"-BoxType\">White Box</button></div>";
+        }
+        return boxTypeSelectionHTML;
+    }
+
+    function setComponentBoxTypeButtonListener(component:Component){
+        Browser.document.getElementById("BoxType-" + component.get_name() + "-BoxType").onclick = function (event:Event){
+            var id:String = untyped event.target.id;
+            id = id.substring(id.indexOf("-") + 1, id.lastIndexOf("-"));
+            for(i in circuitDiagram.get_componentIterator()){
+                if(i.getNameOfTheComponentKind() == "CC" && component.get_name() == id){
+                    if(i.get_boxType() == BOX.BLACK_BOX){
+                        i.set_boxType(BOX.WHITE_BOX);
+                    }else{
+                        i.set_boxType(BOX.BLACK_BOX);
+                    }
+                }
+            }
+
+            boxTypeList();
+            updateCanvas.update();
+        }
+    }
+
     public function boxTypeList(){
         var boxTypeSelectionHTML = "";
 
         for(i in circuitDiagram.get_componentIterator()){
             if(i.getNameOfTheComponentKind() == "CC"){
-                if(i.get_boxType() == BOX.BLACK_BOX){
-                    boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">"+i.get_name()+"<button type=\"button\" class=\"btn btn-primary btn-sm\" id=\"BoxType-"+i.get_name()+"-BoxType\">Black Box</button></div>";
-                }else{
-                    boxTypeSelectionHTML += "<div class=\"col-sm-12 col-md-12 col-lg-12\">"+i.get_name()+"<button type=\"button\" class=\"btn btn-primary btn-sm active\" id=\"BoxType-"+i.get_name()+"-BoxType\">White Box</button></div>";
-                }
+                boxTypeSelectionHTML += setSetComponentBoxTypeDiv(i);
             }
         }
         Browser.document.getElementById("compoundComponentBoxSelection").innerHTML = boxTypeSelectionHTML;
         for(i in circuitDiagram.get_componentIterator()){
             if(i.getNameOfTheComponentKind() == "CC"){
-                Browser.document.getElementById("BoxType-" + i.get_name() + "-BoxType").onclick = function (event:Event){
-                    var id:String = untyped event.target.id;
-                    id = id.substring(id.indexOf("-") + 1, id.lastIndexOf("-"));
-                    for(i in circuitDiagram.get_componentIterator()){
-                        if(i.getNameOfTheComponentKind() == "CC" && i.get_name() == id){
-                            if(i.get_boxType() == BOX.BLACK_BOX){
-                                i.set_boxType(BOX.WHITE_BOX);
-                            }else{
-                                i.set_boxType(BOX.BLACK_BOX);
-                            }
-                        }
-                    }
-
-                    boxTypeList();
-                    updateCanvas.update();
-                }
+                setComponentBoxTypeButtonListener(i);
             }
         }
     }

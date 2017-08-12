@@ -1,5 +1,7 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.type.Coordinate;
+import js.html.Element;
 import js.Browser;
 import js.html.CanvasRenderingContext2D;
 import js.html.CanvasElement;
@@ -84,10 +86,46 @@ class UpdateCanvas {
         update();
     }
     function o(){
-
+        transform = Transform.identity();
+        update();
     }
     function f(){
+        var canvasElement:Element = Browser.document.getElementById("canvas-" + circuitDiagram.get_name());
 
+        var styleWidth:String = canvasElement.style.width;
+        styleWidth = styleWidth.substring(0, styleWidth.indexOf("p"));
+
+        var styleHeight:String = canvasElement.style.height;
+        styleHeight = styleHeight.substring(0, styleHeight.indexOf("p"));
+
+        var width:Float = cast styleWidth;
+        var height:Float = cast styleHeight;
+
+        var centerViewCoordinateOfCanvasElement:Coordinate = new Coordinate(width/2, height/2);
+
+        var circuitDiagramCenterWorldCoordinate:Coordinate = circuitDiagram.getComponentAndLinkCenterCoordinate();
+
+        var circuitDiagramWidth:Float = circuitDiagram.get_diagramWidth();
+        var circuitDiagramHeight:Float = circuitDiagram.get_diagramHeight();
+        var xRation:Float = 1;
+        var yRation:Float = 1;
+
+        var screenSize:Float = width > height ? width : height;
+        var circuitDiagramSize:Float = circuitDiagramWidth > circuitDiagramHeight ? circuitDiagramWidth : circuitDiagramHeight;
+
+        var scareRation:Float = circuitDiagramSize/screenSize < 1 ? circuitDiagramSize/screenSize : screenSize/circuitDiagramSize;
+
+        trace(scareRation);
+        transform = Transform.identity().scale(scareRation, scareRation);
+
+        var circuitDiagramCenterViewCoordinate = transform.pointConvert(circuitDiagramCenterWorldCoordinate);
+
+        var xOffset:Float = centerViewCoordinateOfCanvasElement.get_xPosition() - circuitDiagramCenterViewCoordinate.get_xPosition();
+        var yOffset:Float = centerViewCoordinateOfCanvasElement.get_yPosition() - circuitDiagramCenterViewCoordinate.get_yPosition();
+
+        transform = transform.translate(xOffset, yOffset);
+
+        update();
     }
 
 }

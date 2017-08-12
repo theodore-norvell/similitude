@@ -64,7 +64,6 @@ class XOR implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
-//                    inport.set_sequence(counter + 1);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -79,7 +78,6 @@ class XOR implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition + height / 2);
-//                    inport.set_sequence(counter + 1);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -94,7 +92,6 @@ class XOR implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition - height / 2);
-//                    inport.set_sequence(counter + 1);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -109,7 +106,6 @@ class XOR implements ComponentKind extends GateAbstract {
                 //inport
                 while (counter < inportNum) {
                     var inport:Port = new Inport(xPosition + width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
-//                    inport.set_sequence(counter + 1);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
