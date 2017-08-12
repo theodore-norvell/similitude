@@ -1786,7 +1786,7 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 		var screenSize = width > height ? width : height;
 		var circuitDiagramSize = circuitDiagramWidth > circuitDiagramHeight ? circuitDiagramWidth : circuitDiagramHeight;
 		var scareRation = circuitDiagramSize / screenSize < 1 ? circuitDiagramSize / screenSize : screenSize / circuitDiagramSize;
-		haxe_Log.trace(scareRation,{ fileName : "UpdateCanvas.hx", lineNumber : 119, className : "com.mun.controller.componentUpdate.UpdateCanvas", methodName : "f"});
+		haxe_Log.trace(scareRation,{ fileName : "UpdateCanvas.hx", lineNumber : 118, className : "com.mun.controller.componentUpdate.UpdateCanvas", methodName : "f"});
 		this.transform = com_mun_view_drawingImpl_Transform.identity().scale(scareRation,scareRation);
 		var circuitDiagramCenterViewCoordinate = this.transform.pointConvert(circuitDiagramCenterWorldCoordinate);
 		var xOffset = centerViewCoordinateOfCanvasElement.get_xPosition() - circuitDiagramCenterViewCoordinate.get_xPosition();
@@ -2619,10 +2619,6 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 			object3.set_component(component);
 			if(this.updateCircuitDiagram.findObjectInWhichCircuitDiagram(object3) == this.hitListWorldPoint.get_circuitDiagram()) {
 				this.linkAndComponentAndEndpointAndPortArray.addComponent(component);
-				if(component.getNameOfTheComponentKind() == "CC") {
-					$("#compoundComponentBoxSelection").append(this.setSetComponentBoxTypeDiv(component));
-					this.setComponentBoxTypeButtonListener(component);
-				}
 			}
 		} else if(linkCounter != 0) {
 			var link = null;
@@ -2742,7 +2738,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 		var i = this.circuitDiagram.get_componentIterator();
 		while(i.hasNext()) {
 			var i1 = i.next();
-			if(i1.getNameOfTheComponentKind() == "CC") {
+			if(i1.getNameOfTheComponentKind() == "CC" && boxTypeSelectionHTML.indexOf("BoxType-" + i1.get_name() + "-BoxType") == -1) {
 				boxTypeSelectionHTML += this.setSetComponentBoxTypeDiv(i1);
 			}
 		}
@@ -3283,7 +3279,16 @@ com_mun_controller_controllerState_SideBar.prototype = {
 			var i = _g1[_g];
 			++_g;
 			if(i != "AND" && i != "OR" && i != "NOT" && i != "NOR" && i != "NAND" && i != "XOR" && i != "MUX" && i != "FlipFlop" && i != "Input" && i != "Output") {
-				this.appendButtonGroupList(i);
+				var circuitDiagramForCheck = this.folder.findCircuitDiagram(i);
+				var j = circuitDiagramForCheck.get_componentIterator();
+				while(j.hasNext()) {
+					var j1 = j.next();
+					if(j1.getNameOfTheComponentKind() == "CC" && j1.get_componentKind().getInnerCircuitDiagram().get_name() == i) {
+						continue;
+					} else {
+						this.appendButtonGroupList(i);
+					}
+				}
 			}
 		}
 		this.bandingOnClick();

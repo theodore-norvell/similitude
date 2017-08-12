@@ -321,12 +321,6 @@ class ControllerCanvasContext {
             object.set_component(component);
             if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
                 linkAndComponentAndEndpointAndPortArray.addComponent(component);
-
-                if(component.getNameOfTheComponentKind() == "CC"){
-                    new JQuery("#compoundComponentBoxSelection").append(setSetComponentBoxTypeDiv(component));
-
-                    setComponentBoxTypeButtonListener(component);
-                }
             }
         }else if(linkCounter != 0){//link selected
             var link:Link = null;
@@ -454,7 +448,8 @@ class ControllerCanvasContext {
         var boxTypeSelectionHTML = "";
 
         for(i in circuitDiagram.get_componentIterator()){
-            if(i.getNameOfTheComponentKind() == "CC"){
+            if(i.getNameOfTheComponentKind() == "CC" && boxTypeSelectionHTML.indexOf("BoxType-"+i.get_name()+"-BoxType") == -1){
+
                 boxTypeSelectionHTML += setSetComponentBoxTypeDiv(i);
             }
         }

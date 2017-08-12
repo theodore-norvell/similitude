@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.FolderI;
 import js.html.Event;
 import com.mun.model.component.CircuitDiagramI;
@@ -124,7 +125,14 @@ class SideBar {
             if(i != "AND" &&  i != "OR" &&  i != "NOT" &&  i != "NOR"
                 &&  i != "NAND" &&  i != "XOR" &&  i != "MUX" &&  i != "FlipFlop"
                 &&  i != "Input" &&  i != "Output"){
-                appendButtonGroupList(i);
+                var circuitDiagramForCheck:CircuitDiagramI = folder.findCircuitDiagram(i);
+                for(j in circuitDiagramForCheck.get_componentIterator()){
+                    if(j.getNameOfTheComponentKind() == "CC" && j.get_componentKind().getInnerCircuitDiagram().get_name() == i){
+                        continue;
+                    }else{
+                        appendButtonGroupList(i);
+                    }
+                }
             }
         }
         bandingOnClick();
