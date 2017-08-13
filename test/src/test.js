@@ -6852,7 +6852,7 @@ com_mun_view_drawComponents_DrawMUX.prototype = {
 		this.drawingAdapter.setStrokeColor(strokeColor);
 		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		this.drawingAdapter.setTextColor("black");
-		this.drawingAdapter.drawText("MUX",this.component.get_xPosition() - 8,this.component.get_yPosition(),this.component.get_width() - 2);
+		this.drawingAdapter.drawText("MUX",this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width());
 		var i = this.component.get_inportIterator();
 		while(i.hasNext()) {
 			var i1 = i.next();
@@ -7410,19 +7410,19 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		switch(orientation[1]) {
 		case 0:
 			this.cxt.moveTo(r.get_xa() + (r.get_xb() - r.get_xa()) / 8,r.get_ya());
-			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y + (r.get_yc() - r.get_yb()) / 7,r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition() + (r.get_yc() - r.get_yb()) / 7,r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
 			break;
 		case 1:
 			this.cxt.moveTo(r.get_xa() - (r.get_xb() - r.get_xa()) / 8,r.get_ya());
-			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y - (r.get_yc() - r.get_yb()) / 7,r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition() - (r.get_yc() - r.get_yb()) / 7,r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
 			break;
 		case 2:
 			this.cxt.moveTo(r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8);
-			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa()) / 7,y,r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa()) / 7,vCenterCoordinate.get_yPosition(),r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
 			break;
 		case 3:
 			this.cxt.moveTo(r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8);
-			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa()) / 7,y,r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa()) / 7,vCenterCoordinate.get_yPosition(),r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
 			break;
 		default:
 		}
@@ -7441,19 +7441,21 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.fillStyle = this.fillColor;
 		this.cxt.strokeStyle = this.strokeColor;
-		this.cxt.fill();
+		this.cxt.fillRect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
 		this.cxt.stroke();
 	}
 	,drawText: function(str,x,y,width) {
-		var coordinate = new com_mun_type_Coordinate(x,y);
-		var vCoordinate = this.trans.pointConvert(coordinate);
-		var x0 = vCoordinate.get_xPosition();
-		var y0 = vCoordinate.get_yPosition();
+		var wCoordinate = new com_mun_type_Coordinate(x - width / 2,y);
+		var eCoordinate = new com_mun_type_Coordinate(x + width / 2,y);
+		var vwCoordinate = this.trans.pointConvert(wCoordinate);
+		var veCoordinate = this.trans.pointConvert(eCoordinate);
+		var x0 = vwCoordinate.get_xPosition();
+		var y0 = vwCoordinate.get_yPosition();
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.font = this.font;
 		this.cxt.fillStyle = this.textColor;
 		this.cxt.strokeStyle = this.strokeColor;
-		this.cxt.fillText(str,x0,y0,width);
+		this.cxt.fillText(str,x0,y0,veCoordinate.get_xPosition() - vwCoordinate.get_xPosition());
 	}
 	,drawCricle: function(x,y,radius) {
 		var wnw = new com_mun_type_Coordinate(x - radius,y);

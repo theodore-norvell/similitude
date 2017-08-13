@@ -26,7 +26,7 @@ class DrawMUX implements DrawComponent{
 
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.setTextColor("black");
-        drawingAdapter.drawText("MUX", component.get_xPosition() - 8, component.get_yPosition(), component.get_width() - 2);
+        drawingAdapter.drawText("MUX", component.get_xPosition(), component.get_yPosition(), component.get_width());
 
         //draw inport
         for (i in component.get_inportIterator()) {

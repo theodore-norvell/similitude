@@ -272,19 +272,19 @@ class DrawingAdapter implements DrawingAdapterI {
         switch (orientation){
             case ORIENTATION.NORTH : {
                 cxt.moveTo(r.get_xa() + (r.get_xb() - r.get_xa()) / 8, r.get_ya());
-                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y  + (r.get_yc() - r.get_yb())/7, r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition()  + (r.get_yc() - r.get_yb())/7, r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
             };
             case ORIENTATION.SOUTH : {
                 cxt.moveTo(r.get_xa() - (r.get_xb() - r.get_xa()) / 8, r.get_ya());
-                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),y  - (r.get_yc() - r.get_yb())/7, r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition()  - (r.get_yc() - r.get_yb())/7, r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
             };
             case ORIENTATION.WEST : {
                 cxt.moveTo(r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8);
-                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa())/7,y, r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa())/7,vCenterCoordinate.get_yPosition(), r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
             };
             case ORIENTATION.EAST : {
                 cxt.moveTo(r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8);
-                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa())/7,y, r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
+                cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa())/7,vCenterCoordinate.get_yPosition(), r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
             };
             default : {
                 //do nothing
@@ -308,23 +308,25 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineWidth = lineWidth;
         cxt.fillStyle = fillColor;
         cxt.strokeStyle = strokeColor;
-        cxt.fill();
+        cxt.fillRect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
         cxt.stroke();
     }
 
     public function drawText(str:String, x:Float, y:Float, width:Float):Void {
-        var coordinate:Coordinate = new Coordinate(x, y);
+        var wCoordinate:Coordinate = new Coordinate(x - width/2, y);
+        var eCoordinate:Coordinate = new Coordinate(x + width/2, y);
 
-        var vCoordinate:Coordinate = trans.pointConvert(coordinate);
+        var vwCoordinate:Coordinate = trans.pointConvert(wCoordinate);
+        var veCoordinate:Coordinate = trans.pointConvert(eCoordinate);
 
-        var x0:Float = vCoordinate.get_xPosition();
-        var y0:Float = vCoordinate.get_yPosition();
+        var x0:Float = vwCoordinate.get_xPosition();
+        var y0:Float = vwCoordinate.get_yPosition();
 
         cxt.lineWidth = lineWidth;
         cxt.font = font;
         cxt.fillStyle = textColor;
         cxt.strokeStyle = strokeColor;
-        cxt.fillText(str, x0, y0, width);
+        cxt.fillText(str, x0, y0, veCoordinate.get_xPosition() - vwCoordinate.get_xPosition());
     }
 
     public function drawCricle(x:Float, y:Float, radius:Float):Void {
