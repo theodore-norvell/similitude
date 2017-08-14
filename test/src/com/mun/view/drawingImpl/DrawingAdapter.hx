@@ -304,7 +304,9 @@ class DrawingAdapter implements DrawingAdapterI {
         var y0:Float = vnw.get_yPosition();
         var x1:Float = vse.get_xPosition();
         var y1:Float = vse.get_yPosition();
+        cxt.beginPath();
         cxt.rect(Math.min(x0, x1), Math.min(y0, y1), Math.abs(x1 - x0), Math.abs(y1 - y0));
+        cxt.closePath();
         cxt.lineWidth = lineWidth;
         cxt.fillStyle = fillColor;
         cxt.strokeStyle = strokeColor;
@@ -326,7 +328,9 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.font = font;
         cxt.fillStyle = textColor;
         cxt.strokeStyle = strokeColor;
+        cxt.beginPath();
         cxt.fillText(str, x0, y0, veCoordinate.get_xPosition() - vwCoordinate.get_xPosition());
+        cxt.closePath();
     }
 
     public function drawCricle(x:Float, y:Float, radius:Float):Void {
@@ -343,7 +347,7 @@ class DrawingAdapter implements DrawingAdapterI {
 
         cxt.beginPath();
         cxt.arc(x0, y0, radius, 0, 2 * Math.PI, false);
-        cxt.closePath;
+        cxt.closePath();
         cxt.lineWidth = lineWidth;
         cxt.fillStyle = fillColor;
         cxt.strokeStyle = strokeColor;

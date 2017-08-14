@@ -1,5 +1,6 @@
 package com.mun.model.gates;
 
+import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
@@ -81,7 +82,7 @@ interface ComponentKind {
      * @param component
      * @param drawingAdapter
     **/
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void;
 
     /**
     * get component sequence

@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.BOX;
@@ -191,7 +192,7 @@ class Component {
         return this;
     }
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray , ?context:CanvasRenderingContext2D){
         if(componentKind.checkInnerCircuitDiagramPortsChange()){
 
             for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
@@ -258,7 +259,7 @@ class Component {
         if(nameOfTheComponentKind != "CC"){
             componentKind.drawComponent(drawingAdpater, highLight);
         }else{
-            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray);
+            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray, context);
         }
     }
 

@@ -1,4 +1,5 @@
 package com.mun.model.gates;
+import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.type.WorldPoint;
@@ -138,10 +139,9 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void {
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform());
-
-        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans);
+        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans, context);
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
         }else{
@@ -153,6 +153,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
             //drawingAdapterTrans = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapterTrans, linkAndComponentArray);
         }
+        context.restore();
     }
 
     function makeTransform():Transform{

@@ -1,5 +1,6 @@
 package com.mun.model.gates;
 
+import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -122,7 +123,7 @@ class XOR implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D){
         var drawComponent:DrawComponent = new DrawXOR(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

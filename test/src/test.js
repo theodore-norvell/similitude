@@ -1725,7 +1725,7 @@ com_mun_controller_componentUpdate_UpdateCanvas.prototype = {
 	}
 	,update: function(linkAndComponentArray) {
 		this.canvas.width = this.canvas.width;
-		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(this.transform,this.context),linkAndComponentArray);
+		this.circuitDiagram.draw(new com_mun_view_drawingImpl_DrawingAdapter(this.transform,this.context),linkAndComponentArray,this.context);
 	}
 	,bindEventListener: function() {
 		window.document.getElementById("left").onmousedown = $bind(this,this.left);
@@ -3711,7 +3711,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 	,componentSetName: function(component,name) {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
-	,draw: function(drawingAdapter,linkAndComponentArray) {
+	,draw: function(drawingAdapter,linkAndComponentArray,context) {
 		var drawFlag = false;
 		var _g = 0;
 		var _g1 = this.componentArray;
@@ -3723,7 +3723,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				while(j.hasNext()) {
 					var j1 = j.next();
 					if(j1 == i) {
-						i.drawComponent(drawingAdapter,true);
+						i.drawComponent(drawingAdapter,true,null,context);
 						drawFlag = true;
 					}
 				}
@@ -3732,7 +3732,7 @@ com_mun_model_component_CircuitDiagram.prototype = {
 				if(i.getNameOfTheComponentKind() != "CC") {
 					i.drawComponent(drawingAdapter,false);
 				} else {
-					i.drawComponent(drawingAdapter,false,linkAndComponentArray);
+					i.drawComponent(drawingAdapter,false,linkAndComponentArray,context);
 				}
 			}
 			drawFlag = false;
@@ -4002,7 +4002,7 @@ com_mun_model_component_Component.prototype = {
 		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
 		return this;
 	}
-	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray,context) {
 		if(this.componentKind.checkInnerCircuitDiagramPortsChange()) {
 			var i = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
 			while(i.hasNext()) {
@@ -4083,7 +4083,7 @@ com_mun_model_component_Component.prototype = {
 		if(this.nameOfTheComponentKind != "CC") {
 			this.componentKind.drawComponent(drawingAdpater,highLight);
 		} else {
-			this.componentKind.drawComponent(drawingAdpater,highLight,linkAndComponentArray);
+			this.componentKind.drawComponent(drawingAdpater,highLight,linkAndComponentArray,context);
 		}
 	}
 	,findHitList: function(coordinate,mode) {
@@ -5034,7 +5034,7 @@ com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawAND(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5158,9 +5158,9 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,hightLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,hightLight,linkAndComponentArray,context) {
 		var drawingAdapterTrans = drawingAdapter.transform(this.makeTransform());
-		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter,drawingAdapterTrans);
+		var drawComponent = new com_mun_view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter,drawingAdapterTrans,context);
 		if(hightLight) {
 			drawComponent.drawCorrespondingComponent("red");
 		} else {
@@ -5169,6 +5169,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
 			this.circuitDiagram.draw(drawingAdapterTrans,linkAndComponentArray);
 		}
+		context.restore();
 	}
 	,makeTransform: function() {
 		var transform = com_mun_view_drawingImpl_Transform.identity();
@@ -5462,7 +5463,7 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawFlipFlop(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5589,7 +5590,7 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawInput(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5777,7 +5778,7 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawMUX(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5875,7 +5876,7 @@ com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.pr
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawNAND(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -5973,7 +5974,7 @@ com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawNOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6073,7 +6074,7 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawNOT(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6171,7 +6172,7 @@ com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prot
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6295,7 +6296,7 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawOutput(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6398,7 +6399,7 @@ com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray,context) {
 		var drawComponent = new com_mun_view_drawComponents_DrawXOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -6715,10 +6716,11 @@ com_mun_view_drawComponents_DrawAND.prototype = {
 	}
 	,__class__: com_mun_view_drawComponents_DrawAND
 };
-var com_mun_view_drawComponents_DrawCompoundComponent = function(component,drawingAdapter,drawingAdapterTrans) {
+var com_mun_view_drawComponents_DrawCompoundComponent = function(component,drawingAdapter,drawingAdapterTrans,context) {
 	this.component = component;
 	this.drawingAdapter = drawingAdapter;
 	this.drawingAdapterTrans = drawingAdapterTrans;
+	this.context = context;
 };
 $hxClasses["com.mun.view.drawComponents.DrawCompoundComponent"] = com_mun_view_drawComponents_DrawCompoundComponent;
 com_mun_view_drawComponents_DrawCompoundComponent.__name__ = ["com","mun","view","drawComponents","DrawCompoundComponent"];
@@ -6727,17 +6729,11 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 	drawingAdapter: null
 	,component: null
 	,drawingAdapterTrans: null
+	,context: null
 	,drawCorrespondingComponent: function(strokeColor) {
 		if(strokeColor == null || strokeColor == "") {
 			strokeColor = "black";
 		}
-		this.drawingAdapter.setStrokeColor(strokeColor);
-		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
-			this.drawingAdapter.setFillColor("white");
-		} else {
-			this.drawingAdapter.setFillColor("gray");
-		}
-		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
 		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.BLACK_BOX) {
 			this.drawingAdapter.setTextColor("black");
 			this.drawingAdapter.drawText(this.component.get_name(),this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width());
@@ -6790,6 +6786,15 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 				}
 			}
 		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
+			this.drawingAdapter.setFillColor("white");
+		} else {
+			this.drawingAdapter.setFillColor("gray");
+		}
+		this.context.save();
+		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
+		this.context.clip();
 		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawCompoundComponent
@@ -7543,7 +7548,9 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		var y0 = vnw.get_yPosition();
 		var x1 = vse.get_xPosition();
 		var y1 = vse.get_yPosition();
+		this.cxt.beginPath();
 		this.cxt.rect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
+		this.cxt.closePath();
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.fillStyle = this.fillColor;
 		this.cxt.strokeStyle = this.strokeColor;
@@ -7561,7 +7568,9 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		this.cxt.font = this.font;
 		this.cxt.fillStyle = this.textColor;
 		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.beginPath();
 		this.cxt.fillText(str,x0,y0,veCoordinate.get_xPosition() - vwCoordinate.get_xPosition());
+		this.cxt.closePath();
 	}
 	,drawCricle: function(x,y,radius) {
 		var wnw = new com_mun_type_Coordinate(x - radius,y);
@@ -7573,6 +7582,7 @@ com_mun_view_drawingImpl_DrawingAdapter.prototype = {
 		var y0 = vse.get_yPosition();
 		this.cxt.beginPath();
 		this.cxt.arc(x0,y0,radius,0,2 * Math.PI,false);
+		this.cxt.closePath();
 		this.cxt.lineWidth = this.lineWidth;
 		this.cxt.fillStyle = this.fillColor;
 		this.cxt.strokeStyle = this.strokeColor;

@@ -1,4 +1,5 @@
 package com.mun.view.drawComponents;
+import js.html.CanvasRenderingContext2D;
 import com.mun.model.enumeration.BOX;
 import com.mun.type.Coordinate;
 import com.mun.model.component.Port;
@@ -10,26 +11,19 @@ class DrawCompoundComponent implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
     var drawingAdapterTrans:DrawingAdapterI;
+    var context:CanvasRenderingContext2D;
 
-    public function new(component:Component, drawingAdapter:DrawingAdapterI, drawingAdapterTrans:DrawingAdapterI) {
+    public function new(component:Component, drawingAdapter:DrawingAdapterI, drawingAdapterTrans:DrawingAdapterI, context:CanvasRenderingContext2D) {
         this.component = component;
         this.drawingAdapter = drawingAdapter;
         this.drawingAdapterTrans = drawingAdapterTrans;
+        this.context = context;
     }
 
     public function drawCorrespondingComponent(strokeColor:String):Void {
         if(strokeColor == null || strokeColor == ""){
             strokeColor = "black";
         }
-        drawingAdapter.setStrokeColor(strokeColor);
-
-        if(component.get_boxType() == BOX.WHITE_BOX ){
-            drawingAdapter.setFillColor("white");
-        }else{
-            drawingAdapter.setFillColor("gray");
-        }
-
-        drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
 
         if(component.get_boxType() == BOX.BLACK_BOX ){
             drawingAdapter.setTextColor("black");
@@ -82,6 +76,18 @@ class DrawCompoundComponent implements DrawComponent{
                 }
             }
         }
+
+        drawingAdapter.setStrokeColor(strokeColor);
+
+        if(component.get_boxType() == BOX.WHITE_BOX ){
+            drawingAdapter.setFillColor("white");
+        }else{
+            drawingAdapter.setFillColor("gray");
+        }
+
+        context.save();
+        drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
+        context.clip();
 
         //reset drawing parameter
         drawingAdapter.resetDrawingParam();

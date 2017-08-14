@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import js.html.CanvasRenderingContext2D;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
@@ -274,14 +275,14 @@ class CircuitDiagram implements CircuitDiagramI{
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
     **/
-    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void{
+    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
             if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0){
                 for(j in linkAndComponentArray.get_componentIterator()){
                     if(j == i){
-                        i.drawComponent(drawingAdapter, true);
+                        i.drawComponent(drawingAdapter, true, context);
                         drawFlag = true;
                     }
                 }
@@ -291,7 +292,7 @@ class CircuitDiagram implements CircuitDiagramI{
                 if(i.getNameOfTheComponentKind() != "CC"){
                     i.drawComponent(drawingAdapter, false);
                 }else{
-                    i.drawComponent(drawingAdapter, false, linkAndComponentArray);
+                    i.drawComponent(drawingAdapter, false, linkAndComponentArray, context);
                 }
             }
 
