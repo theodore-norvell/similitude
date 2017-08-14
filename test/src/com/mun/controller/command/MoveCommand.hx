@@ -200,11 +200,14 @@ class MoveCommand implements Command {
 
         if (linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0) {
             for(i in linkAndComponentAndEndpointArray.get_linkIterator()){
-                i.get_leftEndpoint().set_xPosition(i.get_leftEndpoint().get_xPosition() + xDisplacement);
-                i.get_leftEndpoint().set_yPosition(i.get_leftEndpoint().get_yPosition() + yDisplacement);
-                i.get_rightEndpoint().set_xPosition(i.get_rightEndpoint().get_xPosition() + xDisplacement);
-                i.get_rightEndpoint().set_yPosition(i.get_rightEndpoint().get_yPosition() + yDisplacement);
-
+                if(i.get_leftEndpoint().get_port() == null){
+                    i.get_leftEndpoint().set_xPosition(i.get_leftEndpoint().get_xPosition() + xDisplacement);
+                    i.get_leftEndpoint().set_yPosition(i.get_leftEndpoint().get_yPosition() + yDisplacement);
+                }
+                if(i.get_rightEndpoint().get_port() == null){
+                    i.get_rightEndpoint().set_xPosition(i.get_rightEndpoint().get_xPosition() + xDisplacement);
+                    i.get_rightEndpoint().set_yPosition(i.get_rightEndpoint().get_yPosition() + yDisplacement);
+                }
                 linkMeetPortUpdate(i);
             }
         }

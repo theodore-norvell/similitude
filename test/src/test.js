@@ -1288,10 +1288,14 @@ com_mun_controller_command_MoveCommand.prototype = {
 			var i2 = this.linkAndComponentAndEndpointArray.get_linkIterator();
 			while(i2.hasNext()) {
 				var i3 = i2.next();
-				i3.get_leftEndpoint().set_xPosition(i3.get_leftEndpoint().get_xPosition() + this.xDisplacement);
-				i3.get_leftEndpoint().set_yPosition(i3.get_leftEndpoint().get_yPosition() + this.yDisplacement);
-				i3.get_rightEndpoint().set_xPosition(i3.get_rightEndpoint().get_xPosition() + this.xDisplacement);
-				i3.get_rightEndpoint().set_yPosition(i3.get_rightEndpoint().get_yPosition() + this.yDisplacement);
+				if(i3.get_leftEndpoint().get_port() == null) {
+					i3.get_leftEndpoint().set_xPosition(i3.get_leftEndpoint().get_xPosition() + this.xDisplacement);
+					i3.get_leftEndpoint().set_yPosition(i3.get_leftEndpoint().get_yPosition() + this.yDisplacement);
+				}
+				if(i3.get_rightEndpoint().get_port() == null) {
+					i3.get_rightEndpoint().set_xPosition(i3.get_rightEndpoint().get_xPosition() + this.xDisplacement);
+					i3.get_rightEndpoint().set_yPosition(i3.get_rightEndpoint().get_yPosition() + this.yDisplacement);
+				}
 				this.linkMeetPortUpdate(i3);
 			}
 		}
