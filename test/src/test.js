@@ -6734,10 +6734,37 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 		if(strokeColor == null || strokeColor == "") {
 			strokeColor = "black";
 		}
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),com_mun_global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),com_mun_global_Constant.portRadius);
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
+			this.drawingAdapter.setFillColor("white");
+		} else {
+			this.drawingAdapter.setFillColor("gray");
+		}
+		this.context.save();
+		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
+		this.context.clip();
 		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.BLACK_BOX) {
 			this.drawingAdapter.setTextColor("black");
 			this.drawingAdapter.drawText(this.component.get_name(),this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width());
 		}
+		this.drawInportAndOutport();
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,drawInportAndOutport: function() {
 		var i = this.component.get_inportIterator();
 		while(i.hasNext()) {
 			var i1 = i.next();
@@ -6786,16 +6813,6 @@ com_mun_view_drawComponents_DrawCompoundComponent.prototype = {
 				}
 			}
 		}
-		this.drawingAdapter.setStrokeColor(strokeColor);
-		if(this.component.get_boxType() == com_mun_model_enumeration_BOX.WHITE_BOX) {
-			this.drawingAdapter.setFillColor("white");
-		} else {
-			this.drawingAdapter.setFillColor("gray");
-		}
-		this.context.save();
-		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
-		this.context.clip();
-		this.drawingAdapter.resetDrawingParam();
 	}
 	,__class__: com_mun_view_drawComponents_DrawCompoundComponent
 };
