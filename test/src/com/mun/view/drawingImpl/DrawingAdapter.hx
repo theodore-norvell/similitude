@@ -144,8 +144,8 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineTo(r.get_xd(), r.get_yd());
         cxt.closePath();
 
-        cxt.moveTo(x + (cymax - cymin) / 2 - 2 * radius, vCenterCoordinate.get_yPosition());
-        cxt.arc(x + (cymax - cymin) / 2 - 2 * radius, vCenterCoordinate.get_yPosition(), radius, 0, 2 * Math.PI, false);
+        cxt.moveTo(vCenterCoordinate.get_xPosition() + (cymax - cymin) / 2 - 2 * radius, vCenterCoordinate.get_yPosition());
+        cxt.arc(vCenterCoordinate.get_xPosition() + (cymax - cymin) / 2 - 2 * radius, vCenterCoordinate.get_yPosition(), radius, 0, 2 * Math.PI, false);
         cxt.closePath();
 
         cxt.fillStyle = fillColor;

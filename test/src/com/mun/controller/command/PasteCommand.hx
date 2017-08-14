@@ -15,11 +15,13 @@ class PasteCommand implements Command {
     var xPosition:Float;
     var yPosition:Float;
     var circuitDiagram:CircuitDiagramI;
+    var copyToCircuitDiagram:CircuitDiagramI;
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
 
 
-    public function new(xPosition:Float, yPosition:Float, circuitDiagram:CircuitDiagramI) {
+    public function new(xPosition:Float, yPosition:Float, circuitDiagram:CircuitDiagramI, copyToCircuitDiagram:CircuitDiagramI) {
         linkAndComponentArray = new LinkAndComponentAndEndpointAndPortArray();
+        this.copyToCircuitDiagram = copyToCircuitDiagram;
         this.copyStack = new Stack();
 
         for(i in circuitDiagram.getCopyStack().getLinkArray()){
@@ -38,11 +40,11 @@ class PasteCommand implements Command {
     public function undo():LinkAndComponentAndEndpointAndPortArray {
 
         for(i in linkAndComponentArray.get_linkIterator()){
-            circuitDiagram.removeLink(i);
+            copyToCircuitDiagram.removeLink(i);
         }
 
         for(i in linkAndComponentArray.get_componentIterator()){
-            circuitDiagram.removeComponent(i);
+            copyToCircuitDiagram.removeComponent(i);
         }
 
         for(i in copyStack.getLinkArray()){
@@ -58,11 +60,11 @@ class PasteCommand implements Command {
 
     public function redo():LinkAndComponentAndEndpointAndPortArray {
         for(i in linkAndComponentArray.get_linkIterator()){
-            circuitDiagram.addLink(i);
+            copyToCircuitDiagram.addLink(i);
         }
 
         for(i in linkAndComponentArray.get_componentIterator()){
-            circuitDiagram.addComponent(i);
+            copyToCircuitDiagram.addComponent(i);
         }
 
         circuitDiagram.getCopyStack().clearStack();
@@ -87,7 +89,7 @@ class PasteCommand implements Command {
 
             linkAndComponentArray.addLink(i);
 
-            circuitDiagram.addLink(i);
+            copyToCircuitDiagram.addLink(i);
         }
 
         for(i in componentArray){
@@ -98,7 +100,7 @@ class PasteCommand implements Command {
 
             linkAndComponentArray.addComponent(i);
 
-            circuitDiagram.addComponent(i);
+            copyToCircuitDiagram.addComponent(i);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.mun.controller.componentUpdate;
 
+import com.mun.type.Coordinate;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.FolderI;
 import com.mun.controller.command.PasteCommand;
@@ -198,10 +199,10 @@ class UpdateCircuitDiagram {
         return result;
     }
 
-    public function paste(mouseLocation:Coordinate):LinkAndComponentAndEndpointAndPortArray{
+    public function paste(mouseLocation:Coordinate, copyToCircuitDiagram:CircuitDiagramI):LinkAndComponentAndEndpointAndPortArray{
         var linkandComponentArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
-        var command:Command = new PasteCommand(mouseLocation.get_xPosition(), mouseLocation.get_yPosition(), circuitDiagram);
+        var command:Command = new PasteCommand(mouseLocation.get_xPosition(), mouseLocation.get_yPosition(), circuitDiagram, copyToCircuitDiagram);
         commandManager.execute(command);
 
         for(i in circuitDiagram.getCopyStack().getLinkArray()){
@@ -255,9 +256,35 @@ class UpdateCircuitDiagram {
         var xMoveDistance:Float = currentMouseLocation.get_xPosition() - mouseDownLocation.get_xPosition();
         var yMoveDistance:Float = currentMouseLocation.get_yPosition() - mouseDownLocation.get_yPosition();
 
-        if(mouseLocationFlag){
-            linkAndComponentAndEndpointArray.getComponentFromIndex(0).set_xPosition(currentMouseLocation.get_xPosition());
-            linkAndComponentAndEndpointArray.getComponentFromIndex(0).set_yPosition(currentMouseLocation.get_yPosition());
+        var linkArray:Array<Link> = new Array<Link>();
+        var componentArray:Array<Component> = new Array<Component>();
+        for(i in linkAndComponentAndEndpointArray.get_linkIterator()){
+            linkArray.push(i);
+        }
+        for(i in linkAndComponentAndEndpointArray.get_componentIterator()){
+            componentArray.push(i);
+        }
+        var centerCoordinate:Coordinate = findTheCenterMoveArrays(linkArray, componentArray);
+
+        if(mouseLocationFlag && linkAndComponentAndEndpointArray.getComponentIteratorLength() != 0){
+            for(i in linkAndComponentAndEndpointArray.get_componentIterator()){
+                i.set_xPosition(currentMouseLocation.get_xPosition() + (i.get_xPosition() - centerCoordinate.get_xPosition()));
+                i.set_yPosition(currentMouseLocation.get_yPosition() + (i.get_yPosition() - centerCoordinate.get_yPosition()));
+            }
+
+        }
+
+        if(mouseLocationFlag && linkAndComponentAndEndpointArray.getLinkIteratorLength() != 0){
+            for(i in linkAndComponentAndEndpointArray.get_linkIterator()){
+                var offsetCoordinate:Coordinate = calculateEndpointOffsetCoordinate(i.get_rightEndpoint(), centerCoordinate.get_xPosition(), centerCoordinate.get_yPosition());
+
+                i.get_rightEndpoint().set_xPosition(currentMouseLocation.get_xPosition() - offsetCoordinate.get_xPosition());
+                i.get_rightEndpoint().set_yPosition(currentMouseLocation.get_yPosition() - offsetCoordinate.get_yPosition());
+
+                offsetCoordinate = calculateEndpointOffsetCoordinate(i.get_leftEndpoint(), centerCoordinate.get_xPosition(), centerCoordinate.get_yPosition());
+                i.get_leftEndpoint().set_xPosition(currentMouseLocation.get_xPosition() - offsetCoordinate.get_xPosition());
+                i.get_leftEndpoint().set_yPosition(currentMouseLocation.get_yPosition() - offsetCoordinate.get_yPosition());
+            }
         }
 
         var moveCircuit:CircuitDiagramI = getTheOperateCircuitDiagram(linkAndComponentAndEndpointArray);
@@ -292,14 +319,88 @@ class UpdateCircuitDiagram {
         
     }
 
+    function calculateEndpointOffsetCoordinate(endpoint:Endpoint, xPosition:Float, yPosition:Float):Coordinate {
+
+        var xOffset:Float = xPosition - endpoint.get_xPosition();
+        var yOffset:Float = yPosition - endpoint.get_yPosition();
+
+        return new Coordinate(xOffset, yOffset);
+    }
+
+    function findTheCenterMoveArrays(linkArray:Array<Link>, componentArray:Array<Component>):Coordinate{
+        var max_x:Float = 0;
+        var max_y:Float = 0;
+        var min_x:Float = 99999;
+        var min_y:Float = 99999;
+        for(i in linkArray){
+            if(i.get_rightEndpoint().get_xPosition() > max_x){
+                max_x = i.get_rightEndpoint().get_xPosition();
+            }
+            if(i.get_rightEndpoint().get_xPosition() < min_x){
+                min_x = i.get_rightEndpoint().get_xPosition();
+            }
+
+            if(i.get_rightEndpoint().get_yPosition() > max_y){
+                max_y = i.get_rightEndpoint().get_yPosition();
+            }
+            if(i.get_rightEndpoint().get_yPosition() < min_y){
+                min_y = i.get_rightEndpoint().get_yPosition();
+            }
+
+            if(i.get_leftEndpoint().get_xPosition() > max_x){
+                max_x = i.get_leftEndpoint().get_xPosition();
+            }
+            if(i.get_leftEndpoint().get_xPosition() < min_x){
+                min_x = i.get_leftEndpoint().get_xPosition();
+            }
+
+            if(i.get_leftEndpoint().get_yPosition() > max_y){
+                max_y = i.get_leftEndpoint().get_yPosition();
+            }
+            if(i.get_leftEndpoint().get_yPosition() < min_y){
+                min_y = i.get_leftEndpoint().get_yPosition();
+            }
+        }
+
+        for(i in componentArray){
+            var maxPosition_x:Float = i.get_xPosition() + i.get_width()/2;
+            var minPosition_x:Float = i.get_xPosition() - i.get_width()/2;
+
+            var maxPosition_y:Float = i.get_yPosition() + i.get_height()/2;
+            var minPosition_y:Float = i.get_yPosition() - i.get_height()/2;
+
+            if(maxPosition_x > max_x){
+                max_x = maxPosition_x;
+            }
+            if(minPosition_x < min_x){
+                min_x = minPosition_x;
+            }
+
+            if(maxPosition_y > max_y){
+                max_y = maxPosition_y;
+            }
+            if(minPosition_y < min_y){
+                min_y = minPosition_y;
+            }
+        }
+
+        //four corners' coordinate (min_x, min_y) (min_x, max_y) (max_x, min_y) (max_x, max_y)
+        //so the center coordiante for these objects could be calculated.
+        return new Coordinate( (max_x - min_x)/2+min_x , (max_y - min_y)/2+min_y);
+    }
+
     public function changeOrientation(componentIterator:Iterator<Component>, orientation:ORIENTATION){
         var componentArray:Array<Component> = new Array<Component>();
         var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+
         for(i in componentIterator){
             componentArray.push(i);
             linkAndComponentArray.addComponent(i);
         }
-        var orientationCommand:Command = new OrientationCommand(componentArray, orientation, circuitDiagram);
+
+        var changeOrientationCircuitDiagram :CircuitDiagramI = getTheOperateCircuitDiagram(linkAndComponentArray);
+
+        var orientationCommand:Command = new OrientationCommand(componentArray, orientation, changeOrientationCircuitDiagram);
         commandManager.execute(orientationCommand);
 
         updateToolBar.update(linkAndComponentArray);
@@ -307,7 +408,8 @@ class UpdateCircuitDiagram {
     }
 
     public function deleteObject(linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
-        var deleteCommand:Command = new DeleteCommand(linkAndComponentArray, circuitDiagram);
+        var deleteObjectCircuitDiagram :CircuitDiagramI = getTheOperateCircuitDiagram(linkAndComponentArray);
+        var deleteCommand:Command = new DeleteCommand(linkAndComponentArray, deleteObjectCircuitDiagram);
         commandManager.execute(deleteCommand);
         redrawCanvas(linkAndComponentArray);
         //compute the size of this diagram

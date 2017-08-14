@@ -115,7 +115,6 @@ class UpdateCanvas {
 
         var scareRation:Float = circuitDiagramSize/screenSize < 1 ? circuitDiagramSize/screenSize : screenSize/circuitDiagramSize;
 
-        trace(scareRation);
         transform = Transform.identity().scale(scareRation, scareRation);
 
         var circuitDiagramCenterViewCoordinate = transform.pointConvert(circuitDiagramCenterWorldCoordinate);

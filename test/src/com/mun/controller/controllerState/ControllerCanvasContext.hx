@@ -118,6 +118,22 @@ class ControllerCanvasContext {
                 linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
                 createComponent = false;
             }
+        }else if(createComponent && controllerState == C_STATE.PASTE){
+            linkAndComponentAndEndpointAndPortArray.clean();
+
+            var x:Float = event.clientX;
+            var y:Float = event.clientY;
+            var mouseMoveLocation:Coordinate = getPointOnCanvas(x,y);
+
+            //translate to world coordinate
+            mouseMoveWorldCoordiante = updateCanvas.getTransform().pointInvert(mouseMoveLocation);
+
+            var moveWorldPointArray:Array<WorldPoint> = circuitDiagram.findWorldPoint(mouseMoveWorldCoordiante, POINT_MODE.ONE);
+
+            createToCircuitDiagram = moveWorldPointArray[0].get_circuitDiagram();
+
+            linkAndComponentAndEndpointAndPortArray.setArray(updateCircuitDiagram.paste(moveWorldPointArray[0].get_coordinate(), createToCircuitDiagram));
+            updateCircuitDiagram.get_commandManager().recordFlagSetTrue();
         }
     }
 
@@ -382,16 +398,14 @@ class ControllerCanvasContext {
                     if(lastState == C_STATE.CREATE_COMPONENT){
                         updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
                     }else if(lastState == C_STATE.PASTE){
-                        updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseDownWorldCoordinate, false);
+                        updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
                     }else{
                         updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseDownWorldCoordinate, false);
                     }
                 }
             };
             case C_STATE.PASTE : {
-                linkAndComponentAndEndpointAndPortArray.clean();
-                linkAndComponentAndEndpointAndPortArray.setArray(updateCircuitDiagram.paste(mouseMoveWorldCoordiante));
-                updateCircuitDiagram.get_commandManager().recordFlagSetTrue();
+                createComponent = true;
             };
             case C_STATE.MULTI_SELECTION : {
                 linkAndComponentAndEndpointAndPortArray.setArray(lastClickArray);
