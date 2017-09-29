@@ -8,3 +8,5 @@ vcs.xml
 test/.idea
 simulation/.idea
 SimilitudeClient.iml
+client/.idea
+server/.idea
