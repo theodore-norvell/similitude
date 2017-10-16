@@ -23,6 +23,13 @@ interface ComponentKind {
     **/
     public function getLeastInportNumber():Int;
 
+    public function getname():String;
+
+    public function getDelay():Int;
+
+    public function setDelay(value:Int):Void;
+
+
     /**
 	 * Every gate should have a algorithm to define the output value.
 	 * this method is to calculate the gate value.

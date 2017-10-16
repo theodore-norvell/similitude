@@ -1,4 +1,5 @@
 package com.mun.model.gates;
+import com.mun.model.observe.Observer;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
@@ -20,9 +21,24 @@ import com.mun.model.component.Port;
 /**
 * compound Component
 **/
-class CompoundComponent implements ComponentKind extends GateAbstract{
+class CompoundComponent implements ComponentKind extends GateAbstract extends Observer{
     var circuitDiagram:CircuitDiagramI;
     var outputCounter:Int;
+    var nameOfTheComponentKind:String="CC";
+    var delay:Int=0;//delay of the component
+
+    public function getDelay():Int{
+        return delay;
+    }
+
+    public function setDelay(value:Int):Void{
+        delay=value;
+    }
+
+    public function getname():String{
+        return nameOfTheComponentKind;
+    }
+
 
     public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;

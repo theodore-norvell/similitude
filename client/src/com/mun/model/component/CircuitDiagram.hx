@@ -1,5 +1,7 @@
 package com.mun.model.component;
 
+import com.mun.model.observe.Observable;
+import com.mun.model.observe.Observer;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
@@ -12,7 +14,7 @@ import com.mun.model.enumeration.ORIENTATION;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
 
-class CircuitDiagram implements CircuitDiagramI{
+class CircuitDiagram extends Observer extends Observable implements CircuitDiagramI{
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
     var name:String;//the name of this circuit diagram

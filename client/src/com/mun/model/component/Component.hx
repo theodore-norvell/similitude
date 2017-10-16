@@ -1,5 +1,6 @@
 package com.mun.model.component;
 
+import com.mun.model.observe.Observable;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
@@ -18,7 +19,7 @@ import com.mun.model.gates.ComponentKind;
  * @author wanhui
  *
  */
-class Component {
+class Component extends Observable{
     var xPosition:Float;//the x position of the component
     var yPosition:Float;//the y position of the component
     var height:Float;//height
@@ -28,9 +29,9 @@ class Component {
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
     var name:String = "";//the name of the component, unique
-    var delay:Int;//delay of the component
+    //var delay:Int;//delay of the component
     var inportsNum:Int;//init
-    var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
+    //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
     /**
     *   create component
@@ -53,7 +54,7 @@ class Component {
         this.inportsNum = inportNum;
         this.boxType = BOX.WHITE_BOX;
 
-        this.delay = 0;//init is zero
+        //this.delay = 0;//init is zero
 
         //initial ports
         var portArray:Array<Port> = new Array<Port>();
@@ -150,21 +151,21 @@ class Component {
     }
 
     public function get_delay():Int {
-        return delay;
+        return this.componentKind.getDelay();
     }
 
     public function set_delay(value:Int) {
-        return this.delay = value;
+        return this.componentKind.setDelay(value);
     }
 
     public function get_inportsNum():Int {
         return inportsNum;
     }
     public function setNameOfTheComponentKind(name:String){
-        this.nameOfTheComponentKind = name;
+        //this.nameOfTheComponentKind = name;
     }
     public function getNameOfTheComponentKind():String{
-        return this.nameOfTheComponentKind;
+        return this.componentKind.getname();
     }
     public function set_inportsNum(value:Int):Bool {
         if (value <= componentKind.getLeastInportNumber()) {
@@ -256,7 +257,7 @@ class Component {
             componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
             componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
         }
-        if(nameOfTheComponentKind != "CC"){
+        if(this.componentKind.getname()!= "CC"){
             componentKind.drawComponent(drawingAdpater, highLight);
         }else{
             componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray, context);

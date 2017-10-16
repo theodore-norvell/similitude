@@ -30,6 +30,21 @@ import com.mun.model.enumeration.VALUE_LOGIC;
  */
 class FlipFlop implements ComponentKind extends GateAbstract {
 
+    var nameOfTheComponentKind:String="FlipFlop";
+    var delay:Int=0;//delay of the component
+
+    public function getDelay():Int{
+        return delay;
+    }
+
+    public function setDelay(value:Int):Void{
+        delay=value;
+    }
+
+    public function getname():String{
+        return nameOfTheComponentKind;
+    }
+
     public function algorithm(portArray:Array<Port>):Array<Port> {
         var port:Port;
         var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
