@@ -662,6 +662,10 @@ var Test = function() { };
 $hxClasses["Test"] = Test;
 Test.__name__ = ["Test"];
 Test.main = function() {
+	haxe_Log.trace("Hello",{ fileName : "Test.hx", lineNumber : 9, className : "Test", methodName : "main"});
+	var a = 2;
+	var b = 3;
+	com_mun_assertions_Assert.assert(a == b);
 	var folderState = new com_mun_controller_controllerState_FolderState();
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
@@ -889,6 +893,24 @@ Type.enumIndex = function(e) {
 };
 Type.allEnums = function(e) {
 	return e.__empty_constructs__;
+};
+var com_mun_assertions_Assert = function() { };
+$hxClasses["com.mun.assertions.Assert"] = com_mun_assertions_Assert;
+com_mun_assertions_Assert.__name__ = ["com","mun","assertions","Assert"];
+com_mun_assertions_Assert.assert = function(e) {
+	if(!e) {
+		throw new js__$Boot_HaxeError(new com_mun_assertions_AssertionFailure());
+	}
+};
+var com_mun_assertions_AssertionFailure = function() {
+};
+$hxClasses["com.mun.assertions.AssertionFailure"] = com_mun_assertions_AssertionFailure;
+com_mun_assertions_AssertionFailure.__name__ = ["com","mun","assertions","AssertionFailure"];
+com_mun_assertions_AssertionFailure.prototype = {
+	toString: function() {
+		return "Assertion failure";
+	}
+	,__class__: com_mun_assertions_AssertionFailure
 };
 var com_mun_controller_command_Command = function() { };
 $hxClasses["com.mun.controller.command.Command"] = com_mun_controller_command_Command;
@@ -8740,6 +8762,15 @@ haxe_Int64Helper.fromFloat = function(f) {
 		result = this7;
 	}
 	return result;
+};
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
+haxe_Log.clear = function() {
+	js_Boot.__clear_trace();
 };
 var haxe_ds_BalancedTree = function() {
 };
