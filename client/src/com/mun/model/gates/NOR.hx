@@ -37,8 +37,10 @@ class NOR implements ComponentKind extends GateAbstract {
         return delay;
     }
 
-    public function setDelay(value:Int):Void{
+    public function setDelay(value:Int):Int{
+        var a:Int=delay;
         delay=value;
+        return a;
     }
 
     public function getname():String{

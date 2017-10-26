@@ -1,5 +1,14 @@
 package com.mun.model.component;
 
+import com.mun.model.attribute.NameValue;
+import com.mun.model.attribute.NameAttr;
+import com.mun.model.attribute.NamePair;
+import com.mun.model.attribute.AttrValue;
+import com.mun.model.enumeration.AttrType;
+import com.mun.model.attribute.Attribute;
+import com.mun.model.attribute.DelayValue;
+import com.mun.model.attribute.DelayAttr;
+import com.mun.model.attribute.DelayPair;
 import com.mun.model.observe.Observable;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
@@ -28,11 +37,14 @@ class Component extends Observable{
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    var name:String = "";//the name of the component, unique
+    var name:NamePair=new NamePair((new NameAttr()),(new NameValue("")));//the name of the component, unique
     //var delay:Int;//delay of the component
+    var Delay:DelayPair=new DelayPair((new DelayAttr()),(new DelayValue(0)));
     var inportsNum:Int;//init
+    var CD:CircuitDiagram;
     //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
+
     /**
     *   create component
      *   @param xPosition: x position
@@ -69,6 +81,37 @@ class Component extends Observable{
             }
 
         }
+    }
+
+    public function hasAttr(s:String):Bool{
+        if(s=="name"||s=="orientation"||s=="delay"){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public function getAttr(s:String):AttrValue{
+        switch(s){
+            case "delay": return Delay.getAttrValue();
+        }
+        return null;
+    }
+
+    public function getAttrInt(s:String):Int{
+        switch(s){
+            case "delay": {if(Delay.getAttr().getAttrType()==AttrType.INT){
+                return Delay.getAttrValue().getvalue();
+            }
+                else return null;
+            }
+        }
+        return null;
+    }
+
+    public function get_CircuitDiagram():CircuitDiagram{
+        return this.CD;
     }
 
     public function get_xPosition():Float {
@@ -127,11 +170,11 @@ class Component extends Observable{
     }
 
     public function get_name():String {
-        return name;
+        return name.getAttrValue().getvalue();
     }
 
     public function set_name(value:String) {
-        return this.name = value;
+        return this.name.putAttr(this,(new NameValue(value)));
     }
 
     public function get_height():Float {
@@ -151,11 +194,11 @@ class Component extends Observable{
     }
 
     public function get_delay():Int {
-        return this.componentKind.getDelay();
+        return Delay.getAttrValue().getvalue();
     }
 
     public function set_delay(value:Int) {
-        return this.componentKind.setDelay(value);
+        return Delay.putAttr(this,(new DelayValue(value)));
     }
 
     public function get_inportsNum():Int {
@@ -273,7 +316,7 @@ class Component extends Observable{
     }
 
     public function createJSon():String{
-        var jsonString:String = "{ \"name\": \"" + this.name + "\",";
+        var jsonString:String = "{ \"name\": \"" + this.name.getAttrValue().getvalue() + "\",";
         jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
         jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
         jsonString += " \"height\": \"" + this.height + "\",";

@@ -27,7 +27,7 @@ interface ComponentKind {
 
     public function getDelay():Int;
 
-    public function setDelay(value:Int):Void;
+    public function setDelay(value:Int):Int;
 
 
     /**

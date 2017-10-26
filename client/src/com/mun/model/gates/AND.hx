@@ -29,6 +29,7 @@ import com.mun.model.enumeration.VALUE_LOGIC;
  */
 class AND implements ComponentKind extends GateAbstract {
 
+
     var nameOfTheComponentKind:String="AND";
     var delay:Int=0;//delay of the component
 
@@ -41,8 +42,10 @@ class AND implements ComponentKind extends GateAbstract {
         return delay;
     }
 
-    public function setDelay(value:Int){
+    public function setDelay(value:Int):Int{
+        var a:Int=delay;
         delay=value;
+        return a;
     }
 
 
