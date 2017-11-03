@@ -33,7 +33,7 @@ class NamePair {
         else return true;
     }
 
-    public function putAttr(c:Component,n:AttrValue):Bool{
+    public function update(c:Component,n:AttrValue):Bool{
         if(canupdate(c,n)==true){
             DelayValue=n;
             return true;

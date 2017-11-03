@@ -1,6 +1,7 @@
 package com.mun.model.gates;
 
-
+import com.mun.model.attribute.NameAttr;
+import com.mun.model.attribute.Attribute;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
@@ -21,8 +22,13 @@ import com.mun.model.enumeration.VALUE_LOGIC;
 class Input implements ComponentKind extends GateAbstract {
 
     var nameOfTheComponentKind:String="Input";
+    var Attr:Array<Attribute>=new Array<Attribute>();
 
     var delay:Int=0;//delay of the component
+
+    public function getAttr():Array<Attribute>{
+        return Attr;
+    }
 
     public function getDelay():Int{
         return delay;
@@ -110,6 +116,7 @@ class Input implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(1);
+        Attr.push(new NameAttr());
     }
 
     override public function addInPort():Port {

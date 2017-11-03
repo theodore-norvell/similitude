@@ -1,5 +1,9 @@
 package com.mun.model.gates;
 
+import com.mun.model.attribute.OrientationAttr;
+import com.mun.model.attribute.NameAttr;
+import com.mun.model.attribute.DelayAttr;
+import com.mun.model.attribute.Attribute;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
@@ -28,8 +32,13 @@ import com.mun.model.enumeration.VALUE_LOGIC;
 class NOT implements ComponentKind extends GateAbstract {
 
     var nameOfTheComponentKind:String="NOT";
+    var Attr:Array<Attribute>=new Array<Attribute>();
 
     var delay:Int=0;//delay of the component
+
+    public function getAttr():Array<Attribute>{
+        return Attr;
+    }
 
     public function getDelay():Int{
         return delay;
@@ -147,5 +156,8 @@ class NOT implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(2);
+        Attr.push(new DelayAttr());
+        Attr.push(new NameAttr());
+        Attr.push(new OrientationAttr());
     }
 }

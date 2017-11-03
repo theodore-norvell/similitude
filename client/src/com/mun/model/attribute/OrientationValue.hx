@@ -2,7 +2,7 @@ package com.mun.model.attribute;
 import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.enumeration.AttrType;
 import sys.db.Object;
-class OrientationValue {
+class OrientationValue implements AttrValue{
     var Orientation:ORIENTATION;
     var AttrType:AttrType=AttrType.ORIENTATION;
     public function new(or:ORIENTATION) {

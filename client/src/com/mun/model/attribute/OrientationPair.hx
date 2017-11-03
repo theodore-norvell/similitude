@@ -1,6 +1,6 @@
 package com.mun.model.attribute;
 import com.mun.model.component.Component;
-class OrientationPair {
+class OrientationPair implements Pair{
     var OrientationAttr:OrientationAttr;
     var OrientationValue:OrientationValue;
     public function new(na:NameAttr,nv:NameValue) {
@@ -21,7 +21,7 @@ class OrientationPair {
         return true;
     }
 
-    public function putAttr(c:Component,n:AttrValue):Bool{
+    public function update(c:Component,n:AttrValue):Bool{
         if(canupdate(c,n)==true){
             OrientationValue=n;
             return true;
