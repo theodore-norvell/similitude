@@ -1,20 +1,26 @@
 package com.mun.model.attribute;
 import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.enumeration.AttrType;
-import sys.db.Object;
+
 class OrientationValue {
-    var Orientation:ORIENTATION;
-    var AttrType:AttrType=AttrType.ORIENTATION;
+    var orientation:ORIENTATION;
+
     public function new(or:ORIENTATION) {
-        Orientation=or;
+        orientation=or;
     }
 
-    public function getvalue():Object{
-        return Orientation;
+
+    public function getValue():Dynamic {
+        return orientation;
 
     }
+
+    public function getOrientation() : ORIENTATION
+        return orientation ;
 
     public function getType():AttrType{
-        return AttrType;
+        return AttrType.ORIENTATION;
     }
+
+
 }
