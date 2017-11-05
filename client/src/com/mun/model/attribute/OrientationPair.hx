@@ -1,20 +1,22 @@
 package com.mun.model.attribute;
+import com.mun.model.attribute.OrientationValue;
+import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.component.Component;
 class OrientationPair implements Pair{
-    var OrientationAttr:OrientationAttr;
-    var OrientationValue:OrientationValue;
-    public function new(na:NameAttr,nv:NameValue) {
-        OrientationAttr=na;
-        OrientationValue=nv;
+    var orientationAttr:OrientationAttr;
+    var orientationValue:OrientationValue;
+    public function new(na:OrientationAttr,nv:AttrValue) {
+        orientationAttr=na;
+        orientationValue=cast(nv,OrientationValue);
     }
 
     public function getAttr():Attribute{
-        return OrientationAttr;
+        return orientationAttr;
 
     }
 
     public function getAttrValue():AttrValue{
-        return OrientationValue;
+        return orientationValue;
     }
 
     public function canupdate(c:Component,n:AttrValue):Bool{
@@ -23,7 +25,7 @@ class OrientationPair implements Pair{
 
     public function update(c:Component,n:AttrValue):Bool{
         if(canupdate(c,n)==true){
-            OrientationValue=n;
+            orientationValue=cast(n,OrientationValue);
             return true;
         }
         return false;

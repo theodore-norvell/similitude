@@ -1,24 +1,25 @@
 package com.mun.model.attribute;
+import com.mun.model.attribute.DelayValue;
 import com.mun.model.component.Component;
 class DelayPair implements Pair{
-    var DelayAttr:DelayAttr;
-    var DelayValue:DelayValue;
-    public function new(da:DelayAttr,dv:DelayValue) {
-        DelayAttr=da;
-        DelayValue=dv;
+    var delayAttr:DelayAttr;
+    var delayValue:DelayValue;
+    public function new(da:DelayAttr,dv:AttrValue) {
+        delayAttr=da;
+        delayValue=cast(dv,DelayValue);
     }
 
     public function getAttr():Attribute{
-        return DelayAttr;
+        return delayAttr;
 
     }
 
     public function getAttrValue():AttrValue{
-        return DelayValue;
+        return delayValue;
     }
 
     public function canupdate(c:Component,n:AttrValue):Bool{
-        if(!Std.is(n,DelayValue)){
+        if(!Std.is(n,delayValue)){
             return false;
         }
         if(n.getvalue()<0||n.getvalue()==null){
@@ -30,7 +31,7 @@ class DelayPair implements Pair{
     // change to void
     public function update(c:Component,n:AttrValue):Bool{
         if(canupdate(c,n)==true){
-            DelayValue=n;
+            delayValue=cast(n,DelayValue);
             return true;
         }
         return false;

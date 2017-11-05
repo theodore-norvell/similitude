@@ -1,5 +1,6 @@
 package com.mun.model.gates;
 
+import com.mun.model.observe.Observable;
 import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.NameAttr;
 import com.mun.model.attribute.DelayAttr;
@@ -26,14 +27,17 @@ import com.mun.model.component.Port;
 /**
 * compound Component
 **/
-class CompoundComponent implements ComponentKind extends GateAbstract extends Observer{
+class CompoundComponent implements ComponentKind extends GateAbstract{
+    var Ob:Observer;
+    var Obable:Observable;
     var circuitDiagram:CircuitDiagramI;
     var outputCounter:Int;
     var nameOfTheComponentKind:String="CC";
     var delay:Int=0;//delay of the component
-    var Attr:Array<Attribute>=new Array<Attribute>();
+    var attr:Array<Attribute>=new Array<Attribute>();
 
     public function getAttr():Array<Attribute>{
+        return attr;
 
     }
 
@@ -66,9 +70,9 @@ class CompoundComponent implements ComponentKind extends GateAbstract extends Ob
         }
 
         super(inputCounter);
-        Attr.push(new DelayAttr());
-        Attr.push(new NameAttr());
-        Attr.push(new OrientationAttr());
+        attr.push(new DelayAttr());
+        attr.push(new NameAttr());
+        attr.push(new OrientationAttr());
     }
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{

@@ -14,7 +14,8 @@ import com.mun.model.enumeration.ORIENTATION;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
 
-class CircuitDiagram extends Observer extends Observable implements CircuitDiagramI{
+class CircuitDiagram extends Observer implements CircuitDiagramI{
+    var Obable:Observable;
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
     var name:String;//the name of this circuit diagram
@@ -35,6 +36,7 @@ class CircuitDiagram extends Observer extends Observable implements CircuitDiagr
     var componentAndLinkCenter:Coordinate;
 
     public function new() {
+        super();
         copyStack = new Stack();
         componentAndLinkCenter = new Coordinate(0, 0);
         this.margin = 50;

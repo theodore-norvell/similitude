@@ -2,10 +2,11 @@ package com.mun.model.attribute;
 import com.mun.model.enumeration.AttrType;
 class NameAttr implements Attribute{
     var name:String="name";
-    var AttrType:AttrType=AttrType.STRING;
+    var attrType:AttrType;
     var defaultname:NameValue=new NameValue("");
 
     public function new() {
+        attrType=AttrType.STRING;
     }
 
     public function getName():String{
@@ -17,7 +18,7 @@ class NameAttr implements Attribute{
     }
 
     public function getAttrType():AttrType{
-        return AttrType;
+        return attrType;
     }
 
 

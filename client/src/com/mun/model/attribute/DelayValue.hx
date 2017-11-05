@@ -1,19 +1,19 @@
 package com.mun.model.attribute;
-import sys.db.Object;
 import com.mun.model.enumeration.AttrType;
 class DelayValue implements AttrValue{
     var delay:Int;
-    var AttrType:AttrType=AttrType.INT;
+    var attrType:AttrType;
     public function new(d:Int) {
         delay=d;
+        attrType==AttrType.INT;
     }
 
-    public function getvalue():Object{
+    public function getvalue():Dynamic{
         return delay;
 
     }
 
     public function getType():AttrType{
-        return AttrType;
+        return attrType;
     }
 }

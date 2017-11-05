@@ -1,35 +1,35 @@
 package com.mun.model.observe;
+import com.mun.model.component.Component;
+import Array;
 class Observable {
 
-    var Observers:Observer= new Observer();
+    var observers:Array<Observer>= new Array<Observer>();
 
-    public function new(OB:Observer) {
-        Observers = OB;
+    public function new() {
+
     }
 
 
     public function addObserver(obs:Observer):Bool {
-        if (obs == null) {
+        if(obs==null){
             return false;
         }
-
-        // search for replica
-        if(Observers==null){
-            return false;
+        else {
+            observers.push(obs);
+            return true;
         }
-
-        return true;
     }
 
 
     public function removeObserver(obs:Observer):Bool {
-        return Observers=null;
+        return observers.remove(obs);
     }
 
 
-    public function notifyObservers(?data:Dynamic):Void {
-
-        Observer.update(this,data);
+    public function notifyObservers(c:Component,?data:Dynamic):Void {
+        for(n in observers){
+            n.update(c,data);
+        }
     }
 
 }

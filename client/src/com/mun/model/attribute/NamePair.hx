@@ -1,20 +1,20 @@
 package com.mun.model.attribute;
 import com.mun.model.component.Component;
-class NamePair {
-    var NameAttr:NameAttr;
-    var NameValue:NameValue;
-    public function new(na:NameAttr,nv:NameValue) {
-        NameAttr=na;
-        NameValue=nv;
+class NamePair implements Pair{
+    var nameAttr:NameAttr;
+    var nameValue:NameValue;
+    public function new(na:NameAttr,nv:AttrValue) {
+        nameAttr=na;
+        nameValue=cast(nv,NameValue);
     }
 
     public function getAttr():Attribute{
-        return NameAttr;
+        return nameAttr;
 
     }
 
     public function getAttrValue():AttrValue{
-        return NameValue;
+        return nameValue;
     }
 
     public function canupdate(c:Component,n:AttrValue):Bool{
@@ -35,7 +35,7 @@ class NamePair {
 
     public function update(c:Component,n:AttrValue):Bool{
         if(canupdate(c,n)==true){
-            DelayValue=n;
+            nameValue=cast(n,NameValue);
             return true;
         }
         return false;

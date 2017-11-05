@@ -1,12 +1,15 @@
 package com.mun.model.attribute;
-import com.mun.model.enumeration.AttrType;
+
 import com.mun.model.enumeration.ORIENTATION;
+import com.mun.model.enumeration.AttrType;
 class OrientationAttr implements Attribute{
     var name:String="orientation";
-    var AttrType:AttrType=AttrType.ORIENTATION;
-    var defaultOrientation:OrientationValue=new OrientationValue(ORIENTATION.EAST);
+    var attrType:AttrType;
+    var defaultOrientation:OrientationValue;
 
     public function new() {
+        attrType=AttrType.Orientation;
+        defaultOrientation=new OrientationValue(ORIENTATION.EAST);
     }
 
     public function getName():String{
@@ -18,6 +21,6 @@ class OrientationAttr implements Attribute{
     }
 
     public function getAttrType():AttrType{
-        return AttrType;
+        return attrType;
     }
 }
