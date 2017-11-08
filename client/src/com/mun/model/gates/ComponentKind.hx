@@ -1,5 +1,7 @@
 package com.mun.model.gates;
 
+import com.mun.model.attribute.Attribute;
+import js.html.Attr;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
@@ -28,6 +30,8 @@ interface ComponentKind {
     public function getDelay():Int;
 
     public function setDelay(value:Int):Int;
+
+    public function getAttr():Array<Attribute>;
 
 
     /**

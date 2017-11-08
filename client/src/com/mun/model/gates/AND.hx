@@ -1,5 +1,9 @@
 package com.mun.model.gates;
 
+import com.mun.model.attribute.Attribute;
+import com.mun.model.attribute.OrientationAttr;
+import com.mun.model.attribute.NameAttr;
+import com.mun.model.attribute.DelayAttr;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawAND;
@@ -31,10 +35,18 @@ class AND implements ComponentKind extends GateAbstract {
 
 
     var nameOfTheComponentKind:String="AND";
+    var Attr:Array<Attribute>=new Array<Attribute>();
     var delay:Int=0;//delay of the component
 
     public function new() {
         super(2);
+        Attr.push(new DelayAttr());
+        Attr.push(new NameAttr());
+        Attr.push(new OrientationAttr());
+    }
+
+    public function getAttr():Array<Attribute>{
+        return Attr;
     }
 
 
