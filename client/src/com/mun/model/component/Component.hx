@@ -1,15 +1,6 @@
 package com.mun.model.component;
 
-import com.mun.model.attribute.OrientationPair;
-import com.mun.model.attribute.DelayAttr;
-import com.mun.model.attribute.DelayPair;
-import com.mun.model.attribute.NamePair;
-import com.mun.model.attribute.NameAttr;
-import com.mun.model.attribute.OrientationAttr;
-import com.mun.assertions.Assert;
 import com.mun.model.attribute.Pair;
-import com.mun.model.attribute.NameValue;
-import com.mun.model.attribute.AttrValue;
 import com.mun.model.observe.Observable;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
@@ -23,6 +14,18 @@ import com.mun.model.drawingInterface.DrawingAdapterI;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.gates.ComponentKind;
+import com.mun.assertions.Assert;
+import com.mun.model.attribute.StringAttr;
+import com.mun.model.attribute.StringPair;
+import com.mun.model.attribute.OrientationAttr;
+import com.mun.model.attribute.OrientationPair;
+import com.mun.model.attribute.IntAttr;
+import com.mun.model.attribute.IntPair;
+import com.mun.model.attribute.AttrValue;
+import com.mun.model.attribute.StringValue;
+import com.mun.model.attribute.IntValue;
+import com.mun.model.attribute.OrientationValue;
+
 /**
  * Component composite by gates and ports, in this class
  * will composite gates and ports into one entity.
@@ -34,17 +37,17 @@ class Component extends Observable{
     var yPosition:Float;//the y position of the component
     var height:Float;//height
     var width:Float;//width
-    var orientation:ORIENTATION;//the orientation of the component
+    //var orientation:ORIENTATION;//the orientation of the component
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
+    //var name:String = "";//the name of the component, unique
     //var delay:Int;//delay of the component
-    var list:Map<String,Pair>=new Map<String,Pair>();
     var inportsNum:Int;//init
-    var CD:CircuitDiagram;
     //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
-
+    var list:Map<String,Pair>=new Map<String,Pair>();
+    var cd:CircuitDiagram;
     /**
     *   create component
      *   @param xPosition: x position
@@ -61,22 +64,10 @@ class Component extends Observable{
         this.yPosition = yPosition;
         this.height = height;
         this.width = width;
-        this.orientation = orientation;
         this.componentKind = componentKind;
         this.componentKind.set_component(this);
         this.inportsNum = inportNum;
         this.boxType = BOX.WHITE_BOX;
-        for(n in componentKind.getAttr()){
-            if(n.getName()=="delay"){
-                list.set(n.getName(),new DelayPair(cast(n,DelayAttr),cast(n,DelayAttr).getdefaultvalue()));
-            }
-            else if(n.getName()=="name"){
-                list.set(n.getName(),new NamePair(cast(n,NameAttr),cast(n,NameAttr).getdefaultvalue()));
-            }
-            else if(n.getName()=="orientation"){
-                list.set(n.getName(),new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
-                }
-            }
 
         //this.delay = 0;//init is zero
 
@@ -93,6 +84,18 @@ class Component extends Observable{
             }
 
         }
+        for(n in componentKind.getAttr()){
+            if(n.getName()=="delay"){
+                list.set(n.getName(),new IntPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
+            }
+            else if(n.getName()=="name"){
+                list.set(n.getName(),new StringPair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
+            }
+            else if(n.getName()=="orientation"){
+                list.set(n.getName(),new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
+            }
+        }
+        list.get("orientation").update(this,new OrientationValue(orientation));
     }
 
     public function getmap(){
@@ -105,7 +108,7 @@ class Component extends Observable{
 
     public function getAttr(s:String):AttrValue{
         Assert.assert(list.exists(s));
-       return list.get(s).getAttrValue();
+        return list.get(s).getAttrValue();
     }
 
     public function getAttrInt(s:String):Int{
@@ -132,7 +135,7 @@ class Component extends Observable{
     }
 
     public function get_CircuitDiagram():CircuitDiagram{
-        return this.CD;
+        return cd;
     }
 
     public function get_xPosition():Float {
@@ -152,11 +155,11 @@ class Component extends Observable{
     }
 
     public function get_orientation():ORIENTATION {
-        return orientation;
+        return list.get("orientation").getAttrValue().getvalue();
     }
 
     public function set_orientation(value:ORIENTATION) {
-        return this.orientation = value;
+        list.get("orientation").update(this,new OrientationValue(value));
     }
 
     public function get_componentKind():ComponentKind {
@@ -194,8 +197,8 @@ class Component extends Observable{
         return list.get("name").getAttrValue().getvalue();
     }
 
-    public function set_name(value:String) :Void{
-        list.get("name").update(this,new NameValue(value));
+    public function set_name(value:String) {
+        list.get("name").update(this,new StringValue(value));
     }
 
     public function get_height():Float {
@@ -219,7 +222,7 @@ class Component extends Observable{
     }
 
     public function set_delay(value:Int) {
-        //return Delay.putAttr(this,(new DelayValue(value)));
+        return list.get("delay").update(this,new IntValue(value));
     }
 
     public function get_inportsNum():Int {
@@ -244,7 +247,7 @@ class Component extends Observable{
                 return false;
             }
         }
-        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
+        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
         return true;
     }
 
@@ -252,8 +255,8 @@ class Component extends Observable{
         return inportArray.remove(inport);
     }
     public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{
-        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
-        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
+        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
+        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
         return this;
     }
 
@@ -318,8 +321,8 @@ class Component extends Observable{
                 }
             }
 
-            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, orientation);
-            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, orientation);
+            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
+            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
         }
         if(this.componentKind.getname()!= "CC"){
             componentKind.drawComponent(drawingAdpater, highLight);
@@ -337,12 +340,12 @@ class Component extends Observable{
     }
 
     public function createJSon():String{
-        var jsonString:String = "{ \"name\": \"" + list.get("name").getAttrValue().getvalue() + "\",";
+        var jsonString:String = "{ \"name\": \"" + this.list.get("name").getAttrValue().getvalue() + "\",";
         jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
         jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
         jsonString += " \"height\": \"" + this.height + "\",";
         jsonString += " \"width\": \"" + this.width + "\",";
-        jsonString += " \"orientation\": \"" + this.orientation + "\",";
+        jsonString += " \"orientation\": \"" + list.get("orientation").getAttrValue().getvalue() + "\",";
         jsonString += " \"delay\": \"" + list.get("delay").getAttrValue().getvalue() + "\",";
         jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
         jsonString += " \"nameOfTheComponentKind\": \"" + this.componentKind.getname() + "\",";

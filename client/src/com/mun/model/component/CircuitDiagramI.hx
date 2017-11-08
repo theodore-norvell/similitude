@@ -80,7 +80,7 @@ interface CircuitDiagramI {
     public function getCopyStack():Stack;
 
     /**
-    * set new orientation for one component
+    * set IntAttr orientation for one component
     **/
     public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void;
 

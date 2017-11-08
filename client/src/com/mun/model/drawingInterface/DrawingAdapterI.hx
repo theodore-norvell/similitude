@@ -53,7 +53,7 @@ interface DrawingAdapterI {
 
     public function getTransform():Transform;
     /**
-    * make a new drawing Adapter
+    * make a IntAttr drawing Adapter
     **/
     public function transform(transform:Transform):DrawingAdapterI;
 

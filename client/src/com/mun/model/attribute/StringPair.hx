@@ -1,11 +1,11 @@
 package com.mun.model.attribute;
 import com.mun.model.component.Component;
-class NamePair implements Pair{
-    var nameAttr:NameAttr;
-    var nameValue:NameValue;
-    public function new(na:NameAttr,nv:AttrValue) {
+class StringPair implements Pair{
+    var nameAttr:StringAttr;
+    var nameValue:StringValue;
+    public function new(na:StringAttr, nv:AttrValue) {
         nameAttr=na;
-        nameValue=cast(nv,NameValue);
+        nameValue=cast(nv,StringValue);
     }
 
     public function getAttr():Attribute{
@@ -18,7 +18,7 @@ class NamePair implements Pair{
     }
 
     public function canupdate(c:Component,n:AttrValue):Bool{
-        if(!Std.is(n,NameValue)){
+        /*if(!Std.is(n,StringValue)){
             return false;
         }
         var b:Bool=true;
@@ -30,12 +30,13 @@ class NamePair implements Pair{
         if(b==false){
             return false;
         }
-        else return true;
+        else return true;*/
+        return true;
     }
 
     public function update(c:Component,n:AttrValue):Bool{
         if(canupdate(c,n)==true){
-            nameValue=cast(n,NameValue);
+            nameValue=cast(n,StringValue);
             return true;
         }
         return false;

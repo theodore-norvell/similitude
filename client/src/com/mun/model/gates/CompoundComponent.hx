@@ -2,8 +2,8 @@ package com.mun.model.gates;
 
 import com.mun.model.observe.Observable;
 import com.mun.model.attribute.OrientationAttr;
-import com.mun.model.attribute.NameAttr;
-import com.mun.model.attribute.DelayAttr;
+import com.mun.model.attribute.StringAttr;
+import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
 import com.mun.model.observe.Observer;
 import js.html.CanvasRenderingContext2D;
@@ -70,8 +70,8 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }
 
         super(inputCounter);
-        attr.push(new DelayAttr());
-        attr.push(new NameAttr());
+        attr.push(new IntAttr());
+        attr.push(new StringAttr());
         attr.push(new OrientationAttr());
     }
 
@@ -184,7 +184,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }
 
         if(component.get_boxType() == BOX.WHITE_BOX){
-            //compound component need to draw all the components in ComponentArray, which should make a new transfrom
+            //compound component need to draw all the components in ComponentArray, which should make a IntAttr transfrom
             //drawingAdapterTrans = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapterTrans, linkAndComponentArray);
         }

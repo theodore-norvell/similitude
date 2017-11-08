@@ -202,6 +202,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
 
     public function addComponent(component:Component):Void {
         componentArray.push(component);
+        component.addObserver(this);
     }
 
     public function removeLink(link:Link):Void {
