@@ -70,6 +70,11 @@ class DrawingAdapter implements DrawingAdapterI {
         return drawingAdapter;
     }
 
+    public function setClip(x:Float, y:Float, width:Float, height:Float):Void {
+        //TODO.  Do we really need to do this?
+        //  Delete this method if not needed.
+    }
+
     public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
 

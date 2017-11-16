@@ -41,6 +41,15 @@ interface DrawingAdapterI {
 	 */
     public function setLineWidth(width:Float):Void;
 
+    /** Clip to a rectangle
+	 *
+	 * @param x   -- The distance from the left edge to the centre of the bounding box in world coordinates.
+	 * @param y   -- The distance from the top edge to the centre of the bounding box in world coordinates.
+	 * @param width  -- The width in world coordinates.
+	 * @param height -- The height in world coordinates.
+	 */
+    public function setClip(x:Float, y:Float, width:Float, height:Float):Void;
+
     /**
     * get the canvas context
     **/
