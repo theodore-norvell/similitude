@@ -5,7 +5,8 @@ class StringAttr implements Attribute{
     var attrType:AttrType;
     var defaultname:StringValue=new StringValue("");
 
-    public function new() {
+    public function new(s:String) {
+        name=s;
         attrType=AttrType.STRING;
     }
 

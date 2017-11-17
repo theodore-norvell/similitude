@@ -3825,29 +3825,6 @@ com_mun_model_attribute_Attribute.prototype = {
 	,getName: null
 	,__class__: com_mun_model_attribute_Attribute
 };
-var com_mun_model_attribute_IntAttr = function() {
-	this.defaultdelay = new com_mun_model_attribute_IntValue(0);
-	this.name = "delay";
-	this.attrType = com_mun_model_enumeration_AttrType.INT;
-};
-$hxClasses["com.mun.model.attribute.IntAttr"] = com_mun_model_attribute_IntAttr;
-com_mun_model_attribute_IntAttr.__name__ = ["com","mun","model","attribute","IntAttr"];
-com_mun_model_attribute_IntAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
-com_mun_model_attribute_IntAttr.prototype = {
-	name: null
-	,attrType: null
-	,defaultdelay: null
-	,getName: function() {
-		return this.name;
-	}
-	,getdefaultvalue: function() {
-		return this.defaultdelay;
-	}
-	,getAttrType: function() {
-		return this.attrType;
-	}
-	,__class__: com_mun_model_attribute_IntAttr
-};
 var com_mun_model_attribute_Pair = function() { };
 $hxClasses["com.mun.model.attribute.Pair"] = com_mun_model_attribute_Pair;
 com_mun_model_attribute_Pair.__name__ = ["com","mun","model","attribute","Pair"];
@@ -3858,14 +3835,14 @@ com_mun_model_attribute_Pair.prototype = {
 	,update: null
 	,__class__: com_mun_model_attribute_Pair
 };
-var com_mun_model_attribute_IntPair = function(da,dv) {
+var com_mun_model_attribute_DelayPair = function(da,dv) {
 	this.delayAttr = da;
 	this.delayValue = js_Boot.__cast(dv , com_mun_model_attribute_IntValue);
 };
-$hxClasses["com.mun.model.attribute.IntPair"] = com_mun_model_attribute_IntPair;
-com_mun_model_attribute_IntPair.__name__ = ["com","mun","model","attribute","IntPair"];
-com_mun_model_attribute_IntPair.__interfaces__ = [com_mun_model_attribute_Pair];
-com_mun_model_attribute_IntPair.prototype = {
+$hxClasses["com.mun.model.attribute.DelayPair"] = com_mun_model_attribute_DelayPair;
+com_mun_model_attribute_DelayPair.__name__ = ["com","mun","model","attribute","DelayPair"];
+com_mun_model_attribute_DelayPair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_DelayPair.prototype = {
 	delayAttr: null
 	,delayValue: null
 	,getAttr: function() {
@@ -3891,7 +3868,31 @@ com_mun_model_attribute_IntPair.prototype = {
 		}
 		return false;
 	}
-	,__class__: com_mun_model_attribute_IntPair
+	,__class__: com_mun_model_attribute_DelayPair
+};
+var com_mun_model_attribute_IntAttr = function(s) {
+	this.defaultdelay = new com_mun_model_attribute_IntValue(0);
+	this.name = "delay";
+	this.name = s;
+	this.attrType = com_mun_model_enumeration_AttrType.INT;
+};
+$hxClasses["com.mun.model.attribute.IntAttr"] = com_mun_model_attribute_IntAttr;
+com_mun_model_attribute_IntAttr.__name__ = ["com","mun","model","attribute","IntAttr"];
+com_mun_model_attribute_IntAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
+com_mun_model_attribute_IntAttr.prototype = {
+	name: null
+	,attrType: null
+	,defaultdelay: null
+	,getName: function() {
+		return this.name;
+	}
+	,getdefaultvalue: function() {
+		return this.defaultdelay;
+	}
+	,getAttrType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_IntAttr
 };
 var com_mun_model_attribute_IntValue = function(d) {
 	this.delay = d;
@@ -3909,6 +3910,34 @@ com_mun_model_attribute_IntValue.prototype = {
 		return this.attrType;
 	}
 	,__class__: com_mun_model_attribute_IntValue
+};
+var com_mun_model_attribute_NamePair = function(na,nv) {
+	this.nameAttr = na;
+	this.nameValue = js_Boot.__cast(nv , com_mun_model_attribute_StringValue);
+};
+$hxClasses["com.mun.model.attribute.NamePair"] = com_mun_model_attribute_NamePair;
+com_mun_model_attribute_NamePair.__name__ = ["com","mun","model","attribute","NamePair"];
+com_mun_model_attribute_NamePair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_NamePair.prototype = {
+	nameAttr: null
+	,nameValue: null
+	,getAttr: function() {
+		return this.nameAttr;
+	}
+	,getAttrValue: function() {
+		return this.nameValue;
+	}
+	,canupdate: function(c,n) {
+		return true;
+	}
+	,update: function(c,n) {
+		if(this.canupdate(c,n) == true) {
+			this.nameValue = js_Boot.__cast(n , com_mun_model_attribute_StringValue);
+			return true;
+		}
+		return false;
+	}
+	,__class__: com_mun_model_attribute_NamePair
 };
 var com_mun_model_attribute_OrientationAttr = function() {
 	this.name = "orientation";
@@ -3979,9 +4008,10 @@ com_mun_model_attribute_OrientationValue.prototype = {
 	}
 	,__class__: com_mun_model_attribute_OrientationValue
 };
-var com_mun_model_attribute_StringAttr = function() {
+var com_mun_model_attribute_StringAttr = function(s) {
 	this.defaultname = new com_mun_model_attribute_StringValue("");
 	this.name = "name";
+	this.name = s;
 	this.attrType = com_mun_model_enumeration_AttrType.STRING;
 };
 $hxClasses["com.mun.model.attribute.StringAttr"] = com_mun_model_attribute_StringAttr;
@@ -4001,34 +4031,6 @@ com_mun_model_attribute_StringAttr.prototype = {
 		return this.attrType;
 	}
 	,__class__: com_mun_model_attribute_StringAttr
-};
-var com_mun_model_attribute_StringPair = function(na,nv) {
-	this.nameAttr = na;
-	this.nameValue = js_Boot.__cast(nv , com_mun_model_attribute_StringValue);
-};
-$hxClasses["com.mun.model.attribute.StringPair"] = com_mun_model_attribute_StringPair;
-com_mun_model_attribute_StringPair.__name__ = ["com","mun","model","attribute","StringPair"];
-com_mun_model_attribute_StringPair.__interfaces__ = [com_mun_model_attribute_Pair];
-com_mun_model_attribute_StringPair.prototype = {
-	nameAttr: null
-	,nameValue: null
-	,getAttr: function() {
-		return this.nameAttr;
-	}
-	,getAttrValue: function() {
-		return this.nameValue;
-	}
-	,canupdate: function(c,n) {
-		return true;
-	}
-	,update: function(c,n) {
-		if(this.canupdate(c,n) == true) {
-			this.nameValue = js_Boot.__cast(n , com_mun_model_attribute_StringValue);
-			return true;
-		}
-		return false;
-	}
-	,__class__: com_mun_model_attribute_StringPair
 };
 var com_mun_model_attribute_StringValue = function(s) {
 	this.name = s;
@@ -4538,7 +4540,7 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 		if(n.getName() == "delay") {
 			var this1 = this.list;
 			var key = n.getName();
-			var value = new com_mun_model_attribute_IntPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue());
+			var value = new com_mun_model_attribute_DelayPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue());
 			var _this = this1;
 			if(__map_reserved[key] != null) {
 				_this.setReserved(key,value);
@@ -4548,7 +4550,7 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 		} else if(n.getName() == "name") {
 			var this2 = this.list;
 			var key1 = n.getName();
-			var value1 = new com_mun_model_attribute_StringPair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue());
+			var value1 = new com_mun_model_attribute_NamePair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue());
 			var _this1 = this2;
 			if(__map_reserved[key1] != null) {
 				_this1.setReserved(key1,value1);
@@ -5769,8 +5771,8 @@ var com_mun_model_gates_AND = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "AND";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.AND"] = com_mun_model_gates_AND;
@@ -5899,8 +5901,8 @@ var com_mun_model_gates_CompoundComponent = function(circuitDiagram) {
 		}
 	}
 	com_mun_model_gates_GateAbstract.call(this,inputCounter);
-	this.attr.push(new com_mun_model_attribute_IntAttr());
-	this.attr.push(new com_mun_model_attribute_StringAttr());
+	this.attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.CompoundComponent"] = com_mun_model_gates_CompoundComponent;
@@ -6087,8 +6089,8 @@ var com_mun_model_gates_FlipFlop = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "FlipFlop";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.FlipFlop"] = com_mun_model_gates_FlipFlop;
@@ -6364,7 +6366,7 @@ var com_mun_model_gates_Input = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "Input";
 	com_mun_model_gates_GateAbstract.call(this,1);
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 };
 $hxClasses["com.mun.model.gates.Input"] = com_mun_model_gates_Input;
 com_mun_model_gates_Input.__name__ = ["com","mun","model","gates","Input"];
@@ -6512,8 +6514,8 @@ var com_mun_model_gates_MUX = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "MUX";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.MUX"] = com_mun_model_gates_MUX;
@@ -6723,8 +6725,8 @@ var com_mun_model_gates_NAND = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "NAND";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.NAND"] = com_mun_model_gates_NAND;
@@ -6844,8 +6846,8 @@ var com_mun_model_gates_NOR = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "NOR";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.NOR"] = com_mun_model_gates_NOR;
@@ -6965,8 +6967,8 @@ var com_mun_model_gates_NOT = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "NOT";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.NOT"] = com_mun_model_gates_NOT;
@@ -7088,8 +7090,8 @@ var com_mun_model_gates_OR = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "OR";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.OR"] = com_mun_model_gates_OR;
@@ -7209,7 +7211,7 @@ var com_mun_model_gates_Output = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "Output";
 	com_mun_model_gates_GateAbstract.call(this,1);
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 };
 $hxClasses["com.mun.model.gates.Output"] = com_mun_model_gates_Output;
 com_mun_model_gates_Output.__name__ = ["com","mun","model","gates","Output"];
@@ -7354,8 +7356,8 @@ var com_mun_model_gates_XOR = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "XOR";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_IntAttr());
-	this.Attr.push(new com_mun_model_attribute_StringAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.XOR"] = com_mun_model_gates_XOR;

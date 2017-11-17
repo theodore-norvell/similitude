@@ -6,7 +6,8 @@ class IntAttr implements Attribute{
     var attrType:AttrType;
     var defaultdelay:IntValue=new IntValue(0);
 
-    public function new() {
+    public function new(s:String) {
+        name=s;
         attrType=AttrType.INT;
     }
 

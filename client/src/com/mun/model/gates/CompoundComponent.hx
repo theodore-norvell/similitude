@@ -70,8 +70,8 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }
 
         super(inputCounter);
-        attr.push(new IntAttr());
-        attr.push(new StringAttr());
+        attr.push(new IntAttr("delay"));
+        attr.push(new StringAttr("name"));
         attr.push(new OrientationAttr());
     }
 

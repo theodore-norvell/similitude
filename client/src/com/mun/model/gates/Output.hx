@@ -181,6 +181,6 @@ class Output implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(1);
-        Attr.push(new StringAttr());
+        Attr.push(new StringAttr("name"));
     }
 }

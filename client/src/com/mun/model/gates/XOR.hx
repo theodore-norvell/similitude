@@ -162,8 +162,8 @@ class XOR implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(2);
-        Attr.push(new IntAttr());
-        Attr.push(new StringAttr());
+        Attr.push(new IntAttr("delay"));
+        Attr.push(new StringAttr("name"));
         Attr.push(new OrientationAttr());
     }
 }
