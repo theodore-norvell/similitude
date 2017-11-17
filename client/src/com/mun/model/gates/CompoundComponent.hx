@@ -6,7 +6,7 @@ import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
 import com.mun.model.observe.Observer;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.type.WorldPoint;
@@ -39,6 +39,10 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
     public function getAttr():Array<Attribute>{
         return attr;
 
+    }
+
+    public function setname(s:String):Void{
+        nameOfTheComponentKind=s;
     }
 
     public function getDelay():Int{
@@ -174,9 +178,9 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void {
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform());
-        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans, context);
+        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans);
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
         }else{
@@ -188,7 +192,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
             //drawingAdapterTrans = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapterTrans, linkAndComponentArray);
         }
-        context.restore();
+        //context.restore();
     }
 
     function makeTransform():Transform{

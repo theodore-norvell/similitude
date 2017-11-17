@@ -2,7 +2,7 @@ package com.mun.model.component;
 
 import com.mun.model.attribute.Pair;
 import com.mun.model.observe.Observable;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.BOX;
@@ -260,7 +260,7 @@ class Component extends Observable{
         return this;
     }
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray , ?context:CanvasRenderingContext2D){
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray ){
         if(componentKind.checkInnerCircuitDiagramPortsChange()){
 
             for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
@@ -327,7 +327,7 @@ class Component extends Observable{
         if(this.componentKind.getname()!= "CC"){
             componentKind.drawComponent(drawingAdpater, highLight);
         }else{
-            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray, context);
+            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray);
         }
     }
 

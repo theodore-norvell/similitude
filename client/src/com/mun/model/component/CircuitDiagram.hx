@@ -287,7 +287,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
             if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0){
                 for(j in linkAndComponentArray.get_componentIterator()){
                     if(j == i){
-                        i.drawComponent(drawingAdapter, true, context);
+                        i.drawComponent(drawingAdapter, true);
                         drawFlag = true;
                     }
                 }
@@ -297,7 +297,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
                 if(i.getNameOfTheComponentKind() != "CC"){
                     i.drawComponent(drawingAdapter, false);
                 }else{
-                    i.drawComponent(drawingAdapter, false, linkAndComponentArray, context);
+                    i.drawComponent(drawingAdapter, false, linkAndComponentArray);
                 }
             }
 
