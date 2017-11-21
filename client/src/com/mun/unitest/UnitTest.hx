@@ -1,4 +1,6 @@
 package com.mun.unitest;
+import com.mun.model.gates.AND;
+import com.mun.model.component.CircuitDiagram;
 import com.mun.model.attribute.NamePair;
 import com.mun.model.attribute.StringValue;
 import com.mun.model.attribute.StringAttr;
@@ -21,23 +23,23 @@ class UnitTest extends haxe.unit.TestCase{
         var ia:IntAttr=new IntAttr("delay");
         var iv:IntValue=new IntValue(0);
         var dp:DelayPair=new DelayPair(ia,iv);
-        assertEquals( dp.getAttrValue().getvalue()==0 );
-        assertEquals( dp.canupdate(c,new IntValue(5)));
+        assertTrue( dp.getAttrValue().getvalue()==0 );
+        assertTrue( dp.canupdate(c,new IntValue(5)));
         dp.update(c,new IntValue(5));
-        assertEquals( dp.getAttrValue().getvalue()==5 );
+        assertTrue( dp.getAttrValue().getvalue()==5 );
     }
 
     public function testIntValue(){
         var iv:IntValue=new IntValue(0);
-        assertEquals( iv.getvalue()==0 );
-        assertEquals( iv.getType()==AttrType.INT );
+        assertTrue( iv.getvalue()==0 );
+        assertTrue( iv.getType()==AttrType.INT);
     }
 
     public function testIntAttr(){
         var ia:IntAttr=new IntAttr("delay");
-        assertEquals( ia.getName()=="delay" );
-        assertEquals(ia.getdefaultvalue().getvalue()==0);
-        assertEquals(ia.getAttrType()==AttrType.INT);
+        assertTrue( ia.getName()=="delay" );
+        assertTrue(ia.getdefaultvalue().getvalue()==0);
+        assertTrue(ia.getAttrType()==AttrType.INT);
     }
 
     public function testOrientationPair(){
@@ -45,23 +47,23 @@ class UnitTest extends haxe.unit.TestCase{
         var ia:OrientationAttr=new OrientationAttr();
         var iv:OrientationValue=new OrientationValue(ORIENTATION.EAST);
         var dp:OrientationPair=new OrientationPair(ia,iv);
-        assertEquals( dp.getAttrValue().getvalue()==ORIENTATION.EAST );
-        assertEquals( dp.canupdate(c,new OrientationValue(ORIENTATION.NORTH)));
-        dp.update(c,new IntValue(ORIENTATION.NORTH));
-        assertEquals( dp.getAttrValue().getvalue()==ORIENTATION.NORTH );
+        assertTrue( dp.getAttrValue().getvalue()==ORIENTATION.EAST );
+        assertTrue( dp.canupdate(c,new OrientationValue(ORIENTATION.NORTH)));
+        dp.update(c,new OrientationValue(ORIENTATION.NORTH));
+        assertTrue( dp.getAttrValue().getvalue()==ORIENTATION.NORTH );
     }
 
     public function testOrientationValue(){
         var iv:OrientationValue=new OrientationValue(ORIENTATION.EAST);
-        assertEquals( iv.getvalue()==ORIENTATION.EAST );
-        assertEquals( iv.getType()==AttrType.Orientation );
+        assertTrue( iv.getvalue()==ORIENTATION.EAST );
+        assertTrue( iv.getType()==AttrType.Orientation );
     }
 
     public function testOrientationAttr(){
         var ia:OrientationAttr=new OrientationAttr();
-        assertEquals( ia.getName()=="orientation" );
-        assertEquals(ia.getdefaultvalue().getvalue()==ORIENTATION.EAST);
-        assertEquals(ia.getAttrType()==AttrType.Orientation);
+        assertTrue( ia.getName()=="orientation" );
+        assertTrue(ia.getdefaultvalue().getvalue()==ORIENTATION.EAST);
+        assertTrue(ia.getAttrType()==AttrType.Orientation);
     }
 
     public function testNamePair(){
@@ -69,22 +71,29 @@ class UnitTest extends haxe.unit.TestCase{
         var ia:StringAttr=new StringAttr("abc");
         var iv:StringValue=new StringValue("abc");
         var dp:NamePair=new NamePair(ia,iv);
-        assertEquals( dp.getAttrValue().getvalue()=="abc" );
-        assertEquals( dp.canupdate(c,new OrientationValue("cd")));
-        dp.update(c,new IntValue("cd"));
-        assertEquals( dp.getAttrValue().getvalue()=="cd" );
+        assertTrue( dp.getAttrValue().getvalue()=="abc" );
+        assertTrue( dp.canupdate(c,new StringValue("cd")));
+        dp.update(c,new StringValue("cd"));
+        assertTrue( dp.getAttrValue().getvalue()=="cd" );
     }
 
     public function testStringValue(){
-        var iv:OrientationValue=new OrientationValue("abc");
-        assertEquals( iv.getvalue()=="abc" );
-        assertEquals( iv.getType()==AttrType.STRING );
+        var iv:StringValue=new StringValue("abc");
+        assertTrue( iv.getvalue()=="abc" );
+        assertTrue( iv.getType()==AttrType.STRING );
     }
 
     public function testStringAttr(){
         var ia:StringAttr=new StringAttr("abc");
-        assertEquals( ia.getName()=="abc" );
-        assertEquals(ia.getdefaultvalue().getvalue()=="");
-        assertEquals(ia.getAttrType()==AttrType.STRING);
+        assertTrue( ia.getName()=="abc" );
+        assertTrue(ia.getdefaultvalue().getvalue()=="");
+        assertTrue(ia.getAttrType()==AttrType.STRING);
+    }
+
+    public function testObserver(){
+        var cd:CircuitDiagram=new CircuitDiagram();
+        var c:Component=new Component(1,1,1,1,ORIENTATION.EAST,new AND(),2);
+        cd.addComponent(c);
+        assertTrue(c.removeObserver(cd));
     }
 }
