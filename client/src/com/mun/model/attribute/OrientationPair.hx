@@ -20,6 +20,9 @@ class OrientationPair implements Pair{
     }
 
     public function canupdate(c:Component,n:AttrValue):Bool{
+        if(!Std.is(n,OrientationValue)){
+            return false;
+        }
         return true;
     }
 

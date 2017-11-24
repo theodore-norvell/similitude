@@ -2,7 +2,7 @@ package com.mun.model.component;
 
 import com.mun.model.attribute.Pair;
 import com.mun.model.observe.Observable;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.BOX;
@@ -16,11 +16,11 @@ import com.mun.model.enumeration.ORIENTATION;
 import com.mun.model.gates.ComponentKind;
 import com.mun.assertions.Assert;
 import com.mun.model.attribute.StringAttr;
-import com.mun.model.attribute.StringPair;
+import com.mun.model.attribute.NamePair;
 import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.OrientationPair;
 import com.mun.model.attribute.IntAttr;
-import com.mun.model.attribute.IntPair;
+import com.mun.model.attribute.DelayPair;
 import com.mun.model.attribute.AttrValue;
 import com.mun.model.attribute.StringValue;
 import com.mun.model.attribute.IntValue;
@@ -86,10 +86,10 @@ class Component extends Observable{
         }
         for(n in componentKind.getAttr()){
             if(n.getName()=="delay"){
-                list.set(n.getName(),new IntPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
+                list.set(n.getName(),new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
             }
             else if(n.getName()=="name"){
-                list.set(n.getName(),new StringPair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
+                list.set(n.getName(),new NamePair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
             }
             else if(n.getName()=="orientation"){
                 list.set(n.getName(),new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
@@ -260,7 +260,7 @@ class Component extends Observable{
         return this;
     }
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray , ?context:CanvasRenderingContext2D){
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray ){
         if(componentKind.checkInnerCircuitDiagramPortsChange()){
 
             for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
@@ -327,7 +327,7 @@ class Component extends Observable{
         if(this.componentKind.getname()!= "CC"){
             componentKind.drawComponent(drawingAdpater, highLight);
         }else{
-            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray, context);
+            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray);
         }
     }
 

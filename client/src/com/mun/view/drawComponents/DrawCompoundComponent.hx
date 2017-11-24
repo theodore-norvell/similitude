@@ -1,5 +1,5 @@
 package com.mun.view.drawComponents;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.model.enumeration.BOX;
 import com.mun.type.Coordinate;
 import com.mun.model.component.Port;
@@ -11,13 +11,13 @@ class DrawCompoundComponent implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
     var drawingAdapterTrans:DrawingAdapterI;
-    var context:CanvasRenderingContext2D;
+    //var context:CanvasRenderingContext2D;
 
-    public function new(component:Component, drawingAdapter:DrawingAdapterI, drawingAdapterTrans:DrawingAdapterI, context:CanvasRenderingContext2D) {
+    public function new(component:Component, drawingAdapter:DrawingAdapterI, drawingAdapterTrans:DrawingAdapterI) {
         this.component = component;
         this.drawingAdapter = drawingAdapter;
         this.drawingAdapterTrans = drawingAdapterTrans;
-        this.context = context;
+       // this.context = context;
     }
 
     public function drawCorrespondingComponent(strokeColor:String):Void {
@@ -48,7 +48,6 @@ class DrawCompoundComponent implements DrawComponent{
 
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.setClip(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
-
 
         if(component.get_boxType() == BOX.BLACK_BOX ){
             drawingAdapter.setTextColor("black");

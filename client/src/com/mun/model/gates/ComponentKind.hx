@@ -93,7 +93,7 @@ interface ComponentKind {
      * @param component
      * @param drawingAdapter
     **/
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void;
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
 
     /**
     * get component sequence
@@ -134,4 +134,6 @@ interface ComponentKind {
     * create xml file
     **/
     public function createJSon():String;
+
+    public function setname(s:String):Void;
 }

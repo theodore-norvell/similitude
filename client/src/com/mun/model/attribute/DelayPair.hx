@@ -19,7 +19,7 @@ class DelayPair implements Pair{
     }
 
     public function canupdate(c:Component,n:AttrValue):Bool{
-        if(!Std.is(n,delayValue)){
+        if(!Std.is(n,IntValue)){
             return false;
         }
         if(n.getvalue()<0||n.getvalue()==null){

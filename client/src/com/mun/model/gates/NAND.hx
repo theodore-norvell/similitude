@@ -4,7 +4,7 @@ import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -44,6 +44,10 @@ class NAND implements ComponentKind extends GateAbstract {
 
     public function getDelay():Int{
         return delay;
+    }
+
+    public function setname(s:String):Void{
+        nameOfTheComponentKind=s;
     }
 
     public function setDelay(value:Int):Int{
@@ -144,7 +148,7 @@ class NAND implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawNAND(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");
@@ -155,8 +159,8 @@ class NAND implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(2);
-        Attr.push(new IntAttr());
-        Attr.push(new StringAttr());
+        Attr.push(new IntAttr("delay"));
+        Attr.push(new StringAttr("name"));
         Attr.push(new OrientationAttr());
     }
 }

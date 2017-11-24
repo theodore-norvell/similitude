@@ -1,5 +1,5 @@
 package com.mun.model.component;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.controller.command.Stack;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
@@ -143,7 +143,7 @@ interface CircuitDiagramI {
     /**
     * draw the circuit diagram itself
     **/
-    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void;
+    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
 
     /**
     * find the hit list

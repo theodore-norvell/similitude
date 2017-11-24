@@ -1,0 +1,4 @@
+-js test.js
+-main UTtest
+-D js-flatten
+-dce no

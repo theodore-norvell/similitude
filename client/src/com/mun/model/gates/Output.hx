@@ -3,7 +3,7 @@ package com.mun.model.gates;
 import haxe.ds.ArraySort;
 import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.Attribute;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -28,6 +28,10 @@ class Output implements ComponentKind extends GateAbstract {
 
     public function getAttr():Array<Attribute>{
         return Attr;
+    }
+
+    public function setname(s:String):Void{
+        nameOfTheComponentKind=s;
     }
 
     public function getDelay():Int{
@@ -170,7 +174,7 @@ class Output implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawOutput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");
@@ -181,6 +185,6 @@ class Output implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(1);
-        Attr.push(new StringAttr());
+        Attr.push(new StringAttr("name"));
     }
 }

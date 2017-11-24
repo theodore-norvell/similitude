@@ -4,7 +4,7 @@ import com.mun.model.attribute.Attribute;
 import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.IntAttr;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawAND;
 import com.mun.view.drawComponents.DrawComponent;
@@ -40,8 +40,8 @@ class AND implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(2);
-        Attr.push(new IntAttr());
-        Attr.push(new StringAttr());
+        Attr.push(new IntAttr("delay"));
+        Attr.push(new StringAttr("name"));
         Attr.push(new OrientationAttr());
     }
 
@@ -63,6 +63,10 @@ class AND implements ComponentKind extends GateAbstract {
 
     public function getname():String{
         return nameOfTheComponentKind;
+    }
+
+    public function setname(s:String):Void{
+        nameOfTheComponentKind=s;
     }
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
@@ -150,7 +154,7 @@ class AND implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawAND(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

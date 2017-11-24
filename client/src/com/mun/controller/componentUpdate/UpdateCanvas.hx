@@ -35,7 +35,7 @@ class UpdateCanvas {
         //clear the canvas
         canvas.width = canvas.width;
 
-        circuitDiagram.draw(new DrawingAdapter(transform, context),linkAndComponentArray, context);
+        circuitDiagram.draw(new DrawingAdapter(transform, context),linkAndComponentArray);
     }
 
 

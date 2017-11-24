@@ -5,7 +5,7 @@ class IntValue implements AttrValue{
     var attrType:AttrType;
     public function new(d:Int) {
         delay=d;
-        attrType==AttrType.INT;
+        attrType=AttrType.INT;
     }
 
     public function getvalue():Dynamic{

@@ -2,7 +2,7 @@ package com.mun.model.component;
 
 import com.mun.model.observe.Observable;
 import com.mun.model.observe.Observer;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
@@ -280,14 +280,14 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
     **/
-    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void{
+    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
             if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0){
                 for(j in linkAndComponentArray.get_componentIterator()){
                     if(j == i){
-                        i.drawComponent(drawingAdapter, true, context);
+                        i.drawComponent(drawingAdapter, true);
                         drawFlag = true;
                     }
                 }
@@ -297,7 +297,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
                 if(i.getNameOfTheComponentKind() != "CC"){
                     i.drawComponent(drawingAdapter, false);
                 }else{
-                    i.drawComponent(drawingAdapter, false, linkAndComponentArray, context);
+                    i.drawComponent(drawingAdapter, false, linkAndComponentArray);
                 }
             }
 
