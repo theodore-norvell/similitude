@@ -1,6 +1,6 @@
 package com.mun.model.attribute;
 import com.mun.model.enumeration.AttrType;
-class NameValue implements AttrValue{
+class StringValue implements AttrValue{
     var name:String;
     public function new(s:String) {
         name=s;

@@ -3825,15 +3825,15 @@ com_mun_model_attribute_Attribute.prototype = {
 	,getName: null
 	,__class__: com_mun_model_attribute_Attribute
 };
-var com_mun_model_attribute_DelayAttr = function() {
-	this.defaultdelay = new com_mun_model_attribute_DelayValue(0);
+var com_mun_model_attribute_IntAttr = function() {
+	this.defaultdelay = new com_mun_model_attribute_IntValue(0);
 	this.name = "delay";
 	this.attrType = com_mun_model_enumeration_AttrType.INT;
 };
-$hxClasses["com.mun.model.attribute.DelayAttr"] = com_mun_model_attribute_DelayAttr;
-com_mun_model_attribute_DelayAttr.__name__ = ["com","mun","model","attribute","DelayAttr"];
-com_mun_model_attribute_DelayAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
-com_mun_model_attribute_DelayAttr.prototype = {
+$hxClasses["com.mun.model.attribute.IntAttr"] = com_mun_model_attribute_IntAttr;
+com_mun_model_attribute_IntAttr.__name__ = ["com","mun","model","attribute","IntAttr"];
+com_mun_model_attribute_IntAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
+com_mun_model_attribute_IntAttr.prototype = {
 	name: null
 	,attrType: null
 	,defaultdelay: null
@@ -3846,16 +3846,26 @@ com_mun_model_attribute_DelayAttr.prototype = {
 	,getAttrType: function() {
 		return this.attrType;
 	}
-	,__class__: com_mun_model_attribute_DelayAttr
+	,__class__: com_mun_model_attribute_IntAttr
 };
-var com_mun_model_attribute_DelayPair = function(da,dv) {
+var com_mun_model_attribute_Pair = function() { };
+$hxClasses["com.mun.model.attribute.Pair"] = com_mun_model_attribute_Pair;
+com_mun_model_attribute_Pair.__name__ = ["com","mun","model","attribute","Pair"];
+com_mun_model_attribute_Pair.prototype = {
+	getAttr: null
+	,getAttrValue: null
+	,canupdate: null
+	,update: null
+	,__class__: com_mun_model_attribute_Pair
+};
+var com_mun_model_attribute_IntPair = function(da,dv) {
 	this.delayAttr = da;
-	this.delayValue = js_Boot.__cast(dv , com_mun_model_attribute_DelayValue);
+	this.delayValue = js_Boot.__cast(dv , com_mun_model_attribute_IntValue);
 };
-$hxClasses["com.mun.model.attribute.DelayPair"] = com_mun_model_attribute_DelayPair;
-com_mun_model_attribute_DelayPair.__name__ = ["com","mun","model","attribute","DelayPair"];
-com_mun_model_attribute_DelayPair.__interfaces__ = [com.mun.model.attribute.Pair];
-com_mun_model_attribute_DelayPair.prototype = {
+$hxClasses["com.mun.model.attribute.IntPair"] = com_mun_model_attribute_IntPair;
+com_mun_model_attribute_IntPair.__name__ = ["com","mun","model","attribute","IntPair"];
+com_mun_model_attribute_IntPair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_IntPair.prototype = {
 	delayAttr: null
 	,delayValue: null
 	,getAttr: function() {
@@ -3876,20 +3886,20 @@ com_mun_model_attribute_DelayPair.prototype = {
 	}
 	,update: function(c,n) {
 		if(this.canupdate(c,n) == true) {
-			this.delayValue = js_Boot.__cast(n , com_mun_model_attribute_DelayValue);
+			this.delayValue = js_Boot.__cast(n , com_mun_model_attribute_IntValue);
 			return true;
 		}
 		return false;
 	}
-	,__class__: com_mun_model_attribute_DelayPair
+	,__class__: com_mun_model_attribute_IntPair
 };
-var com_mun_model_attribute_DelayValue = function(d) {
+var com_mun_model_attribute_IntValue = function(d) {
 	this.delay = d;
 };
-$hxClasses["com.mun.model.attribute.DelayValue"] = com_mun_model_attribute_DelayValue;
-com_mun_model_attribute_DelayValue.__name__ = ["com","mun","model","attribute","DelayValue"];
-com_mun_model_attribute_DelayValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
-com_mun_model_attribute_DelayValue.prototype = {
+$hxClasses["com.mun.model.attribute.IntValue"] = com_mun_model_attribute_IntValue;
+com_mun_model_attribute_IntValue.__name__ = ["com","mun","model","attribute","IntValue"];
+com_mun_model_attribute_IntValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
+com_mun_model_attribute_IntValue.prototype = {
 	delay: null
 	,attrType: null
 	,getvalue: function() {
@@ -3898,89 +3908,7 @@ com_mun_model_attribute_DelayValue.prototype = {
 	,getType: function() {
 		return this.attrType;
 	}
-	,__class__: com_mun_model_attribute_DelayValue
-};
-var com_mun_model_attribute_NameAttr = function() {
-	this.defaultname = new com_mun_model_attribute_NameValue("");
-	this.name = "name";
-	this.attrType = com_mun_model_enumeration_AttrType.STRING;
-};
-$hxClasses["com.mun.model.attribute.NameAttr"] = com_mun_model_attribute_NameAttr;
-com_mun_model_attribute_NameAttr.__name__ = ["com","mun","model","attribute","NameAttr"];
-com_mun_model_attribute_NameAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
-com_mun_model_attribute_NameAttr.prototype = {
-	name: null
-	,attrType: null
-	,defaultname: null
-	,getName: function() {
-		return this.name;
-	}
-	,getdefaultvalue: function() {
-		return this.defaultname;
-	}
-	,getAttrType: function() {
-		return this.attrType;
-	}
-	,__class__: com_mun_model_attribute_NameAttr
-};
-var com_mun_model_attribute_NamePair = function(na,nv) {
-	this.nameAttr = na;
-	this.nameValue = js_Boot.__cast(nv , com_mun_model_attribute_NameValue);
-};
-$hxClasses["com.mun.model.attribute.NamePair"] = com_mun_model_attribute_NamePair;
-com_mun_model_attribute_NamePair.__name__ = ["com","mun","model","attribute","NamePair"];
-com_mun_model_attribute_NamePair.__interfaces__ = [com.mun.model.attribute.Pair];
-com_mun_model_attribute_NamePair.prototype = {
-	nameAttr: null
-	,nameValue: null
-	,getAttr: function() {
-		return this.nameAttr;
-	}
-	,getAttrValue: function() {
-		return this.nameValue;
-	}
-	,canupdate: function(c,n) {
-		if(!js_Boot.__instanceof(n,com_mun_model_attribute_NameValue)) {
-			return false;
-		}
-		var b = true;
-		var i = c.get_CircuitDiagram().get_componentIterator();
-		while(i.hasNext()) {
-			var i1 = i.next();
-			if(i1.get_name() == n.getvalue()) {
-				b = false;
-			}
-		}
-		if(b == false) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-	,update: function(c,n) {
-		if(this.canupdate(c,n) == true) {
-			this.nameValue = js_Boot.__cast(n , com_mun_model_attribute_NameValue);
-			return true;
-		}
-		return false;
-	}
-	,__class__: com_mun_model_attribute_NamePair
-};
-var com_mun_model_attribute_NameValue = function(s) {
-	this.name = s;
-};
-$hxClasses["com.mun.model.attribute.NameValue"] = com_mun_model_attribute_NameValue;
-com_mun_model_attribute_NameValue.__name__ = ["com","mun","model","attribute","NameValue"];
-com_mun_model_attribute_NameValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
-com_mun_model_attribute_NameValue.prototype = {
-	name: null
-	,getvalue: function() {
-		return this.name;
-	}
-	,getType: function() {
-		return com_mun_model_enumeration_AttrType.STRING;
-	}
-	,__class__: com_mun_model_attribute_NameValue
+	,__class__: com_mun_model_attribute_IntValue
 };
 var com_mun_model_attribute_OrientationAttr = function() {
 	this.name = "orientation";
@@ -4011,7 +3939,7 @@ var com_mun_model_attribute_OrientationPair = function(na,nv) {
 };
 $hxClasses["com.mun.model.attribute.OrientationPair"] = com_mun_model_attribute_OrientationPair;
 com_mun_model_attribute_OrientationPair.__name__ = ["com","mun","model","attribute","OrientationPair"];
-com_mun_model_attribute_OrientationPair.__interfaces__ = [com.mun.model.attribute.Pair];
+com_mun_model_attribute_OrientationPair.__interfaces__ = [com_mun_model_attribute_Pair];
 com_mun_model_attribute_OrientationPair.prototype = {
 	orientationAttr: null
 	,orientationValue: null
@@ -4050,6 +3978,73 @@ com_mun_model_attribute_OrientationValue.prototype = {
 		return this.attrType;
 	}
 	,__class__: com_mun_model_attribute_OrientationValue
+};
+var com_mun_model_attribute_StringAttr = function() {
+	this.defaultname = new com_mun_model_attribute_StringValue("");
+	this.name = "name";
+	this.attrType = com_mun_model_enumeration_AttrType.STRING;
+};
+$hxClasses["com.mun.model.attribute.StringAttr"] = com_mun_model_attribute_StringAttr;
+com_mun_model_attribute_StringAttr.__name__ = ["com","mun","model","attribute","StringAttr"];
+com_mun_model_attribute_StringAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
+com_mun_model_attribute_StringAttr.prototype = {
+	name: null
+	,attrType: null
+	,defaultname: null
+	,getName: function() {
+		return this.name;
+	}
+	,getdefaultvalue: function() {
+		return this.defaultname;
+	}
+	,getAttrType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_StringAttr
+};
+var com_mun_model_attribute_StringPair = function(na,nv) {
+	this.nameAttr = na;
+	this.nameValue = js_Boot.__cast(nv , com_mun_model_attribute_StringValue);
+};
+$hxClasses["com.mun.model.attribute.StringPair"] = com_mun_model_attribute_StringPair;
+com_mun_model_attribute_StringPair.__name__ = ["com","mun","model","attribute","StringPair"];
+com_mun_model_attribute_StringPair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_StringPair.prototype = {
+	nameAttr: null
+	,nameValue: null
+	,getAttr: function() {
+		return this.nameAttr;
+	}
+	,getAttrValue: function() {
+		return this.nameValue;
+	}
+	,canupdate: function(c,n) {
+		return true;
+	}
+	,update: function(c,n) {
+		if(this.canupdate(c,n) == true) {
+			this.nameValue = js_Boot.__cast(n , com_mun_model_attribute_StringValue);
+			return true;
+		}
+		return false;
+	}
+	,__class__: com_mun_model_attribute_StringPair
+};
+var com_mun_model_attribute_StringValue = function(s) {
+	this.name = s;
+};
+$hxClasses["com.mun.model.attribute.StringValue"] = com_mun_model_attribute_StringValue;
+com_mun_model_attribute_StringValue.__name__ = ["com","mun","model","attribute","StringValue"];
+com_mun_model_attribute_StringValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
+com_mun_model_attribute_StringValue.prototype = {
+	name: null
+	,getvalue: function() {
+		return this.name;
+	}
+	,getType: function() {
+		return com_mun_model_enumeration_AttrType.STRING;
+	}
+	,__class__: com_mun_model_attribute_StringValue
 };
 var com_mun_model_observe_Observer = function() {
 };
@@ -4260,6 +4255,7 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 	}
 	,addComponent: function(component) {
 		this.componentArray.push(component);
+		component.addObserver(this);
 	}
 	,removeLink: function(link) {
 		HxOverrides.remove(this.linkArray,link);
@@ -4517,20 +4513,32 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 	this.yPosition = yPosition;
 	this.height = height;
 	this.width = width;
-	this.orientation = orientation;
 	this.componentKind = componentKind;
 	this.componentKind.set_component(this);
 	this.inportsNum = inportNum;
 	this.boxType = com_mun_model_enumeration_BOX.WHITE_BOX;
-	var _g = 0;
-	var _g1 = componentKind.getAttr();
-	while(_g < _g1.length) {
-		var n = _g1[_g];
-		++_g;
+	var portArray = [];
+	portArray = this.componentKind.createPorts(xPosition,yPosition,width,height,orientation,inportNum);
+	var _g1 = 0;
+	var _g = portArray.length;
+	while(_g1 < _g) {
+		var o = _g1++;
+		var port = portArray[o];
+		if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+			this.inportArray.push(port);
+		} else {
+			this.outportArray.push(port);
+		}
+	}
+	var _g2 = 0;
+	var _g11 = componentKind.getAttr();
+	while(_g2 < _g11.length) {
+		var n = _g11[_g2];
+		++_g2;
 		if(n.getName() == "delay") {
 			var this1 = this.list;
 			var key = n.getName();
-			var value = new com_mun_model_attribute_DelayPair(js_Boot.__cast(n , com_mun_model_attribute_DelayAttr),(js_Boot.__cast(n , com_mun_model_attribute_DelayAttr)).getdefaultvalue());
+			var value = new com_mun_model_attribute_IntPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue());
 			var _this = this1;
 			if(__map_reserved[key] != null) {
 				_this.setReserved(key,value);
@@ -4540,7 +4548,7 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 		} else if(n.getName() == "name") {
 			var this2 = this.list;
 			var key1 = n.getName();
-			var value1 = new com_mun_model_attribute_NamePair(js_Boot.__cast(n , com_mun_model_attribute_NameAttr),(js_Boot.__cast(n , com_mun_model_attribute_NameAttr)).getdefaultvalue());
+			var value1 = new com_mun_model_attribute_StringPair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue());
 			var _this1 = this2;
 			if(__map_reserved[key1] != null) {
 				_this1.setReserved(key1,value1);
@@ -4559,19 +4567,8 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 			}
 		}
 	}
-	var portArray = [];
-	portArray = this.componentKind.createPorts(xPosition,yPosition,width,height,orientation,inportNum);
-	var _g11 = 0;
-	var _g2 = portArray.length;
-	while(_g11 < _g2) {
-		var o = _g11++;
-		var port = portArray[o];
-		if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
-			this.inportArray.push(port);
-		} else {
-			this.outportArray.push(port);
-		}
-	}
+	var _this3 = this.list;
+	(__map_reserved["orientation"] != null ? _this3.getReserved("orientation") : _this3.h["orientation"]).update(this,new com_mun_model_attribute_OrientationValue(orientation));
 };
 $hxClasses["com.mun.model.component.Component"] = com_mun_model_component_Component;
 com_mun_model_component_Component.__name__ = ["com","mun","model","component","Component"];
@@ -4581,14 +4578,13 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 	,yPosition: null
 	,height: null
 	,width: null
-	,orientation: null
 	,componentKind: null
 	,inportArray: null
 	,outportArray: null
-	,list: null
 	,inportsNum: null
-	,CD: null
 	,boxType: null
+	,list: null
+	,cd: null
 	,getmap: function() {
 		return this.list;
 	}
@@ -4614,7 +4610,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 107, className : "com.mun.model.component.Component", methodName : "getAttr"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 110, className : "com.mun.model.component.Component", methodName : "getAttr"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4634,7 +4630,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 112, className : "com.mun.model.component.Component", methodName : "getAttrInt"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 115, className : "com.mun.model.component.Component", methodName : "getAttrInt"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4654,7 +4650,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 117, className : "com.mun.model.component.Component", methodName : "canupdate"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 120, className : "com.mun.model.component.Component", methodName : "canupdate"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4678,7 +4674,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 125, className : "com.mun.model.component.Component", methodName : "update"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 128, className : "com.mun.model.component.Component", methodName : "update"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4692,7 +4688,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return false;
 	}
 	,get_CircuitDiagram: function() {
-		return this.CD;
+		return this.cd;
 	}
 	,get_xPosition: function() {
 		return this.xPosition;
@@ -4707,10 +4703,12 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return this.yPosition = value;
 	}
 	,get_orientation: function() {
-		return this.orientation;
+		var _this = this.list;
+		return (__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue();
 	}
 	,set_orientation: function(value) {
-		return this.orientation = value;
+		var _this = this.list;
+		(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).update(this,new com_mun_model_attribute_OrientationValue(value));
 	}
 	,get_componentKind: function() {
 		return this.componentKind;
@@ -4742,7 +4740,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 	}
 	,set_name: function(value) {
 		var _this = this.list;
-		(__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).update(this,new com_mun_model_attribute_NameValue(value));
+		(__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).update(this,new com_mun_model_attribute_StringValue(value));
 	}
 	,get_height: function() {
 		return this.height;
@@ -4761,6 +4759,8 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).getAttrValue().getvalue();
 	}
 	,set_delay: function(value) {
+		var _this = this.list;
+		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).update(this,new com_mun_model_attribute_IntValue(value));
 	}
 	,get_inportsNum: function() {
 		return this.inportsNum;
@@ -4783,15 +4783,18 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 				return false;
 			}
 		}
-		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
+		var _this = this.list;
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
 		return true;
 	}
 	,removeInport: function(inport) {
 		return HxOverrides.remove(this.inportArray,inport);
 	}
 	,updateMoveComponentPortPosition: function(xPosition,yPosition) {
-		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,this.orientation);
-		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.orientation);
+		var _this = this.list;
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
+		var _this1 = this.list;
+		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
 		return this;
 	}
 	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray,context) {
@@ -4869,8 +4872,10 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 					HxOverrides.remove(this.outportArray,i3);
 				}
 			}
-			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
-			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,this.orientation);
+			var _this = this.list;
+			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
+			var _this1 = this.list;
+			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
 		}
 		if(this.componentKind.getname() != "CC") {
 			this.componentKind.drawComponent(drawingAdpater,highLight);
@@ -4891,9 +4896,10 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
 		jsonString += " \"height\": \"" + this.height + "\",";
 		jsonString += " \"width\": \"" + this.width + "\",";
-		jsonString += " \"orientation\": \"" + Std.string(this.orientation) + "\",";
 		var _this1 = this.list;
-		jsonString += " \"delay\": \"" + Std.string((__map_reserved["delay"] != null ? _this1.getReserved("delay") : _this1.h["delay"]).getAttrValue().getvalue()) + "\",";
+		jsonString += " \"orientation\": \"" + Std.string((__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue()) + "\",";
+		var _this2 = this.list;
+		jsonString += " \"delay\": \"" + Std.string((__map_reserved["delay"] != null ? _this2.getReserved("delay") : _this2.h["delay"]).getAttrValue().getvalue()) + "\",";
 		jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
 		jsonString += " \"nameOfTheComponentKind\": \"" + this.componentKind.getname() + "\",";
 		jsonString += "\"componentKind\":";
@@ -5763,8 +5769,8 @@ var com_mun_model_gates_AND = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "AND";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.AND"] = com_mun_model_gates_AND;
@@ -5893,8 +5899,8 @@ var com_mun_model_gates_CompoundComponent = function(circuitDiagram) {
 		}
 	}
 	com_mun_model_gates_GateAbstract.call(this,inputCounter);
-	this.attr.push(new com_mun_model_attribute_DelayAttr());
-	this.attr.push(new com_mun_model_attribute_NameAttr());
+	this.attr.push(new com_mun_model_attribute_IntAttr());
+	this.attr.push(new com_mun_model_attribute_StringAttr());
 	this.attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.CompoundComponent"] = com_mun_model_gates_CompoundComponent;
@@ -6081,8 +6087,8 @@ var com_mun_model_gates_FlipFlop = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "FlipFlop";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.FlipFlop"] = com_mun_model_gates_FlipFlop;
@@ -6358,7 +6364,7 @@ var com_mun_model_gates_Input = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "Input";
 	com_mun_model_gates_GateAbstract.call(this,1);
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 };
 $hxClasses["com.mun.model.gates.Input"] = com_mun_model_gates_Input;
 com_mun_model_gates_Input.__name__ = ["com","mun","model","gates","Input"];
@@ -6506,8 +6512,8 @@ var com_mun_model_gates_MUX = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "MUX";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.MUX"] = com_mun_model_gates_MUX;
@@ -6717,8 +6723,8 @@ var com_mun_model_gates_NAND = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "NAND";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.NAND"] = com_mun_model_gates_NAND;
@@ -6838,8 +6844,8 @@ var com_mun_model_gates_NOR = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "NOR";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.NOR"] = com_mun_model_gates_NOR;
@@ -6959,8 +6965,8 @@ var com_mun_model_gates_NOT = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "NOT";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.NOT"] = com_mun_model_gates_NOT;
@@ -7082,8 +7088,8 @@ var com_mun_model_gates_OR = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "OR";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.OR"] = com_mun_model_gates_OR;
@@ -7203,7 +7209,7 @@ var com_mun_model_gates_Output = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "Output";
 	com_mun_model_gates_GateAbstract.call(this,1);
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 };
 $hxClasses["com.mun.model.gates.Output"] = com_mun_model_gates_Output;
 com_mun_model_gates_Output.__name__ = ["com","mun","model","gates","Output"];
@@ -7348,8 +7354,8 @@ var com_mun_model_gates_XOR = function() {
 	this.Attr = [];
 	this.nameOfTheComponentKind = "XOR";
 	com_mun_model_gates_GateAbstract.call(this,2);
-	this.Attr.push(new com_mun_model_attribute_DelayAttr());
-	this.Attr.push(new com_mun_model_attribute_NameAttr());
+	this.Attr.push(new com_mun_model_attribute_IntAttr());
+	this.Attr.push(new com_mun_model_attribute_StringAttr());
 	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.XOR"] = com_mun_model_gates_XOR;

@@ -1,8 +1,8 @@
 package com.mun.model.gates;
 
 import com.mun.model.attribute.OrientationAttr;
-import com.mun.model.attribute.NameAttr;
-import com.mun.model.attribute.DelayAttr;
+import com.mun.model.attribute.StringAttr;
+import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
@@ -155,8 +155,8 @@ class NOR implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(2);
-        Attr.push(new DelayAttr());
-        Attr.push(new NameAttr());
+        Attr.push(new IntAttr());
+        Attr.push(new StringAttr());
         Attr.push(new OrientationAttr());
     }
 }

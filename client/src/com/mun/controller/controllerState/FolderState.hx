@@ -177,7 +177,7 @@ class FolderState {
 
                 updateCircuitDiagram.redrawCanvas();
             };
-            case F_STATE.CREATE : {//create a new circuit diagram
+            case F_STATE.CREATE : {//create a IntAttr circuit diagram
                 if(circuitDiagram != null){
                     previouseCircuitDiagramArray.push(circuitDiagram);
                 }

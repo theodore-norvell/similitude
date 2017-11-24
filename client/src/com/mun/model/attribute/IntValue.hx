@@ -1,6 +1,6 @@
 package com.mun.model.attribute;
 import com.mun.model.enumeration.AttrType;
-class DelayValue implements AttrValue{
+class IntValue implements AttrValue{
     var delay:Int;
     var attrType:AttrType;
     public function new(d:Int) {

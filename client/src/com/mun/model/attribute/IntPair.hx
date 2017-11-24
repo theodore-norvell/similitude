@@ -1,7 +1,7 @@
 package com.mun.model.attribute;
 import com.mun.model.attribute.IntValue;
 import com.mun.model.component.Component;
-class DelayPair implements Pair{
+class IntPair implements Pair{
     var delayAttr:IntAttr;
     var delayValue:IntValue;
     public function new(da:IntAttr, dv:AttrValue) {

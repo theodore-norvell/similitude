@@ -1,7 +1,7 @@
 package com.mun.model.gates;
 
 import haxe.ds.ArraySort;
-import com.mun.model.attribute.NameAttr;
+import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.Attribute;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
@@ -181,6 +181,6 @@ class Output implements ComponentKind extends GateAbstract {
 
     public function new() {
         super(1);
-        Attr.push(new NameAttr());
+        Attr.push(new StringAttr());
     }
 }

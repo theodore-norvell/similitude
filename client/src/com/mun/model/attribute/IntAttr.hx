@@ -1,12 +1,13 @@
 package com.mun.model.attribute;
+
 import com.mun.model.enumeration.AttrType;
-class NameAttr implements Attribute{
-    var name:String="name";
+class IntAttr implements Attribute{
+    var name:String="delay";
     var attrType:AttrType;
-    var defaultname:NameValue=new NameValue("");
+    var defaultdelay:IntValue=new IntValue(0);
 
     public function new() {
-        attrType=AttrType.STRING;
+        attrType=AttrType.INT;
     }
 
     public function getName():String{
@@ -14,7 +15,7 @@ class NameAttr implements Attribute{
     }
 
     public function getdefaultvalue():AttrValue{
-        return defaultname;
+        return defaultdelay;
     }
 
     public function getAttrType():AttrType{

@@ -1,6 +1,6 @@
 package com.mun.model.attribute;
 import com.mun.model.component.Component;
-class NamePair implements Pair{
+class StringPair implements Pair{
     var nameAttr:StringAttr;
     var nameValue:StringValue;
     public function new(na:StringAttr, nv:AttrValue) {
