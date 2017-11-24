@@ -11,3 +11,4 @@ SimilitudeClient.iml
 client/.idea
 server/.idea
 .idea
+test.js

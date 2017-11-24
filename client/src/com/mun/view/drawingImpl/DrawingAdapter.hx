@@ -53,14 +53,6 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineWidth = width;
     }
 
-    public function get_cxt():CanvasRenderingContext2D {
-        return cxt;
-    }
-
-    public function set_cxt(value:CanvasRenderingContext2D):Void {
-        this.cxt = value;
-    }
-
     public function getTransform():Transform{
         return this.trans;
     }
