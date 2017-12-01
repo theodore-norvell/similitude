@@ -428,6 +428,10 @@ class UpdateCircuitDiagram {
         circuitDiagram.componentSetName(component, name);
     }
 
+    public function setComponentDelay(component:Component, delay:Int){
+        circuitDiagram.componentSetDelay(component, delay);
+    }
+
     public function undo(){
         var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = commandManager.undo();
         redrawCanvas(linkAndComponentArray);

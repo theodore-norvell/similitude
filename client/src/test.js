@@ -2514,6 +2514,9 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,setComponentName: function(component,name) {
 		this.circuitDiagram.componentSetName(component,name);
 	}
+	,setComponentDelay: function(component,delay) {
+		this.circuitDiagram.componentSetDelay(component,delay);
+	}
 	,undo: function() {
 		var linkAndComponentArray = this.commandManager.undo();
 		this.redrawCanvas(linkAndComponentArray);
@@ -2642,11 +2645,13 @@ var com_mun_controller_componentUpdate_UpdateToolBar = function(updateCircuitDia
 	this.linkAndComponentArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
 	this.updateCircuitDiagram = updateCircuitDiagram;
 	this.nameInput = window.document.getElementById("name_input");
+	this.delayInput = window.document.getElementById("delay_input");
 	this.orientation = window.document.getElementById("orientation");
 	this.toolBar = window.document.getElementById("toolbar_div");
 	this.deleteButton = window.document.getElementById("delete");
 	this.orientation_div = window.document.getElementById("orientation_div");
 	this.component_name_div = window.document.getElementById("component_name_div");
+	this.component_delay_div = window.document.getElementById("component_delay_div");
 	this.undo = window.document.getElementById("undo");
 	this.undo.style.visibility = "visible";
 	this.redo = window.document.getElementById("redo");
@@ -2660,10 +2665,12 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,linkAndComponentArray: null
 	,nameInput: null
 	,orientation: null
+	,delayInput: null
 	,orientation_div: null
 	,toolBar: null
 	,deleteButton: null
 	,component_name_div: null
+	,component_delay_div: null
 	,undo: null
 	,redo: null
 	,controllerCanvasContext: null
@@ -2694,6 +2701,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 			if(linkAndComponentArray.getComponentIteratorLength() == 1) {
 				this.visible(true);
 				this.setNameInput();
+				this.setDelayInput();
 			} else {
 				this.visible(false);
 			}
@@ -2720,6 +2728,9 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,setNameInput: function() {
 		$(this.nameInput).val(this.linkAndComponentArray.getComponentFromIndex(0).get_name());
+	}
+	,setDelayInput: function() {
+		$(this.delayInput).val(this.linkAndComponentArray.getComponentFromIndex(0).get_delay());
 	}
 	,changeToNorth: function() {
 		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
@@ -2748,6 +2759,8 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,inputChange: function() {
 		if(this.linkAndComponentArray.getComponentIteratorLength() == 1) {
 			var temp = $(this.nameInput).val();
+			var temp2 = $(this.delayInput).val();
+			this.updateCircuitDiagram.setComponentDelay(this.linkAndComponentArray.getComponentFromIndex(0),temp2);
 			this.updateCircuitDiagram.setComponentName(this.linkAndComponentArray.getComponentFromIndex(0),temp);
 		}
 	}
@@ -2778,15 +2791,18 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		if(allVisable) {
 			this.orientation_div.style.visibility = "visible";
 			this.component_name_div.style.visibility = "visible";
+			this.component_delay_div.style.visibility = "visible";
 		} else {
 			this.orientation_div.style.visibility = "hidden";
 			this.component_name_div.style.visibility = "hidden";
+			this.component_delay_div.style.visibility = "hidden";
 		}
 	}
 	,hidden: function() {
 		this.deleteButton.style.visibility = "hidden";
 		this.orientation_div.style.visibility = "hidden";
 		this.component_name_div.style.visibility = "hidden";
+		this.component_delay_div.style.visibility = "hidden";
 	}
 	,setUndoButtonDisability: function(disable) {
 		if(disable) {
@@ -2807,6 +2823,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,unbindEventListener: function() {
 		this.nameInput.removeEventListener("keyup",$bind(this,this.inputChange));
+		this.delayInput.removeEventListener("keyup",$bind(this,this.inputChange));
 		this.deleteButton.removeEventListener("click",$bind(this,this.deleteObject));
 		this.undo.removeEventListener("click",$bind(this,this.undoCommand));
 		this.redo.removeEventListener("click",$bind(this,this.redoCommand));
@@ -2820,6 +2837,7 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	}
 	,bindEventListener: function() {
 		this.nameInput.addEventListener("keyup",$bind(this,this.inputChange),false);
+		this.delayInput.addEventListener("keyup",$bind(this,this.inputChange),false);
 		this.deleteButton.onclick = $bind(this,this.deleteObject);
 		this.undo.onclick = $bind(this,this.undoCommand);
 		this.redo.onclick = $bind(this,this.redoCommand);
@@ -4082,6 +4100,7 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,deleteLink: null
 	,deleteComponent: null
 	,componentSetName: null
+	,componentSetDelay: null
 	,computeDiagramSize: null
 	,get_diagramWidth: null
 	,get_diagramHeight: null
@@ -4332,6 +4351,9 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 	}
 	,componentSetName: function(component,name) {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
+	}
+	,componentSetDelay: function(component,delay) {
+		this.componentArray[this.componentArray.indexOf(component)].set_delay(delay);
 	}
 	,draw: function(drawingAdapter,linkAndComponentArray) {
 		var drawFlag = false;
