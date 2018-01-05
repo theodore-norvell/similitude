@@ -1,6 +1,8 @@
 package com.mun.model.component;
 
-import js.html.CanvasRenderingContext2D;
+import com.mun.model.observe.Observable;
+import com.mun.model.observe.Observer;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
 import com.mun.model.enumeration.MODE;
@@ -12,7 +14,8 @@ import com.mun.model.enumeration.ORIENTATION;
 import com.mun.type.Coordinate;
 import com.mun.type.WorldPoint;
 
-class CircuitDiagram implements CircuitDiagramI{
+class CircuitDiagram extends Observer implements CircuitDiagramI{
+    var Obable:Observable;
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
     var name:String;//the name of this circuit diagram
@@ -33,6 +36,7 @@ class CircuitDiagram implements CircuitDiagramI{
     var componentAndLinkCenter:Coordinate;
 
     public function new() {
+        super();
         copyStack = new Stack();
         componentAndLinkCenter = new Coordinate(0, 0);
         this.margin = 50;
@@ -198,6 +202,7 @@ class CircuitDiagram implements CircuitDiagramI{
 
     public function addComponent(component:Component):Void {
         componentArray.push(component);
+        component.addObserver(this);
     }
 
     public function removeLink(link:Link):Void {
@@ -271,18 +276,22 @@ class CircuitDiagram implements CircuitDiagramI{
         componentArray[componentArray.indexOf(component)].set_name(name);
     }
 
+    public function componentSetDelay(component:Component, delay:Int):Void{
+        componentArray[componentArray.indexOf(component)].set_delay(delay);
+    }
+
     /**
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
     **/
-    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void{
+    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void{
         var drawFlag:Bool = false;
         //update component array
         for(i in componentArray){
             if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0){
                 for(j in linkAndComponentArray.get_componentIterator()){
                     if(j == i){
-                        i.drawComponent(drawingAdapter, true, context);
+                        i.drawComponent(drawingAdapter, true);
                         drawFlag = true;
                     }
                 }
@@ -292,7 +301,7 @@ class CircuitDiagram implements CircuitDiagramI{
                 if(i.getNameOfTheComponentKind() != "CC"){
                     i.drawComponent(drawingAdapter, false);
                 }else{
-                    i.drawComponent(drawingAdapter, false, linkAndComponentArray, context);
+                    i.drawComponent(drawingAdapter, false, linkAndComponentArray);
                 }
             }
 

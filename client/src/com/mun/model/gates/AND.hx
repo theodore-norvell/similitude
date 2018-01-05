@@ -1,6 +1,10 @@
 package com.mun.model.gates;
 
-import js.html.CanvasRenderingContext2D;
+import com.mun.model.attribute.Attribute;
+import com.mun.model.attribute.OrientationAttr;
+import com.mun.model.attribute.StringAttr;
+import com.mun.model.attribute.IntAttr;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawAND;
 import com.mun.view.drawComponents.DrawComponent;
@@ -29,8 +33,40 @@ import com.mun.model.enumeration.VALUE_LOGIC;
  */
 class AND implements ComponentKind extends GateAbstract {
 
+
+    var nameOfTheComponentKind:String="AND";
+    var Attr:Array<Attribute>=new Array<Attribute>();
+    var delay:Int=0;//delay of the component
+
     public function new() {
         super(2);
+        Attr.push(new IntAttr("delay"));
+        Attr.push(new StringAttr("name"));
+        Attr.push(new OrientationAttr());
+    }
+
+    public function getAttr():Array<Attribute>{
+        return Attr;
+    }
+
+
+    public function getDelay():Int{
+        return delay;
+    }
+
+    public function setDelay(value:Int):Int{
+        var a:Int=delay;
+        delay=value;
+        return a;
+    }
+
+
+    public function getname():String{
+        return nameOfTheComponentKind;
+    }
+
+    public function setname(s:String):Void{
+        nameOfTheComponentKind=s;
     }
 
     public function algorithm(portArray:Array<Port>):Array<Port> {
@@ -118,7 +154,7 @@ class AND implements ComponentKind extends GateAbstract {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawAND(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

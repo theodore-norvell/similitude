@@ -56,7 +56,7 @@ class Folder implements FolderI{
         return circuitDiagram;
     }
 
-    //precondiction: the new name should not blank && is not equal to ""
+    //precondiction: the IntAttr name should not blank && is not equal to ""
     public function changeCircuitDiagramName(oldName:String,newName:String, circuitDiagram:CircuitDiagramI):Bool{
         if(circuitDiagramMap.exists(newName)){
             return false;

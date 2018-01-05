@@ -15,10 +15,12 @@ class UpdateToolBar {
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray;
     var nameInput:DOMElement;
     var orientation:DOMElement;
+    var delayInput:DOMElement;
     var orientation_div:DOMElement;
     var toolBar:DOMElement;
     var deleteButton:DOMElement;
     var component_name_div:DOMElement;
+    var component_delay_div:DOMElement;
     var undo:DOMElement;
     var redo:DOMElement;
     var controllerCanvasContext:ControllerCanvasContext;
@@ -29,11 +31,13 @@ class UpdateToolBar {
         this.updateCircuitDiagram = updateCircuitDiagram;
 
         nameInput = Browser.document.getElementById("name_input");
+        delayInput = Browser.document.getElementById("delay_input");
         orientation = Browser.document.getElementById("orientation");
         toolBar = Browser.document.getElementById("toolbar_div");
         deleteButton = Browser.document.getElementById("delete");
         orientation_div = Browser.document.getElementById("orientation_div");
         component_name_div = Browser.document.getElementById("component_name_div");
+        component_delay_div = Browser.document.getElementById("component_delay_div");
         undo = Browser.document.getElementById("undo");
         undo.style.visibility = "visible";
         redo = Browser.document.getElementById("redo");
@@ -71,6 +75,7 @@ class UpdateToolBar {
             if(linkAndComponentArray.getComponentIteratorLength() == 1){
                 visible(true);
                 setNameInput();
+                setDelayInput();
             }else{
                 visible(false);
             }
@@ -102,6 +107,10 @@ class UpdateToolBar {
         new JQuery(nameInput).val(linkAndComponentArray.getComponentFromIndex(0).get_name());
     }
 
+    function setDelayInput(){
+        new JQuery(delayInput).val(linkAndComponentArray.getComponentFromIndex(0).get_delay());
+    }
+
     function changeToNorth(){
         if(linkAndComponentArray.getComponentIteratorLength() != 0){
             updateCircuitDiagram.changeOrientation(linkAndComponentArray.get_componentIterator(),ORIENTATION.NORTH);
@@ -130,6 +139,8 @@ class UpdateToolBar {
     function inputChange(){
         if(linkAndComponentArray.getComponentIteratorLength() == 1){
             var temp:Dynamic = new JQuery(nameInput).val();
+            var temp2:Int = new JQuery(delayInput).val();
+            updateCircuitDiagram.setComponentDelay(linkAndComponentArray.getComponentFromIndex(0),temp2);
             updateCircuitDiagram.setComponentName(linkAndComponentArray.getComponentFromIndex(0),temp);
         }
     }
@@ -166,9 +177,11 @@ class UpdateToolBar {
         if(allVisable){
             orientation_div.style.visibility = "visible";
             component_name_div.style.visibility = "visible";
+            component_delay_div.style.visibility = "visible";
         }else{
             orientation_div.style.visibility = "hidden";
             component_name_div.style.visibility = "hidden";
+            component_delay_div.style.visibility = "hidden";
         }
 
     }
@@ -177,6 +190,7 @@ class UpdateToolBar {
         deleteButton.style.visibility = "hidden";
         orientation_div.style.visibility = "hidden";
         component_name_div.style.visibility = "hidden";
+        component_delay_div.style.visibility = "hidden";
     }
 
     public function setUndoButtonDisability(disable:Bool){
@@ -201,6 +215,7 @@ class UpdateToolBar {
 
     public function unbindEventListener(){
         nameInput.removeEventListener("keyup",inputChange);
+        delayInput.removeEventListener("keyup",inputChange);
         deleteButton.removeEventListener("click", deleteObject);
         undo.removeEventListener("click", undoCommand);
         redo.removeEventListener("click", redoCommand);
@@ -215,6 +230,7 @@ class UpdateToolBar {
 
     public function bindEventListener(){
         nameInput.addEventListener("keyup",inputChange,false);
+        delayInput.addEventListener("keyup",inputChange,false);
         deleteButton.onclick = deleteObject;
         undo.onclick = undoCommand;
         redo.onclick = redoCommand;

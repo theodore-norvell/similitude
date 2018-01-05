@@ -11,7 +11,7 @@ import com.mun.global.Constant.*;
 /**
 * move component
 *
-* Move action infulence the performance significantlly because every move will create a new move command which take lots of resources.
+* Move action infulence the performance significantlly because every move will create a IntAttr move command which take lots of resources.
 * Moreover, continuously moving need to redraw the canvas very frequently
 *
 * @author wanhui
@@ -46,7 +46,7 @@ class MoveCommand implements Command {
     var linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
     var linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
 
-    //the displacement use new mouse location position minus mouse down location
+    //the displacement use IntAttr mouse location position minus mouse down location
     public function new(linkAndComponentAndEndpointArray:LinkAndComponentAndEndpointAndPortArray, xDisplacement:Float, yDisplacement:Float, circuitDiagram:CircuitDiagramI) {
 
         for(i in linkAndComponentAndEndpointArray.get_componentIterator()){

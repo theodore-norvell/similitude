@@ -1,5 +1,12 @@
 package com.mun.model.gates;
-import js.html.CanvasRenderingContext2D;
+
+import com.mun.model.observe.Observable;
+import com.mun.model.attribute.OrientationAttr;
+import com.mun.model.attribute.StringAttr;
+import com.mun.model.attribute.IntAttr;
+import com.mun.model.attribute.Attribute;
+import com.mun.model.observe.Observer;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.type.WorldPoint;
@@ -21,8 +28,37 @@ import com.mun.model.component.Port;
 * compound Component
 **/
 class CompoundComponent implements ComponentKind extends GateAbstract{
+    var Ob:Observer;
+    var Obable:Observable;
     var circuitDiagram:CircuitDiagramI;
     var outputCounter:Int;
+    var nameOfTheComponentKind:String="CC";
+    var delay:Int=0;//delay of the component
+    var attr:Array<Attribute>=new Array<Attribute>();
+
+    public function getAttr():Array<Attribute>{
+        return attr;
+
+    }
+
+    public function setname(s:String):Void{
+        nameOfTheComponentKind=s;
+    }
+
+    public function getDelay():Int{
+        return delay;
+    }
+
+    public function setDelay(value:Int):Int{
+        var a:Int=delay;
+        delay=value;
+        return a;
+    }
+
+    public function getname():String{
+        return nameOfTheComponentKind;
+    }
+
 
     public function new(circuitDiagram:CircuitDiagramI) {
         this.circuitDiagram = circuitDiagram;
@@ -38,6 +74,9 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }
 
         super(inputCounter);
+        attr.push(new IntAttr("delay"));
+        attr.push(new StringAttr("name"));
+        attr.push(new OrientationAttr());
     }
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{
@@ -139,9 +178,9 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void {
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform());
-        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans, context);
+        var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans);
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
         }else{
@@ -149,11 +188,11 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         }
 
         if(component.get_boxType() == BOX.WHITE_BOX){
-            //compound component need to draw all the components in ComponentArray, which should make a new transfrom
+            //compound component need to draw all the components in ComponentArray, which should make a IntAttr transfrom
             //drawingAdapterTrans = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapterTrans, linkAndComponentArray);
         }
-        context.restore();
+        //context.restore();
     }
 
     function makeTransform():Transform{

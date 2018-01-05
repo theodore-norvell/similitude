@@ -1,4 +1,4 @@
 -js test.js
--main Test
+-main UTtest
 -D js-flatten
 -dce no

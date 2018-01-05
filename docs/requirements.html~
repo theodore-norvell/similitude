@@ -133,55 +133,6 @@
 <h3>Selection model</h3>
 <p>At each point in time a set of components and links on each  diagram are considered selected. Selected components are displayed in a distinctive colour. Selected components may belong to diagrams that are inside of compound components, so it is possible that not all selected components and links belong to the same diagram.</p>
 <h3>Use cases for editing</h3>
-<h4>Login by clicking login button</h4>
-<p>Requirements: Login in as client</p>
-<p>Actors: The user and the client</p>
-<p>Precondition: The client clicked login button.</p>
-<p>Postcondition: The client clicked login button.</p>
-<p>Basic Flow</p>
-<ol>
-  <li>User: input user name and password and click login in Login window</li>
-  <li>User: need to input name and password again when either of them match database</li>
-  <li>User: can find password if user forget it by clicking forget button</li>
-  <li>User: in forget password window user need to input their user name and email address</li>
-</ol>
-<p>Notes:</p>
-<p></p>
-<h4>Regist by clicking Regist button in login window</h4>
-<p>Requirements: Regist as client</p>
-<p>Actors: The user and the client</p>
-<p>Precondition: The client clicked regist button.</p>
-<p>Postcondition: The client clicked regist button.</p>
-<p>Basic Flow</p>
-<ol>
-  <li>User: input user name, password and email address then click regist button</li>
-  <li>User: need to input name, password and email address again when user name already exist</li>
-</ol>
-<p>Notes:</p>
-<p></p>
-<h4>File upload</h4>
-<p>Requirements: File upload as registed client</p>
-<p>Actors: The user and the client</p>
-<p>Precondition: After login</p>
-<p>Postcondition: After login</p>
-<p>Basic Flow</p>
-<ol>
-  <li>User: diagrams can be uploaded by clicking upload button</li>
-  <li>User: need to choose yes or no when diagrams already exit and needed to be covered</li>
-</ol>
-<p>Notes:</p>
-<h4>File download</h4>
-<p>Requirements: File download as registed client</p>
-<p>Actors: The user and the client</p>
-<p>Precondition: After login</p>
-<p>Postcondition: After login</p>
-<p>Basic Flow</p>
-<ol>
-  <li>User: diagrams can be uploaded by clicking upload button</li>
-  <li>User: need to choose yes or no when diagrams already exit and if needed to be covered</li>
-</ol>
-<p>Notes:</p>
-<p></p>
 <h4>Add component by drag and drop</h4>
 <p>Requirements: Add components to a circuit diagram.</p>
 <p>Actors: The user and the client</p>

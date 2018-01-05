@@ -1,5 +1,5 @@
 package com.mun.model.component;
-import js.html.CanvasRenderingContext2D;
+//import js.html.CanvasRenderingContext2D;
 import com.mun.controller.command.Stack;
 import com.mun.type.HitObject;
 import com.mun.model.enumeration.POINT_MODE;
@@ -80,7 +80,7 @@ interface CircuitDiagramI {
     public function getCopyStack():Stack;
 
     /**
-    * set new orientation for one component
+    * set IntAttr orientation for one component
     **/
     public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void;
 
@@ -98,6 +98,8 @@ interface CircuitDiagramI {
     * set name for component
     **/
     public function componentSetName(component:Component, name:String):Void;
+
+    public function componentSetDelay(component:Component, delay:Int):Void;
 
     /**
     * compute the size of this diagram
@@ -143,7 +145,7 @@ interface CircuitDiagramI {
     /**
     * draw the circuit diagram itself
     **/
-    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void;
+    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
 
     /**
     * find the hit list

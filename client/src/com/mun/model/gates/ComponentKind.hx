@@ -1,5 +1,7 @@
 package com.mun.model.gates;
 
+import com.mun.model.attribute.Attribute;
+import js.html.Attr;
 import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
@@ -22,6 +24,15 @@ interface ComponentKind {
      * @return the number of inport should be in this component kind at least
     **/
     public function getLeastInportNumber():Int;
+
+    public function getname():String;
+
+    public function getDelay():Int;
+
+    public function setDelay(value:Int):Int;
+
+    public function getAttr():Array<Attribute>;
+
 
     /**
 	 * Every gate should have a algorithm to define the output value.
@@ -82,7 +93,7 @@ interface ComponentKind {
      * @param component
      * @param drawingAdapter
     **/
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray, ?context:CanvasRenderingContext2D):Void;
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
 
     /**
     * get component sequence
@@ -123,4 +134,6 @@ interface ComponentKind {
     * create xml file
     **/
     public function createJSon():String;
+
+    public function setname(s:String):Void;
 }
