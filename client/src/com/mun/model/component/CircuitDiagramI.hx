@@ -99,6 +99,8 @@ interface CircuitDiagramI {
     **/
     public function componentSetName(component:Component, name:String):Void;
 
+    public function componentSetDelay(component:Component, delay:Int):Void;
+
     /**
     * compute the size of this diagram
     * note: the size of this diagram changed only happens in two suitutions

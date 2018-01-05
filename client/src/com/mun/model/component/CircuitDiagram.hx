@@ -276,6 +276,10 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
         componentArray[componentArray.indexOf(component)].set_name(name);
     }
 
+    public function componentSetDelay(component:Component, delay:Int):Void{
+        componentArray[componentArray.indexOf(component)].set_delay(delay);
+    }
+
     /**
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
