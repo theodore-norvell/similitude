@@ -1,0 +1,32 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "",
+  "main": "haxenode.js",
+  "bin": {
+    "src": "example.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "junming",
+  "license": "ISC",
+  "dependencies": {
+    "Logger": "0.0.0",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "css-parse": "^2.0.0",
+    "debug": "^3.1.0",
+    "express": "^4.16.2",
+    "express-mailer": "^0.3.1",
+    "jade": "^1.11.0",
+    "logger": "0.0.1",
+    "morgan": "^1.9.0",
+    "multer": "^1.3.0",
+    "nodemailer": "^4.4.1",
+    "serve-favicon": "^2.4.5",
+    "static": "^2.0.0",
+    "steno": "^0.4.4",
+    "window": "^4.2.4"
+  }
+}

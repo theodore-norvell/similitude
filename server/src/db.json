@@ -1,0 +1,10 @@
+{
+     "User" : [
+         {
+             "_hxcls" : "User"
+            ,"username" : "test"
+            ,"password" : "test"
+            ,"email" : "denebwish@gmail.com"
+        }
+    ]
+}

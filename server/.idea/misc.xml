@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$" />
-  </component>
-  <component name="MavenProjectsManager">
-    <option name="originalFiles">
-      <list>
-        <option value="$PROJECT_DIR$/pom.xml" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/../test/src/com/mun/controller/mouseAction/CanvasListener.hx" />
-    <file url="file://$PROJECT_DIR$/../test/src/com/mun/type/LinkAndComponentAndEndpointArray.hx" />
-    <file url="file://$PROJECT_DIR$/../test/src/com/mun/type/LinkAndComponentArray.hx" />
-    <file url="file://$PROJECT_DIR$/../test/src/com/mun/type/Type.hx" />
-  </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_9" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_3" default="true" project-jdk-name="Haxe 3.4.3" project-jdk-type="Haxe toolkit">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

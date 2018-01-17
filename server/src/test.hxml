@@ -1,0 +1,4 @@
+-lib tjson
+-js test.js
+-main Test
+-dce no
