@@ -224,6 +224,29 @@ class Main
             res.sendfile(Node.__dirname+'/changepassword.html');
         });
 
+
+        app.post('/changepassword/users', jsonParser, function (req : Request, res : Response,next ) {
+            var _req : Dynamic = req;
+            var username = req.param('username');
+            var db = new HaxeLow('db.json');
+            var user = db.col(User);
+            var flag:Bool = true;
+            for(i in user){
+                if(i.getname() == username){
+                    flag = i.changepass(_req.body.oldp,_req.body.newp);
+                    break;
+                }
+            }
+            if(flag == true){
+                db.save();
+                res.send('y');
+            }
+            else{
+                res.send('n');
+            }
+
+        });
+
         app.use(function(req, res, next) {
             res.status(404).send('404');
         });

@@ -29,7 +29,7 @@ class Test {
             <font color="+"red"+">password don't match</font>");
         }
         else{
-        if(username!=""&&password!=""&&email!=""){
+        if(username!=""&&password!=""&&email!=""&&c_password!=''){
             var u:User = new User(username,password,email) ;
             //new JQuery("#regist_username").hide();
             var s = {

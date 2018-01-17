@@ -459,8 +459,30 @@ var Main = function() {
 	app.get("/changepassword",function(req7,res7) {
 		res7.sendfile(__dirname + "/changepassword.html");
 	});
-	app["use"](function(req8,res8,next2) {
-		res8.status(404).send("404");
+	app.post("/changepassword/users",jsonParser,function(req8,res8,next2) {
+		var _req4 = req8;
+		var username2 = req8.param("username");
+		var db3 = new HaxeLow("db.json");
+		var user3 = db3.col(User);
+		var flag2 = true;
+		var _g3 = 0;
+		while(_g3 < user3.length) {
+			var i3 = user3[_g3];
+			++_g3;
+			if(i3.getname() == username2) {
+				flag2 = i3.changepass(_req4.body.oldp,_req4.body.newp);
+				break;
+			}
+		}
+		if(flag2 == true) {
+			db3.save();
+			res8.send("y");
+		} else {
+			res8.send("n");
+		}
+	});
+	app["use"](function(req9,res9,next3) {
+		res9.status(404).send("404");
 	});
 	var tmp2 = app.get("port");
 	app.listen(tmp2,function() {
@@ -687,6 +709,14 @@ User.prototype = {
 	}
 	,getpassword: function() {
 		return this.password;
+	}
+	,changepass: function(oldp,newp) {
+		if(this.password == oldp) {
+			this.password = newp;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	,__class__: User
 };

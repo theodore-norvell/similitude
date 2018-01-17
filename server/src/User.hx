@@ -32,5 +32,15 @@ class User {
         return password;
     }
 
+    public function changepass(oldp:String,newp:String):Bool{
+        if(password == oldp){
+            password = newp;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
 }
