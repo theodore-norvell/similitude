@@ -7,6 +7,7 @@ import js.Node.console;
 import js.npm.Express;
 import js.npm.Nodemailer;
 import js.npm.express.*;
+import org.mongodb.Mongo;
 
 class Main
 {
@@ -15,6 +16,8 @@ class Main
     function new()
     {
         var app :Express = new Express();
+
+        var mongo = new Mongo("localhost", 3000);
 
         var mailTransport = Nodemailer.createTransport({
             service: "Gmail",
@@ -195,11 +198,9 @@ class Main
                 var options = {
                     from        : 'web.circuitdiagram@hotmail.com',
                     to          : temp,
-                    // cc         : ''  //抄送
-                    // bcc      : ''    //密送
-                    subject        : '一封来自Node Mailer的邮件',
-                    text          : '一封来自Node Mailer的邮件',
-                    html           : '<h1>Hello, your password is'+pass+'！</h1>',
+                    subject        : 'From web application',
+                    text          : 'From web application',
+                    html           : '<h1>Hello, your password is:  '+pass+'！</h1>',
                     attachments :
                     [
 
