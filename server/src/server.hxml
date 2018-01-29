@@ -1,4 +1,5 @@
--lib mongomod
+-lib tjson
+-lib mongodb
 -lib js-kit
 -lib hxnodejs
 -lib haxelow

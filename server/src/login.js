@@ -408,14 +408,17 @@ Login.prototype = {
 		var username = $("#username").val();
 		var password = $("#password").val();
 		if(username != "" && password != "") {
-			var u = new User(username,password,null);
+			var u = new User(username,password,"asdfasdf");
 			var s_username = username;
 			var s_password = password;
 			var o = tjson_TJSON.encode(u);
-			haxe_Log.trace(o,{ fileName : "Login.hx", lineNumber : 27, className : "Login", methodName : "regist"});
+			var tmp = haxe_Log.trace;
+			var o1 = tjson_TJSON.parse(o);
+			tmp(o1 == null ? null : js_Boot.getClass(o1),{ fileName : "Login.hx", lineNumber : 27, className : "Login", methodName : "regist"});
+			haxe_Log.trace(u == null ? null : js_Boot.getClass(u),{ fileName : "Login.hx", lineNumber : 28, className : "Login", methodName : "regist"});
 			$.ajax({ type : "post", url : "http://127.0.0.1:3000/", contentType : "application/json", data : o}).done(function(text) {
 				if(text == "y") {
-					haxe_Log.trace("logged in",{ fileName : "Login.hx", lineNumber : 40, className : "Login", methodName : "regist"});
+					haxe_Log.trace("logged in",{ fileName : "Login.hx", lineNumber : 41, className : "Login", methodName : "regist"});
 					$("#alert").css("opacity",0.5).fadeIn();
 					$("#alert2").css("opacity",1).fadeIn();
 					$("#text1").css("opacity",1).fadeIn();
@@ -426,7 +429,7 @@ Login.prototype = {
 					};
 				}
 				if(text == "n") {
-					haxe_Log.trace("fail",{ fileName : "Login.hx", lineNumber : 51, className : "Login", methodName : "regist"});
+					haxe_Log.trace("fail",{ fileName : "Login.hx", lineNumber : 52, className : "Login", methodName : "regist"});
 					$("#nametag").html("Incorrect username or password");
 				}
 			}).fail(function(jqXHR,testStatus,errorThrown) {
@@ -1114,6 +1117,17 @@ User.prototype = {
 	}
 	,check: function(name,pass) {
 		if(name == this.username && pass == this.password) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,getpassword: function() {
+		return this.password;
+	}
+	,changepass: function(oldp,newp) {
+		if(this.password == oldp) {
+			this.password = newp;
 			return true;
 		} else {
 			return false;

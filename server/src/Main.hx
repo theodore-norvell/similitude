@@ -7,17 +7,39 @@ import js.Node.console;
 import js.npm.Express;
 import js.npm.Nodemailer;
 import js.npm.express.*;
-import org.mongodb.Mongo;
+import js.npm.mongoose.*;
+import js.npm.mongoose.macro.Manager;
+import js.npm.mongoose.macro.Model;
+import tjson.TJSON;
 
+typedef StuffData = {
+test : String,
+foo : Int,
+?bar : {
+hello : String,
+world : Array<Dynamic>
+}
+}
+class Stuff extends Model<StuffData>{}
+class StuffManager extends js.npm.mongoose.macro.Manager<StuffData,Stuff>{}
 class Main
 {
+
+
 
     private var server:Dynamic;
     function new()
     {
         var app :Express = new Express();
 
-        var mongo = new Mongo("localhost", 3000);
+
+        /**
+        * database connection test and build model
+**/
+        var database = new js.npm.mongoose.Mongoose();
+        database.connect("mongodb://localhost/test_mongoose");
+        var stuff = StuffManager.build(database, "Stuff");
+
 
         var mailTransport = Nodemailer.createTransport({
             service: "Gmail",

@@ -17,14 +17,14 @@ class Login {
         var username:String = new JQuery("#username").val();
         var password:String = new JQuery("#password").val();
         if(username!=""&&password!=""){
-            var u:User = new User(username,password,null) ;
+            var u:User = new User(username,password,"asdfasdf") ;
             //new JQuery("#regist_username").hide();
             var s = {
                 username: username,
                 password: password
             };
             var o = TJSON.encode(u);
-            trace(o);
+            trace(Type.getClass(TJSON.parse(o)));
             //var db = new HaxeLow('db.json');
             //var user = db.col(User);
             //user.push(u);
