@@ -15,13 +15,11 @@ import com.mun.global.Constant.*;
 * abstract class for gates
 * @author wanhui
 **/
-class GateAbstract{
-    var leastInportNum:Int;
+class GateAbstract {
     var sequence:Int;//use for input and output
     var component:Component;
 
-    private function new(leastInportNum:Int) {
-        this.leastInportNum = leastInportNum;
+    private function new() {
 
         sequence = -1;
     }
@@ -32,10 +30,6 @@ class GateAbstract{
 
     public function set_component(value:Component):Void {
         this.component = value;
-    }
-
-    public function getLeastInportNumber():Int {
-        return this.leastInportNum;
     }
 
     public function addInPort():Port {
@@ -225,14 +219,8 @@ class GateAbstract{
     }
 
     public function getInnerCircuitDiagram():CircuitDiagramI{
+        // TODO I don't like this.
         return null;//for most of the componentkind it has no circuit diagram inside, except compound component
-    }
-
-    public function createJSon():String{
-        var jsonString:String = "{ \"leastInportNum\": \"" + this.leastInportNum + "\",";
-        jsonString += "\"sequence\": \"" + this.sequence + "\"}";
-
-        return jsonString;
     }
 
     /**

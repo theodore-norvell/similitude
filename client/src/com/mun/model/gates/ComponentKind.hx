@@ -1,8 +1,6 @@
 package com.mun.model.gates;
 
 import com.mun.model.attribute.Attribute;
-import js.html.Attr;
-import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
@@ -19,28 +17,10 @@ import com.mun.model.enumeration.ORIENTATION;
 * @author wanhui
 **/
 interface ComponentKind {
-    /**
-    * get the least inport number for each of the component kind
-     * @return the number of inport should be in this component kind at least
-    **/
-    public function getLeastInportNumber():Int;
 
     public function getname():String;
 
-    public function getDelay():Int;
-
-    public function setDelay(value:Int):Int;
-
     public function getAttr():Array<Attribute>;
-
-
-    /**
-	 * Every gate should have a algorithm to define the output value.
-	 * this method is to calculate the gate value.
-	 * @param DrawAND type to manage those input and output
-	 * @return DrawAND type describe those input and output
-	 */
-    public function algorithm(portArray:Array<Port>):Array<Port>;
 
     /** create ports for each gate.
     *  Because box can identify the 4 corner of the component, so we can use a,b,c,d to identify the position of the component
@@ -129,11 +109,6 @@ interface ComponentKind {
     * this function just use for compound component
     **/
     public function getInnerCircuitDiagram():CircuitDiagramI;
-
-    /**
-    * create xml file
-    **/
-    public function createJSon():String;
 
     public function setname(s:String):Void;
 }

@@ -105,14 +105,15 @@ class FolderState {
         });
 
         Browser.document.getElementById("download").onclick = function(){
-            var blob:Blob = new Blob([Json.stringify(circuitDiagram.createJSon())], {type: "application/json"});
-            var a:DOMElement = Browser.document.createAnchorElement();
-            var url = URL.createObjectURL(blob);
-            var filename = circuitDiagram.get_name()+'.json';
-            a.setAttribute("href", url);
-            a.setAttribute("download", filename);
-            a.click();
-            URL.revokeObjectURL(url);
+// Presumably the following code is out of date.
+//            var blob:Blob = new Blob([Json.stringify(circuitDiagram.createJSon())], {type: "application/json"});
+//            var a:DOMElement = Browser.document.createAnchorElement();
+//            var url = URL.createObjectURL(blob);
+//            var filename = circuitDiagram.get_name()+'.json';
+//            a.setAttribute("href", url);
+//            a.setAttribute("download", filename);
+//            a.click();
+//            URL.revokeObjectURL(url);
         };
 
         Browser.document.getElementById("import").onclick = function(){

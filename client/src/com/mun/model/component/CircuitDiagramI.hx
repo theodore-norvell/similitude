@@ -161,6 +161,4 @@ interface CircuitDiagramI {
     * is this circuitdiagram has nothing?
     **/
     public function isEmpty():Bool;
-
-    public function createJSon():String;
 }

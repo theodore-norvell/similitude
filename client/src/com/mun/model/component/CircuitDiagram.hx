@@ -380,33 +380,4 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
             return false;
         }
     }
-
-    public function createJSon():String{
-        var jsonString:String = "{ \"name\": \"" + this.name + "\",";
-        jsonString += "\"diagramWidth\": \"" + this.diagramWidth + "\",";
-        jsonString += "\"diagramHeight\": \"" + this.diagramHeight + "\",";
-        jsonString += "\"xMin\": \"" + this.xMin + "\",";
-        jsonString += "\"yMin\": \"" + this.yMin + "\",";
-        jsonString += "\"xMax\": \"" + this.xMax + "\",";
-        jsonString += "\"yMax\": \"" + this.yMax + "\",";
-
-        jsonString += "\"ComponentArray\":[";
-        for(i in 0...componentArray.length){
-            jsonString += componentArray[i].createJSon();
-            if(i != componentArray.length -1){
-                jsonString += ",";
-            }
-        }
-        jsonString += "],";
-
-        jsonString += "\"LinkArray\":[";
-        for(i in 0...linkArray.length){
-            jsonString += linkArray[i].createJSon();
-            if(i != linkArray.length -1){
-                jsonString += ",";
-            }
-        }
-        jsonString += "]}";
-        return jsonString;
-    }
 }

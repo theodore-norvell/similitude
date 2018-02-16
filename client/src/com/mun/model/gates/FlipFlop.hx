@@ -1,10 +1,10 @@
 package com.mun.model.gates;
 
+import com.mun.assertions.Assert ;
 import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
-//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -14,7 +14,6 @@ import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.ORIENTATION;
-import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * Flip-Flop<br>
  * Truth Table
@@ -35,63 +34,24 @@ class FlipFlop implements ComponentKind extends GateAbstract {
 
     var nameOfTheComponentKind:String="FlipFlop";
     var Attr:Array<Attribute>=new Array<Attribute>();
-    var delay:Int=0;//delay of the component
+
+    public function new() {
+        super();
+        Attr.push(new IntAttr("delay"));
+        Attr.push(new StringAttr("name"));
+        Attr.push(new OrientationAttr());
+    }
 
     public function getAttr():Array<Attribute>{
         return Attr;
-    }
-
-    public function getDelay():Int{
-        return delay;
     }
 
     public function setname(s:String):Void{
         nameOfTheComponentKind=s;
     }
 
-    public function setDelay(value:Int):Int{
-        var a:Int=delay;
-        delay=value;
-        return a;
-    }
-
-    public function getname():String{
+    public function getname():String {
         return nameOfTheComponentKind;
-    }
-
-    public function algorithm(portArray:Array<Port>):Array<Port> {
-        var port:Port;
-        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
-
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.CLK) {
-                if (port.get_value() != VALUE_LOGIC.RISING_EDGE) {
-                    //if clock is not at rising edge, then the value of flip-flop will not change
-                    return portArray;
-                }
-            }
-        }
-
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.D) {
-                value = port.get_value();
-            }
-        }
-
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.Q) {
-                port.set_value(value);
-            }
-
-            if (port.get_portDescription() == IOTYPE.QN) {
-                if (value == VALUE_LOGIC.TRUE) {
-                    port.set_value(VALUE_LOGIC.FALSE);
-                } else if (value == VALUE_LOGIC.FALSE) {
-                    port.set_value(VALUE_LOGIC.TRUE);
-                }
-            }
-        }
-        return portArray;
     }
 
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
@@ -170,6 +130,7 @@ class FlipFlop implements ComponentKind extends GateAbstract {
     }
 
     override public function addInPort():Port {
+        Assert.assert(false) ;
         return null;//because flip-flop can't add any ports
     }
 
@@ -307,12 +268,5 @@ class FlipFlop implements ComponentKind extends GateAbstract {
         }else{
             drawComponent.drawCorrespondingComponent("black");
         }
-    }
-
-    public function new() {
-        super(2);
-        Attr.push(new IntAttr("delay"));
-        Attr.push(new StringAttr("name"));
-        Attr.push(new OrientationAttr());
     }
 }
