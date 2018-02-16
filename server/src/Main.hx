@@ -1,5 +1,10 @@
 package ;
 
+import Std;
+import String;
+import tjson.TJSON;
+import tjson.TJSON;
+import org.bsonspec.ObjectID;
 import js.Node;
 import js.node.Http;
 import js.node.Path;
@@ -10,19 +15,40 @@ import js.npm.express.*;
 import js.npm.mongoose.*;
 import js.npm.mongoose.macro.Manager;
 import js.npm.mongoose.macro.Model;
+import js.support.Error;
+import com.mun.model.component.CircuitDiagram;
+
 import tjson.TJSON;
 
+
+@:schemaOptions({
+    autoIndex: true
+})
 typedef StuffData = {
-test : String,
-foo : Int,
-?bar : {
-hello : String,
-world : Array<Dynamic>
+folder : {
+    parentid : String,
+    currentFolderName : String,
+    isFolder : Bool
+},
+version : {
+    fileName: String,
+    number : Array<Int>,
+    contents : Array<String>,
+    modified : Date
+},
+metainformation : {
+    fileType : String,
+    owner : String,
+    permissions : {
+        group : Array<String>,
+        permission : String
+    },
+    created : Date
 }
 }
 class Stuff extends Model<StuffData>{}
 class StuffManager extends js.npm.mongoose.macro.Manager<StuffData,Stuff>{}
-class Main
+class Main implements util.Async
 {
 
 
@@ -37,8 +63,52 @@ class Main
         * database connection test and build model
 **/
         var database = new js.npm.mongoose.Mongoose();
-        database.connect("mongodb://localhost/test_mongoose");
-        var stuff = StuffManager.build(database, "Stuff");
+        database.connect("mongodb://localhost/test_mongoose",
+                         function( err : Null<Error>) : Void {
+                             console.log("inside callback for connect err is " + err );
+                         });
+        var stuffMan : StuffManager = StuffManager.build(database, "test");
+
+        var err,stuff = @async stuffMan.find({"folder.currentFolderName" : "root", "folder.isFolder" : true});
+            trace(stuff);
+
+
+//        console.log("about to remove");
+//        stuffMan.remove( {},function (err : Null<Error>) : Void {
+//            console.log("inside callback err is " + err);
+//        } ) ;
+//        console.log("inside callback, err is" + err );
+//        console.log("back from remove");
+
+
+//        var d : StuffData = {
+//            folder : {
+//                parentid : "",
+//                currentFolderName : "NewFolder",
+//                isFolder : false
+//            },
+//            version : {
+//                fileName : "",
+//                number : [1],
+//                contents : [""],
+//                modified : Date.now(),
+//            },
+//            metainformation : {
+//                fileType : "circuit",
+//                owner : "test",
+//                permissions : {
+//                    group : ["a"],
+//                    permission : "true"
+//                },
+//                created : Date.now()
+//            }
+//        }
+
+
+//            stuffMan.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
+//            console.log("inside callback err is " + err + " stuff is " + stuff);
+//            });
+//        console.log("back from create");
 
 
         var mailTransport = Nodemailer.createTransport({
@@ -48,6 +118,9 @@ class Main
                 pass: "Webapplication"
             }
         });
+
+
+
 
 
 
@@ -128,38 +201,46 @@ class Main
             //    db.save();
             //}
             for(i in user){
-                /**
-            var raw = i;
-            var myInstance:User = new User("1","1","1");
-
-            var structsFields:Array<String> = Reflect.fields(raw);
-            var classFields:Array<String> = Type.getInstanceFields(Type.getClass(myInstance));
-
-            for (field in structsFields)
-            {
-                if (classFields.indexOf(field) > -1)
-                {
-                    var value:Dynamic = Reflect.field(raw, field);
-                    Reflect.setField(myInstance, field, value);
-                }
-            }
-            trace(myInstance.getname());
-            **/
                 if(i.getname() == _req.body.username ){
                            usernameflag = false;
                         }
                 if( i.getmail() == _req.body.email){
                     emailflag = false;
                 }
-
-                //trace(i.getname());
-                //trace(_req.body.username);
             }
 
             if(emailflag==true && usernameflag == true){
                 user.push(_req.body);
                 db.save();
-                console.log("t");
+                console.log("new client registered, username : "+_req.body.username);
+                var stufftemp : StuffManager = StuffManager.build(database, _req.body.username);
+                var d : StuffData = {
+                    folder : {
+                        parentid : "",
+                        currentFolderName : "root",
+                        isFolder : true
+                    },
+                    version : {
+                        fileName : "",
+                        number : [1],
+                        contents : [],
+                        modified : Date.now(),
+                    },
+                    metainformation : {
+                        fileType : "circuit",
+                        owner : _req.body.username,
+                        permissions : {
+                            group : ["personal"],
+                            permission : "true"
+                        },
+                        created : Date.now()
+                    }
+                }
+
+                stufftemp.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
+                    console.log("inside callback err is " + err + " stuff is " + stuff);
+                });
+
                 res.send("t");
             }
             else{
@@ -173,24 +254,210 @@ class Main
                 }
             }
 
-
-
-
-            //var _username = _req.body.name;
-            //trace( _req.body );
-            //trace(_req.body.name);
-
         });
 
-// This responds a DELETE request for the /del_user page.
 
-        app.get('/app/users', jsonParser, function (req : Request, res : Response,next ) {
+        app.get('/app/users', function (req : Request, res : Response,next ) {
             //console.log("Got a GET request for the homepage");
             //res.send(Node.__dirname);
             var _req : Dynamic = req;
             var username = req.param('username');
             trace(username);
             res.sendfile((Node.__dirname).substring(0,(Node.__dirname).indexOf('server\\src'))+"\\client\\app.html");
+        });
+
+        app.post('/app/users', jsonParser, function (req : Request, res : Response,next ) {
+            var _req : Dynamic = req;
+
+            var d : StuffData = {
+                folder : {
+                    parentid : "",
+                    currentFolderName : "NewFolder",
+                    isFolder : false
+                },
+                version : {
+                    fileName : "",
+                    number : [1],
+                    contents : [_req.body],
+                    modified : Date.now(),
+                },
+                metainformation : {
+                    fileType : "circuit",
+                    owner : "test",
+                    permissions : {
+                        group : ["a"],
+                        permission : "true"
+                    },
+                    created : Date.now()
+                }
+            }
+
+
+//            stuffMan.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
+//            console.log("inside callback err is " + err + " stuff is " + stuff);
+//            });
+
+//            res.send(_req.body);
+
+            stuffMan.find({"_id": "5a86e271ed10310f8c7f49fc"},function (err : Null<Error>, stuff) : Void {
+                trace(stuff[0].version.contents[0]);
+                res.send(stuff[0].version.contents[0]);
+            });
+
+        });
+
+        app.post('/app/users/folder',function (req : Request, res : Response,next ) {
+            var _req : Dynamic = req;
+            console.log(req.param('new')+req.param('username')+req.param('folder').split("/")[0]+req.param('fileName'));
+            var stufftemp : StuffManager = StuffManager.build(database, req.param('username'));
+            /**
+            *
+            * create new folder
+            *
+**/
+            if(req.param('new')=="true"){
+                var temp : Array<String> =req.param('folder').split("/");
+                var i:Int=0;
+                var s:String="";
+                var find: Bool = true;
+                do{
+                    if(i==0){
+                        stufftemp.find({"folder.parentid" : "", "folder.currentFolderName" : temp[0], "folder.isFolder" : true},
+                        function (err : Null<Error>, stuff) : Void {
+                        trace(stuff);
+                        s=Std.string(stuff[0]._id);
+                        i++;
+                        });
+
+                    }
+                    else{
+                        stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[i], "folder.isFolder" : true},
+                        function (err : Null<Error>, stuff) : Void {
+                            if(stuff!=null){
+                                s=Std.string(stuff[0]._id);
+                                i++;
+                            }
+                            else{
+                                find=false;
+                                i=temp.length-1;
+                            }
+                        });
+                    }
+                }while(i<temp.length-1);
+
+                if(find == true){
+                    stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[temp.length-1], "folder.isFolder" : true},
+                    function (err : Null<Error>, stuff) : Void {
+                        if(stuff == null){
+                            var d : StuffData = {
+                                folder : {
+                                    parentid : s,
+                                    currentFolderName : temp[temp.length-1],
+                                    isFolder : true
+                                },
+                                version : {
+                                    fileName : "",
+                                    number : [1],
+                                    contents : [""],
+                                    modified : Date.now(),
+                                },
+                                metainformation : {
+                                    fileType : "circuit",
+                                    owner : req.param('username'),
+                                    permissions : {
+                                        group : ["personal"],
+                                        permission : "true"
+                                    },
+                                    created : Date.now()
+                                }
+                            }
+
+                            stufftemp.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
+                                console.log("inside callback err is " + err + " stuff is " + stuff);
+                                res.send("success");
+                            });
+                        }
+                        else{
+                            find = false;
+                        }
+                    });
+
+                }
+                if(find == false){
+                    res.send("patherror");
+                }
+            }
+            else{
+                var temp : Array<String> =req.param("folder").split("/");
+                var i:Int=0;
+                var s="";
+                var find: Bool = true;
+                do{
+                    if(i==0){
+                        stufftemp.find({ "folder.currentFolderName" : temp[0], "folder.isFolder" : true},
+                        function (err : Null<Error>, stuff) : Void {
+                            s=Std.string(stuff[0]._id);
+                            trace("test1  "+s);
+                        });
+                        i++;
+                    }
+                    else{
+                        stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[i], "folder.isFolder" : true},
+                        function (err : Null<Error>, stuff) : Void {
+                            if(stuff!=null){
+                                s=Std.string(stuff[0]._id);
+                                i++;
+                            }
+                            else{
+                                find=false;
+                                i=temp.length;
+                            }
+                        });
+                    }
+                }while(i<temp.length);
+                trace("test2   "+s);
+
+                if(find==true){
+                    stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[temp.length-1],
+                        "folder.isFolder" : false, "fileName" : req.param('fileName')},
+                    function (err : Null<Error>, stuff) : Void {
+                        if(stuff == null){
+                            var d : StuffData = {
+                                folder : {
+                                    parentid : s,
+                                    currentFolderName : temp[temp.length-1],
+                                    isFolder : true
+                                },
+                                version : {
+                                    fileName : req.param('fileName'),
+                                    number :[1],
+                                    contents : [_req.body],
+                                    modified : Date.now(),
+                                },
+                                metainformation : {
+                                    fileType : "circuit",
+                                    owner : req.param('username'),
+                                    permissions : {
+                                        group : ["personal"],
+                                        permission : "true"
+                                    },
+                                    created : Date.now()
+                                }
+                            }
+
+                            stufftemp.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
+                                console.log("inside callback err is " + err + " stuff is " + stuff);
+                                res.send("success");
+                            });
+                        }
+                        else{
+                            stuff[0].version.number.push(stuff[0].version.number.length);
+                            stuff[0].version.contents.push(_req.body);
+                        }
+                    });
+
+                }
+            }
         });
 
         app.get('/forgot', function (req : Request, res : Response) {
@@ -200,8 +467,6 @@ class Main
         });
 
         app.post('/forgot/users', jsonParser, function (req : Request, res : Response,next ) {
-            //console.log("Got a GET request for the homepage");
-            //res.send(Node.__dirname);
             var _req : Dynamic = req;
             var username = req.param('username');
             var db = new HaxeLow('db.json');

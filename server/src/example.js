@@ -358,7 +358,7 @@ Stuff.__name__ = ["Stuff"];
 Stuff.__properties__ = {get_Schema:"get_Schema"};
 Stuff.get_Schema = function() {
 	if(Stuff._schema == null) {
-		Stuff._schema = new js_npm_mongoose_Schema({ bar : { type : { hello : { type : String}, world : { type : [js_npm_mongoose_schema_types_Mixed]}}, optional : true}, foo : { type : Number}, test : { type : String}},{ });
+		Stuff._schema = new js_npm_mongoose_Schema({ folder : { type : { currentFolderName : { type : String}, isFolder : { type : Boolean}, parentid : { type : String}}}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : { group : { type : [String]}, permission : { type : String}}}}}, version : { type : { contents : { type : [String]}, fileName : { type : String}, modified : { type : Date}, number : { type : [Number]}}}},{ });
 		var proto1 = Stuff.prototype;
 		var _g = 0;
 		var _g1 = Reflect.fields(proto1);
@@ -376,9 +376,9 @@ Stuff.get_Schema = function() {
 };
 Stuff.__super__ = js_npm_mongoose_macro_Model;
 Stuff.prototype = $extend(js_npm_mongoose_macro_Model.prototype,{
-	bar: null
-	,foo: null
-	,test: null
+	folder: null
+	,metainformation: null
+	,version: null
 	,_id: null
 	,__class__: Stuff
 });
@@ -408,169 +408,304 @@ StuffManager.__super__ = js_npm_mongoose_macro_Manager;
 StuffManager.prototype = $extend(js_npm_mongoose_macro_Manager.prototype,{
 	__class__: StuffManager
 });
+var util_Async = function() { };
+$hxClasses["util.Async"] = util_Async;
+util_Async.__name__ = ["util","Async"];
 var Main = function() {
 	var app = new js_npm_Express();
 	var database = new js_npm_mongoose_Mongoose();
-	database.connect("mongodb://localhost/test_mongoose");
-	var m = database.model("Stuff",Stuff.get_Schema(),null,null);
+	database.connect("mongodb://localhost/test_mongoose",function(err) {
+		console.log("inside callback for connect err is " + err);
+	});
+	var m = Stuff.get_Schema();
+	var m1 = database.model("test",m,null,null);
 	var proto = StuffManager.prototype;
 	var _g = 0;
 	var _g1 = Reflect.fields(proto);
 	while(_g < _g1.length) {
 		var f = _g1[_g];
 		++_g;
-		m[f] = proto[f];
+		m1[f] = proto[f];
 	}
-	var stuff = m;
-	var u = new User("abc","abc","asdfasdf");
-	var o = tjson_TJSON.encode(u);
-	console.log(JSON.parse(o));
-	new js_npm_mongoose_Schema(JSON.parse(o));
-	var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
-	app.set("port",3000);
-	var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
-	app["use"](new js_npm_express_Static(tmp));
-	var tmp1 = js_npm_express_BodyParser.json();
-	app["use"](tmp1);
-	var jsonParser = js_npm_express_BodyParser.json();
-	console.log(__dirname.substring(0,__dirname.indexOf("server\\src")) + "client\\src");
-	app.get("/",function(req,res) {
-		res.sendfile(__dirname + "/login.html");
-	});
-	app.post("/",jsonParser,function(req1,res1) {
-		var _req = req1;
-		var db = new HaxeLow("db.json");
-		var user = db.col(User);
-		var flag = false;
-		var _g2 = 0;
-		while(_g2 < user.length) {
-			var i = user[_g2];
-			++_g2;
-			flag = i.check(_req.body.username,_req.body.password);
-			if(flag == true) {
-				break;
-			}
-		}
-		if(flag == true) {
-			console.log("login");
-			res1.send("y");
-		} else {
-			console.log("login fail");
-			res1.send("n");
-		}
-	});
-	app.get("/regist",function(req2,res2) {
-		res2.sendfile(__dirname + "/regist.html");
-	});
-	app.post("/regist",jsonParser,function(req3,res3) {
-		var _req1 = req3;
-		var db1 = new HaxeLow("db.json");
-		var user1 = db1.col(User);
-		var emailflag = true;
-		var usernameflag = true;
-		var _g3 = 0;
-		while(_g3 < user1.length) {
-			var i1 = user1[_g3];
-			++_g3;
-			if(i1.getname() == _req1.body.username) {
-				usernameflag = false;
-			}
-			if(i1.getmail() == _req1.body.email) {
-				emailflag = false;
-			}
-		}
-		if(emailflag == true && usernameflag == true) {
-			user1.push(_req1.body);
-			db1.save();
-			console.log("t");
-			res3.send("t");
-		} else {
-			if(usernameflag == false) {
-				console.log("username");
-				res3.send("username");
-			}
-			if(emailflag == false) {
-				console.log("email");
-				res3.send("email");
-			}
-		}
-	});
-	app.get("/app/users",jsonParser,function(req4,res4,next) {
-		var _req2 = req4;
-		var username = req4.param("username");
-		console.log(username);
-		res4.sendfile(__dirname.substring(0,__dirname.indexOf("server\\src")) + "\\client\\app.html");
-	});
-	app.get("/forgot",function(req5,res5) {
-		res5.sendfile(__dirname + "/forgot.html");
-	});
-	app.post("/forgot/users",jsonParser,function(req6,res6,next1) {
-		var _req3 = req6;
-		var username1 = req6.param("username");
-		var db2 = new HaxeLow("db.json");
-		var user2 = db2.col(User);
-		var flag1 = false;
-		var temp = "";
-		var pass = "";
-		var _g4 = 0;
-		while(_g4 < user2.length) {
-			var i2 = user2[_g4];
-			++_g4;
-			if(i2.getname() == username1) {
-				flag1 = true;
-				temp = i2.getmail();
-				pass = i2.getpassword();
-			}
-		}
-		if(flag1 == true) {
-			var options = { from : "web.circuitdiagram@hotmail.com", to : temp, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
-			mailTransport.sendMail(options,function(err,msg) {
-				if(err) {
-					console.log(err);
-				} else {
-					console.log("email sent to user: " + Std.string(username1));
+	var stuffMan = m1;
+	stuffMan.find({ "folder.currentFolderName" : "root", "folder.isFolder" : true},function(err1,stuff) {
+		console.log(stuff);
+		var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
+		app.set("port",3000);
+		var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
+		app["use"](new js_npm_express_Static(tmp));
+		var tmp1 = js_npm_express_BodyParser.json();
+		app["use"](tmp1);
+		var jsonParser = js_npm_express_BodyParser.json();
+		console.log(__dirname.substring(0,__dirname.indexOf("server\\src")) + "client\\src");
+		app.get("/",function(req,res) {
+			res.sendfile(__dirname + "/login.html");
+		});
+		app.post("/",jsonParser,function(req1,res1) {
+			var _req = req1;
+			var db = new HaxeLow("db.json");
+			var user = db.col(User);
+			var flag = false;
+			var _g2 = 0;
+			while(_g2 < user.length) {
+				var i = user[_g2];
+				++_g2;
+				flag = i.check(_req.body.username,_req.body.password);
+				if(flag == true) {
+					break;
 				}
-			});
-			res6.send("y");
-		} else {
-			res6.send("n");
-		}
-	});
-	app.get("/changepassword",function(req7,res7) {
-		res7.sendfile(__dirname + "/changepassword.html");
-	});
-	app.post("/changepassword/users",jsonParser,function(req8,res8,next2) {
-		var _req4 = req8;
-		var username2 = req8.param("username");
-		var db3 = new HaxeLow("db.json");
-		var user3 = db3.col(User);
-		var flag2 = true;
-		var _g5 = 0;
-		while(_g5 < user3.length) {
-			var i3 = user3[_g5];
-			++_g5;
-			if(i3.getname() == username2) {
-				flag2 = i3.changepass(_req4.body.oldp,_req4.body.newp);
-				break;
 			}
-		}
-		if(flag2 == true) {
-			db3.save();
-			res8.send("y");
-		} else {
-			res8.send("n");
-		}
-	});
-	app["use"](function(req9,res9,next3) {
-		res9.status(404).send("404");
-	});
-	var tmp2 = app.get("port");
-	app.listen(tmp2,function() {
-		console.log("Express server listening on port " + Std.string(app.get("port")));
+			if(flag == true) {
+				console.log("login");
+				res1.send("y");
+			} else {
+				console.log("login fail");
+				res1.send("n");
+			}
+		});
+		app.get("/regist",function(req2,res2) {
+			res2.sendfile(__dirname + "/regist.html");
+		});
+		app.post("/regist",jsonParser,function(req3,res3) {
+			var _req1 = req3;
+			var db1 = new HaxeLow("db.json");
+			var user1 = db1.col(User);
+			var emailflag = true;
+			var usernameflag = true;
+			var _g3 = 0;
+			while(_g3 < user1.length) {
+				var i1 = user1[_g3];
+				++_g3;
+				if(i1.getname() == _req1.body.username) {
+					usernameflag = false;
+				}
+				if(i1.getmail() == _req1.body.email) {
+					emailflag = false;
+				}
+			}
+			if(emailflag == true && usernameflag == true) {
+				user1.push(_req1.body);
+				db1.save();
+				console.log("new client registered, username : " + Std.string(_req1.body.username));
+				var name = _req1.body.username;
+				var m2 = Stuff.get_Schema();
+				var m3 = database.model(name,m2,null,null);
+				var proto1 = StuffManager.prototype;
+				var _g4 = 0;
+				var _g11 = Reflect.fields(proto1);
+				while(_g4 < _g11.length) {
+					var f1 = _g11[_g4];
+					++_g4;
+					m3[f1] = proto1[f1];
+				}
+				var stufftemp = m3;
+				var d = { fileName : "", number : [1], contents : [], modified : new Date()};
+				var d1 = { folder : { parentid : "", currentFolderName : "root", isFolder : true}, version : d, metainformation : { fileType : "circuit", owner : _req1.body.username, permissions : { group : ["personal"], permission : "true"}, created : new Date()}};
+				stufftemp.create(d1,function(err2,stuff1) {
+					console.log("inside callback err is " + err2 + " stuff is " + Std.string(stuff1));
+				});
+				res3.send("t");
+			} else {
+				if(usernameflag == false) {
+					console.log("username");
+					res3.send("username");
+				}
+				if(emailflag == false) {
+					console.log("email");
+					res3.send("email");
+				}
+			}
+		});
+		app.get("/app/users",function(req4,res4,next) {
+			var _req2 = req4;
+			var username = req4.param("username");
+			console.log(username);
+			res4.sendfile(__dirname.substring(0,__dirname.indexOf("server\\src")) + "\\client\\app.html");
+		});
+		app.post("/app/users",jsonParser,function(req5,res5,next1) {
+			var _req3 = req5;
+			var d_folder = { parentid : "", currentFolderName : "NewFolder", isFolder : false};
+			var d_version = { fileName : "", number : [1], contents : [_req3.body], modified : new Date()};
+			var d_metainformation = { fileType : "circuit", owner : "test", permissions : { group : ["a"], permission : "true"}, created : new Date()};
+			stuffMan.find({ "_id" : "5a86e271ed10310f8c7f49fc"},function(err3,stuff2) {
+				console.log(stuff2[0].version.contents[0]);
+				res5.send(stuff2[0].version.contents[0]);
+			});
+		});
+		app.post("/app/users/folder",function(req6,res6,next2) {
+			var _req4 = req6;
+			console.log(req6.param("new") + req6.param("username") + req6.param("folder").split("/")[0] + req6.param("fileName"));
+			var name1 = req6.param("username");
+			var m4 = Stuff.get_Schema();
+			var m5 = database.model(name1,m4,null,null);
+			var proto2 = StuffManager.prototype;
+			var _g5 = 0;
+			var _g12 = Reflect.fields(proto2);
+			while(_g5 < _g12.length) {
+				var f2 = _g12[_g5];
+				++_g5;
+				m5[f2] = proto2[f2];
+			}
+			var stufftemp1 = m5;
+			if(req6.param("new") == "true") {
+				var temp = req6.param("folder").split("/");
+				var i2 = 0;
+				var s = "";
+				var find = true;
+				while(true) {
+					if(i2 == 0) {
+						stufftemp1.find({ "folder.parentid" : "", "folder.currentFolderName" : temp[0], "folder.isFolder" : true},function(err4,stuff3) {
+							console.log(stuff3);
+							s = Std.string(stuff3[0]._id);
+							i2 += 1;
+						});
+					} else {
+						stufftemp1.find({ "folder.parentid" : s, "folder.currentFolderName" : temp[i2], "folder.isFolder" : true},function(err5,stuff4) {
+							if(stuff4 != null) {
+								s = Std.string(stuff4[0]._id);
+								i2 += 1;
+							} else {
+								find = false;
+								i2 = temp.length - 1;
+							}
+						});
+					}
+					if(!(i2 < temp.length - 1)) {
+						break;
+					}
+				}
+				if(find == true) {
+					stufftemp1.find({ "folder.parentid" : s, "folder.currentFolderName" : temp[temp.length - 1], "folder.isFolder" : true},function(err6,stuff5) {
+						if(stuff5 == null) {
+							var d2 = { folder : { parentid : s, currentFolderName : temp[temp.length - 1], isFolder : true}, version : { fileName : "", number : [1], contents : [""], modified : new Date()}, metainformation : { fileType : "circuit", owner : req6.param("username"), permissions : { group : ["personal"], permission : "true"}, created : new Date()}};
+							stufftemp1.create(d2,function(err7,stuff6) {
+								console.log("inside callback err is " + err7 + " stuff is " + Std.string(stuff6));
+								res6.send("success");
+							});
+						} else {
+							find = false;
+						}
+					});
+				}
+				if(find == false) {
+					res6.send("patherror");
+				}
+			} else {
+				var temp1 = req6.param("folder").split("/");
+				var i3 = 0;
+				var s1 = "";
+				var find1 = true;
+				while(true) {
+					if(i3 == 0) {
+						stufftemp1.find({ "folder.currentFolderName" : temp1[0], "folder.isFolder" : true},function(err8,stuff7) {
+							s1 = Std.string(stuff7[0]._id);
+							console.log("test1  " + s1);
+						});
+						i3 += 1;
+					} else {
+						stufftemp1.find({ "folder.parentid" : s1, "folder.currentFolderName" : temp1[i3], "folder.isFolder" : true},function(err9,stuff8) {
+							if(stuff8 != null) {
+								s1 = Std.string(stuff8[0]._id);
+								i3 += 1;
+							} else {
+								find1 = false;
+								i3 = temp1.length;
+							}
+						});
+					}
+					if(!(i3 < temp1.length)) {
+						break;
+					}
+				}
+				console.log("test2   " + s1);
+				if(find1 == true) {
+					stufftemp1.find({ "folder.parentid" : s1, "folder.currentFolderName" : temp1[temp1.length - 1], "folder.isFolder" : false, "fileName" : req6.param("fileName")},function(err10,stuff9) {
+						if(stuff9 == null) {
+							var d3 = { folder : { parentid : s1, currentFolderName : temp1[temp1.length - 1], isFolder : true}, version : { fileName : req6.param("fileName"), number : [1], contents : [_req4.body], modified : new Date()}, metainformation : { fileType : "circuit", owner : req6.param("username"), permissions : { group : ["personal"], permission : "true"}, created : new Date()}};
+							stufftemp1.create(d3,function(err11,stuff10) {
+								console.log("inside callback err is " + err11 + " stuff is " + Std.string(stuff10));
+								res6.send("success");
+							});
+						} else {
+							stuff9[0].version.number.push(stuff9[0].version.number.length);
+							stuff9[0].version.contents.push(_req4.body);
+						}
+					});
+				}
+			}
+		});
+		app.get("/forgot",function(req7,res7) {
+			res7.sendfile(__dirname + "/forgot.html");
+		});
+		app.post("/forgot/users",jsonParser,function(req8,res8,next3) {
+			var _req5 = req8;
+			var username1 = req8.param("username");
+			var db2 = new HaxeLow("db.json");
+			var user2 = db2.col(User);
+			var flag1 = false;
+			var temp2 = "";
+			var pass = "";
+			var _g6 = 0;
+			while(_g6 < user2.length) {
+				var i4 = user2[_g6];
+				++_g6;
+				if(i4.getname() == username1) {
+					flag1 = true;
+					temp2 = i4.getmail();
+					pass = i4.getpassword();
+				}
+			}
+			if(flag1 == true) {
+				var options = { from : "web.circuitdiagram@hotmail.com", to : temp2, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
+				mailTransport.sendMail(options,function(err12,msg) {
+					if(err12) {
+						console.log(err12);
+					} else {
+						console.log("email sent to user: " + Std.string(username1));
+					}
+				});
+				res8.send("y");
+			} else {
+				res8.send("n");
+			}
+		});
+		app.get("/changepassword",function(req9,res9) {
+			res9.sendfile(__dirname + "/changepassword.html");
+		});
+		app.post("/changepassword/users",jsonParser,function(req10,res10,next4) {
+			var _req6 = req10;
+			var username2 = req10.param("username");
+			var db3 = new HaxeLow("db.json");
+			var user3 = db3.col(User);
+			var flag2 = true;
+			var _g7 = 0;
+			while(_g7 < user3.length) {
+				var i5 = user3[_g7];
+				++_g7;
+				if(i5.getname() == username2) {
+					flag2 = i5.changepass(_req6.body.oldp,_req6.body.newp);
+					break;
+				}
+			}
+			if(flag2 == true) {
+				db3.save();
+				res10.send("y");
+			} else {
+				res10.send("n");
+			}
+		});
+		app["use"](function(req11,res11,next5) {
+			res11.status(404).send("404");
+		});
+		var tmp2 = app.get("port");
+		app.listen(tmp2,function() {
+			console.log("Express server listening on port " + Std.string(app.get("port")));
+		});
 	});
 };
 $hxClasses["Main"] = Main;
 Main.__name__ = ["Main"];
+Main.__interfaces__ = [util_Async];
 Main.main = function() {
 	var main = new Main();
 };
@@ -646,6 +781,13 @@ Std.parseInt = function(x) {
 		return null;
 	}
 	return v;
+};
+Std.random = function(x) {
+	if(x <= 0) {
+		return 0;
+	} else {
+		return Math.floor(Math.random() * x);
+	}
 };
 var StringTools = function() { };
 $hxClasses["StringTools"] = StringTools;
@@ -800,6 +942,2027 @@ User.prototype = {
 	}
 	,__class__: User
 };
+var com_mun_assertions_Assert = function() { };
+$hxClasses["com.mun.assertions.Assert"] = com_mun_assertions_Assert;
+com_mun_assertions_Assert.__name__ = ["com","mun","assertions","Assert"];
+var com_mun_assertions_AssertionFailure = function(message,parts) {
+	this.message = message;
+	this.parts = parts;
+};
+$hxClasses["com.mun.assertions.AssertionFailure"] = com_mun_assertions_AssertionFailure;
+com_mun_assertions_AssertionFailure.__name__ = ["com","mun","assertions","AssertionFailure"];
+com_mun_assertions_AssertionFailure.prototype = {
+	message: null
+	,parts: null
+	,toString: function() {
+		var buf_b = "";
+		buf_b += Std.string("Assertion failure: " + this.message + ", where");
+		var _g = 0;
+		var _g1 = this.parts;
+		while(_g < _g1.length) {
+			var part = _g1[_g];
+			++_g;
+			buf_b += Std.string("\n\t" + part.expr + ": " + Std.string(part.value));
+		}
+		return buf_b;
+	}
+	,__class__: com_mun_assertions_AssertionFailure
+};
+var com_mun_controller_command_Command = function() { };
+$hxClasses["com.mun.controller.command.Command"] = com_mun_controller_command_Command;
+com_mun_controller_command_Command.__name__ = ["com","mun","controller","command","Command"];
+com_mun_controller_command_Command.prototype = {
+	undo: null
+	,redo: null
+	,execute: null
+	,__class__: com_mun_controller_command_Command
+};
+var com_mun_controller_command_CommandManager = function() {
+	this.recordFlag = false;
+	this.redoStack = [];
+	this.undoStack = [];
+	this.linkAndComponentAndEndpointAndPortArray = new com_mun_type_LinkAndComponentAndEndpointAndPortArray();
+};
+$hxClasses["com.mun.controller.command.CommandManager"] = com_mun_controller_command_CommandManager;
+com_mun_controller_command_CommandManager.__name__ = ["com","mun","controller","command","CommandManager"];
+com_mun_controller_command_CommandManager.prototype = {
+	undoStack: null
+	,redoStack: null
+	,linkAndComponentAndEndpointAndPortArray: null
+	,recordFlag: null
+	,execute: function(command) {
+		command.execute();
+		if(!this.recordFlag) {
+			this.undoStack.push(command);
+		}
+		this.recordFlag = true;
+		if(this.redoStack.length != 0) {
+			var _g1 = 0;
+			var _g = this.redoStack.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.redoStack.pop();
+			}
+		}
+	}
+	,undo: function() {
+		if(this.undoStack.length == 0) {
+			return this.linkAndComponentAndEndpointAndPortArray;
+		}
+		var command = this.undoStack.pop();
+		this.linkAndComponentAndEndpointAndPortArray = command.undo();
+		this.redoStack.push(command);
+		return this.linkAndComponentAndEndpointAndPortArray;
+	}
+	,redo: function() {
+		if(this.redoStack.length == 0) {
+			return this.linkAndComponentAndEndpointAndPortArray;
+		}
+		var command = this.redoStack.pop();
+		this.linkAndComponentAndEndpointAndPortArray = command.redo();
+		this.undoStack.push(command);
+		return this.linkAndComponentAndEndpointAndPortArray;
+	}
+	,popUndoStack: function() {
+		this.undoStack.pop();
+	}
+	,popRedoStack: function() {
+		this.redoStack.pop();
+	}
+	,recordFlagRest: function() {
+		this.recordFlag = false;
+	}
+	,recordFlagSetTrue: function() {
+		this.recordFlag = true;
+	}
+	,getUndoStackSize: function() {
+		return this.undoStack.length;
+	}
+	,getRedoStackSize: function() {
+		return this.redoStack.length;
+	}
+	,__class__: com_mun_controller_command_CommandManager
+};
+var com_mun_controller_command_Stack = function() {
+	this.linkArray = [];
+	this.componentArray = [];
+};
+$hxClasses["com.mun.controller.command.Stack"] = com_mun_controller_command_Stack;
+com_mun_controller_command_Stack.__name__ = ["com","mun","controller","command","Stack"];
+com_mun_controller_command_Stack.prototype = {
+	linkArray: null
+	,componentArray: null
+	,getLinkArray: function() {
+		return this.linkArray;
+	}
+	,getComponentArray: function() {
+		return this.componentArray;
+	}
+	,pushLink: function(link) {
+		this.linkArray.push(link);
+	}
+	,pushComponent: function(component) {
+		this.componentArray.push(component);
+	}
+	,clearStack: function() {
+		this.linkArray = [];
+		this.componentArray = [];
+	}
+	,isStackEmpty: function() {
+		if(this.linkArray.length == 0 && this.componentArray.length == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,__class__: com_mun_controller_command_Stack
+};
+var com_mun_global_Constant = function() {
+};
+$hxClasses["com.mun.global.Constant"] = com_mun_global_Constant;
+com_mun_global_Constant.__name__ = ["com","mun","global","Constant"];
+com_mun_global_Constant.prototype = {
+	__class__: com_mun_global_Constant
+};
+var com_mun_model_attribute_AttrValue = function() { };
+$hxClasses["com.mun.model.attribute.AttrValue"] = com_mun_model_attribute_AttrValue;
+com_mun_model_attribute_AttrValue.__name__ = ["com","mun","model","attribute","AttrValue"];
+com_mun_model_attribute_AttrValue.prototype = {
+	getvalue: null
+	,getType: null
+	,__class__: com_mun_model_attribute_AttrValue
+};
+var com_mun_model_attribute_Attribute = function() { };
+$hxClasses["com.mun.model.attribute.Attribute"] = com_mun_model_attribute_Attribute;
+com_mun_model_attribute_Attribute.__name__ = ["com","mun","model","attribute","Attribute"];
+com_mun_model_attribute_Attribute.prototype = {
+	getdefaultvalue: null
+	,getAttrType: null
+	,getName: null
+	,__class__: com_mun_model_attribute_Attribute
+};
+var com_mun_model_attribute_Pair = function() { };
+$hxClasses["com.mun.model.attribute.Pair"] = com_mun_model_attribute_Pair;
+com_mun_model_attribute_Pair.__name__ = ["com","mun","model","attribute","Pair"];
+com_mun_model_attribute_Pair.prototype = {
+	getAttr: null
+	,getAttrValue: null
+	,canupdate: null
+	,update: null
+	,__class__: com_mun_model_attribute_Pair
+};
+var com_mun_model_attribute_DelayPair = function(da,dv) {
+	this.delayAttr = da;
+	this.delayValue = js_Boot.__cast(dv , com_mun_model_attribute_IntValue);
+};
+$hxClasses["com.mun.model.attribute.DelayPair"] = com_mun_model_attribute_DelayPair;
+com_mun_model_attribute_DelayPair.__name__ = ["com","mun","model","attribute","DelayPair"];
+com_mun_model_attribute_DelayPair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_DelayPair.prototype = {
+	delayAttr: null
+	,delayValue: null
+	,getAttr: function() {
+		return this.delayAttr;
+	}
+	,getAttrValue: function() {
+		return this.delayValue;
+	}
+	,canupdate: function(c,n) {
+		if(!js_Boot.__instanceof(n,com_mun_model_attribute_IntValue)) {
+			return false;
+		}
+		if(n.getvalue() < 0 || n.getvalue() == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	,update: function(c,n) {
+		if(this.canupdate(c,n) == true) {
+			this.delayValue = js_Boot.__cast(n , com_mun_model_attribute_IntValue);
+			return true;
+		}
+		return false;
+	}
+	,__class__: com_mun_model_attribute_DelayPair
+};
+var com_mun_model_attribute_IntAttr = function(s) {
+	this.defaultdelay = new com_mun_model_attribute_IntValue(0);
+	this.name = "delay";
+	this.name = s;
+	this.attrType = com_mun_model_enumeration_AttrType.INT;
+};
+$hxClasses["com.mun.model.attribute.IntAttr"] = com_mun_model_attribute_IntAttr;
+com_mun_model_attribute_IntAttr.__name__ = ["com","mun","model","attribute","IntAttr"];
+com_mun_model_attribute_IntAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
+com_mun_model_attribute_IntAttr.prototype = {
+	name: null
+	,attrType: null
+	,defaultdelay: null
+	,getName: function() {
+		return this.name;
+	}
+	,getdefaultvalue: function() {
+		return this.defaultdelay;
+	}
+	,getAttrType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_IntAttr
+};
+var com_mun_model_attribute_IntValue = function(d) {
+	this.delay = d;
+	this.attrType = com_mun_model_enumeration_AttrType.INT;
+};
+$hxClasses["com.mun.model.attribute.IntValue"] = com_mun_model_attribute_IntValue;
+com_mun_model_attribute_IntValue.__name__ = ["com","mun","model","attribute","IntValue"];
+com_mun_model_attribute_IntValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
+com_mun_model_attribute_IntValue.prototype = {
+	delay: null
+	,attrType: null
+	,getvalue: function() {
+		return this.delay;
+	}
+	,getType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_IntValue
+};
+var com_mun_model_attribute_NamePair = function(na,nv) {
+	this.nameAttr = na;
+	this.nameValue = js_Boot.__cast(nv , com_mun_model_attribute_StringValue);
+};
+$hxClasses["com.mun.model.attribute.NamePair"] = com_mun_model_attribute_NamePair;
+com_mun_model_attribute_NamePair.__name__ = ["com","mun","model","attribute","NamePair"];
+com_mun_model_attribute_NamePair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_NamePair.prototype = {
+	nameAttr: null
+	,nameValue: null
+	,getAttr: function() {
+		return this.nameAttr;
+	}
+	,getAttrValue: function() {
+		return this.nameValue;
+	}
+	,canupdate: function(c,n) {
+		return true;
+	}
+	,update: function(c,n) {
+		if(this.canupdate(c,n) == true) {
+			this.nameValue = js_Boot.__cast(n , com_mun_model_attribute_StringValue);
+			return true;
+		}
+		return false;
+	}
+	,__class__: com_mun_model_attribute_NamePair
+};
+var com_mun_model_attribute_OrientationAttr = function() {
+	this.name = "orientation";
+	this.attrType = com_mun_model_enumeration_AttrType.Orientation;
+	this.defaultOrientation = new com_mun_model_attribute_OrientationValue(com_mun_model_enumeration_ORIENTATION.EAST);
+};
+$hxClasses["com.mun.model.attribute.OrientationAttr"] = com_mun_model_attribute_OrientationAttr;
+com_mun_model_attribute_OrientationAttr.__name__ = ["com","mun","model","attribute","OrientationAttr"];
+com_mun_model_attribute_OrientationAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
+com_mun_model_attribute_OrientationAttr.prototype = {
+	name: null
+	,attrType: null
+	,defaultOrientation: null
+	,getName: function() {
+		return this.name;
+	}
+	,getdefaultvalue: function() {
+		return this.defaultOrientation;
+	}
+	,getAttrType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_OrientationAttr
+};
+var com_mun_model_attribute_OrientationPair = function(na,nv) {
+	this.orientationAttr = na;
+	this.orientationValue = js_Boot.__cast(nv , com_mun_model_attribute_OrientationValue);
+};
+$hxClasses["com.mun.model.attribute.OrientationPair"] = com_mun_model_attribute_OrientationPair;
+com_mun_model_attribute_OrientationPair.__name__ = ["com","mun","model","attribute","OrientationPair"];
+com_mun_model_attribute_OrientationPair.__interfaces__ = [com_mun_model_attribute_Pair];
+com_mun_model_attribute_OrientationPair.prototype = {
+	orientationAttr: null
+	,orientationValue: null
+	,getAttr: function() {
+		return this.orientationAttr;
+	}
+	,getAttrValue: function() {
+		return this.orientationValue;
+	}
+	,canupdate: function(c,n) {
+		if(!js_Boot.__instanceof(n,com_mun_model_attribute_OrientationValue)) {
+			return false;
+		}
+		return true;
+	}
+	,update: function(c,n) {
+		if(this.canupdate(c,n) == true) {
+			this.orientationValue = js_Boot.__cast(n , com_mun_model_attribute_OrientationValue);
+			return true;
+		}
+		return false;
+	}
+	,__class__: com_mun_model_attribute_OrientationPair
+};
+var com_mun_model_attribute_OrientationValue = function(or) {
+	this.orientation = or;
+	this.attrType = com_mun_model_enumeration_AttrType.Orientation;
+};
+$hxClasses["com.mun.model.attribute.OrientationValue"] = com_mun_model_attribute_OrientationValue;
+com_mun_model_attribute_OrientationValue.__name__ = ["com","mun","model","attribute","OrientationValue"];
+com_mun_model_attribute_OrientationValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
+com_mun_model_attribute_OrientationValue.prototype = {
+	orientation: null
+	,attrType: null
+	,getvalue: function() {
+		return this.orientation;
+	}
+	,getType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_OrientationValue
+};
+var com_mun_model_attribute_StringAttr = function(s) {
+	this.defaultname = new com_mun_model_attribute_StringValue("");
+	this.name = "name";
+	this.name = s;
+	this.attrType = com_mun_model_enumeration_AttrType.STRING;
+};
+$hxClasses["com.mun.model.attribute.StringAttr"] = com_mun_model_attribute_StringAttr;
+com_mun_model_attribute_StringAttr.__name__ = ["com","mun","model","attribute","StringAttr"];
+com_mun_model_attribute_StringAttr.__interfaces__ = [com_mun_model_attribute_Attribute];
+com_mun_model_attribute_StringAttr.prototype = {
+	name: null
+	,attrType: null
+	,defaultname: null
+	,getName: function() {
+		return this.name;
+	}
+	,getdefaultvalue: function() {
+		return this.defaultname;
+	}
+	,getAttrType: function() {
+		return this.attrType;
+	}
+	,__class__: com_mun_model_attribute_StringAttr
+};
+var com_mun_model_attribute_StringValue = function(s) {
+	this.name = s;
+};
+$hxClasses["com.mun.model.attribute.StringValue"] = com_mun_model_attribute_StringValue;
+com_mun_model_attribute_StringValue.__name__ = ["com","mun","model","attribute","StringValue"];
+com_mun_model_attribute_StringValue.__interfaces__ = [com_mun_model_attribute_AttrValue];
+com_mun_model_attribute_StringValue.prototype = {
+	name: null
+	,getvalue: function() {
+		return this.name;
+	}
+	,getType: function() {
+		return com_mun_model_enumeration_AttrType.STRING;
+	}
+	,__class__: com_mun_model_attribute_StringValue
+};
+var com_mun_model_observe_Observer = function() {
+};
+$hxClasses["com.mun.model.observe.Observer"] = com_mun_model_observe_Observer;
+com_mun_model_observe_Observer.__name__ = ["com","mun","model","observe","Observer"];
+com_mun_model_observe_Observer.prototype = {
+	update: function(c,data) {
+	}
+	,__class__: com_mun_model_observe_Observer
+};
+var com_mun_model_component_CircuitDiagramI = function() { };
+$hxClasses["com.mun.model.component.CircuitDiagramI"] = com_mun_model_component_CircuitDiagramI;
+com_mun_model_component_CircuitDiagramI.__name__ = ["com","mun","model","component","CircuitDiagramI"];
+com_mun_model_component_CircuitDiagramI.prototype = {
+	get_commandManager: null
+	,set_commandManager: null
+	,get_componentIterator: null
+	,get_componentReverseIterator: null
+	,get_linkReverseIterator: null
+	,get_linkIterator: null
+	,get_name: null
+	,set_name: null
+	,addLink: null
+	,addComponent: null
+	,removeLink: null
+	,removeComponent: null
+	,getCopyStack: null
+	,setNewOirentation: null
+	,deleteLink: null
+	,deleteComponent: null
+	,componentSetName: null
+	,componentSetDelay: null
+	,computeDiagramSize: null
+	,get_diagramWidth: null
+	,get_diagramHeight: null
+	,get_xMin: null
+	,get_yMin: null
+	,get_xMax: null
+	,get_yMax: null
+	,getComponentAndLinkCenterCoordinate: null
+	,draw: null
+	,findHitList: null
+	,findWorldPoint: null
+	,isEmpty: null
+	,createJSon: null
+	,__class__: com_mun_model_component_CircuitDiagramI
+};
+var com_mun_model_component_CircuitDiagram = function() {
+	this.linkArrayReverseFlag = false;
+	this.componentArrayReverseFlag = false;
+	this.linkArray = [];
+	this.componentArray = [];
+	com_mun_model_observe_Observer.call(this);
+	this.copyStack = new com_mun_controller_command_Stack();
+	this.componentAndLinkCenter = new com_mun_type_Coordinate(0,0);
+	this.margin = 50;
+};
+$hxClasses["com.mun.model.component.CircuitDiagram"] = com_mun_model_component_CircuitDiagram;
+com_mun_model_component_CircuitDiagram.__name__ = ["com","mun","model","component","CircuitDiagram"];
+com_mun_model_component_CircuitDiagram.__interfaces__ = [com_mun_model_component_CircuitDiagramI];
+com_mun_model_component_CircuitDiagram.__super__ = com_mun_model_observe_Observer;
+com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe_Observer.prototype,{
+	Obable: null
+	,componentArray: null
+	,linkArray: null
+	,name: null
+	,copyStack: null
+	,commandManager: null
+	,componentArrayReverseFlag: null
+	,linkArrayReverseFlag: null
+	,diagramWidth: null
+	,diagramHeight: null
+	,xMin: null
+	,yMin: null
+	,xMax: null
+	,yMax: null
+	,margin: null
+	,componentAndLinkCenter: null
+	,computeDiagramSize: function() {
+		this.xMin = 99999999;
+		this.yMin = 99999999;
+		this.xMax = 0;
+		this.yMax = 0;
+		var _g = 0;
+		var _g1 = this.componentArray;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(i.get_xPosition() - i.get_width() / 2 < this.xMin) {
+				this.xMin = i.get_xPosition() - i.get_width() / 2;
+			}
+			if(i.get_xPosition() + i.get_width() / 2 > this.xMax) {
+				this.xMax = i.get_xPosition() + i.get_width() / 2;
+			}
+			if(i.get_yPosition() - i.get_height() / 2 < this.yMin) {
+				this.yMin = i.get_yPosition() - i.get_height() / 2;
+			}
+			if(i.get_yPosition() + i.get_height() / 2 > this.yMax) {
+				this.yMax = i.get_yPosition() + i.get_height() / 2;
+			}
+		}
+		var _g2 = 0;
+		var _g11 = this.linkArray;
+		while(_g2 < _g11.length) {
+			var i1 = _g11[_g2];
+			++_g2;
+			if(i1.get_leftEndpoint().get_xPosition() < this.xMin) {
+				this.xMin = i1.get_leftEndpoint().get_xPosition();
+			}
+			if(i1.get_leftEndpoint().get_xPosition() > this.xMax) {
+				this.xMax = i1.get_leftEndpoint().get_xPosition();
+			}
+			if(i1.get_leftEndpoint().get_yPosition() < this.yMin) {
+				this.yMin = i1.get_leftEndpoint().get_yPosition();
+			}
+			if(i1.get_leftEndpoint().get_yPosition() > this.yMax) {
+				this.yMax = i1.get_leftEndpoint().get_yPosition();
+			}
+			if(i1.get_rightEndpoint().get_xPosition() < this.xMin) {
+				this.xMin = i1.get_rightEndpoint().get_xPosition();
+			}
+			if(i1.get_rightEndpoint().get_xPosition() > this.xMax) {
+				this.xMax = i1.get_rightEndpoint().get_xPosition();
+			}
+			if(i1.get_rightEndpoint().get_yPosition() < this.yMin) {
+				this.yMin = i1.get_rightEndpoint().get_yPosition();
+			}
+			if(i1.get_rightEndpoint().get_yPosition() > this.yMax) {
+				this.yMax = i1.get_rightEndpoint().get_yPosition();
+			}
+		}
+		this.componentAndLinkCenter.set_xPosition((this.xMin + this.xMax) / 2);
+		this.componentAndLinkCenter.set_yPosition((this.yMin + this.yMax) / 2);
+		this.diagramWidth = this.xMax - this.xMin + this.margin;
+		this.diagramHeight = this.yMax - this.yMin + this.margin;
+		if(this.diagramHeight > this.diagramWidth) {
+			this.diagramWidth = this.diagramHeight;
+		} else {
+			this.diagramHeight = this.diagramWidth;
+		}
+	}
+	,getComponentAndLinkCenterCoordinate: function() {
+		return this.componentAndLinkCenter;
+	}
+	,get_diagramWidth: function() {
+		return this.diagramWidth;
+	}
+	,get_diagramHeight: function() {
+		return this.diagramHeight;
+	}
+	,get_xMin: function() {
+		return this.xMin;
+	}
+	,get_yMin: function() {
+		return this.yMin;
+	}
+	,get_xMax: function() {
+		return this.xMax;
+	}
+	,get_yMax: function() {
+		return this.yMax;
+	}
+	,get_commandManager: function() {
+		return this.commandManager;
+	}
+	,set_commandManager: function(value) {
+		this.commandManager = value;
+	}
+	,get_componentIterator: function() {
+		if(this.componentArrayReverseFlag) {
+			this.componentArrayReverse();
+		}
+		return HxOverrides.iter(this.componentArray);
+	}
+	,get_componentReverseIterator: function() {
+		if(!this.componentArrayReverseFlag) {
+			this.componentArrayReverse();
+		}
+		return HxOverrides.iter(this.componentArray);
+	}
+	,componentArrayReverse: function() {
+		this.componentArrayReverseFlag = !this.componentArrayReverseFlag;
+		this.componentArray.reverse();
+	}
+	,get_linkIterator: function() {
+		if(this.linkArrayReverseFlag) {
+			this.linkArrayReverse();
+		}
+		return HxOverrides.iter(this.linkArray);
+	}
+	,get_linkReverseIterator: function() {
+		if(!this.linkArrayReverseFlag) {
+			this.linkArrayReverse();
+		}
+		return HxOverrides.iter(this.linkArray);
+	}
+	,linkArrayReverse: function() {
+		this.linkArrayReverseFlag = !this.linkArrayReverseFlag;
+		this.linkArray.reverse();
+	}
+	,get_name: function() {
+		return this.name;
+	}
+	,set_name: function(value) {
+		this.name = value;
+	}
+	,addLink: function(link) {
+		this.linkArray.push(link);
+	}
+	,addComponent: function(component) {
+		this.componentArray.push(component);
+		component.addObserver(this);
+	}
+	,removeLink: function(link) {
+		HxOverrides.remove(this.linkArray,link);
+	}
+	,removeComponent: function(component) {
+		HxOverrides.remove(this.componentArray,component);
+	}
+	,getCopyStack: function() {
+		return this.copyStack;
+	}
+	,setNewOirentation: function(component,newOrientation) {
+		var _g1 = 0;
+		var _g = this.componentArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(component == this.componentArray[i]) {
+				this.componentArray[i].set_orientation(newOrientation);
+				this.componentArray[i].updateMoveComponentPortPosition(this.componentArray[i].get_xPosition(),this.componentArray[i].get_yPosition());
+				this.linkArraySelfUpdate();
+				break;
+			}
+		}
+	}
+	,deleteLink: function(link) {
+		HxOverrides.remove(this.linkArray,link);
+	}
+	,deleteComponent: function(component) {
+		HxOverrides.remove(this.componentArray,component);
+		var i = component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var _g1 = 0;
+			var _g = this.linkArray.length;
+			while(_g1 < _g) {
+				var j = _g1++;
+				if(i1 == this.linkArray[j].get_leftEndpoint().get_port()) {
+					this.linkArray[j].get_leftEndpoint().set_port(null);
+				}
+				if(i1 == this.linkArray[j].get_rightEndpoint().get_port()) {
+					this.linkArray[j].get_rightEndpoint().set_port(null);
+				}
+			}
+		}
+		var i2 = component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var _g11 = 0;
+			var _g2 = this.linkArray.length;
+			while(_g11 < _g2) {
+				var j1 = _g11++;
+				if(i3 == this.linkArray[j1].get_leftEndpoint().get_port()) {
+					this.linkArray[j1].get_leftEndpoint().set_port(null);
+				}
+				if(i3 == this.linkArray[j1].get_rightEndpoint().get_port()) {
+					this.linkArray[j1].get_rightEndpoint().set_port(null);
+				}
+			}
+		}
+	}
+	,linkArraySelfUpdate: function() {
+		var _g1 = 0;
+		var _g = this.linkArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.linkArray[i].get_leftEndpoint().updatePosition();
+			this.linkArray[i].get_rightEndpoint().updatePosition();
+		}
+	}
+	,componentSetName: function(component,name) {
+		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
+	}
+	,componentSetDelay: function(component,delay) {
+		this.componentArray[this.componentArray.indexOf(component)].set_delay(delay);
+	}
+	,draw: function(drawingAdapter,linkAndComponentArray) {
+		var drawFlag = false;
+		var _g = 0;
+		var _g1 = this.componentArray;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0) {
+				var j = linkAndComponentArray.get_componentIterator();
+				while(j.hasNext()) {
+					var j1 = j.next();
+					if(j1 == i) {
+						i.drawComponent(drawingAdapter,true);
+						drawFlag = true;
+					}
+				}
+			}
+			if(!drawFlag) {
+				if(i.getNameOfTheComponentKind() != "CC") {
+					i.drawComponent(drawingAdapter,false);
+				} else {
+					i.drawComponent(drawingAdapter,false,linkAndComponentArray);
+				}
+			}
+			drawFlag = false;
+		}
+		drawFlag = false;
+		var _g2 = 0;
+		var _g11 = this.linkArray;
+		while(_g2 < _g11.length) {
+			var i1 = _g11[_g2];
+			++_g2;
+			if(linkAndComponentArray != null && linkAndComponentArray.getLinkIteratorLength() != 0) {
+				var j2 = linkAndComponentArray.get_linkIterator();
+				while(j2.hasNext()) {
+					var j3 = j2.next();
+					if(j3 == i1) {
+						i1.drawLink(drawingAdapter,true);
+						drawFlag = true;
+					}
+				}
+			}
+			if(!drawFlag) {
+				i1.drawLink(drawingAdapter,false);
+			}
+			drawFlag = false;
+		}
+	}
+	,findHitList: function(coordinate,mode) {
+		var hitObjectArray = [];
+		var hitLinkArray = [];
+		var _g = 0;
+		var _g1 = this.linkArray;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			hitLinkArray = i.findHitList(coordinate,mode);
+			var _g2 = 0;
+			while(_g2 < hitLinkArray.length) {
+				var j = hitLinkArray[_g2];
+				++_g2;
+				j.set_circuitDiagram(this);
+				hitObjectArray.push(j);
+			}
+		}
+		var result = [];
+		var _g3 = 0;
+		var _g11 = this.componentArray;
+		while(_g3 < _g11.length) {
+			var i1 = _g11[_g3];
+			++_g3;
+			result = i1.findHitList(coordinate,mode);
+			var _g21 = 0;
+			while(_g21 < result.length) {
+				var j1 = result[_g21];
+				++_g21;
+				if(j1.get_circuitDiagram() == null) {
+					j1.set_circuitDiagram(this);
+				}
+				hitObjectArray.push(j1);
+			}
+		}
+		return hitObjectArray;
+	}
+	,findWorldPoint: function(worldCoordinate,mode) {
+		var worldPointArray = [];
+		var _g = 0;
+		var _g1 = this.componentArray;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			var tempWorldPointArray = i.findWorldPoint(worldCoordinate,mode);
+			var _g2 = 0;
+			while(_g2 < tempWorldPointArray.length) {
+				var j = tempWorldPointArray[_g2];
+				++_g2;
+				worldPointArray.push(j);
+			}
+			if(worldPointArray.length != 0) {
+				break;
+			}
+		}
+		if(worldPointArray.length == 0 || mode == com_mun_model_enumeration_POINT_$MODE.PATH) {
+			worldPointArray.push(new com_mun_type_WorldPoint(this,worldCoordinate));
+		}
+		return worldPointArray;
+	}
+	,isEmpty: function() {
+		if(this.componentArray.length == 0 && this.linkArray.length == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,createJSon: function() {
+		var jsonString = "{ \"name\": \"" + this.name + "\",";
+		jsonString += "\"diagramWidth\": \"" + this.diagramWidth + "\",";
+		jsonString += "\"diagramHeight\": \"" + this.diagramHeight + "\",";
+		jsonString += "\"xMin\": \"" + this.xMin + "\",";
+		jsonString += "\"yMin\": \"" + this.yMin + "\",";
+		jsonString += "\"xMax\": \"" + this.xMax + "\",";
+		jsonString += "\"yMax\": \"" + this.yMax + "\",";
+		jsonString += "\"ComponentArray\":[";
+		var _g1 = 0;
+		var _g = this.componentArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			jsonString += this.componentArray[i].createJSon();
+			if(i != this.componentArray.length - 1) {
+				jsonString += ",";
+			}
+		}
+		jsonString += "],";
+		jsonString += "\"LinkArray\":[";
+		var _g11 = 0;
+		var _g2 = this.linkArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			jsonString += this.linkArray[i1].createJSon();
+			if(i1 != this.linkArray.length - 1) {
+				jsonString += ",";
+			}
+		}
+		jsonString += "]}";
+		return jsonString;
+	}
+	,__class__: com_mun_model_component_CircuitDiagram
+});
+var com_mun_model_observe_Observable = function() {
+	this.observers = [];
+};
+$hxClasses["com.mun.model.observe.Observable"] = com_mun_model_observe_Observable;
+com_mun_model_observe_Observable.__name__ = ["com","mun","model","observe","Observable"];
+com_mun_model_observe_Observable.prototype = {
+	observers: null
+	,addObserver: function(obs) {
+		if(obs == null) {
+			return false;
+		} else {
+			this.observers.push(obs);
+			return true;
+		}
+	}
+	,removeObserver: function(obs) {
+		return HxOverrides.remove(this.observers,obs);
+	}
+	,notifyObservers: function(c,data) {
+		var _g = 0;
+		var _g1 = this.observers;
+		while(_g < _g1.length) {
+			var n = _g1[_g];
+			++_g;
+			n.update(c,data);
+		}
+	}
+	,__class__: com_mun_model_observe_Observable
+};
+var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
+	this.list = new haxe_ds_StringMap();
+	this.outportArray = [];
+	this.inportArray = [];
+	com_mun_model_observe_Observable.call(this);
+	this.xPosition = xPosition;
+	this.yPosition = yPosition;
+	this.height = height;
+	this.width = width;
+	this.componentKind = componentKind;
+	this.componentKind.set_component(this);
+	this.inportsNum = inportNum;
+	this.boxType = com_mun_model_enumeration_BOX.WHITE_BOX;
+	var portArray = [];
+	portArray = this.componentKind.createPorts(xPosition,yPosition,width,height,orientation,inportNum);
+	var _g1 = 0;
+	var _g = portArray.length;
+	while(_g1 < _g) {
+		var o = _g1++;
+		var port = portArray[o];
+		if(port.get_portDescription() == com_mun_model_enumeration_IOTYPE.INPUT || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.CLK || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.D || port.get_portDescription() == com_mun_model_enumeration_IOTYPE.S) {
+			this.inportArray.push(port);
+		} else {
+			this.outportArray.push(port);
+		}
+	}
+	var _g2 = 0;
+	var _g11 = componentKind.getAttr();
+	while(_g2 < _g11.length) {
+		var n = _g11[_g2];
+		++_g2;
+		if(n.getName() == "delay") {
+			var this1 = this.list;
+			var key = n.getName();
+			var value = new com_mun_model_attribute_DelayPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue());
+			var _this = this1;
+			if(__map_reserved[key] != null) {
+				_this.setReserved(key,value);
+			} else {
+				_this.h[key] = value;
+			}
+		} else if(n.getName() == "name") {
+			var this2 = this.list;
+			var key1 = n.getName();
+			var value1 = new com_mun_model_attribute_NamePair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue());
+			var _this1 = this2;
+			if(__map_reserved[key1] != null) {
+				_this1.setReserved(key1,value1);
+			} else {
+				_this1.h[key1] = value1;
+			}
+		} else if(n.getName() == "orientation") {
+			var this3 = this.list;
+			var key2 = n.getName();
+			var value2 = new com_mun_model_attribute_OrientationPair(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr),(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr)).getdefaultvalue());
+			var _this2 = this3;
+			if(__map_reserved[key2] != null) {
+				_this2.setReserved(key2,value2);
+			} else {
+				_this2.h[key2] = value2;
+			}
+		}
+	}
+	var _this3 = this.list;
+	(__map_reserved["orientation"] != null ? _this3.getReserved("orientation") : _this3.h["orientation"]).update(this,new com_mun_model_attribute_OrientationValue(orientation));
+};
+$hxClasses["com.mun.model.component.Component"] = com_mun_model_component_Component;
+com_mun_model_component_Component.__name__ = ["com","mun","model","component","Component"];
+com_mun_model_component_Component.__super__ = com_mun_model_observe_Observable;
+com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Observable.prototype,{
+	xPosition: null
+	,yPosition: null
+	,height: null
+	,width: null
+	,componentKind: null
+	,inportArray: null
+	,outportArray: null
+	,inportsNum: null
+	,boxType: null
+	,list: null
+	,cd: null
+	,getmap: function() {
+		return this.list;
+	}
+	,hasAttr: function(s) {
+		var _this = this.list;
+		if(__map_reserved[s] != null) {
+			return _this.existsReserved(s);
+		} else {
+			return _this.h.hasOwnProperty(s);
+		}
+	}
+	,getAttr: function(s) {
+		var _tmp0 = this.list;
+		var _e = _tmp0;
+		var _tmp1 = function(key) {
+			if(__map_reserved[key] != null) {
+				return _e.existsReserved(key);
+			} else {
+				return _e.h.hasOwnProperty(key);
+			}
+		};
+		var _tmp2 = s;
+		var _tmp3 = _tmp1(_tmp2);
+		if(!_tmp3) {
+			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
+			console.log("Throwing exception " + Std.string(e));
+			throw new js__$Boot_HaxeError(e);
+		}
+		var _this = this.list;
+		return (__map_reserved[s] != null ? _this.getReserved(s) : _this.h[s]).getAttrValue();
+	}
+	,getAttrInt: function(s) {
+		var _tmp0 = this.list;
+		var _e = _tmp0;
+		var _tmp1 = function(key) {
+			if(__map_reserved[key] != null) {
+				return _e.existsReserved(key);
+			} else {
+				return _e.h.hasOwnProperty(key);
+			}
+		};
+		var _tmp2 = s;
+		var _tmp3 = _tmp1(_tmp2);
+		if(!_tmp3) {
+			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
+			console.log("Throwing exception " + Std.string(e));
+			throw new js__$Boot_HaxeError(e);
+		}
+		var _this = this.list;
+		return (__map_reserved[s] != null ? _this.getReserved(s) : _this.h[s]).getAttrValue().getvalue();
+	}
+	,canupdate: function(s,v) {
+		var _tmp0 = this.list;
+		var _e = _tmp0;
+		var _tmp1 = function(key) {
+			if(__map_reserved[key] != null) {
+				return _e.existsReserved(key);
+			} else {
+				return _e.h.hasOwnProperty(key);
+			}
+		};
+		var _tmp2 = s;
+		var _tmp3 = _tmp1(_tmp2);
+		if(!_tmp3) {
+			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
+			console.log("Throwing exception " + Std.string(e));
+			throw new js__$Boot_HaxeError(e);
+		}
+		var _this = this.list;
+		if(__map_reserved[s] != null ? _this.existsReserved(s) : _this.h.hasOwnProperty(s)) {
+			var _this1 = this.list;
+			return (__map_reserved[s] != null ? _this1.getReserved(s) : _this1.h[s]).canupdate(this,v);
+		}
+		return false;
+	}
+	,update: function(s,v) {
+		var _tmp0 = this.list;
+		var _e = _tmp0;
+		var _tmp1 = function(key) {
+			if(__map_reserved[key] != null) {
+				return _e.existsReserved(key);
+			} else {
+				return _e.h.hasOwnProperty(key);
+			}
+		};
+		var _tmp2 = s;
+		var _tmp3 = _tmp1(_tmp2);
+		if(!_tmp3) {
+			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
+			console.log("Throwing exception " + Std.string(e));
+			throw new js__$Boot_HaxeError(e);
+		}
+		var _this = this.list;
+		if(__map_reserved[s] != null ? _this.existsReserved(s) : _this.h.hasOwnProperty(s)) {
+			var _this1 = this.list;
+			if((__map_reserved[s] != null ? _this1.getReserved(s) : _this1.h[s]).canupdate(this,v)) {
+				var _this2 = this.list;
+				return (__map_reserved[s] != null ? _this2.getReserved(s) : _this2.h[s]).update(this,v);
+			}
+		}
+		return false;
+	}
+	,get_CircuitDiagram: function() {
+		return this.cd;
+	}
+	,get_xPosition: function() {
+		return this.xPosition;
+	}
+	,set_xPosition: function(value) {
+		return this.xPosition = value;
+	}
+	,get_yPosition: function() {
+		return this.yPosition;
+	}
+	,set_yPosition: function(value) {
+		return this.yPosition = value;
+	}
+	,get_orientation: function() {
+		var _this = this.list;
+		return (__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue();
+	}
+	,set_orientation: function(value) {
+		var _this = this.list;
+		(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).update(this,new com_mun_model_attribute_OrientationValue(value));
+	}
+	,get_componentKind: function() {
+		return this.componentKind;
+	}
+	,set_componentKind: function(value) {
+		return this.componentKind = value;
+	}
+	,get_boxType: function() {
+		return this.boxType;
+	}
+	,set_boxType: function(value) {
+		this.boxType = value;
+	}
+	,get_inportIterator: function() {
+		return HxOverrides.iter(this.inportArray);
+	}
+	,get_inportIteratorLength: function() {
+		return this.inportArray.length;
+	}
+	,get_outportIteratorLength: function() {
+		return this.outportArray.length;
+	}
+	,get_outportIterator: function() {
+		return HxOverrides.iter(this.outportArray);
+	}
+	,get_name: function() {
+		var _this = this.list;
+		return (__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).getAttrValue().getvalue();
+	}
+	,set_name: function(value) {
+		var _this = this.list;
+		(__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).update(this,new com_mun_model_attribute_StringValue(value));
+	}
+	,get_height: function() {
+		return this.height;
+	}
+	,set_height: function(value) {
+		return this.height = value;
+	}
+	,get_width: function() {
+		return this.width;
+	}
+	,set_width: function(value) {
+		return this.width = value;
+	}
+	,get_delay: function() {
+		var _this = this.list;
+		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).getAttrValue().getvalue();
+	}
+	,set_delay: function(value) {
+		var _this = this.list;
+		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).update(this,new com_mun_model_attribute_IntValue(value));
+	}
+	,get_inportsNum: function() {
+		return this.inportsNum;
+	}
+	,setNameOfTheComponentKind: function(name) {
+	}
+	,getNameOfTheComponentKind: function() {
+		return this.componentKind.getname();
+	}
+	,set_inportsNum: function(value) {
+		if(value <= this.componentKind.getLeastInportNumber()) {
+			return false;
+		}
+		this.inportsNum = value;
+		while(this.inportArray.length < value) {
+			var port = this.componentKind.addInPort();
+			if(port != null) {
+				this.inportArray.push(port);
+			} else {
+				return false;
+			}
+		}
+		var _this = this.list;
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
+		return true;
+	}
+	,removeInport: function(inport) {
+		return HxOverrides.remove(this.inportArray,inport);
+	}
+	,updateMoveComponentPortPosition: function(xPosition,yPosition) {
+		var _this = this.list;
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
+		var _this1 = this.list;
+		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
+		return this;
+	}
+	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray) {
+		if(this.componentKind.checkInnerCircuitDiagramPortsChange()) {
+			var i = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				var inputFlag = false;
+				var outputFlag = false;
+				var _g = 0;
+				var _g1 = this.inportArray;
+				while(_g < _g1.length) {
+					var j = _g1[_g];
+					++_g;
+					if(i1.getNameOfTheComponentKind() == "Input") {
+						if(i1.get_componentKind().get_sequence() == j.get_sequence()) {
+							inputFlag = true;
+						}
+					}
+				}
+				var _g2 = 0;
+				var _g11 = this.outportArray;
+				while(_g2 < _g11.length) {
+					var j1 = _g11[_g2];
+					++_g2;
+					if(i1.getNameOfTheComponentKind() == "Output") {
+						if(i1.get_componentKind().get_sequence() == j1.get_sequence()) {
+							outputFlag = true;
+						}
+					}
+				}
+				if(!inputFlag && !outputFlag) {
+					if(i1.getNameOfTheComponentKind() == "Input") {
+						var port = this.componentKind.addInPort();
+						port.set_sequence(i1.get_componentKind().get_sequence());
+						this.inportArray.push(port);
+					} else {
+						var port1 = this.componentKind.addOutPort();
+						port1.set_sequence(i1.get_componentKind().get_sequence());
+						this.outportArray.push(port1);
+					}
+				}
+			}
+			var _g3 = 0;
+			var _g12 = this.inportArray;
+			while(_g3 < _g12.length) {
+				var i2 = _g12[_g3];
+				++_g3;
+				var flag_delete = true;
+				var j2 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+				while(j2.hasNext()) {
+					var j3 = j2.next();
+					if(i2.get_sequence() == j3.get_componentKind().get_sequence() && j3.getNameOfTheComponentKind() == "Input") {
+						flag_delete = false;
+					}
+				}
+				if(flag_delete) {
+					HxOverrides.remove(this.inportArray,i2);
+				}
+			}
+			var _g4 = 0;
+			var _g13 = this.outportArray;
+			while(_g4 < _g13.length) {
+				var i3 = _g13[_g4];
+				++_g4;
+				var flag_delete1 = true;
+				var j4 = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
+				while(j4.hasNext()) {
+					var j5 = j4.next();
+					if(i3.get_sequence() == j5.get_componentKind().get_sequence() && j5.getNameOfTheComponentKind() == "Output") {
+						flag_delete1 = false;
+					}
+				}
+				if(flag_delete1) {
+					HxOverrides.remove(this.outportArray,i3);
+				}
+			}
+			var _this = this.list;
+			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
+			var _this1 = this.list;
+			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
+		}
+		if(this.componentKind.getname() != "CC") {
+			this.componentKind.drawComponent(drawingAdpater,highLight);
+		} else {
+			this.componentKind.drawComponent(drawingAdpater,highLight,linkAndComponentArray);
+		}
+	}
+	,findHitList: function(coordinate,mode) {
+		return this.componentKind.findHitList(coordinate,mode);
+	}
+	,findWorldPoint: function(coordinate,mode) {
+		return this.componentKind.findWorldPoint(coordinate,mode);
+	}
+	,createJSon: function() {
+		var _this = this.list;
+		var jsonString = "{ \"name\": \"" + Std.string((__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).getAttrValue().getvalue()) + "\",";
+		jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
+		jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
+		jsonString += " \"height\": \"" + this.height + "\",";
+		jsonString += " \"width\": \"" + this.width + "\",";
+		var _this1 = this.list;
+		jsonString += " \"orientation\": \"" + Std.string((__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue()) + "\",";
+		var _this2 = this.list;
+		jsonString += " \"delay\": \"" + Std.string((__map_reserved["delay"] != null ? _this2.getReserved("delay") : _this2.h["delay"]).getAttrValue().getvalue()) + "\",";
+		jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
+		jsonString += " \"nameOfTheComponentKind\": \"" + this.componentKind.getname() + "\",";
+		jsonString += "\"componentKind\":";
+		jsonString += this.componentKind.createJSon();
+		jsonString += ",";
+		jsonString += "\"inportArray\":[";
+		var _g1 = 0;
+		var _g = this.inportArray.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			jsonString += this.inportArray[i].createJSon();
+			if(i != this.inportArray.length - 1) {
+				jsonString += ",";
+			}
+		}
+		jsonString += "],";
+		jsonString += "\"outportArray\":[";
+		var _g11 = 0;
+		var _g2 = this.outportArray.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			jsonString += this.outportArray[i1].createJSon();
+			if(i1 != this.outportArray.length - 1) {
+				jsonString += ",";
+			}
+		}
+		jsonString += "]}";
+		return jsonString;
+	}
+	,__class__: com_mun_model_component_Component
+});
+var com_mun_model_component_Endpoint = function(xPosition,yPosition) {
+	this.xPosition = xPosition;
+	this.yPosition = yPosition;
+};
+$hxClasses["com.mun.model.component.Endpoint"] = com_mun_model_component_Endpoint;
+com_mun_model_component_Endpoint.__name__ = ["com","mun","model","component","Endpoint"];
+com_mun_model_component_Endpoint.prototype = {
+	xPosition: null
+	,yPosition: null
+	,port: null
+	,get_xPosition: function() {
+		return this.xPosition;
+	}
+	,get_yPosition: function() {
+		return this.yPosition;
+	}
+	,get_port: function() {
+		return this.port;
+	}
+	,set_xPosition: function(value) {
+		return this.xPosition = value;
+	}
+	,set_yPosition: function(value) {
+		return this.yPosition = value;
+	}
+	,set_port: function(value) {
+		return this.port = value;
+	}
+	,updatePosition: function() {
+		if(this.port != null) {
+			this.xPosition = this.port.get_xPosition();
+			this.yPosition = this.port.get_yPosition();
+		}
+	}
+	,createJSon: function() {
+		var jsonString = "{ \"xPosition\": \"" + this.xPosition + "\",";
+		jsonString += "\"yPosition\": \"" + this.yPosition + "\"";
+		jsonString += "}";
+		return jsonString;
+	}
+	,__class__: com_mun_model_component_Endpoint
+};
+var com_mun_model_component_Port = function() { };
+$hxClasses["com.mun.model.component.Port"] = com_mun_model_component_Port;
+com_mun_model_component_Port.__name__ = ["com","mun","model","component","Port"];
+com_mun_model_component_Port.prototype = {
+	get_xPosition: null
+	,get_yPosition: null
+	,set_xPosition: null
+	,set_yPosition: null
+	,get_value: null
+	,set_value: null
+	,get_portDescription: null
+	,set_portDescription: null
+	,get_sequence: null
+	,set_sequence: null
+	,createJSon: null
+	,__class__: com_mun_model_component_Port
+};
+var com_mun_model_component_Inport = function(xPosition,yPosition) {
+	this.sequence = -1;
+	this.xPosition = xPosition;
+	this.yPosition = yPosition;
+	this.portDescription = com_mun_model_enumeration_IOTYPE.INPUT;
+};
+$hxClasses["com.mun.model.component.Inport"] = com_mun_model_component_Inport;
+com_mun_model_component_Inport.__name__ = ["com","mun","model","component","Inport"];
+com_mun_model_component_Inport.__interfaces__ = [com_mun_model_component_Port];
+com_mun_model_component_Inport.prototype = {
+	xPosition: null
+	,yPosition: null
+	,portDescription: null
+	,value: null
+	,sequence: null
+	,get_xPosition: function() {
+		return this.xPosition;
+	}
+	,get_yPosition: function() {
+		return this.yPosition;
+	}
+	,set_xPosition: function(xPosition) {
+		this.xPosition = xPosition;
+	}
+	,set_yPosition: function(yPosition) {
+		this.yPosition = yPosition;
+	}
+	,get_value: function() {
+		return this.value;
+	}
+	,set_value: function(value) {
+		this.value = value;
+	}
+	,get_portDescription: function() {
+		return this.portDescription;
+	}
+	,set_portDescription: function(value) {
+		this.portDescription = value;
+	}
+	,get_sequence: function() {
+		return this.sequence;
+	}
+	,set_sequence: function(sequence) {
+		this.sequence = sequence;
+	}
+	,createJSon: function() {
+		var jsonString = "{ \"xPosition\": \"" + this.xPosition + "\",";
+		jsonString += "\"yPosition\": \"" + this.yPosition + "\",";
+		jsonString += "\"portDescription\": \"" + Std.string(this.portDescription) + "\",";
+		jsonString += "\"value\": \"" + Std.string(this.value) + "\",";
+		jsonString += "\"sequence\": \"" + this.sequence + "\"";
+		jsonString += "}";
+		return jsonString;
+	}
+	,__class__: com_mun_model_component_Inport
+};
+var com_mun_model_component_Link = function(leftEndpoint,rightEndpoint) {
+	this.leftEndpoint = leftEndpoint;
+	this.rightEndpoint = rightEndpoint;
+};
+$hxClasses["com.mun.model.component.Link"] = com_mun_model_component_Link;
+com_mun_model_component_Link.__name__ = ["com","mun","model","component","Link"];
+com_mun_model_component_Link.prototype = {
+	leftEndpoint: null
+	,rightEndpoint: null
+	,getLinkLength: function() {
+		return Math.sqrt(Math.pow(Math.abs(this.leftEndpoint.get_xPosition() - this.rightEndpoint.get_xPosition()),2) + Math.pow(Math.abs(this.leftEndpoint.get_yPosition() - this.rightEndpoint.get_yPosition()),2));
+	}
+	,get_leftEndpoint: function() {
+		return this.leftEndpoint;
+	}
+	,set_leftEndpoint: function(value) {
+		return this.leftEndpoint = value;
+	}
+	,get_rightEndpoint: function() {
+		return this.rightEndpoint;
+	}
+	,set_rightEndpoint: function(value) {
+		return this.rightEndpoint = value;
+	}
+	,drawLink: function(drawingAdapter,highLight) {
+		var drawComponent = new com_mun_view_drawComponents_DrawLink(this,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,findHitList: function(coordinate,mode) {
+		var hitObjectArray = [];
+		var link = this.isOnLink(coordinate);
+		if(link != null) {
+			var hitObject = new com_mun_type_HitObject();
+			hitObject.set_link(link);
+			hitObjectArray.push(hitObject);
+		}
+		var endpoint = this.pointOnEndpoint(coordinate);
+		if(endpoint != null) {
+			var hitObject1 = new com_mun_type_HitObject();
+			hitObject1.set_endpoint(endpoint);
+			hitObjectArray.push(hitObject1);
+		}
+		return hitObjectArray;
+	}
+	,pointOnEndpoint: function(coordinate) {
+		if(this.pointsDistance(this.leftEndpoint.get_xPosition(),this.leftEndpoint.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToEndpointDistance) {
+			return this.leftEndpoint;
+		}
+		if(this.pointsDistance(this.rightEndpoint.get_xPosition(),this.rightEndpoint.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToEndpointDistance) {
+			return this.rightEndpoint;
+		}
+		return null;
+	}
+	,isOnLink: function(coordinate) {
+		if(this.pointToLine(this.leftEndpoint.get_xPosition(),this.leftEndpoint.get_yPosition(),this.rightEndpoint.get_xPosition(),this.rightEndpoint.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition()) <= com_mun_global_Constant.pointToLineDistance) {
+			var theDistanaceToLeftEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.get_xPosition() - this.leftEndpoint.get_xPosition()),2) + Math.pow(Math.abs(coordinate.get_yPosition() - this.leftEndpoint.get_yPosition()),2));
+			var theDistanceToRightEndpoint = Math.sqrt(Math.pow(Math.abs(coordinate.get_xPosition() - this.rightEndpoint.get_xPosition()),2) + Math.pow(Math.abs(coordinate.get_yPosition() - this.rightEndpoint.get_yPosition()),2));
+			if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint) {
+				if(theDistanceToRightEndpoint >= com_mun_global_Constant.pointToEndpointDistance) {
+					return this;
+				}
+			} else if(theDistanaceToLeftEndpoint >= com_mun_global_Constant.pointToEndpointDistance) {
+				return this;
+			}
+		}
+		return null;
+	}
+	,pointToLine: function(x1,y1,x2,y2,x0,y0) {
+		var space = 0;
+		var a;
+		var b;
+		var c;
+		a = this.pointsDistance(x1,y1,x2,y2);
+		b = this.pointsDistance(x1,y1,x0,y0);
+		c = this.pointsDistance(x2,y2,x0,y0);
+		if(c + b == a) {
+			space = 0;
+			return space;
+		}
+		if(a <= 0.00001) {
+			space = b;
+			return space;
+		}
+		if(c * c > a * a + b * b) {
+			space = b;
+			return space;
+		}
+		if(b * b >= a * a + c * c) {
+			space = c;
+			return space;
+		}
+		var p = (a + b + c) / 2;
+		var s = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+		space = 2 * s / a;
+		return space;
+	}
+	,pointsDistance: function(x1,y1,x2,y2) {
+		var lineLength = 0;
+		lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+		return lineLength;
+	}
+	,createJSon: function() {
+		var jsonString = "{ \"leftEndpoint\": " + this.leftEndpoint.createJSon() + ",";
+		jsonString += "\"rightEndpoint\": " + this.rightEndpoint.createJSon();
+		jsonString += "}";
+		return jsonString;
+	}
+	,__class__: com_mun_model_component_Link
+};
+var com_mun_model_drawingInterface_DrawingAdapterI = function() { };
+$hxClasses["com.mun.model.drawingInterface.DrawingAdapterI"] = com_mun_model_drawingInterface_DrawingAdapterI;
+com_mun_model_drawingInterface_DrawingAdapterI.__name__ = ["com","mun","model","drawingInterface","DrawingAdapterI"];
+com_mun_model_drawingInterface_DrawingAdapterI.prototype = {
+	setStrokeColor: null
+	,setFillColor: null
+	,setTextColor: null
+	,setTextFont: null
+	,setLineWidth: null
+	,get_cxt: null
+	,set_cxt: null
+	,getTransform: null
+	,transform: null
+	,resetDrawingParam: null
+	,drawAndShape: null
+	,drawNAndShape: null
+	,drawOrShape: null
+	,drawNOrShape: null
+	,drawBufferShape: null
+	,drawNotShape: null
+	,drawXorShape: null
+	,drawRect: null
+	,drawText: null
+	,drawCricle: null
+	,drawLine: null
+	,__class__: com_mun_model_drawingInterface_DrawingAdapterI
+};
+var com_mun_model_enumeration_AttrType = { __ename__ : true, __constructs__ : ["INT","STRING","Orientation"] };
+com_mun_model_enumeration_AttrType.INT = ["INT",0];
+com_mun_model_enumeration_AttrType.INT.toString = $estr;
+com_mun_model_enumeration_AttrType.INT.__enum__ = com_mun_model_enumeration_AttrType;
+com_mun_model_enumeration_AttrType.STRING = ["STRING",1];
+com_mun_model_enumeration_AttrType.STRING.toString = $estr;
+com_mun_model_enumeration_AttrType.STRING.__enum__ = com_mun_model_enumeration_AttrType;
+com_mun_model_enumeration_AttrType.Orientation = ["Orientation",2];
+com_mun_model_enumeration_AttrType.Orientation.toString = $estr;
+com_mun_model_enumeration_AttrType.Orientation.__enum__ = com_mun_model_enumeration_AttrType;
+var com_mun_model_enumeration_BOX = { __ename__ : true, __constructs__ : ["WHITE_BOX","BLACK_BOX"] };
+com_mun_model_enumeration_BOX.WHITE_BOX = ["WHITE_BOX",0];
+com_mun_model_enumeration_BOX.WHITE_BOX.toString = $estr;
+com_mun_model_enumeration_BOX.WHITE_BOX.__enum__ = com_mun_model_enumeration_BOX;
+com_mun_model_enumeration_BOX.BLACK_BOX = ["BLACK_BOX",1];
+com_mun_model_enumeration_BOX.BLACK_BOX.toString = $estr;
+com_mun_model_enumeration_BOX.BLACK_BOX.__enum__ = com_mun_model_enumeration_BOX;
+var com_mun_model_enumeration_IOTYPE = { __ename__ : true, __constructs__ : ["INPUT","S","D","CLK","OUTPUT","Q","QN"] };
+com_mun_model_enumeration_IOTYPE.INPUT = ["INPUT",0];
+com_mun_model_enumeration_IOTYPE.INPUT.toString = $estr;
+com_mun_model_enumeration_IOTYPE.INPUT.__enum__ = com_mun_model_enumeration_IOTYPE;
+com_mun_model_enumeration_IOTYPE.S = ["S",1];
+com_mun_model_enumeration_IOTYPE.S.toString = $estr;
+com_mun_model_enumeration_IOTYPE.S.__enum__ = com_mun_model_enumeration_IOTYPE;
+com_mun_model_enumeration_IOTYPE.D = ["D",2];
+com_mun_model_enumeration_IOTYPE.D.toString = $estr;
+com_mun_model_enumeration_IOTYPE.D.__enum__ = com_mun_model_enumeration_IOTYPE;
+com_mun_model_enumeration_IOTYPE.CLK = ["CLK",3];
+com_mun_model_enumeration_IOTYPE.CLK.toString = $estr;
+com_mun_model_enumeration_IOTYPE.CLK.__enum__ = com_mun_model_enumeration_IOTYPE;
+com_mun_model_enumeration_IOTYPE.OUTPUT = ["OUTPUT",4];
+com_mun_model_enumeration_IOTYPE.OUTPUT.toString = $estr;
+com_mun_model_enumeration_IOTYPE.OUTPUT.__enum__ = com_mun_model_enumeration_IOTYPE;
+com_mun_model_enumeration_IOTYPE.Q = ["Q",5];
+com_mun_model_enumeration_IOTYPE.Q.toString = $estr;
+com_mun_model_enumeration_IOTYPE.Q.__enum__ = com_mun_model_enumeration_IOTYPE;
+com_mun_model_enumeration_IOTYPE.QN = ["QN",6];
+com_mun_model_enumeration_IOTYPE.QN.toString = $estr;
+com_mun_model_enumeration_IOTYPE.QN.__enum__ = com_mun_model_enumeration_IOTYPE;
+var com_mun_model_enumeration_MODE = { __ename__ : true, __constructs__ : ["EXCLUDE_PARENTS","INCLUDE_PARENTS"] };
+com_mun_model_enumeration_MODE.EXCLUDE_PARENTS = ["EXCLUDE_PARENTS",0];
+com_mun_model_enumeration_MODE.EXCLUDE_PARENTS.toString = $estr;
+com_mun_model_enumeration_MODE.EXCLUDE_PARENTS.__enum__ = com_mun_model_enumeration_MODE;
+com_mun_model_enumeration_MODE.INCLUDE_PARENTS = ["INCLUDE_PARENTS",1];
+com_mun_model_enumeration_MODE.INCLUDE_PARENTS.toString = $estr;
+com_mun_model_enumeration_MODE.INCLUDE_PARENTS.__enum__ = com_mun_model_enumeration_MODE;
+var com_mun_model_enumeration_ORIENTATION = { __ename__ : true, __constructs__ : ["NORTH","SOUTH","WEST","EAST","UNKNOW"] };
+com_mun_model_enumeration_ORIENTATION.NORTH = ["NORTH",0];
+com_mun_model_enumeration_ORIENTATION.NORTH.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.NORTH.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.SOUTH = ["SOUTH",1];
+com_mun_model_enumeration_ORIENTATION.SOUTH.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.SOUTH.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.WEST = ["WEST",2];
+com_mun_model_enumeration_ORIENTATION.WEST.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.WEST.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.EAST = ["EAST",3];
+com_mun_model_enumeration_ORIENTATION.EAST.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.EAST.__enum__ = com_mun_model_enumeration_ORIENTATION;
+com_mun_model_enumeration_ORIENTATION.UNKNOW = ["UNKNOW",4];
+com_mun_model_enumeration_ORIENTATION.UNKNOW.toString = $estr;
+com_mun_model_enumeration_ORIENTATION.UNKNOW.__enum__ = com_mun_model_enumeration_ORIENTATION;
+var com_mun_model_enumeration_POINT_$MODE = { __ename__ : true, __constructs__ : ["ONE","PATH"] };
+com_mun_model_enumeration_POINT_$MODE.ONE = ["ONE",0];
+com_mun_model_enumeration_POINT_$MODE.ONE.toString = $estr;
+com_mun_model_enumeration_POINT_$MODE.ONE.__enum__ = com_mun_model_enumeration_POINT_$MODE;
+com_mun_model_enumeration_POINT_$MODE.PATH = ["PATH",1];
+com_mun_model_enumeration_POINT_$MODE.PATH.toString = $estr;
+com_mun_model_enumeration_POINT_$MODE.PATH.__enum__ = com_mun_model_enumeration_POINT_$MODE;
+var com_mun_model_enumeration_VALUE_$LOGIC = { __ename__ : true, __constructs__ : ["FALSE","TRUE","UNDEFINED","RISING_EDGE","DOWN_EDGE"] };
+com_mun_model_enumeration_VALUE_$LOGIC.FALSE = ["FALSE",0];
+com_mun_model_enumeration_VALUE_$LOGIC.FALSE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.FALSE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.TRUE = ["TRUE",1];
+com_mun_model_enumeration_VALUE_$LOGIC.TRUE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.TRUE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED = ["UNDEFINED",2];
+com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE = ["RISING_EDGE",3];
+com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE = ["DOWN_EDGE",4];
+com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE.toString = $estr;
+com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
+var com_mun_model_gates_ComponentKind = function() { };
+$hxClasses["com.mun.model.gates.ComponentKind"] = com_mun_model_gates_ComponentKind;
+com_mun_model_gates_ComponentKind.__name__ = ["com","mun","model","gates","ComponentKind"];
+com_mun_model_gates_ComponentKind.prototype = {
+	getLeastInportNumber: null
+	,getname: null
+	,getDelay: null
+	,setDelay: null
+	,getAttr: null
+	,algorithm: null
+	,createPorts: null
+	,checkInnerCircuitDiagramPortsChange: null
+	,addInPort: null
+	,addOutPort: null
+	,updateInPortPosition: null
+	,updateOutPortPosition: null
+	,drawComponent: null
+	,get_sequence: null
+	,set_sequence: null
+	,get_component: null
+	,set_component: null
+	,findHitList: null
+	,findWorldPoint: null
+	,getInnerCircuitDiagram: null
+	,createJSon: null
+	,setname: null
+	,__class__: com_mun_model_gates_ComponentKind
+};
+var com_mun_type_Coordinate = function(xPosition,yPosition) {
+	this.set_xPosition(xPosition);
+	this.set_yPosition(yPosition);
+};
+$hxClasses["com.mun.type.Coordinate"] = com_mun_type_Coordinate;
+com_mun_type_Coordinate.__name__ = ["com","mun","type","Coordinate"];
+com_mun_type_Coordinate.prototype = {
+	xPosition: null
+	,yPosition: null
+	,get_xPosition: function() {
+		return this.xPosition;
+	}
+	,set_xPosition: function(value) {
+		return this.xPosition = value;
+	}
+	,get_yPosition: function() {
+		return this.yPosition;
+	}
+	,set_yPosition: function(value) {
+		return this.yPosition = value;
+	}
+	,__class__: com_mun_type_Coordinate
+	,__properties__: {set_yPosition:"set_yPosition",get_yPosition:"get_yPosition",set_xPosition:"set_xPosition",get_xPosition:"get_xPosition"}
+};
+var com_mun_type_HitObject = function() {
+};
+$hxClasses["com.mun.type.HitObject"] = com_mun_type_HitObject;
+com_mun_type_HitObject.__name__ = ["com","mun","type","HitObject"];
+com_mun_type_HitObject.prototype = {
+	circuitDiagram: null
+	,component: null
+	,link: null
+	,port: null
+	,endpoint: null
+	,hitNothing: function() {
+		if(this.component == null && this.link == null && this.port == null && this.endpoint == null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,get_circuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,set_circuitDiagram: function(value) {
+		return this.circuitDiagram = value;
+	}
+	,get_component: function() {
+		return this.component;
+	}
+	,set_component: function(value) {
+		return this.component = value;
+	}
+	,get_link: function() {
+		return this.link;
+	}
+	,set_link: function(value) {
+		return this.link = value;
+	}
+	,get_port: function() {
+		return this.port;
+	}
+	,set_port: function(value) {
+		return this.port = value;
+	}
+	,get_endpoint: function() {
+		return this.endpoint;
+	}
+	,set_endpoint: function(value) {
+		return this.endpoint = value;
+	}
+	,__class__: com_mun_type_HitObject
+};
+var com_mun_type_LinkAndComponentAndEndpointAndPortArray = function() {
+	this.linkArray = [];
+	this.componentArray = [];
+	this.endponentArray = [];
+	this.portArray = [];
+};
+$hxClasses["com.mun.type.LinkAndComponentAndEndpointAndPortArray"] = com_mun_type_LinkAndComponentAndEndpointAndPortArray;
+com_mun_type_LinkAndComponentAndEndpointAndPortArray.__name__ = ["com","mun","type","LinkAndComponentAndEndpointAndPortArray"];
+com_mun_type_LinkAndComponentAndEndpointAndPortArray.prototype = {
+	linkArray: null
+	,componentArray: null
+	,endponentArray: null
+	,portArray: null
+	,addLink: function(link) {
+		if(this.linkArray.indexOf(link) == -1 && link != null) {
+			this.linkArray.push(link);
+		}
+	}
+	,addComponent: function(component) {
+		if(this.componentArray.indexOf(component) == -1 && component != null) {
+			this.componentArray.push(component);
+		}
+	}
+	,addEndpoint: function(endpoint) {
+		if(this.endponentArray.indexOf(endpoint) == -1 && endpoint != null) {
+			this.endponentArray.push(endpoint);
+		}
+	}
+	,addPort: function(port) {
+		if(this.portArray.indexOf(port) == -1 && port != null) {
+			this.portArray.push(port);
+		}
+	}
+	,removeLink: function(link) {
+		if(this.linkArray.indexOf(link) != -1 && link != null) {
+			HxOverrides.remove(this.linkArray,link);
+		}
+	}
+	,removeComponent: function(component) {
+		if(this.componentArray.indexOf(component) != -1 && component != null) {
+			HxOverrides.remove(this.componentArray,component);
+		}
+	}
+	,removeEndpoint: function(endpoint) {
+		if(this.endponentArray.indexOf(endpoint) != -1 && endpoint != null) {
+			HxOverrides.remove(this.endponentArray,endpoint);
+		}
+	}
+	,removePort: function(port) {
+		if(this.portArray.indexOf(port) != -1 && port != null) {
+			HxOverrides.remove(this.portArray,port);
+		}
+	}
+	,get_linkIterator: function() {
+		return HxOverrides.iter(this.linkArray);
+	}
+	,get_componentIterator: function() {
+		return HxOverrides.iter(this.componentArray);
+	}
+	,get_endpointIterator: function() {
+		return HxOverrides.iter(this.endponentArray);
+	}
+	,get_portIterator: function() {
+		return HxOverrides.iter(this.portArray);
+	}
+	,getLinkIteratorLength: function() {
+		return this.linkArray.length;
+	}
+	,getEndppointIteratorLength: function() {
+		return this.endponentArray.length;
+	}
+	,getComponentIteratorLength: function() {
+		return this.componentArray.length;
+	}
+	,getPortIteratorLength: function() {
+		return this.portArray.length;
+	}
+	,getComponentFromIndex: function(index) {
+		return this.componentArray[index];
+	}
+	,getLinkFromIndex: function(index) {
+		return this.linkArray[index];
+	}
+	,getEndpointFromIndex: function(index) {
+		return this.endponentArray[index];
+	}
+	,getPortFromIndex: function(index) {
+		return this.portArray[index];
+	}
+	,setArray: function(array) {
+		this.clean();
+		var i = array.get_linkIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			this.addLink(i1);
+		}
+		var i2 = array.get_componentIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			this.addComponent(i3);
+		}
+		var i4 = array.get_portIterator();
+		while(i4.hasNext()) {
+			var i5 = i4.next();
+			this.addPort(i5);
+		}
+		var i6 = array.get_endpointIterator();
+		while(i6.hasNext()) {
+			var i7 = i6.next();
+			this.addEndpoint(i7);
+		}
+	}
+	,clean: function() {
+		this.linkArray.splice(0,this.linkArray.length);
+		this.componentArray.splice(0,this.componentArray.length);
+		this.endponentArray.splice(0,this.endponentArray.length);
+		this.portArray.splice(0,this.portArray.length);
+	}
+	,isEmpty: function() {
+		if(this.linkArray.length == 0 && this.componentArray.length == 0 && this.endponentArray.length == 0 && this.portArray.length == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,__class__: com_mun_type_LinkAndComponentAndEndpointAndPortArray
+};
+var com_mun_type_WorldPoint = function(circuitDiagram,coordinate) {
+	this.circuitDiagram = circuitDiagram;
+	this.coordinate = coordinate;
+};
+$hxClasses["com.mun.type.WorldPoint"] = com_mun_type_WorldPoint;
+com_mun_type_WorldPoint.__name__ = ["com","mun","type","WorldPoint"];
+com_mun_type_WorldPoint.prototype = {
+	circuitDiagram: null
+	,coordinate: null
+	,get_circuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,set_circuitDiagram: function(value) {
+		return this.circuitDiagram = value;
+	}
+	,get_coordinate: function() {
+		return this.coordinate;
+	}
+	,set_coordinate: function(value) {
+		return this.coordinate = value;
+	}
+	,__class__: com_mun_type_WorldPoint
+};
+var com_mun_view_drawComponents_DrawComponent = function() { };
+$hxClasses["com.mun.view.drawComponents.DrawComponent"] = com_mun_view_drawComponents_DrawComponent;
+com_mun_view_drawComponents_DrawComponent.__name__ = ["com","mun","view","drawComponents","DrawComponent"];
+com_mun_view_drawComponents_DrawComponent.prototype = {
+	drawCorrespondingComponent: null
+	,__class__: com_mun_view_drawComponents_DrawComponent
+};
+var com_mun_view_drawComponents_DrawLink = function(link,drawingAdapter) {
+	this.link = link;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["com.mun.view.drawComponents.DrawLink"] = com_mun_view_drawComponents_DrawLink;
+com_mun_view_drawComponents_DrawLink.__name__ = ["com","mun","view","drawComponents","DrawLink"];
+com_mun_view_drawComponents_DrawLink.__interfaces__ = [com_mun_view_drawComponents_DrawComponent];
+com_mun_view_drawComponents_DrawLink.prototype = {
+	drawingAdapter: null
+	,link: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawLine(this.link.get_leftEndpoint().get_xPosition(),this.link.get_leftEndpoint().get_yPosition(),this.link.get_rightEndpoint().get_xPosition(),this.link.get_rightEndpoint().get_yPosition());
+	}
+	,__class__: com_mun_view_drawComponents_DrawLink
+};
+var com_mun_view_drawingImpl_RectangleI = function() { };
+$hxClasses["com.mun.view.drawingImpl.RectangleI"] = com_mun_view_drawingImpl_RectangleI;
+com_mun_view_drawingImpl_RectangleI.__name__ = ["com","mun","view","drawingImpl","RectangleI"];
+com_mun_view_drawingImpl_RectangleI.prototype = {
+	min: null
+	,max: null
+	,width: null
+	,height: null
+	,set_minCoordinate: null
+	,set_maxCoordinate: null
+	,__class__: com_mun_view_drawingImpl_RectangleI
+};
+var com_mun_view_drawingImpl_Rectangle = function(corner0,corner1) {
+	this.minCoordinate = new com_mun_type_Coordinate(Math.min(corner0.get_xPosition(),corner1.get_xPosition()),Math.min(corner0.get_yPosition(),corner1.get_yPosition()));
+	this.maxCoordinate = new com_mun_type_Coordinate(Math.max(corner0.get_xPosition(),corner1.get_xPosition()),Math.max(corner0.get_yPosition(),corner1.get_yPosition()));
+	this.updateWidthAndHeight();
+};
+$hxClasses["com.mun.view.drawingImpl.Rectangle"] = com_mun_view_drawingImpl_Rectangle;
+com_mun_view_drawingImpl_Rectangle.__name__ = ["com","mun","view","drawingImpl","Rectangle"];
+com_mun_view_drawingImpl_Rectangle.__interfaces__ = [com_mun_view_drawingImpl_RectangleI];
+com_mun_view_drawingImpl_Rectangle.prototype = {
+	minCoordinate: null
+	,maxCoordinate: null
+	,width_: null
+	,height_: null
+	,min: function() {
+		return this.minCoordinate;
+	}
+	,max: function() {
+		return this.maxCoordinate;
+	}
+	,width: function() {
+		return this.width_;
+	}
+	,height: function() {
+		return this.height_;
+	}
+	,set_minCoordinate: function(value) {
+		this.minCoordinate = value;
+		this.updateWidthAndHeight();
+	}
+	,set_maxCoordinate: function(value) {
+		this.maxCoordinate = value;
+		this.updateWidthAndHeight();
+	}
+	,updateWidthAndHeight: function() {
+		this.width_ = this.maxCoordinate.get_xPosition() - this.minCoordinate.get_xPosition();
+		this.height_ = this.maxCoordinate.get_yPosition() - this.minCoordinate.get_yPosition();
+	}
+	,__class__: com_mun_view_drawingImpl_Rectangle
+};
+var com_mun_view_drawingImpl_Transform = function(m,im) {
+	this.convertMatrix = m;
+	this.invertMatrix = im;
+};
+$hxClasses["com.mun.view.drawingImpl.Transform"] = com_mun_view_drawingImpl_Transform;
+com_mun_view_drawingImpl_Transform.__name__ = ["com","mun","view","drawingImpl","Transform"];
+com_mun_view_drawingImpl_Transform.identity = function() {
+	return new com_mun_view_drawingImpl_Transform([1,0,0,0,1,0,0,0,1],[1,0,0,0,1,0,0,0,1]);
+};
+com_mun_view_drawingImpl_Transform.prototype = {
+	convertMatrix: null
+	,invertMatrix: null
+	,pointConvert: function(c) {
+		return new com_mun_type_Coordinate(this.convertMatrix[0] * c.get_xPosition() + this.convertMatrix[1] * c.get_yPosition() + this.convertMatrix[2],this.convertMatrix[3] * c.get_xPosition() + this.convertMatrix[4] * c.get_yPosition() + this.convertMatrix[5]);
+	}
+	,pointInvert: function(c) {
+		return new com_mun_type_Coordinate(this.invertMatrix[0] * c.get_xPosition() + this.invertMatrix[1] * c.get_yPosition() + this.invertMatrix[2],this.invertMatrix[3] * c.get_xPosition() + this.invertMatrix[4] * c.get_yPosition() + this.invertMatrix[5]);
+	}
+	,rectConvert: function(c) {
+		var maxCoordinate = this.pointConvert(c.max());
+		var minCoordinate = this.pointConvert(c.min());
+		return new com_mun_view_drawingImpl_Rectangle(maxCoordinate,minCoordinate);
+	}
+	,rectInvert: function(c) {
+		var maxCoordinate = this.pointInvert(c.max());
+		var minCoordinate = this.pointInvert(c.min());
+		return new com_mun_view_drawingImpl_Rectangle(maxCoordinate,minCoordinate);
+	}
+	,scale: function(xRatio,yRatio) {
+		var scaleArray = [xRatio,0,0,0,yRatio,0,0,0,1];
+		var invScaleArray = [1 / xRatio,0,0,0,1 / yRatio,0,0,0,1];
+		return new com_mun_view_drawingImpl_Transform(this.multiply(scaleArray,this.convertMatrix),this.multiply(this.invertMatrix,invScaleArray));
+	}
+	,translate: function(xDelta,yDelta) {
+		var translateArray = [1,0,xDelta,0,1,yDelta,0,0,1];
+		var invTranslateArray = [1,0,-xDelta,0,1,-yDelta,0,0,1];
+		return new com_mun_view_drawingImpl_Transform(this.multiply(translateArray,this.convertMatrix),this.multiply(this.invertMatrix,invTranslateArray));
+	}
+	,quadrantRotate: function(n) {
+		return null;
+	}
+	,compose: function(other) {
+		return new com_mun_view_drawingImpl_Transform(this.multiply(other.convertMatrix,this.convertMatrix),this.multiply(this.invertMatrix,other.invertMatrix));
+	}
+	,multiply: function(matrix1,matrix2) {
+		var n = Math.sqrt(matrix1.length);
+		var tempArray = [];
+		var _g1 = 0;
+		var _g = n;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var _g3 = 0;
+			var _g2 = n;
+			while(_g3 < _g2) {
+				var j = _g3++;
+				tempArray[n * i + j] = 0;
+			}
+		}
+		var _g11 = 0;
+		var _g4 = n;
+		while(_g11 < _g4) {
+			var i1 = _g11++;
+			var _g31 = 0;
+			var _g21 = n;
+			while(_g31 < _g21) {
+				var j1 = _g31++;
+				var _g5 = 0;
+				var _g41 = n;
+				while(_g5 < _g41) {
+					var k = _g5++;
+					tempArray[n * i1 + j1] += matrix1[n * i1 + k] * matrix2[n * k + j1];
+				}
+			}
+		}
+		return tempArray;
+	}
+	,__class__: com_mun_view_drawingImpl_Transform
+};
 var haxe_IMap = function() { };
 $hxClasses["haxe.IMap"] = haxe_IMap;
 haxe_IMap.__name__ = ["haxe","IMap"];
@@ -817,7 +2980,9 @@ haxe_Utf8.prototype = {
 	__b: null
 	,__class__: haxe_Utf8
 };
-var haxe_ds_StringMap = function() { };
+var haxe_ds_StringMap = function() {
+	this.h = { };
+};
 $hxClasses["haxe.ds.StringMap"] = haxe_ds_StringMap;
 haxe_ds_StringMap.__name__ = ["haxe","ds","StringMap"];
 haxe_ds_StringMap.__interfaces__ = [haxe_IMap];
@@ -830,12 +2995,24 @@ haxe_ds_StringMap.prototype = {
 		}
 		return this.h[key];
 	}
+	,setReserved: function(key,value) {
+		if(this.rh == null) {
+			this.rh = { };
+		}
+		this.rh["$" + key] = value;
+	}
 	,getReserved: function(key) {
 		if(this.rh == null) {
 			return null;
 		} else {
 			return this.rh["$" + key];
 		}
+	}
+	,existsReserved: function(key) {
+		if(this.rh == null) {
+			return false;
+		}
+		return this.rh.hasOwnProperty("$" + key);
 	}
 	,keys: function() {
 		return HxOverrides.iter(this.arrayKeys());
@@ -858,12 +3035,207 @@ haxe_ds_StringMap.prototype = {
 	}
 	,__class__: haxe_ds_StringMap
 };
-var haxe_io_Bytes = function() { };
+var haxe_io_Bytes = function(data) {
+	this.length = data.byteLength;
+	this.b = new Uint8Array(data);
+	this.b.bufferValue = data;
+	data.hxBytes = this;
+	data.bytes = this.b;
+};
 $hxClasses["haxe.io.Bytes"] = haxe_io_Bytes;
 haxe_io_Bytes.__name__ = ["haxe","io","Bytes"];
+haxe_io_Bytes.ofString = function(s) {
+	var a = [];
+	var i = 0;
+	while(i < s.length) {
+		var c = s.charCodeAt(i++);
+		if(55296 <= c && c <= 56319) {
+			c = c - 55232 << 10 | s.charCodeAt(i++) & 1023;
+		}
+		if(c <= 127) {
+			a.push(c);
+		} else if(c <= 2047) {
+			a.push(192 | c >> 6);
+			a.push(128 | c & 63);
+		} else if(c <= 65535) {
+			a.push(224 | c >> 12);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
+		} else {
+			a.push(240 | c >> 18);
+			a.push(128 | c >> 12 & 63);
+			a.push(128 | c >> 6 & 63);
+			a.push(128 | c & 63);
+		}
+	}
+	return new haxe_io_Bytes(new Uint8Array(a).buffer);
+};
 haxe_io_Bytes.prototype = {
-	b: null
+	length: null
+	,b: null
+	,toHex: function() {
+		var s_b = "";
+		var chars = [];
+		var str = "0123456789abcdef";
+		var _g1 = 0;
+		var _g = str.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			chars.push(HxOverrides.cca(str,i));
+		}
+		var _g11 = 0;
+		var _g2 = this.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var c = this.b[i1];
+			s_b += String.fromCharCode(chars[c >> 4]);
+			s_b += String.fromCharCode(chars[c & 15]);
+		}
+		return s_b;
+	}
 	,__class__: haxe_io_Bytes
+};
+var haxe_io_BytesBuffer = function() {
+	this.b = [];
+};
+$hxClasses["haxe.io.BytesBuffer"] = haxe_io_BytesBuffer;
+haxe_io_BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
+haxe_io_BytesBuffer.prototype = {
+	b: null
+	,getBytes: function() {
+		var bytes = new haxe_io_Bytes(new Uint8Array(this.b).buffer);
+		this.b = null;
+		return bytes;
+	}
+	,__class__: haxe_io_BytesBuffer
+};
+var haxe_io_Output = function() { };
+$hxClasses["haxe.io.Output"] = haxe_io_Output;
+haxe_io_Output.__name__ = ["haxe","io","Output"];
+haxe_io_Output.prototype = {
+	bigEndian: null
+	,writeByte: function(c) {
+		throw new js__$Boot_HaxeError("Not implemented");
+	}
+	,writeUInt16: function(x) {
+		if(x < 0 || x >= 65536) {
+			throw new js__$Boot_HaxeError(haxe_io_Error.Overflow);
+		}
+		if(this.bigEndian) {
+			this.writeByte(x >> 8);
+			this.writeByte(x & 255);
+		} else {
+			this.writeByte(x & 255);
+			this.writeByte(x >> 8);
+		}
+	}
+	,writeUInt24: function(x) {
+		if(x < 0 || x >= 16777216) {
+			throw new js__$Boot_HaxeError(haxe_io_Error.Overflow);
+		}
+		if(this.bigEndian) {
+			this.writeByte(x >> 16);
+			this.writeByte(x >> 8 & 255);
+			this.writeByte(x & 255);
+		} else {
+			this.writeByte(x & 255);
+			this.writeByte(x >> 8 & 255);
+			this.writeByte(x >> 16);
+		}
+	}
+	,writeInt32: function(x) {
+		if(this.bigEndian) {
+			this.writeByte(x >>> 24);
+			this.writeByte(x >> 16 & 255);
+			this.writeByte(x >> 8 & 255);
+			this.writeByte(x & 255);
+		} else {
+			this.writeByte(x & 255);
+			this.writeByte(x >> 8 & 255);
+			this.writeByte(x >> 16 & 255);
+			this.writeByte(x >>> 24);
+		}
+	}
+	,__class__: haxe_io_Output
+};
+var haxe_io_BytesOutput = function() {
+	this.b = new haxe_io_BytesBuffer();
+};
+$hxClasses["haxe.io.BytesOutput"] = haxe_io_BytesOutput;
+haxe_io_BytesOutput.__name__ = ["haxe","io","BytesOutput"];
+haxe_io_BytesOutput.__super__ = haxe_io_Output;
+haxe_io_BytesOutput.prototype = $extend(haxe_io_Output.prototype,{
+	b: null
+	,writeByte: function(c) {
+		this.b.b.push(c);
+	}
+	,writeBytes: function(buf,pos,len) {
+		var _this = this.b;
+		if(pos < 0 || len < 0 || pos + len > buf.length) {
+			throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+		}
+		var b1 = _this.b;
+		var b2 = buf.b;
+		var _g1 = pos;
+		var _g = pos + len;
+		while(_g1 < _g) {
+			var i = _g1++;
+			_this.b.push(b2[i]);
+		}
+		return len;
+	}
+	,getBytes: function() {
+		return this.b.getBytes();
+	}
+	,__class__: haxe_io_BytesOutput
+});
+var haxe_io_Eof = function() { };
+$hxClasses["haxe.io.Eof"] = haxe_io_Eof;
+haxe_io_Eof.__name__ = ["haxe","io","Eof"];
+haxe_io_Eof.prototype = {
+	toString: function() {
+		return "Eof";
+	}
+	,__class__: haxe_io_Eof
+};
+var haxe_io_Error = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
+haxe_io_Error.Blocked = ["Blocked",0];
+haxe_io_Error.Blocked.toString = $estr;
+haxe_io_Error.Blocked.__enum__ = haxe_io_Error;
+haxe_io_Error.Overflow = ["Overflow",1];
+haxe_io_Error.Overflow.toString = $estr;
+haxe_io_Error.Overflow.__enum__ = haxe_io_Error;
+haxe_io_Error.OutsideBounds = ["OutsideBounds",2];
+haxe_io_Error.OutsideBounds.toString = $estr;
+haxe_io_Error.OutsideBounds.__enum__ = haxe_io_Error;
+haxe_io_Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe_io_Error; $x.toString = $estr; return $x; };
+var haxe_io_Input = function() { };
+$hxClasses["haxe.io.Input"] = haxe_io_Input;
+haxe_io_Input.__name__ = ["haxe","io","Input"];
+haxe_io_Input.prototype = {
+	readByte: function() {
+		throw new js__$Boot_HaxeError("Not implemented");
+	}
+	,readBytes: function(s,pos,len) {
+		var k = len;
+		var b = s.b;
+		if(pos < 0 || len < 0 || pos + len > s.length) {
+			throw new js__$Boot_HaxeError(haxe_io_Error.OutsideBounds);
+		}
+		try {
+			while(k > 0) {
+				b[pos] = this.readByte();
+				++pos;
+				--k;
+			}
+		} catch( eof ) {
+			if (eof instanceof js__$Boot_HaxeError) eof = eof.val;
+			if( js_Boot.__instanceof(eof,haxe_io_Eof) ) {
+			} else throw(eof);
+		}
+		return len - k;
+	}
+	,__class__: haxe_io_Input
 };
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
@@ -1063,6 +3435,13 @@ js_Boot.__instanceof = function(o,cl) {
 		return o.__enum__ == cl;
 	}
 };
+js_Boot.__cast = function(o,t) {
+	if(js_Boot.__instanceof(o,t)) {
+		return o;
+	} else {
+		throw new js__$Boot_HaxeError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+	}
+};
 js_Boot.__nativeClassName = function(o) {
 	var name = js_Boot.__toStr.call(o).slice(8,-1);
 	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
@@ -1091,7 +3470,31 @@ js_npm_express__$Route_Route_$Impl_$.fromEReg = function(e) {
 var js_npm_express_Static = require("express").static;
 var js_npm_mongoose_Mongoose = require("mongoose").Mongoose;
 var js_npm_mongoose_Schema = require("mongoose").Schema;
-var js_npm_mongoose_schema_types_Mixed = require("mongoose").Schema.Types.Mixed;
+var org_bsonspec_ObjectID = function(input) {
+	if(input == null) {
+		var out = new haxe_io_BytesOutput();
+		out.writeInt32(Math.floor(new Date().getTime() / 1000));
+		out.writeBytes(org_bsonspec_ObjectID.machine,0,3);
+		out.writeUInt16(org_bsonspec_ObjectID.pid);
+		out.writeUInt24(org_bsonspec_ObjectID.sequence++);
+		if(org_bsonspec_ObjectID.sequence > 16777215) {
+			org_bsonspec_ObjectID.sequence = 0;
+		}
+		this.bytes = out.getBytes();
+	} else {
+		this.bytes = new haxe_io_Bytes(new ArrayBuffer(12));
+		input.readBytes(this.bytes,0,12);
+	}
+};
+$hxClasses["org.bsonspec.ObjectID"] = org_bsonspec_ObjectID;
+org_bsonspec_ObjectID.__name__ = ["org","bsonspec","ObjectID"];
+org_bsonspec_ObjectID.prototype = {
+	toString: function() {
+		return "ObjectID(\"" + this.bytes.toHex() + "\")";
+	}
+	,bytes: null
+	,__class__: org_bsonspec_ObjectID
+};
 var sys_FileSystem = function() { };
 $hxClasses["sys.FileSystem"] = sys_FileSystem;
 sys_FileSystem.__name__ = ["sys","FileSystem"];
@@ -1666,6 +4069,9 @@ tjson_FancyStyle.prototype = {
 	}
 	,__class__: tjson_FancyStyle
 };
+var util_AsyncBuilder = function() { };
+$hxClasses["util.AsyncBuilder"] = util_AsyncBuilder;
+util_AsyncBuilder.__name__ = ["util","AsyncBuilder"];
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -1685,7 +4091,18 @@ Bool.__ename__ = ["Bool"];
 var Class = $hxClasses["Class"] = { __name__ : ["Class"]};
 var Enum = { };
 var __map_reserved = {};
+com_mun_global_Constant.portRadius = 3;
+com_mun_global_Constant.pointToLineDistance = 5;
+com_mun_global_Constant.pointToEndpointDistance = 6;
+com_mun_global_Constant.PIXELRATIO = 1;
+com_mun_global_Constant.TRANSFORM_X_DELTA = 40;
+com_mun_global_Constant.TRANSFORM_Y_DELTA = 40;
+com_mun_global_Constant.TRANSFORM_ZOOM_IN_RATE = 1.5;
+com_mun_global_Constant.TRANSFORM_ZOOM_OUT_RATE = 0.5;
 js_Boot.__toStr = ({ }).toString;
+org_bsonspec_ObjectID.sequence = 0;
+org_bsonspec_ObjectID.machine = haxe_io_Bytes.ofString("flash");
+org_bsonspec_ObjectID.pid = Std.random(65536);
 tjson_TJSON.OBJECT_REFERENCE_PREFIX = "@~obRef#";
 Main.main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

@@ -1,6 +1,8 @@
 package com.mun.model.component;
 import com.mun.type.Object;
 interface FolderI {
+    public function add(cd:CircuitDiagramI):CircuitDiagramI;
+
     public function getFloderName():String;
 
     public function setFloderName(name:String):Void;

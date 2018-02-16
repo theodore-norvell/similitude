@@ -23,7 +23,7 @@ class FolderState {
     var currentState:F_STATE;
 
     var folder:FolderI;
-    var circuitDiagram:CircuitDiagramI;
+    public var circuitDiagram:CircuitDiagramI;
     var updateCircuitDiagram:UpdateCircuitDiagram;
     var updateToolBar:UpdateToolBar;
     var updateCanvas:UpdateCanvas;
@@ -317,6 +317,56 @@ class FolderState {
         updateToolBar.setControllerCanvasContext(controllerCanvasContext);
 
         pushToMap();
+    }
+
+    public function load(cd:CircuitDiagramI){
+        new JQuery("li[id$='-li']").removeClass("active");
+        new JQuery(".tab-pane[id$='-panel']").removeClass("active");
+        new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
+        currentState = F_STATE.CREATE;
+        if(circuitDiagram != null){
+            previouseCircuitDiagramArray.push(circuitDiagram);
+        }
+
+        circuitDiagram = folder.add(cd);
+        circuitDiagramArray .push(circuitDiagram);
+        addNewCicruitDiagramTab();
+        createNewCanvas(circuitDiagram.get_name());
+
+        updateCircuitDiagram = new UpdateCircuitDiagram(circuitDiagram, folder);
+        circuitDiagram.set_commandManager(updateCircuitDiagram.get_commandManager());
+
+        updateToolBar = new UpdateToolBar(updateCircuitDiagram);
+        updateCircuitDiagram.setUpdateToolBar(updateToolBar);
+
+        updateCanvas = new UpdateCanvas(circuitDiagram, canvas, context);
+        updateCircuitDiagram.setUpdateCanvas(updateCanvas);
+
+        sideBar = new SideBar(updateCircuitDiagram, circuitDiagram, folder);
+
+        controllerCanvasContext = new ControllerCanvasContext(circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar, canvas, updateCanvas);
+        sideBar.setControllerCanvasContext(controllerCanvasContext);
+        updateToolBar.setControllerCanvasContext(controllerCanvasContext);
+
+        pushToMap();
+
+        for(i in sideBarMap.iterator()){
+            for(j in circuitDiagramArray){
+                if(i.getCircuitDiagram() != j){
+                    i.pushCompoundComponentToGateNameArray(j.get_name());
+                }
+            }
+        }
+
+        currentIndex = circuitDiagramArray.length - 1;
+
+        //reset the alert
+        new JQuery("#nameofcddiv").removeClass("has-error").removeClass("has-success");
+        new JQuery("#nameofcdspan1").removeClass("glyphicon-remove").removeClass("glyphicon-ok");
+
+        currentState = F_STATE.CURRENT;
+
+        checkState();
     }
 
     function changeNameForHTMLStuff(oldName:String,newName:String){

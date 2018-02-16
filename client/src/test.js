@@ -997,11 +997,38 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 		return argument;
 	}
 };
-var Test = function() { };
+var Test = function(f) {
+	this.folderState = f;
+	this.b = window.document.getElementById("upload");
+	this.b.addEventListener("click",$bind(this,this.regist),false);
+};
 $hxClasses["Test"] = Test;
 Test.__name__ = ["Test"];
 Test.main = function() {
 	var folderState = new com_mun_controller_controllerState_FolderState();
+	var test = new Test(folderState);
+};
+Test.prototype = {
+	folderState: null
+	,b: null
+	,regist: function() {
+		var _gthis = this;
+		var o = tjson_TJSON.encode(this.folderState.circuitDiagram);
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users?username=test&new=false&folder=root&fileName=" + this.folderState.circuitDiagram.get_name(), contentType : "application/json", dataType : "text", data : o}).done(function(text) {
+			haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 36, className : "Test", methodName : "regist"});
+			haxe_Log.trace("This is the text" + text,{ fileName : "Test.hx", lineNumber : 37, className : "Test", methodName : "regist"});
+			haxe_Log.trace("It is a " + Std.string(text == null ? null : js_Boot.getClass(text)),{ fileName : "Test.hx", lineNumber : 38, className : "Test", methodName : "regist"});
+			var t = js_Boot.__cast(tjson_TJSON.parse(text) , com_mun_model_component_CircuitDiagramI);
+			haxe_Log.trace(t,{ fileName : "Test.hx", lineNumber : 42, className : "Test", methodName : "regist"});
+			var i = t.get_componentIterator();
+			while(i.hasNext()) {
+				var i1 = i.next();
+				haxe_Log.trace(i1.get_componentKind(),{ fileName : "Test.hx", lineNumber : 44, className : "Test", methodName : "regist"});
+			}
+			_gthis.folderState.load(tjson_TJSON.parse(text));
+		});
+	}
+	,__class__: Test
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -3507,6 +3534,48 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.updateToolBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.pushToMap();
 	}
+	,load: function(cd) {
+		$("li[id$='-li']").removeClass("active");
+		$(".tab-pane[id$='-panel']").removeClass("active");
+		$(".tab-pane[id$='-sidebar']").removeClass("active");
+		this.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
+		if(this.circuitDiagram != null) {
+			this.previouseCircuitDiagramArray.push(this.circuitDiagram);
+		}
+		this.circuitDiagram = this.folder.add(cd);
+		this.circuitDiagramArray.push(this.circuitDiagram);
+		this.addNewCicruitDiagramTab();
+		this.createNewCanvas(this.circuitDiagram.get_name());
+		this.updateCircuitDiagram = new com_mun_controller_componentUpdate_UpdateCircuitDiagram(this.circuitDiagram,this.folder);
+		this.circuitDiagram.set_commandManager(this.updateCircuitDiagram.get_commandManager());
+		this.updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(this.updateCircuitDiagram);
+		this.updateCircuitDiagram.setUpdateToolBar(this.updateToolBar);
+		this.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(this.circuitDiagram,this.canvas,this.context);
+		this.updateCircuitDiagram.setUpdateCanvas(this.updateCanvas);
+		this.sideBar = new com_mun_controller_controllerState_SideBar(this.updateCircuitDiagram,this.circuitDiagram,this.folder);
+		this.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(this.circuitDiagram,this.updateCircuitDiagram,this.sideBar,this.updateToolBar,this.canvas,this.updateCanvas);
+		this.sideBar.setControllerCanvasContext(this.controllerCanvasContext);
+		this.updateToolBar.setControllerCanvasContext(this.controllerCanvasContext);
+		this.pushToMap();
+		var i = this.sideBarMap.iterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var _g = 0;
+			var _g1 = this.circuitDiagramArray;
+			while(_g < _g1.length) {
+				var j = _g1[_g];
+				++_g;
+				if(i1.getCircuitDiagram() != j) {
+					i1.pushCompoundComponentToGateNameArray(j.get_name());
+				}
+			}
+		}
+		this.currentIndex = this.circuitDiagramArray.length - 1;
+		$("#nameofcddiv").removeClass("has-error").removeClass("has-success");
+		$("#nameofcdspan1").removeClass("glyphicon-remove").removeClass("glyphicon-ok");
+		this.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+		this.checkState();
+	}
 	,changeNameForHTMLStuff: function(oldName,newName) {
 		window.document.getElementById(oldName + "-a").innerHTML = "" + newName + "<span id=\"" + newName + "-close\" class=\"glyphicon glyphicon-remove\"></span>";
 		this.registerCloseButton(newName);
@@ -5005,7 +5074,8 @@ var com_mun_model_component_FolderI = function() { };
 $hxClasses["com.mun.model.component.FolderI"] = com_mun_model_component_FolderI;
 com_mun_model_component_FolderI.__name__ = ["com","mun","model","component","FolderI"];
 com_mun_model_component_FolderI.prototype = {
-	getFloderName: null
+	add: null
+	,getFloderName: null
 	,setFloderName: null
 	,pushCircuitDiagramToMap: null
 	,findCircuitDiagram: null
@@ -5074,6 +5144,14 @@ com_mun_model_component_Folder.prototype = {
 			++counter;
 			uniqueNmaeFlag = true;
 		}
+		this.pushCircuitDiagramToMap(circuitDiagram);
+		return circuitDiagram;
+	}
+	,add: function(cd) {
+		var circuitDiagram = cd;
+		var autoGenerateName = "";
+		var counter = 0;
+		var uniqueNmaeFlag = true;
 		this.pushCircuitDiagramToMap(circuitDiagram);
 		return circuitDiagram;
 	}
@@ -7126,6 +7204,7 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		return portArray;
 	}
 	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		haxe_Log.trace(this.component,{ fileName : "NOT.hx", lineNumber : 153, className : "com.mun.model.gates.NOT", methodName : "drawComponent"});
 		var drawComponent = new com_mun_view_drawComponents_DrawNOT(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -9872,6 +9951,53 @@ haxe_Log.trace = function(v,infos) {
 };
 haxe_Log.clear = function() {
 	js_Boot.__clear_trace();
+};
+var haxe_Utf8 = function(size) {
+	this.__b = "";
+};
+$hxClasses["haxe.Utf8"] = haxe_Utf8;
+haxe_Utf8.__name__ = ["haxe","Utf8"];
+haxe_Utf8.iter = function(s,chars) {
+	var _g1 = 0;
+	var _g = s.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		chars(HxOverrides.cca(s,i));
+	}
+};
+haxe_Utf8.encode = function(s) {
+	throw new js__$Boot_HaxeError("Not implemented");
+};
+haxe_Utf8.decode = function(s) {
+	throw new js__$Boot_HaxeError("Not implemented");
+};
+haxe_Utf8.charCodeAt = function(s,index) {
+	return HxOverrides.cca(s,index);
+};
+haxe_Utf8.validate = function(s) {
+	return true;
+};
+haxe_Utf8.compare = function(a,b) {
+	if(a > b) {
+		return 1;
+	} else if(a == b) {
+		return 0;
+	} else {
+		return -1;
+	}
+};
+haxe_Utf8.sub = function(s,pos,len) {
+	return HxOverrides.substr(s,pos,len);
+};
+haxe_Utf8.prototype = {
+	__b: null
+	,addChar: function(c) {
+		this.__b += String.fromCharCode(c);
+	}
+	,toString: function() {
+		return this.__b;
+	}
+	,__class__: haxe_Utf8
 };
 var haxe_ds_ArraySort = function() { };
 $hxClasses["haxe.ds.ArraySort"] = haxe_ds_ArraySort;
@@ -13363,6 +13489,569 @@ js_jquery_JqIterator.prototype = {
 	}
 	,__class__: js_jquery_JqIterator
 };
+var tjson_TJSON = function() { };
+$hxClasses["tjson.TJSON"] = tjson_TJSON;
+tjson_TJSON.__name__ = ["tjson","TJSON"];
+tjson_TJSON.parse = function(json,fileName,stringProcessor) {
+	if(fileName == null) {
+		fileName = "JSON Data";
+	}
+	var t = new tjson_TJSONParser(json,fileName,stringProcessor);
+	return t.doParse();
+};
+tjson_TJSON.encode = function(obj,style,useCache) {
+	if(useCache == null) {
+		useCache = true;
+	}
+	var t = new tjson_TJSONEncoder(useCache);
+	return t.doEncode(obj,style);
+};
+var tjson_TJSONParser = function(vjson,vfileName,stringProcessor) {
+	if(vfileName == null) {
+		vfileName = "JSON Data";
+	}
+	this.json = vjson;
+	this.fileName = vfileName;
+	this.currentLine = 1;
+	this.lastSymbolQuoted = false;
+	this.pos = 0;
+	this.floatRegex = new EReg("^-?[0-9]*\\.[0-9]+$","");
+	this.intRegex = new EReg("^-?[0-9]+$","");
+	this.strProcessor = stringProcessor == null ? $bind(this,this.defaultStringProcessor) : stringProcessor;
+	this.cache = [];
+};
+$hxClasses["tjson.TJSONParser"] = tjson_TJSONParser;
+tjson_TJSONParser.__name__ = ["tjson","TJSONParser"];
+tjson_TJSONParser.prototype = {
+	pos: null
+	,json: null
+	,lastSymbolQuoted: null
+	,fileName: null
+	,currentLine: null
+	,cache: null
+	,floatRegex: null
+	,intRegex: null
+	,strProcessor: null
+	,doParse: function() {
+		try {
+			var _g = this.getNextSymbol();
+			switch(_g) {
+			case "[":
+				return this.doArray();
+			case "{":
+				return this.doObject();
+			default:
+				var s = _g;
+				return this.convertSymbolToProperType(s);
+			}
+		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			if( js_Boot.__instanceof(e,String) ) {
+				throw new js__$Boot_HaxeError(this.fileName + " on line " + this.currentLine + ": " + e);
+			} else throw(e);
+		}
+	}
+	,doObject: function() {
+		var o = { };
+		var val = "";
+		var key;
+		var isClassOb = false;
+		this.cache.push(o);
+		while(this.pos < this.json.length) {
+			key = this.getNextSymbol();
+			if(key == "," && !this.lastSymbolQuoted) {
+				continue;
+			}
+			if(key == "}" && !this.lastSymbolQuoted) {
+				if(isClassOb && o.TJ_unserialize != null) {
+					o.TJ_unserialize();
+				}
+				return o;
+			}
+			var seperator = this.getNextSymbol();
+			if(seperator != ":") {
+				throw new js__$Boot_HaxeError("Expected ':' but got '" + seperator + "' instead.");
+			}
+			var v = this.getNextSymbol();
+			if(key == "_hxcls") {
+				var cls = Type.resolveClass(v);
+				if(cls == null) {
+					throw new js__$Boot_HaxeError("Invalid class name - " + v);
+				}
+				o = Type.createEmptyInstance(cls);
+				this.cache.pop();
+				this.cache.push(o);
+				isClassOb = true;
+				continue;
+			}
+			if(v == "{" && !this.lastSymbolQuoted) {
+				val = this.doObject();
+			} else if(v == "[" && !this.lastSymbolQuoted) {
+				val = this.doArray();
+			} else {
+				val = this.convertSymbolToProperType(v);
+			}
+			o[key] = val;
+		}
+		throw new js__$Boot_HaxeError("Unexpected end of file. Expected '}'");
+	}
+	,doArray: function() {
+		var a = [];
+		var val;
+		while(this.pos < this.json.length) {
+			val = this.getNextSymbol();
+			if(val == "," && !this.lastSymbolQuoted) {
+				continue;
+			} else if(val == "]" && !this.lastSymbolQuoted) {
+				return a;
+			} else if(val == "{" && !this.lastSymbolQuoted) {
+				val = this.doObject();
+			} else if(val == "[" && !this.lastSymbolQuoted) {
+				val = this.doArray();
+			} else {
+				val = this.convertSymbolToProperType(val);
+			}
+			a.push(val);
+		}
+		throw new js__$Boot_HaxeError("Unexpected end of file. Expected ']'");
+	}
+	,convertSymbolToProperType: function(symbol) {
+		if(this.lastSymbolQuoted) {
+			if(StringTools.startsWith(symbol,tjson_TJSON.OBJECT_REFERENCE_PREFIX)) {
+				var idx = Std.parseInt(HxOverrides.substr(symbol,tjson_TJSON.OBJECT_REFERENCE_PREFIX.length,null));
+				return this.cache[idx];
+			}
+			return symbol;
+		}
+		if(this.looksLikeFloat(symbol)) {
+			return parseFloat(symbol);
+		}
+		if(this.looksLikeInt(symbol)) {
+			return Std.parseInt(symbol);
+		}
+		if(symbol.toLowerCase() == "true") {
+			return true;
+		}
+		if(symbol.toLowerCase() == "false") {
+			return false;
+		}
+		if(symbol.toLowerCase() == "null") {
+			return null;
+		}
+		return symbol;
+	}
+	,looksLikeFloat: function(s) {
+		if(!this.floatRegex.match(s)) {
+			if(this.intRegex.match(s)) {
+				var intStr = this.intRegex.matched(0);
+				if(HxOverrides.cca(intStr,0) == 45) {
+					return intStr > "-2147483648";
+				} else {
+					return intStr > "2147483647";
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	,looksLikeInt: function(s) {
+		return this.intRegex.match(s);
+	}
+	,getNextSymbol: function() {
+		this.lastSymbolQuoted = false;
+		var c = "";
+		var inQuote = false;
+		var quoteType = "";
+		var symbol = "";
+		var inEscape = false;
+		var inSymbol = false;
+		var inLineComment = false;
+		var inBlockComment = false;
+		while(this.pos < this.json.length) {
+			c = this.json.charAt(this.pos++);
+			if(c == "\n" && !inSymbol) {
+				this.currentLine++;
+			}
+			if(inLineComment) {
+				if(c == "\n" || c == "\r") {
+					inLineComment = false;
+					this.pos++;
+				}
+				continue;
+			}
+			if(inBlockComment) {
+				if(c == "*" && this.json.charAt(this.pos) == "/") {
+					inBlockComment = false;
+					this.pos++;
+				}
+				continue;
+			}
+			if(inQuote) {
+				if(inEscape) {
+					inEscape = false;
+					if(c == "'" || c == "\"") {
+						symbol += c;
+						continue;
+					}
+					if(c == "t") {
+						symbol += "\t";
+						continue;
+					}
+					if(c == "n") {
+						symbol += "\n";
+						continue;
+					}
+					if(c == "\\") {
+						symbol += "\\";
+						continue;
+					}
+					if(c == "r") {
+						symbol += "\r";
+						continue;
+					}
+					if(c == "/") {
+						symbol += "/";
+						continue;
+					}
+					if(c == "u") {
+						var hexValue = 0;
+						var _g = 0;
+						while(_g < 4) {
+							var i = _g++;
+							if(this.pos >= this.json.length) {
+								throw new js__$Boot_HaxeError("Unfinished UTF8 character");
+							}
+							var nc = HxOverrides.cca(this.json,this.pos++);
+							hexValue <<= 4;
+							if(nc >= 48 && nc <= 57) {
+								hexValue += nc - 48;
+							} else if(nc >= 65 && nc <= 70) {
+								hexValue += 10 + nc - 65;
+							} else if(nc >= 97 && nc <= 102) {
+								hexValue += 10 + nc - 95;
+							} else {
+								throw new js__$Boot_HaxeError("Not a hex digit");
+							}
+						}
+						var utf = new haxe_Utf8();
+						utf.__b += String.fromCharCode(hexValue);
+						symbol += utf.__b;
+						continue;
+					}
+					throw new js__$Boot_HaxeError("Invalid escape sequence '\\" + c + "'");
+				} else {
+					if(c == "\\") {
+						inEscape = true;
+						continue;
+					}
+					if(c == quoteType) {
+						return symbol;
+					}
+					symbol += c;
+					continue;
+				}
+			} else if(c == "/") {
+				var c2 = this.json.charAt(this.pos);
+				if(c2 == "/") {
+					inLineComment = true;
+					this.pos++;
+					continue;
+				} else if(c2 == "*") {
+					inBlockComment = true;
+					this.pos++;
+					continue;
+				}
+			}
+			if(inSymbol) {
+				if(c == " " || c == "\n" || c == "\r" || c == "\t" || c == "," || c == ":" || c == "}" || c == "]") {
+					this.pos--;
+					return symbol;
+				} else {
+					symbol += c;
+					continue;
+				}
+			} else {
+				if(c == " " || c == "\t" || c == "\n" || c == "\r") {
+					continue;
+				}
+				if(c == "{" || c == "}" || c == "[" || c == "]" || c == "," || c == ":") {
+					return c;
+				}
+				if(c == "'" || c == "\"") {
+					inQuote = true;
+					quoteType = c;
+					this.lastSymbolQuoted = true;
+					continue;
+				} else {
+					inSymbol = true;
+					symbol = c;
+					continue;
+				}
+			}
+		}
+		if(inQuote) {
+			throw new js__$Boot_HaxeError("Unexpected end of data. Expected ( " + quoteType + " )");
+		}
+		return symbol;
+	}
+	,defaultStringProcessor: function(str) {
+		return str;
+	}
+	,__class__: tjson_TJSONParser
+};
+var tjson_TJSONEncoder = function(useCache) {
+	if(useCache == null) {
+		useCache = true;
+	}
+	this.uCache = useCache;
+	if(this.uCache) {
+		this.cache = [];
+	}
+};
+$hxClasses["tjson.TJSONEncoder"] = tjson_TJSONEncoder;
+tjson_TJSONEncoder.__name__ = ["tjson","TJSONEncoder"];
+tjson_TJSONEncoder.prototype = {
+	cache: null
+	,uCache: null
+	,doEncode: function(obj,style) {
+		if(!Reflect.isObject(obj)) {
+			throw new js__$Boot_HaxeError("Provided object is not an object.");
+		}
+		var st;
+		if(js_Boot.__instanceof(style,tjson_EncodeStyle)) {
+			st = style;
+		} else if(style == "fancy") {
+			st = new tjson_FancyStyle();
+		} else {
+			st = new tjson_SimpleStyle();
+		}
+		var buffer_b = "";
+		if((obj instanceof Array) && obj.__enum__ == null || js_Boot.__instanceof(obj,List)) {
+			buffer_b += Std.string(this.encodeIterable(obj,st,0));
+		} else if(js_Boot.__instanceof(obj,haxe_ds_StringMap)) {
+			buffer_b += Std.string(this.encodeMap(obj,st,0));
+		} else {
+			this.cacheEncode(obj);
+			buffer_b += Std.string(this.encodeObject(obj,st,0));
+		}
+		return buffer_b;
+	}
+	,encodeObject: function(obj,style,depth) {
+		var buffer_b = "";
+		buffer_b += Std.string(style.beginObject(depth));
+		var fieldCount = 0;
+		var fields;
+		var dontEncodeFields = null;
+		var o = obj;
+		var cls = o == null ? null : js_Boot.getClass(o);
+		if(cls != null) {
+			fields = Type.getInstanceFields(cls);
+		} else {
+			fields = Reflect.fields(obj);
+		}
+		var _g = Type["typeof"](obj);
+		if(_g[1] == 6) {
+			var c = _g[2];
+			if(fieldCount++ > 0) {
+				buffer_b += Std.string(style.entrySeperator(depth));
+			} else {
+				buffer_b += Std.string(style.firstEntry(depth));
+			}
+			buffer_b += Std.string("\"_hxcls\"" + style.keyValueSeperator(depth));
+			buffer_b += Std.string(this.encodeValue(Type.getClassName(c),style,depth));
+			if(obj.TJ_noEncode != null) {
+				dontEncodeFields = obj.TJ_noEncode();
+			}
+		}
+		var _g1 = 0;
+		while(_g1 < fields.length) {
+			var field = fields[_g1];
+			++_g1;
+			if(dontEncodeFields != null && dontEncodeFields.indexOf(field) >= 0) {
+				continue;
+			}
+			var value = Reflect.field(obj,field);
+			var vStr = this.encodeValue(value,style,depth);
+			if(vStr != null) {
+				if(fieldCount++ > 0) {
+					buffer_b += Std.string(style.entrySeperator(depth));
+				} else {
+					buffer_b += Std.string(style.firstEntry(depth));
+				}
+				buffer_b += Std.string("\"" + field + "\"" + style.keyValueSeperator(depth) + vStr);
+			}
+		}
+		buffer_b += Std.string(style.endObject(depth));
+		return buffer_b;
+	}
+	,encodeMap: function(obj,style,depth) {
+		var buffer_b = "";
+		buffer_b += Std.string(style.beginObject(depth));
+		var fieldCount = 0;
+		var field = obj.keys();
+		while(field.hasNext()) {
+			var field1 = field.next();
+			if(fieldCount++ > 0) {
+				buffer_b += Std.string(style.entrySeperator(depth));
+			} else {
+				buffer_b += Std.string(style.firstEntry(depth));
+			}
+			var value = obj.get(field1);
+			buffer_b += Std.string("\"" + field1 + "\"" + style.keyValueSeperator(depth));
+			buffer_b += Std.string(this.encodeValue(value,style,depth));
+		}
+		buffer_b += Std.string(style.endObject(depth));
+		return buffer_b;
+	}
+	,encodeIterable: function(obj,style,depth) {
+		var buffer_b = "";
+		buffer_b += Std.string(style.beginArray(depth));
+		var fieldCount = 0;
+		var value = $iterator(obj)();
+		while(value.hasNext()) {
+			var value1 = value.next();
+			if(fieldCount++ > 0) {
+				buffer_b += Std.string(style.entrySeperator(depth));
+			} else {
+				buffer_b += Std.string(style.firstEntry(depth));
+			}
+			buffer_b += Std.string(this.encodeValue(value1,style,depth));
+		}
+		buffer_b += Std.string(style.endArray(depth));
+		return buffer_b;
+	}
+	,cacheEncode: function(value) {
+		if(!this.uCache) {
+			return null;
+		}
+		var _g1 = 0;
+		var _g = this.cache.length;
+		while(_g1 < _g) {
+			var c = _g1++;
+			if(this.cache[c] == value) {
+				return "\"" + tjson_TJSON.OBJECT_REFERENCE_PREFIX + c + "\"";
+			}
+		}
+		this.cache.push(value);
+		return null;
+	}
+	,encodeValue: function(value,style,depth) {
+		if(typeof(value) == "number" && ((value | 0) === value) || typeof(value) == "number") {
+			return value;
+		} else if((value instanceof Array) && value.__enum__ == null || js_Boot.__instanceof(value,List)) {
+			var v = value;
+			return this.encodeIterable(v,style,depth + 1);
+		} else if(js_Boot.__instanceof(value,List)) {
+			var v1 = value;
+			return this.encodeIterable(v1,style,depth + 1);
+		} else if(js_Boot.__instanceof(value,haxe_ds_StringMap)) {
+			return this.encodeMap(value,style,depth + 1);
+		} else if(typeof(value) == "string") {
+			return "\"" + StringTools.replace(StringTools.replace(StringTools.replace(StringTools.replace(Std.string(value),"\\","\\\\"),"\n","\\n"),"\r","\\r"),"\"","\\\"") + "\"";
+		} else if(typeof(value) == "boolean") {
+			return value;
+		} else if(Reflect.isObject(value)) {
+			var ret = this.cacheEncode(value);
+			if(ret != null) {
+				return ret;
+			}
+			return this.encodeObject(value,style,depth + 1);
+		} else if(value == null) {
+			return "null";
+		} else {
+			return null;
+		}
+	}
+	,__class__: tjson_TJSONEncoder
+};
+var tjson_EncodeStyle = function() { };
+$hxClasses["tjson.EncodeStyle"] = tjson_EncodeStyle;
+tjson_EncodeStyle.__name__ = ["tjson","EncodeStyle"];
+tjson_EncodeStyle.prototype = {
+	beginObject: null
+	,endObject: null
+	,beginArray: null
+	,endArray: null
+	,firstEntry: null
+	,entrySeperator: null
+	,keyValueSeperator: null
+	,__class__: tjson_EncodeStyle
+};
+var tjson_SimpleStyle = function() {
+};
+$hxClasses["tjson.SimpleStyle"] = tjson_SimpleStyle;
+tjson_SimpleStyle.__name__ = ["tjson","SimpleStyle"];
+tjson_SimpleStyle.__interfaces__ = [tjson_EncodeStyle];
+tjson_SimpleStyle.prototype = {
+	beginObject: function(depth) {
+		return "{";
+	}
+	,endObject: function(depth) {
+		return "}";
+	}
+	,beginArray: function(depth) {
+		return "[";
+	}
+	,endArray: function(depth) {
+		return "]";
+	}
+	,firstEntry: function(depth) {
+		return "";
+	}
+	,entrySeperator: function(depth) {
+		return ",";
+	}
+	,keyValueSeperator: function(depth) {
+		return ":";
+	}
+	,__class__: tjson_SimpleStyle
+};
+var tjson_FancyStyle = function(tab) {
+	if(tab == null) {
+		tab = "    ";
+	}
+	this.tab = tab;
+	this.charTimesNCache = [""];
+};
+$hxClasses["tjson.FancyStyle"] = tjson_FancyStyle;
+tjson_FancyStyle.__name__ = ["tjson","FancyStyle"];
+tjson_FancyStyle.__interfaces__ = [tjson_EncodeStyle];
+tjson_FancyStyle.prototype = {
+	tab: null
+	,beginObject: function(depth) {
+		return "{\n";
+	}
+	,endObject: function(depth) {
+		return "\n" + this.charTimesN(depth) + "}";
+	}
+	,beginArray: function(depth) {
+		return "[\n";
+	}
+	,endArray: function(depth) {
+		return "\n" + this.charTimesN(depth) + "]";
+	}
+	,firstEntry: function(depth) {
+		return this.charTimesN(depth + 1) + " ";
+	}
+	,entrySeperator: function(depth) {
+		return "\n" + this.charTimesN(depth + 1) + ",";
+	}
+	,keyValueSeperator: function(depth) {
+		return " : ";
+	}
+	,charTimesNCache: null
+	,charTimesN: function(n) {
+		if(n < this.charTimesNCache.length) {
+			return this.charTimesNCache[n];
+		} else {
+			var tmp = this.charTimesN(n - 1);
+			return this.charTimesNCache[n] = tmp + this.tab;
+		}
+	}
+	,__class__: tjson_FancyStyle
+};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -13423,5 +14112,6 @@ haxe_io_FPHelper.LN2 = 0.6931471805599453;
 js_Boot.__toStr = ({ }).toString;
 js_html_compat_Float32Array.BYTES_PER_ELEMENT = 4;
 js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
+tjson_TJSON.OBJECT_REFERENCE_PREFIX = "@~obRef#";
 Test.main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

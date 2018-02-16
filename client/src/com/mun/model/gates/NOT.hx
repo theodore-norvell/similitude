@@ -150,6 +150,7 @@ class NOT implements ComponentKind extends GateAbstract {
     }
 
     public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+        trace(component);
         var drawComponent:DrawComponent = new DrawNOT(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

@@ -18,6 +18,8 @@ class Folder implements FolderI{
         this.name = name;
     }
 
+
+
     public function pushCircuitDiagramToMap(circuitdiagram:CircuitDiagramI):Void{
         circuitDiagramMap.set(circuitdiagram.get_name(), circuitdiagram);
     }
@@ -52,6 +54,15 @@ class Folder implements FolderI{
             uniqueNmaeFlag = true;
         }
 
+        pushCircuitDiagramToMap(circuitDiagram);
+        return circuitDiagram;
+    }
+
+    public function add(cd:CircuitDiagramI):CircuitDiagramI{
+        var circuitDiagram:CircuitDiagramI = cd;
+        var autoGenerateName:String = "";
+        var counter:Int = 0;
+        var uniqueNmaeFlag:Bool = true;
         pushCircuitDiagramToMap(circuitDiagram);
         return circuitDiagram;
     }

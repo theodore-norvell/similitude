@@ -1,0 +1,138 @@
+{
+  "_hxcls": "com.mun.model.component.CircuitDiagram",
+  "Obable": null,
+  "componentArray": [
+    {
+      "_hxcls": "com.mun.model.component.Component",
+      "xPosition": 172.20519542861362,
+      "yPosition": 188.87954110898661,
+      "height": 40,
+      "width": 40,
+      "componentKind": {
+        "_hxcls": "com.mun.model.gates.NOT",
+        "nameOfTheComponentKind": "NOT",
+        "Attr": [
+          {
+            "_hxcls": "com.mun.model.attribute.IntAttr",
+            "name": "delay",
+            "defaultdelay": {
+              "_hxcls": "com.mun.model.attribute.IntValue",
+              "delay": 0
+            }
+          },
+          {
+            "_hxcls": "com.mun.model.attribute.StringAttr",
+            "name": "name",
+            "defaultname": {
+              "_hxcls": "com.mun.model.attribute.StringValue",
+              "name": ""
+            }
+          },
+          {
+            "_hxcls": "com.mun.model.attribute.OrientationAttr",
+            "name": "orientation",
+            "defaultOrientation": {
+              "_hxcls": "com.mun.model.attribute.OrientationValue"
+            }
+          }
+        ],
+        "delay": 0,
+        "leastInportNum": 2,
+        "sequence": -1,
+        "component": "@~obRef#1"
+      },
+      "inportArray": [
+        {
+          "_hxcls": "com.mun.model.component.Inport",
+          "xPosition": 152.20519542861362,
+          "yPosition": 188.87954110898661,
+          "value": null,
+          "sequence": -1
+        }
+      ],
+      "outportArray": [
+        {
+          "_hxcls": "com.mun.model.component.Outport",
+          "xPosition": 192.20519542861362,
+          "yPosition": 188.87954110898661,
+          "value": null,
+          "sequence": null
+        }
+      ],
+      "inportsNum": 2,
+      "list": {
+        "delay": {
+          "_hxcls": "com.mun.model.attribute.DelayPair",
+          "delayAttr": "@~obRef#3",
+          "delayValue": "@~obRef#4"
+        },
+        "name": {
+          "_hxcls": "com.mun.model.attribute.NamePair",
+          "nameAttr": "@~obRef#5",
+          "nameValue": "@~obRef#6"
+        },
+        "orientation": {
+          "_hxcls": "com.mun.model.attribute.OrientationPair",
+          "orientationAttr": "@~obRef#7",
+          "orientationValue": {
+            "_hxcls": "com.mun.model.attribute.OrientationValue"
+          }
+        }
+      },
+      "cd": null,
+      "observers": [
+        "@~obRef#0"
+      ]
+    }
+  ],
+  "linkArray": [],
+  "name": "Untitled 0",
+  "copyStack": {
+    "_hxcls": "com.mun.controller.command.Stack",
+    "linkArray": [],
+    "componentArray": []
+  },
+  "commandManager": {
+    "_hxcls": "com.mun.controller.command.CommandManager",
+    "undoStack": [
+      {
+        "_hxcls": "com.mun.controller.command.AddCommand",
+        "link": null,
+        "component": "@~obRef#1",
+        "circuitDiagram": "@~obRef#0",
+        "linkAndComponentAndEndpointAndPortArray": {
+          "_hxcls": "com.mun.type.LinkAndComponentAndEndpointAndPortArray",
+          "linkArray": [],
+          "componentArray": [
+            "@~obRef#1"
+          ],
+          "endponentArray": [],
+          "portArray": []
+        }
+      }
+    ],
+    "redoStack": [],
+    "linkAndComponentAndEndpointAndPortArray": {
+      "_hxcls": "com.mun.type.LinkAndComponentAndEndpointAndPortArray",
+      "linkArray": [],
+      "componentArray": [],
+      "endponentArray": [],
+      "portArray": []
+    },
+    "recordFlag": false
+  },
+  "componentArrayReverseFlag": false,
+  "linkArrayReverseFlag": false,
+  "diagramWidth": 90,
+  "diagramHeight": 90,
+  "xMin": 152.20519542861362,
+  "yMin": 168.87954110898661,
+  "xMax": 192.20519542861362,
+  "yMax": 208.87954110898661,
+  "margin": 50,
+  "componentAndLinkCenter": {
+    "_hxcls": "com.mun.type.Coordinate",
+    "xPosition": 172.20519542861362,
+    "yPosition": 188.87954110898661
+  }
+}
