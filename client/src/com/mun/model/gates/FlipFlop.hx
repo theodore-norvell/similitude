@@ -30,7 +30,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class FlipFlop implements ComponentKind extends GateAbstract {
+class FlipFlop implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="FlipFlop";
     var Attr:Array<Attribute>=new Array<Attribute>();

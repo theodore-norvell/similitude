@@ -29,7 +29,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class OR implements ComponentKind extends GateAbstract {
+class OR implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="OR";
     var Attr:Array<Attribute>=new Array<Attribute>();

@@ -29,7 +29,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class NAND implements ComponentKind extends GateAbstract {
+class NAND implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="NAND";
     var Attr:Array<Attribute>=new Array<Attribute>();

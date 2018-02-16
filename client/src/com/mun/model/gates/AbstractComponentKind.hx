@@ -17,7 +17,7 @@ import com.mun.global.Constant.*;
 * abstract class for gates
 * @author wanhui
 **/
-class GateAbstract {
+class AbstractComponentKind {
     // TODO: Get rid of this.
     var sequence:Int;//use for input and output
     var component:Component;

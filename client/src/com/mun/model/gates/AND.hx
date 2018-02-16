@@ -29,7 +29,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class AND implements ComponentKind extends GateAbstract {
+class AND implements ComponentKind extends AbstractComponentKind {
 
 
     var nameOfTheComponentKind:String="AND";

@@ -36,7 +36,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class MUX implements ComponentKind extends GateAbstract {
+class MUX implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="MUX";
     var Attr:Array<Attribute>=new Array<Attribute>();

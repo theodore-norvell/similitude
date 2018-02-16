@@ -27,7 +27,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class NOT implements ComponentKind extends GateAbstract {
+class NOT implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="NOT";
     var Attr:Array<Attribute>=new Array<Attribute>();

@@ -29,7 +29,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class NOR implements ComponentKind extends GateAbstract {
+class NOR implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="NOR";
     var Attr:Array<Attribute>=new Array<Attribute>();

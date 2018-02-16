@@ -29,7 +29,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class XOR implements ComponentKind extends GateAbstract {
+class XOR implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="XOR";
     var Attr:Array<Attribute>=new Array<Attribute>();

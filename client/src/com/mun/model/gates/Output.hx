@@ -17,7 +17,7 @@ import com.mun.model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class Output implements ComponentKind extends GateAbstract {
+class Output implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="Output";
     var Attr:Array<Attribute>=new Array<Attribute>();

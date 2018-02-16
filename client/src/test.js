@@ -5650,7 +5650,7 @@ com_mun_model_gates_GateAbstract.prototype = {
 	}
 	,getInnerCircuitDiagram: function() {
 		var e = new com_mun_assertions_AssertionFailure("false",[]);
-		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "GateAbstract.hx", lineNumber : 224, className : "com.mun.model.gates.GateAbstract", methodName : "getInnerCircuitDiagram"});
+		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "GateAbstract.hx", lineNumber : 225, className : "com.mun.model.gates.GateAbstract", methodName : "getInnerCircuitDiagram"});
 		throw new js__$Boot_HaxeError(e);
 	}
 	,checkInnerCircuitDiagramPortsChange: function() {
@@ -5896,7 +5896,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 			break;
 		default:
 			var e = new com_mun_assertions_AssertionFailure("false",[]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "CompoundComponent.hx", lineNumber : 157, className : "com.mun.model.gates.CompoundComponent", methodName : "createPorts"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "CompoundComponent.hx", lineNumber : 161, className : "com.mun.model.gates.CompoundComponent", methodName : "createPorts"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		return portArray;

@@ -27,7 +27,7 @@ import com.mun.model.component.Port;
 /**
 * compound Component
 **/
-class CompoundComponent implements ComponentKind extends GateAbstract{
+class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     var Ob:Observer;
     var Obable:Observable;
     var circuitDiagram:CircuitDiagramI;
