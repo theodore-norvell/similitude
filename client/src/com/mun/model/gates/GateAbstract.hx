@@ -1,4 +1,6 @@
 package com.mun.model.gates;
+
+import com.mun.assertions.Assert ;
 import com.mun.model.component.Outport;
 import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
@@ -16,6 +18,7 @@ import com.mun.global.Constant.*;
 * @author wanhui
 **/
 class GateAbstract {
+    // TODO: Get rid of this.
     var sequence:Int;//use for input and output
     var component:Component;
 
@@ -219,7 +222,7 @@ class GateAbstract {
     }
 
     public function getInnerCircuitDiagram():CircuitDiagramI{
-        // TODO I don't like this.
+        Assert.assert(false) ;
         return null;//for most of the componentkind it has no circuit diagram inside, except compound component
     }
 

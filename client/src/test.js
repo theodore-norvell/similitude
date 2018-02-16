@@ -5649,7 +5649,9 @@ com_mun_model_gates_GateAbstract.prototype = {
 		return [];
 	}
 	,getInnerCircuitDiagram: function() {
-		return null;
+		var e = new com_mun_assertions_AssertionFailure("false",[]);
+		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "GateAbstract.hx", lineNumber : 224, className : "com.mun.model.gates.GateAbstract", methodName : "getInnerCircuitDiagram"});
+		throw new js__$Boot_HaxeError(e);
 	}
 	,checkInnerCircuitDiagramPortsChange: function() {
 		return false;

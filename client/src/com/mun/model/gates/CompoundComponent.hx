@@ -97,12 +97,16 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2, height / (inportCount+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
+                        var inport_1:Port = new Inport(xPosition - width / 2,
+                                                       height / (inportCount+1) * (i.get_componentKind().get_sequence()+1)
+                                                       + (yPosition - height / 2));
                         inport_1.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition + width / 2,  height / (outportCount+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
+                        var outport_:Port = new Outport(xPosition + width / 2,
+                                                        height / (outportCount+1) * (i.get_componentKind().get_sequence()+1)
+                                                        + (yPosition - height / 2));
                         outport_.set_sequence(i.get_componentKind().get_sequence());
                         portArray.push(outport_);
                     }

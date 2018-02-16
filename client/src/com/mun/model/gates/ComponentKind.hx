@@ -77,21 +77,25 @@ interface ComponentKind {
 
     /**
     * get component sequence
+    * TODO Get rid of this.
     **/
     public function get_sequence():Int;
 
     /**
     * set component sequence
+    * TODO Get rid of this.
     **/
     public function set_sequence(value:Int):Int;
 
     /**
-    * get the componentKind belongs to which component
+    * get the component which belongs to this kind.
+    * TODO Get rid of this.
     **/
     public function get_component():Component;
 
     /**
     * set the componentKind belongs to which component
+    * TODO Get rid of this.
     **/
     public function set_component(value:Component):Void;
 
@@ -107,6 +111,7 @@ interface ComponentKind {
 
     /**
     * this function just use for compound component
+    * TODO Get rid of this.
     **/
     public function getInnerCircuitDiagram():CircuitDiagramI;
 
