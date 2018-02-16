@@ -1,7 +1,6 @@
 package com.mun.model.drawingInterface;
 
 import com.mun.view.drawingImpl.Transform;
-import js.html.CanvasRenderingContext2D;
 import com.mun.model.enumeration.ORIENTATION;
 /**  A drawing adaptor represents a tool for outputting
  *   drawings to a part of a screen or page or similar
@@ -41,15 +40,14 @@ interface DrawingAdapterI {
 	 */
     public function setLineWidth(width:Float):Void;
 
-    /**
-    * get the canvas context
-    **/
-    public function get_cxt():CanvasRenderingContext2D;
-
-    /**
-    * set the canvas context
-    **/
-    public function set_cxt(value:CanvasRenderingContext2D):Void;
+    /** Clip to a rectangle
+	 *
+	 * @param x   -- The distance from the left edge to the centre of the bounding box in world coordinates.
+	 * @param y   -- The distance from the top edge to the centre of the bounding box in world coordinates.
+	 * @param width  -- The width in world coordinates.
+	 * @param height -- The height in world coordinates.
+	 */
+    public function setClip(x:Float, y:Float, width:Float, height:Float):Void;
 
     public function getTransform():Transform;
     /**

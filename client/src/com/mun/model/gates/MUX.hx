@@ -4,7 +4,6 @@ import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
-//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -14,7 +13,6 @@ import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.ORIENTATION;
-import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * 2-1 MUX<br>
  * For MUX, the format in the map should be like this:<br>
@@ -38,71 +36,21 @@ import com.mun.model.enumeration.VALUE_LOGIC;
  * @author wanhui
  *
  */
-class MUX implements ComponentKind extends GateAbstract {
+class MUX implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="MUX";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
-    var delay:Int=0;//delay of the component
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
+    public function new() {
+        super() ;
+        attributes.push(new IntAttr("delay"));
     }
 
     public function setname(s:String):Void{
         nameOfTheComponentKind=s;
     }
 
-    public function getDelay():Int{
-        return delay;
-    }
-
-    public function setDelay(value:Int):Int{
-        var a:Int=delay;
-        delay=value;
-        return a;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
-    }
-
-    public function algorithm(portArray:Array<Port>):Array<Port> {
-        var port:Port;
-        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
-        var selectValue:VALUE_LOGIC = VALUE_LOGIC.FALSE;
-
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.S) {
-                selectValue = port.get_value();
-                break;
-            }
-        }
-
-        //if s == 1 the output should as the same as the input 2
-        if (selectValue == VALUE_LOGIC.TRUE) {
-            for (port in portArray) {
-                if (port.get_sequence() == 1) {
-                    value = port.get_value();
-                    break;
-                }
-            }
-        } else if (selectValue == VALUE_LOGIC.FALSE) {//if S == 0, the output should as the same as input 1
-            for (port in portArray) {
-                if (port.get_sequence() == 0) {
-                    value = port.get_value();
-                    break;
-                }
-            }
-        }
-
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.OUTPUT) {
-                port.set_value(value);
-                break;
-            }
-        }
-        return portArray;
     }
 
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
@@ -242,12 +190,5 @@ class MUX implements ComponentKind extends GateAbstract {
         }else{
             drawComponent.drawCorrespondingComponent("black");
         }
-    }
-
-    public function new() {
-        super(2);
-        Attr.push(new IntAttr("delay"));
-        Attr.push(new StringAttr("name"));
-        Attr.push(new OrientationAttr());
     }
 }

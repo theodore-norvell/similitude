@@ -46,9 +46,8 @@ class DrawCompoundComponent implements DrawComponent{
             drawingAdapter.setFillColor("gray");
         }
 
-        //context.save();
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
-        //context.clip();
+        drawingAdapter.setClip(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
 
         if(component.get_boxType() == BOX.BLACK_BOX ){
             drawingAdapter.setTextColor("black");
