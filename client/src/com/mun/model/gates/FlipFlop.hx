@@ -33,17 +33,12 @@ import com.mun.model.enumeration.ORIENTATION;
 class FlipFlop implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="FlipFlop";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
     public function new() {
         super();
-        Attr.push(new IntAttr("delay"));
-        Attr.push(new StringAttr("name"));
-        Attr.push(new OrientationAttr());
-    }
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
+        attributes.push(new IntAttr("delay"));
+        attributes.push(new IntAttr("hold"));
+        attributes.push(new IntAttr("setup"));
     }
 
     public function setname(s:String):Void{

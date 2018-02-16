@@ -33,17 +33,10 @@ class AND implements ComponentKind extends AbstractComponentKind {
 
 
     var nameOfTheComponentKind:String="AND";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
     public function new() {
         super() ;
-        Attr.push(new IntAttr("delay"));
-        Attr.push(new StringAttr("name"));
-        Attr.push(new OrientationAttr());
-    }
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
+        attributes.push(new IntAttr("delay"));
     }
 
 

@@ -30,17 +30,10 @@ import com.mun.model.enumeration.ORIENTATION;
 class NOT implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="NOT";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
     public function new() {
         super() ;
-        Attr.push(new IntAttr("delay"));
-        Attr.push(new StringAttr("name"));
-        Attr.push(new OrientationAttr());
-    }
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
+        attributes.push(new IntAttr("delay"));
     }
 
     public function setname(s:String):Void{

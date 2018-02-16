@@ -273,11 +273,8 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
     }
 
     public function componentSetName(component:Component, name:String):Void{
+        // TODO.  It must be enforced that components of a circuit have unique names.
         componentArray[componentArray.indexOf(component)].set_name(name);
-    }
-
-    public function componentSetDelay(component:Component, delay:Int):Void{
-        componentArray[componentArray.indexOf(component)].set_delay(delay);
     }
 
     /**

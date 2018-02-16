@@ -20,15 +20,9 @@ import com.mun.model.enumeration.ORIENTATION;
 class Output implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="Output";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
     public function new() {
         super() ;
-        Attr.push(new StringAttr("name"));
-    }
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
     }
 
     public function setname(s:String):Void{

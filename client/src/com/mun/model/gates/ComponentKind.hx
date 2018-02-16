@@ -20,6 +20,7 @@ interface ComponentKind {
 
     public function getname():String;
 
+    // TODO: I don't like that this returns an array.  Is there a better interface?
     public function getAttr():Array<Attribute>;
 
     /** create ports for each gate.

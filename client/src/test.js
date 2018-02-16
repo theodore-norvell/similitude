@@ -2514,9 +2514,6 @@ com_mun_controller_componentUpdate_UpdateCircuitDiagram.prototype = {
 	,setComponentName: function(component,name) {
 		this.circuitDiagram.componentSetName(component,name);
 	}
-	,setComponentDelay: function(component,delay) {
-		this.circuitDiagram.componentSetDelay(component,delay);
-	}
 	,undo: function() {
 		var linkAndComponentArray = this.commandManager.undo();
 		this.redrawCanvas(linkAndComponentArray);
@@ -2730,7 +2727,6 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 		$(this.nameInput).val(this.linkAndComponentArray.getComponentFromIndex(0).get_name());
 	}
 	,setDelayInput: function() {
-		$(this.delayInput).val(this.linkAndComponentArray.getComponentFromIndex(0).get_delay());
 	}
 	,changeToNorth: function() {
 		if(this.linkAndComponentArray.getComponentIteratorLength() != 0) {
@@ -2759,8 +2755,6 @@ com_mun_controller_componentUpdate_UpdateToolBar.prototype = {
 	,inputChange: function() {
 		if(this.linkAndComponentArray.getComponentIteratorLength() == 1) {
 			var temp = $(this.nameInput).val();
-			var temp2 = $(this.delayInput).val();
-			this.updateCircuitDiagram.setComponentDelay(this.linkAndComponentArray.getComponentFromIndex(0),temp2);
 			this.updateCircuitDiagram.setComponentName(this.linkAndComponentArray.getComponentFromIndex(0),temp);
 		}
 	}
@@ -4092,7 +4086,6 @@ com_mun_model_component_CircuitDiagramI.prototype = {
 	,deleteLink: null
 	,deleteComponent: null
 	,componentSetName: null
-	,componentSetDelay: null
 	,computeDiagramSize: null
 	,get_diagramWidth: null
 	,get_diagramHeight: null
@@ -4342,9 +4335,6 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 	}
 	,componentSetName: function(component,name) {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
-	}
-	,componentSetDelay: function(component,delay) {
-		this.componentArray[this.componentArray.indexOf(component)].set_delay(delay);
 	}
 	,draw: function(drawingAdapter,linkAndComponentArray) {
 		var drawFlag = false;
@@ -4597,7 +4587,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 110, className : "com.mun.model.component.Component", methodName : "getAttr"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 109, className : "com.mun.model.component.Component", methodName : "getAttr"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4617,7 +4607,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 115, className : "com.mun.model.component.Component", methodName : "getAttrInt"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 114, className : "com.mun.model.component.Component", methodName : "getAttrInt"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4637,7 +4627,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 120, className : "com.mun.model.component.Component", methodName : "canupdate"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 119, className : "com.mun.model.component.Component", methodName : "canupdate"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4661,7 +4651,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 128, className : "com.mun.model.component.Component", methodName : "update"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 127, className : "com.mun.model.component.Component", methodName : "update"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -4740,14 +4730,6 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 	}
 	,set_width: function(value) {
 		return this.width = value;
-	}
-	,get_delay: function() {
-		var _this = this.list;
-		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).getAttrValue().getvalue();
-	}
-	,set_delay: function(value) {
-		var _this = this.list;
-		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).update(this,new com_mun_model_attribute_IntValue(value));
 	}
 	,get_inportsNum: function() {
 		return this.inportsNum;
@@ -5479,14 +5461,21 @@ com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE = ["DOWN_EDGE",4];
 com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE.toString = $estr;
 com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE.__enum__ = com_mun_model_enumeration_VALUE_$LOGIC;
 com_mun_model_enumeration_VALUE_$LOGIC.__empty_constructs__ = [com_mun_model_enumeration_VALUE_$LOGIC.FALSE,com_mun_model_enumeration_VALUE_$LOGIC.TRUE,com_mun_model_enumeration_VALUE_$LOGIC.UNDEFINED,com_mun_model_enumeration_VALUE_$LOGIC.RISING_EDGE,com_mun_model_enumeration_VALUE_$LOGIC.DOWN_EDGE];
-var com_mun_model_gates_GateAbstract = function() {
+var com_mun_model_gates_AbstractComponentKind = function() {
+	this.attributes = [];
 	this.sequence = -1;
+	this.attributes.push(new com_mun_model_attribute_OrientationAttr());
+	this.attributes.push(new com_mun_model_attribute_StringAttr("name"));
 };
-$hxClasses["com.mun.model.gates.GateAbstract"] = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_GateAbstract.__name__ = ["com","mun","model","gates","GateAbstract"];
-com_mun_model_gates_GateAbstract.prototype = {
+$hxClasses["com.mun.model.gates.AbstractComponentKind"] = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_AbstractComponentKind.__name__ = ["com","mun","model","gates","AbstractComponentKind"];
+com_mun_model_gates_AbstractComponentKind.prototype = {
 	sequence: null
 	,component: null
+	,attributes: null
+	,getAttr: function() {
+		return this.attributes;
+	}
 	,get_component: function() {
 		return this.component;
 	}
@@ -5650,13 +5639,13 @@ com_mun_model_gates_GateAbstract.prototype = {
 	}
 	,getInnerCircuitDiagram: function() {
 		var e = new com_mun_assertions_AssertionFailure("false",[]);
-		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "GateAbstract.hx", lineNumber : 225, className : "com.mun.model.gates.GateAbstract", methodName : "getInnerCircuitDiagram"});
+		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "AbstractComponentKind.hx", lineNumber : 235, className : "com.mun.model.gates.AbstractComponentKind", methodName : "getInnerCircuitDiagram"});
 		throw new js__$Boot_HaxeError(e);
 	}
 	,checkInnerCircuitDiagramPortsChange: function() {
 		return false;
 	}
-	,__class__: com_mun_model_gates_GateAbstract
+	,__class__: com_mun_model_gates_AbstractComponentKind
 };
 var com_mun_model_gates_ComponentKind = function() { };
 $hxClasses["com.mun.model.gates.ComponentKind"] = com_mun_model_gates_ComponentKind;
@@ -5682,23 +5671,16 @@ com_mun_model_gates_ComponentKind.prototype = {
 	,__class__: com_mun_model_gates_ComponentKind
 };
 var com_mun_model_gates_AND = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "AND";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.AND"] = com_mun_model_gates_AND;
 com_mun_model_gates_AND.__name__ = ["com","mun","model","gates","AND"];
 com_mun_model_gates_AND.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_AND.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_AND.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,getname: function() {
 		return this.nameOfTheComponentKind;
 	}
@@ -5771,27 +5753,19 @@ com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 	,__class__: com_mun_model_gates_AND
 });
 var com_mun_model_gates_CompoundComponent = function(circuitDiagram) {
-	this.attr = [];
 	this.nameOfTheComponentKind = "CC";
-	com_mun_model_gates_GateAbstract.call(this);
+	com_mun_model_gates_AbstractComponentKind.call(this);
 	this.circuitDiagram = circuitDiagram;
-	this.attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.attr.push(new com_mun_model_attribute_OrientationAttr());
 };
 $hxClasses["com.mun.model.gates.CompoundComponent"] = com_mun_model_gates_CompoundComponent;
 com_mun_model_gates_CompoundComponent.__name__ = ["com","mun","model","gates","CompoundComponent"];
 com_mun_model_gates_CompoundComponent.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_CompoundComponent.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_CompoundComponent.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	Ob: null
 	,Obable: null
 	,circuitDiagram: null
 	,nameOfTheComponentKind: null
-	,attr: null
-	,getAttr: function() {
-		return this.attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -5896,7 +5870,7 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 			break;
 		default:
 			var e = new com_mun_assertions_AssertionFailure("false",[]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "CompoundComponent.hx", lineNumber : 161, className : "com.mun.model.gates.CompoundComponent", methodName : "createPorts"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "CompoundComponent.hx", lineNumber : 152, className : "com.mun.model.gates.CompoundComponent", methodName : "createPorts"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		return portArray;
@@ -5955,23 +5929,18 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 	,__class__: com_mun_model_gates_CompoundComponent
 });
 var com_mun_model_gates_FlipFlop = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "FlipFlop";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
+	this.attributes.push(new com_mun_model_attribute_IntAttr("hold"));
+	this.attributes.push(new com_mun_model_attribute_IntAttr("setup"));
 };
 $hxClasses["com.mun.model.gates.FlipFlop"] = com_mun_model_gates_FlipFlop;
 com_mun_model_gates_FlipFlop.__name__ = ["com","mun","model","gates","FlipFlop"];
 com_mun_model_gates_FlipFlop.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_FlipFlop.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_FlipFlop.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6043,7 +6012,7 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 	}
 	,addInPort: function() {
 		var e = new com_mun_assertions_AssertionFailure("false",[]);
-		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "FlipFlop.hx", lineNumber : 133, className : "com.mun.model.gates.FlipFlop", methodName : "addInPort"});
+		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "FlipFlop.hx", lineNumber : 128, className : "com.mun.model.gates.FlipFlop", methodName : "addInPort"});
 		throw new js__$Boot_HaxeError(e);
 	}
 	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
@@ -6189,21 +6158,16 @@ com_mun_model_gates_FlipFlop.prototype = $extend(com_mun_model_gates_GateAbstrac
 	,__class__: com_mun_model_gates_FlipFlop
 });
 var com_mun_model_gates_Input = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "Input";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_StringAttr("name"));
 };
 $hxClasses["com.mun.model.gates.Input"] = com_mun_model_gates_Input;
 com_mun_model_gates_Input.__name__ = ["com","mun","model","gates","Input"];
 com_mun_model_gates_Input.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_Input.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_Input.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6308,23 +6272,16 @@ com_mun_model_gates_Input.prototype = $extend(com_mun_model_gates_GateAbstract.p
 	,__class__: com_mun_model_gates_Input
 });
 var com_mun_model_gates_MUX = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "MUX";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.MUX"] = com_mun_model_gates_MUX;
 com_mun_model_gates_MUX.__name__ = ["com","mun","model","gates","MUX"];
 com_mun_model_gates_MUX.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_MUX.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_MUX.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6467,23 +6424,16 @@ com_mun_model_gates_MUX.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 	,__class__: com_mun_model_gates_MUX
 });
 var com_mun_model_gates_NAND = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "NAND";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.NAND"] = com_mun_model_gates_NAND;
 com_mun_model_gates_NAND.__name__ = ["com","mun","model","gates","NAND"];
 com_mun_model_gates_NAND.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_NAND.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_NAND.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6559,23 +6509,16 @@ com_mun_model_gates_NAND.prototype = $extend(com_mun_model_gates_GateAbstract.pr
 	,__class__: com_mun_model_gates_NAND
 });
 var com_mun_model_gates_NOR = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "NOR";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.NOR"] = com_mun_model_gates_NOR;
 com_mun_model_gates_NOR.__name__ = ["com","mun","model","gates","NOR"];
 com_mun_model_gates_NOR.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_NOR.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_NOR.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6651,23 +6594,16 @@ com_mun_model_gates_NOR.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 	,__class__: com_mun_model_gates_NOR
 });
 var com_mun_model_gates_NOT = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "NOT";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.NOT"] = com_mun_model_gates_NOT;
 com_mun_model_gates_NOT.__name__ = ["com","mun","model","gates","NOT"];
 com_mun_model_gates_NOT.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_NOT.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_NOT.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6741,23 +6677,16 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 	,__class__: com_mun_model_gates_NOT
 });
 var com_mun_model_gates_OR = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "OR";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.OR"] = com_mun_model_gates_OR;
 com_mun_model_gates_OR.__name__ = ["com","mun","model","gates","OR"];
 com_mun_model_gates_OR.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_OR.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_OR.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6833,21 +6762,15 @@ com_mun_model_gates_OR.prototype = $extend(com_mun_model_gates_GateAbstract.prot
 	,__class__: com_mun_model_gates_OR
 });
 var com_mun_model_gates_Output = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "Output";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
+	com_mun_model_gates_AbstractComponentKind.call(this);
 };
 $hxClasses["com.mun.model.gates.Output"] = com_mun_model_gates_Output;
 com_mun_model_gates_Output.__name__ = ["com","mun","model","gates","Output"];
 com_mun_model_gates_Output.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_Output.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_Output.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
@@ -6948,23 +6871,16 @@ com_mun_model_gates_Output.prototype = $extend(com_mun_model_gates_GateAbstract.
 	,__class__: com_mun_model_gates_Output
 });
 var com_mun_model_gates_XOR = function() {
-	this.Attr = [];
 	this.nameOfTheComponentKind = "XOR";
-	com_mun_model_gates_GateAbstract.call(this);
-	this.Attr.push(new com_mun_model_attribute_IntAttr("delay"));
-	this.Attr.push(new com_mun_model_attribute_StringAttr("name"));
-	this.Attr.push(new com_mun_model_attribute_OrientationAttr());
+	com_mun_model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.XOR"] = com_mun_model_gates_XOR;
 com_mun_model_gates_XOR.__name__ = ["com","mun","model","gates","XOR"];
 com_mun_model_gates_XOR.__interfaces__ = [com_mun_model_gates_ComponentKind];
-com_mun_model_gates_XOR.__super__ = com_mun_model_gates_GateAbstract;
-com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
+com_mun_model_gates_XOR.__super__ = com_mun_model_gates_AbstractComponentKind;
+com_mun_model_gates_XOR.prototype = $extend(com_mun_model_gates_AbstractComponentKind.prototype,{
 	nameOfTheComponentKind: null
-	,Attr: null
-	,getAttr: function() {
-		return this.Attr;
-	}
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}

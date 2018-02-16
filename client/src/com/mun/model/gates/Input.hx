@@ -20,15 +20,10 @@ import com.mun.model.enumeration.ORIENTATION;
 class Input implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="Input";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
     public function new() {
         super() ;
-        Attr.push(new StringAttr("name"));
-    }
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
+        attributes.push(new StringAttr("name"));
     }
 
     public function setname(s:String):Void{

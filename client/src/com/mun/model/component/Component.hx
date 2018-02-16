@@ -41,8 +41,6 @@ class Component extends Observable{
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    //var name:String = "";//the name of the component, unique
-    //var delay:Int;//delay of the component
     var inportsNum:Int;//init
     //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
@@ -84,6 +82,7 @@ class Component extends Observable{
             }
 
         }
+        // TODO What is going on with this loop?  What about other attributes.
         for(n in componentKind.getAttr()){
             if(n.getName()=="delay"){
                 list.set(n.getName(),new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
@@ -215,14 +214,6 @@ class Component extends Observable{
 
     public function set_width(value:Float) {
         return this.width = value;
-    }
-
-    public function get_delay():Int {
-        return list.get("delay").getAttrValue().getvalue();
-    }
-
-    public function set_delay(value:Int) {
-        return list.get("delay").update(this,new IntValue(value));
     }
 
     public function get_inportsNum():Int {

@@ -32,12 +32,6 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     var Obable:Observable;
     var circuitDiagram:CircuitDiagramI;
     var nameOfTheComponentKind:String="CC";
-    var attr:Array<Attribute>=new Array<Attribute>();
-
-    public function getAttr():Array<Attribute>{
-        return attr;
-
-    }
 
     public function setname(s:String):Void{
         nameOfTheComponentKind=s;
@@ -51,9 +45,6 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     public function new(circuitDiagram:CircuitDiagramI) {
         super() ;
         this.circuitDiagram = circuitDiagram;
-        attr.push(new IntAttr("delay"));
-        attr.push(new StringAttr("name"));
-        attr.push(new OrientationAttr());
     }
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{

@@ -30,6 +30,8 @@ class UpdateToolBar {
 
         this.updateCircuitDiagram = updateCircuitDiagram;
 
+        // TODO Why are these fields hard coded?  The table should be generated based on what attibutes the
+        // currently selected stuff has.
         nameInput = Browser.document.getElementById("name_input");
         delayInput = Browser.document.getElementById("delay_input");
         orientation = Browser.document.getElementById("orientation");
@@ -108,7 +110,10 @@ class UpdateToolBar {
     }
 
     function setDelayInput(){
-        new JQuery(delayInput).val(linkAndComponentArray.getComponentFromIndex(0).get_delay());
+        // TODO.  Get rid of the hard coding.  The attribute table should be generated based
+        // on the attributes that the components actually have.
+        // Meanwhile I'm commenting this out, since there is no get_delay method in component.
+        // new JQuery(delayInput).val(linkAndComponentArray.getComponentFromIndex(0).get_delay());
     }
 
     function changeToNorth(){
@@ -137,10 +142,11 @@ class UpdateToolBar {
     }
 
     function inputChange(){
+        // TODO.  Fix this.
         if(linkAndComponentArray.getComponentIteratorLength() == 1){
             var temp:Dynamic = new JQuery(nameInput).val();
-            var temp2:Int = new JQuery(delayInput).val();
-            updateCircuitDiagram.setComponentDelay(linkAndComponentArray.getComponentFromIndex(0),temp2);
+            //var temp2:Int = new JQuery(delayInput).val();
+            //updateCircuitDiagram.setComponentDelay(linkAndComponentArray.getComponentFromIndex(0),temp2);
             updateCircuitDiagram.setComponentName(linkAndComponentArray.getComponentFromIndex(0),temp);
         }
     }

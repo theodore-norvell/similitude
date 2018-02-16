@@ -1,6 +1,9 @@
 package com.mun.model.gates;
 
 import com.mun.assertions.Assert ;
+import com.mun.model.attribute.Attribute ;
+import com.mun.model.attribute.OrientationAttr ;
+import com.mun.model.attribute.StringAttr ;
 import com.mun.model.component.Outport;
 import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
@@ -19,12 +22,19 @@ import com.mun.global.Constant.*;
 **/
 class AbstractComponentKind {
     // TODO: Get rid of this.
-    var sequence:Int;//use for input and output
-    var component:Component;
+    private var sequence:Int;//use for input and output
+    private var component:Component;
+    private var attributes:Array<Attribute>=new Array<Attribute>();
 
     private function new() {
 
         sequence = -1;
+        attributes.push(new OrientationAttr());
+        attributes.push(new StringAttr("name"));
+    }
+
+    public function getAttr():Array<Attribute>{
+        return attributes;
     }
 
     public function get_component():Component {
