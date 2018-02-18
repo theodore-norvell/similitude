@@ -9369,6 +9369,7 @@ haxe_Log.clear = function() {
 	js_Boot.__clear_trace();
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 var haxe_Utf8 = function(size) {
 	this.__b = "";
 };
@@ -9550,6 +9551,8 @@ haxe_ds_ArraySort.swap = function(a,i,j) {
 haxe_ds_ArraySort.compare = function(a,cmp,i,j) {
 	return cmp(a[i],a[j]);
 };
+=======
+>>>>>>> origin/TheosDevelopment
 =======
 >>>>>>> origin/TheosDevelopment
 var haxe_ds_BalancedTree = function() {
