@@ -53,14 +53,6 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.lineWidth = width;
     }
 
-    public function get_cxt():CanvasRenderingContext2D {
-        return cxt;
-    }
-
-    public function set_cxt(value:CanvasRenderingContext2D):Void {
-        this.cxt = value;
-    }
-
     public function getTransform():Transform{
         return this.trans;
     }
@@ -68,6 +60,11 @@ class DrawingAdapter implements DrawingAdapterI {
     public function transform(transform:Transform):DrawingAdapterI{
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(transform.compose(trans), cxt);
         return drawingAdapter;
+    }
+
+    public function setClip(x:Float, y:Float, width:Float, height:Float):Void {
+        //TODO.  Do we really need to do this?
+        //  Delete this method if not needed.
     }
 
     public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {

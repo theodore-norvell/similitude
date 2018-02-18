@@ -32,7 +32,7 @@ class ControllerCanvasContext {
     var sideBar:SideBar;
     var updateToolBar:UpdateToolBar;
 
-    var linkAndComponentAndEndpointAndPortArray:LinkAndComponentAndEndpointAndPortArray;
+    var selection:LinkAndComponentAndEndpointAndPortArray;
     var lastClickArray:LinkAndComponentAndEndpointAndPortArray;
     var hitListWorldPoint:WorldPoint;
 
@@ -64,7 +64,7 @@ class ControllerCanvasContext {
         mouseState = M_STATE.IDLE;
 
         keyState = new KeyState();
-        linkAndComponentAndEndpointAndPortArray = new LinkAndComponentAndEndpointAndPortArray();
+        selection = new LinkAndComponentAndEndpointAndPortArray();
         lastClickArray = new LinkAndComponentAndEndpointAndPortArray();
 
         createComponent = false;
@@ -96,7 +96,7 @@ class ControllerCanvasContext {
 
     function doMouseEnter(event:MouseEvent){
         if(createComponent && controllerState == C_STATE.CREATE_COMPONENT){
-            linkAndComponentAndEndpointAndPortArray.clean();
+            selection.clean();
 
             var x:Float = event.clientX;
             var y:Float = event.clientY;
@@ -115,11 +115,11 @@ class ControllerCanvasContext {
 
             }else{
                 updateCircuitDiagram.createComponentByCommand(sideBar.getComponent(), createToCircuitDiagram);
-                linkAndComponentAndEndpointAndPortArray.addComponent(sideBar.getComponent());
+                selection.addComponent(sideBar.getComponent());
                 createComponent = false;
             }
         }else if(createComponent && controllerState == C_STATE.PASTE){
-            linkAndComponentAndEndpointAndPortArray.clean();
+            selection.clean();
 
             var x:Float = event.clientX;
             var y:Float = event.clientY;
@@ -132,7 +132,7 @@ class ControllerCanvasContext {
 
             createToCircuitDiagram = moveWorldPointArray[0].get_circuitDiagram();
 
-            linkAndComponentAndEndpointAndPortArray.setArray(updateCircuitDiagram.paste(moveWorldPointArray[0].get_coordinate(), createToCircuitDiagram));
+            selection.setArray(updateCircuitDiagram.paste(moveWorldPointArray[0].get_coordinate(), createToCircuitDiagram));
             updateCircuitDiagram.get_commandManager().recordFlagSetTrue();
         }
     }
@@ -307,7 +307,7 @@ class ControllerCanvasContext {
                 var object:Object = new Object();
                 object.set_endPoint(endpoint);
                 if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
-                    linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+                    selection.addEndpoint(endpoint);
                 }
             }else{
                 controllerState = C_STATE.CREATE_LINK;
@@ -324,7 +324,7 @@ class ControllerCanvasContext {
             var object:Object = new Object();
             object.set_endPoint(endpoint);
             if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
-                linkAndComponentAndEndpointAndPortArray.addEndpoint(endpoint);
+                selection.addEndpoint(endpoint);
             }
         }else if(componentCounter != 0){//component selected
             var component:Component = null;
@@ -336,7 +336,7 @@ class ControllerCanvasContext {
             var object:Object = new Object();
             object.set_component(component);
             if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
-                linkAndComponentAndEndpointAndPortArray.addComponent(component);
+                selection.addComponent(component);
             }
         }else if(linkCounter != 0){//link selected
             var link:Link = null;
@@ -349,14 +349,14 @@ class ControllerCanvasContext {
             var object:Object = new Object();
             object.set_link(link);
             if(updateCircuitDiagram.findObjectInWhichCircuitDiagram(object) == hitListWorldPoint.get_circuitDiagram()){
-                linkAndComponentAndEndpointAndPortArray.addLink(link);
+                selection.addLink(link);
             }
         }else if(componentCounter == 0 && linkCounter == 0 && portCounter == 0 && endpointCounter == 0){
             controllerState = C_STATE.CREATE_LINK;
             checkState();
         }
 
-        updateCircuitDiagram.hightLightObject(linkAndComponentAndEndpointAndPortArray);
+        updateCircuitDiagram.hightLightObject(selection);
 
         //update tool bar
         toolBarUpdate();
@@ -365,9 +365,9 @@ class ControllerCanvasContext {
     function checkState(){
         switch(controllerState){
             case C_STATE.IDLE : {
-                lastClickArray.setArray(linkAndComponentAndEndpointAndPortArray);
+                lastClickArray.setArray(selection);
                 if(!(keyState.get_key() == KEY.ALT_KEY && keyState.get_keyState() == K_STATE.KEY_DOWN)){
-                    linkAndComponentAndEndpointAndPortArray.clean();
+                    selection.clean();
                 }
 
                 //check is any link is not enough long: link at least need have 10 pixel long
@@ -388,19 +388,19 @@ class ControllerCanvasContext {
 
             };
             case C_STATE.CREATE_LINK : {
-                linkAndComponentAndEndpointAndPortArray.clean();
+                selection.clean();
                 var link:Link = updateCircuitDiagram.addLink(mouseDownWorldCoordinate,mouseDownWorldCoordinate, hitListWorldPoint.get_circuitDiagram());
-                linkAndComponentAndEndpointAndPortArray.addEndpoint(link.get_rightEndpoint());
+                selection.addEndpoint(link.get_rightEndpoint());
                 hightLightLink = link;
             };
             case C_STATE.MOVE : {
-                if(!linkAndComponentAndEndpointAndPortArray.isEmpty()){
+                if(!selection.isEmpty()){
                     if(lastState == C_STATE.CREATE_COMPONENT){
-                        updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
+                        updateCircuitDiagram.moveSelectedObjects(selection, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
                     }else if(lastState == C_STATE.PASTE){
-                        updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
+                        updateCircuitDiagram.moveSelectedObjects(selection, mouseMoveWorldCoordiante, mouseMoveWorldCoordiante, true);
                     }else{
-                        updateCircuitDiagram.moveSelectedObjects(linkAndComponentAndEndpointAndPortArray, mouseMoveWorldCoordiante, mouseDownWorldCoordinate, false);
+                        updateCircuitDiagram.moveSelectedObjects(selection, mouseMoveWorldCoordiante, mouseDownWorldCoordinate, false);
                     }
                 }
             };
@@ -408,11 +408,11 @@ class ControllerCanvasContext {
                 createComponent = true;
             };
             case C_STATE.MULTI_SELECTION : {
-                linkAndComponentAndEndpointAndPortArray.setArray(lastClickArray);
+                selection.setArray(lastClickArray);
                 checkHitList();
             };
             case C_STATE.SINGLE_SELECTION : {
-                linkAndComponentAndEndpointAndPortArray.clean();
+                selection.clean();
                 checkHitList();
             };
             default : {
@@ -422,8 +422,8 @@ class ControllerCanvasContext {
     }
 
     function toolBarUpdate(){
-        if(linkAndComponentAndEndpointAndPortArray.getComponentIteratorLength() !=0 || linkAndComponentAndEndpointAndPortArray.getLinkIteratorLength() != 0){
-            updateToolBar.update(linkAndComponentAndEndpointAndPortArray);
+        if(selection.getComponentIteratorLength() !=0 || selection.getLinkIteratorLength() != 0){
+            updateToolBar.update(selection);
         }else{
             updateToolBar.hidden();
         }
