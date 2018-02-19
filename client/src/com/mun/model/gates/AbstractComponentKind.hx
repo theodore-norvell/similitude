@@ -1,4 +1,9 @@
 package com.mun.model.gates;
+
+import com.mun.assertions.Assert ;
+import com.mun.model.attribute.Attribute ;
+import com.mun.model.attribute.OrientationAttr ;
+import com.mun.model.attribute.StringAttr ;
 import com.mun.model.component.Outport;
 import com.mun.type.HitObject;
 import com.mun.model.component.CircuitDiagramI;
@@ -15,15 +20,21 @@ import com.mun.global.Constant.*;
 * abstract class for gates
 * @author wanhui
 **/
-class GateAbstract{
-    var leastInportNum:Int;
-    var sequence:Int;//use for input and output
-    var component:Component;
+class AbstractComponentKind {
+    // TODO: Get rid of this.
+    private var sequence:Int;//use for input and output
+    private var component:Component;
+    private var attributes:Array<Attribute>=new Array<Attribute>();
 
-    private function new(leastInportNum:Int) {
-        this.leastInportNum = leastInportNum;
+    private function new() {
 
         sequence = -1;
+        attributes.push(new OrientationAttr());
+        attributes.push(new StringAttr("name"));
+    }
+
+    public function getAttr():Array<Attribute>{
+        return attributes;
     }
 
     public function get_component():Component {
@@ -32,10 +43,6 @@ class GateAbstract{
 
     public function set_component(value:Component):Void {
         this.component = value;
-    }
-
-    public function getLeastInportNumber():Int {
-        return this.leastInportNum;
     }
 
     public function addInPort():Port {
@@ -225,14 +232,8 @@ class GateAbstract{
     }
 
     public function getInnerCircuitDiagram():CircuitDiagramI{
+        Assert.assert(false) ;
         return null;//for most of the componentkind it has no circuit diagram inside, except compound component
-    }
-
-    public function createJSon():String{
-        var jsonString:String = "{ \"leastInportNum\": \"" + this.leastInportNum + "\",";
-        jsonString += "\"sequence\": \"" + this.sequence + "\"}";
-
-        return jsonString;
     }
 
     /**

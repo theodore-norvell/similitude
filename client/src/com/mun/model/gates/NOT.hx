@@ -4,7 +4,6 @@ import com.mun.model.attribute.OrientationAttr;
 import com.mun.model.attribute.StringAttr;
 import com.mun.model.attribute.IntAttr;
 import com.mun.model.attribute.Attribute;
-//import js.html.CanvasRenderingContext2D;
 import com.mun.type.LinkAndComponentAndEndpointAndPortArray;
 import com.mun.view.drawComponents.DrawComponent;
 import com.mun.model.drawingInterface.DrawingAdapterI;
@@ -14,7 +13,6 @@ import com.mun.model.component.Outport;
 import com.mun.model.component.Port;
 import com.mun.model.enumeration.IOTYPE;
 import com.mun.model.enumeration.ORIENTATION;
-import com.mun.model.enumeration.VALUE_LOGIC;
 /**
  * NOT gate<br>
  * Truth Table
@@ -29,55 +27,21 @@ import com.mun.model.enumeration.VALUE_LOGIC;
  * @author wanhui
  *
  */
-class NOT implements ComponentKind extends GateAbstract {
+class NOT implements ComponentKind extends AbstractComponentKind {
 
     var nameOfTheComponentKind:String="NOT";
-    var Attr:Array<Attribute>=new Array<Attribute>();
 
-    var delay:Int=0;//delay of the component
-
-    public function getAttr():Array<Attribute>{
-        return Attr;
+    public function new() {
+        super() ;
+        attributes.push(new IntAttr("delay"));
     }
 
     public function setname(s:String):Void{
         nameOfTheComponentKind=s;
     }
 
-    public function getDelay():Int{
-        return delay;
-    }
-
-    public function setDelay(value:Int):Int{
-        var a:Int=delay;
-        delay=value;
-        return a;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
-    }
-
-    public function algorithm(portArray:Array<Port>):Array<Port> {
-        var port:Port;
-        var value:VALUE_LOGIC = VALUE_LOGIC.TRUE;
-
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.INPUT) {//for input gate there should be have only one input port and also only one output port
-                value = port.get_value();
-                break;
-            }
-        }
-        for (port in portArray) {
-            if (port.get_portDescription() == IOTYPE.OUTPUT) {
-                if (value == VALUE_LOGIC.TRUE)
-                    port.set_value(VALUE_LOGIC.FALSE);
-                else if (value == VALUE_LOGIC.FALSE)
-                    port.set_value(VALUE_LOGIC.TRUE);
-            }
-        }
-
-        return portArray;
     }
 
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum):Array<Port> {
@@ -156,12 +120,5 @@ class NOT implements ComponentKind extends GateAbstract {
         }else{
             drawComponent.drawCorrespondingComponent("black");
         }
-    }
-
-    public function new() {
-        super(2);
-        Attr.push(new IntAttr("delay"));
-        Attr.push(new StringAttr("name"));
-        Attr.push(new OrientationAttr());
     }
 }

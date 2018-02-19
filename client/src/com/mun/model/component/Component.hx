@@ -41,8 +41,6 @@ class Component extends Observable{
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    //var name:String = "";//the name of the component, unique
-    //var delay:Int;//delay of the component
     var inportsNum:Int;//init
     //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
@@ -84,6 +82,7 @@ class Component extends Observable{
             }
 
         }
+        // TODO What is going on with this loop?  What about other attributes.
         for(n in componentKind.getAttr()){
             if(n.getName()=="delay"){
                 list.set(n.getName(),new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
@@ -217,14 +216,6 @@ class Component extends Observable{
         return this.width = value;
     }
 
-    public function get_delay():Int {
-        return list.get("delay").getAttrValue().getvalue();
-    }
-
-    public function set_delay(value:Int) {
-        return list.get("delay").update(this,new IntValue(value));
-    }
-
     public function get_inportsNum():Int {
         return inportsNum;
     }
@@ -233,22 +224,6 @@ class Component extends Observable{
     }
     public function getNameOfTheComponentKind():String{
         return this.componentKind.getname();
-    }
-    public function set_inportsNum(value:Int):Bool {
-        if (value <= componentKind.getLeastInportNumber()) {
-            return false;
-        }
-        this.inportsNum = value;
-        while (inportArray.length < value) {
-            var port:Port = componentKind.addInPort();
-            if (port != null) {
-                inportArray.push(port);
-            } else {
-                return false;
-            }
-        }
-        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        return true;
     }
 
     public function removeInport(inport:Inport):Bool {
@@ -337,41 +312,5 @@ class Component extends Observable{
 
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         return componentKind.findWorldPoint(coordinate, mode);
-    }
-
-    public function createJSon():String{
-        var jsonString:String = "{ \"name\": \"" + this.list.get("name").getAttrValue().getvalue() + "\",";
-        jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
-        jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
-        jsonString += " \"height\": \"" + this.height + "\",";
-        jsonString += " \"width\": \"" + this.width + "\",";
-        jsonString += " \"orientation\": \"" + list.get("orientation").getAttrValue().getvalue() + "\",";
-        jsonString += " \"delay\": \"" + list.get("delay").getAttrValue().getvalue() + "\",";
-        jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
-        jsonString += " \"nameOfTheComponentKind\": \"" + this.componentKind.getname() + "\",";
-
-        jsonString += "\"componentKind\":";
-        jsonString += componentKind.createJSon();
-        jsonString += ",";
-
-        jsonString += "\"inportArray\":[";
-        for(i in 0...inportArray.length){
-            jsonString += inportArray[i].createJSon();
-            if(i != inportArray.length -1){
-                jsonString += ",";
-            }
-        }
-        jsonString += "],";
-
-        jsonString += "\"outportArray\":[";
-        for(i in 0...outportArray.length){
-            jsonString += outportArray[i].createJSon();
-            if(i != outportArray.length -1){
-                jsonString += ",";
-            }
-        }
-        jsonString += "]}";
-
-        return jsonString;
     }
 }
