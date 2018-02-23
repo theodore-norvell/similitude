@@ -358,7 +358,7 @@ Stuff.__name__ = ["Stuff"];
 Stuff.__properties__ = {get_Schema:"get_Schema"};
 Stuff.get_Schema = function() {
 	if(Stuff._schema == null) {
-		Stuff._schema = new js_npm_mongoose_Schema({ folder : { type : { currentFolderName : { type : String}, isFolder : { type : Boolean}, parentid : { type : String}}}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : { group : { type : [String]}, permission : { type : String}}}}}, version : { type : { contents : { type : [String]}, fileName : { type : String}, modified : { type : Date}, number : { type : [Number]}}}},{ });
+		Stuff._schema = new js_npm_mongoose_Schema({ fileName : { type : String}, isFolder : { type : Boolean}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : [{ group : { type : String}, permission : { type : String}}]}}}, parentid : { type : String}, version : { type : [{ contents : { type : String}, modified : { type : Date}, number : { type : Number}}]}},{ });
 		var proto1 = Stuff.prototype;
 		var _g = 0;
 		var _g1 = Reflect.fields(proto1);
@@ -376,8 +376,10 @@ Stuff.get_Schema = function() {
 };
 Stuff.__super__ = js_npm_mongoose_macro_Model;
 Stuff.prototype = $extend(js_npm_mongoose_macro_Model.prototype,{
-	folder: null
+	fileName: null
+	,isFolder: null
 	,metainformation: null
+	,parentid: null
 	,version: null
 	,_id: null
 	,__class__: Stuff
@@ -412,6 +414,7 @@ var util_Async = function() { };
 $hxClasses["util.Async"] = util_Async;
 util_Async.__name__ = ["util","Async"];
 var Main = function() {
+	var _gthis = this;
 	var app = new js_npm_Express();
 	var database = new js_npm_mongoose_Mongoose();
 	database.connect("mongodb://localhost/test_mongoose",function(err) {
@@ -428,8 +431,8 @@ var Main = function() {
 		m1[f] = proto[f];
 	}
 	var stuffMan = m1;
-	stuffMan.find({ "folder.currentFolderName" : "root", "folder.isFolder" : true},function(err1,stuff) {
-		console.log(stuff);
+	stuffMan.find({ "fileName" : "root", "isFolder" : true},function(err1,stuff) {
+		console.log(stuff[0]);
 		var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
 		app.set("port",3000);
 		var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
@@ -499,9 +502,8 @@ var Main = function() {
 					m3[f1] = proto1[f1];
 				}
 				var stufftemp = m3;
-				var d = { fileName : "", number : [1], contents : [], modified : new Date()};
-				var d1 = { folder : { parentid : "", currentFolderName : "root", isFolder : true}, version : d, metainformation : { fileType : "circuit", owner : _req1.body.username, permissions : { group : ["personal"], permission : "true"}, created : new Date()}};
-				stufftemp.create(d1,function(err2,stuff1) {
+				var d = { parentid : "", isFolder : true, fileName : "root", version : [{ number : 1, contents : "", modified : new Date()}], metainformation : { fileType : "folder", owner : _req1.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+				stufftemp.create(d,function(err2,stuff1) {
 					console.log("inside callback err is " + err2 + " stuff is " + Std.string(stuff1));
 				});
 				res3.send("t");
@@ -524,12 +526,12 @@ var Main = function() {
 		});
 		app.post("/app/users",jsonParser,function(req5,res5,next1) {
 			var _req3 = req5;
-			var d_folder = { parentid : "", currentFolderName : "NewFolder", isFolder : false};
-			var d_version = { fileName : "", number : [1], contents : [_req3.body], modified : new Date()};
-			var d_metainformation = { fileType : "circuit", owner : "test", permissions : { group : ["a"], permission : "true"}, created : new Date()};
+			var d_parentid = "";
+			var d_isFolder = true;
+			var d_fileName = "root";
+			var d_version = [{ number : 1, contents : "", modified : new Date()}];
+			var d_metainformation = { fileType : "folder", owner : _req3.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
 			stuffMan.find({ "_id" : "5a86e271ed10310f8c7f49fc"},function(err3,stuff2) {
-				console.log(stuff2[0].version.contents[0]);
-				res5.send(stuff2[0].version.contents[0]);
 			});
 		});
 		app.post("/app/users/folder",function(req6,res6,next2) {
@@ -554,13 +556,13 @@ var Main = function() {
 				var find = true;
 				while(true) {
 					if(i2 == 0) {
-						stufftemp1.find({ "folder.parentid" : "", "folder.currentFolderName" : temp[0], "folder.isFolder" : true},function(err4,stuff3) {
+						stufftemp1.find({ "parentid" : "", "fileName" : temp[0], "isFolder" : true},function(err4,stuff3) {
 							console.log(stuff3);
 							s = Std.string(stuff3[0]._id);
 							i2 += 1;
 						});
 					} else {
-						stufftemp1.find({ "folder.parentid" : s, "folder.currentFolderName" : temp[i2], "folder.isFolder" : true},function(err5,stuff4) {
+						stufftemp1.find({ "parentid" : s, "fileName" : temp[i2], "isFolder" : true},function(err5,stuff4) {
 							if(stuff4 != null) {
 								s = Std.string(stuff4[0]._id);
 								i2 += 1;
@@ -575,10 +577,10 @@ var Main = function() {
 					}
 				}
 				if(find == true) {
-					stufftemp1.find({ "folder.parentid" : s, "folder.currentFolderName" : temp[temp.length - 1], "folder.isFolder" : true},function(err6,stuff5) {
+					stufftemp1.find({ "parentid" : s, "fileName" : temp[temp.length - 1], "isFolder" : true},function(err6,stuff5) {
 						if(stuff5 == null) {
-							var d2 = { folder : { parentid : s, currentFolderName : temp[temp.length - 1], isFolder : true}, version : { fileName : "", number : [1], contents : [""], modified : new Date()}, metainformation : { fileType : "circuit", owner : req6.param("username"), permissions : { group : ["personal"], permission : "true"}, created : new Date()}};
-							stufftemp1.create(d2,function(err7,stuff6) {
+							var d1 = { parentid : "", isFolder : true, fileName : "root", version : [{ number : 1, contents : "", modified : new Date()}], metainformation : { fileType : "folder", owner : _req4.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+							stufftemp1.create(d1,function(err7,stuff6) {
 								console.log("inside callback err is " + err7 + " stuff is " + Std.string(stuff6));
 								res6.send("success");
 							});
@@ -591,44 +593,21 @@ var Main = function() {
 					res6.send("patherror");
 				}
 			} else {
-				var temp1 = req6.param("folder").split("/");
-				var i3 = 0;
-				var s1 = "";
-				var find1 = true;
-				while(true) {
-					if(i3 == 0) {
-						stufftemp1.find({ "folder.currentFolderName" : temp1[0], "folder.isFolder" : true},function(err8,stuff7) {
-							s1 = Std.string(stuff7[0]._id);
-							console.log("test1  " + s1);
-						});
-						i3 += 1;
-					} else {
-						stufftemp1.find({ "folder.parentid" : s1, "folder.currentFolderName" : temp1[i3], "folder.isFolder" : true},function(err9,stuff8) {
-							if(stuff8 != null) {
-								s1 = Std.string(stuff8[0]._id);
-								i3 += 1;
-							} else {
-								find1 = false;
-								i3 = temp1.length;
-							}
-						});
-					}
-					if(!(i3 < temp1.length)) {
-						break;
-					}
-				}
-				console.log("test2   " + s1);
-				if(find1 == true) {
-					stufftemp1.find({ "folder.parentid" : s1, "folder.currentFolderName" : temp1[temp1.length - 1], "folder.isFolder" : false, "fileName" : req6.param("fileName")},function(err10,stuff9) {
-						if(stuff9 == null) {
-							var d3 = { folder : { parentid : s1, currentFolderName : temp1[temp1.length - 1], isFolder : true}, version : { fileName : req6.param("fileName"), number : [1], contents : [_req4.body], modified : new Date()}, metainformation : { fileType : "circuit", owner : req6.param("username"), permissions : { group : ["personal"], permission : "true"}, created : new Date()}};
-							stufftemp1.create(d3,function(err11,stuff10) {
-								console.log("inside callback err is " + err11 + " stuff is " + Std.string(stuff10));
+				var path = req6.param("folder").split("/");
+				var idOfFolder = "";
+				_gthis.findFileId(idOfFolder,path,stufftemp1);
+				console.log("test2   " + idOfFolder);
+				if(idOfFolder != null) {
+					stufftemp1.find({ "parentid" : idOfFolder, "isFolder" : false, "fileName" : req6.param("fileName")},function(err8,stuff7) {
+						if(stuff7 == null) {
+							var d2 = req6.param("fileName");
+							var d3 = [{ number : 1, contents : _req4.body, modified : new Date()}];
+							var d4 = req6.param("username");
+							var d5 = { parentid : idOfFolder, isFolder : false, fileName : d2, version : d3, metainformation : { fileType : "CircuitDiagram", owner : d4, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+							stufftemp1.create(d5,function(err9,stuff8) {
+								console.log("inside callback err is " + err9 + " stuff is " + Std.string(stuff8));
 								res6.send("success");
 							});
-						} else {
-							stuff9[0].version.number.push(stuff9[0].version.number.length);
-							stuff9[0].version.contents.push(_req4.body);
 						}
 					});
 				}
@@ -643,23 +622,23 @@ var Main = function() {
 			var db2 = new HaxeLow("db.json");
 			var user2 = db2.col(User);
 			var flag1 = false;
-			var temp2 = "";
+			var temp1 = "";
 			var pass = "";
 			var _g6 = 0;
 			while(_g6 < user2.length) {
-				var i4 = user2[_g6];
+				var i3 = user2[_g6];
 				++_g6;
-				if(i4.getname() == username1) {
+				if(i3.getname() == username1) {
 					flag1 = true;
-					temp2 = i4.getmail();
-					pass = i4.getpassword();
+					temp1 = i3.getmail();
+					pass = i3.getpassword();
 				}
 			}
 			if(flag1 == true) {
-				var options = { from : "web.circuitdiagram@hotmail.com", to : temp2, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
-				mailTransport.sendMail(options,function(err12,msg) {
-					if(err12) {
-						console.log(err12);
+				var options = { from : "web.circuitdiagram@hotmail.com", to : temp1, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
+				mailTransport.sendMail(options,function(err10,msg) {
+					if(err10) {
+						console.log(err10);
 					} else {
 						console.log("email sent to user: " + Std.string(username1));
 					}
@@ -680,10 +659,10 @@ var Main = function() {
 			var flag2 = true;
 			var _g7 = 0;
 			while(_g7 < user3.length) {
-				var i5 = user3[_g7];
+				var i4 = user3[_g7];
 				++_g7;
-				if(i5.getname() == username2) {
-					flag2 = i5.changepass(_req6.body.oldp,_req6.body.newp);
+				if(i4.getname() == username2) {
+					flag2 = i4.changepass(_req6.body.oldp,_req6.body.newp);
 					break;
 				}
 			}
@@ -711,6 +690,33 @@ Main.main = function() {
 };
 Main.prototype = {
 	server: null
+	,findFileId: function(idOfFolder,path,manager) {
+		var _gthis = this;
+		manager.find({ "fileName" : path[0], "isFolder" : true},function(err,rootModel) {
+			if(err != null) {
+				console.log(err);
+			}
+			var idOfFolder1 = Std.string(rootModel[0]._id);
+			console.log("id of root is " + idOfFolder1);
+			_gthis.findFileIdHelper(1,idOfFolder1,path,manager);
+		});
+	}
+	,findFileIdHelper: function(i,idOfCurrent,path,manager) {
+		var _gthis = this;
+		if(i != path.length) {
+			manager.find({ "parentid" : idOfCurrent, "fileName" : path[i]},function(err,results) {
+				if(err != null) {
+					console.log(err);
+				}
+				if(results != null) {
+					idOfCurrent = Std.string(results[0]._id);
+					_gthis.findFileIdHelper(i + 1,idOfCurrent,path,manager);
+				} else {
+					idOfCurrent = null;
+				}
+			});
+		}
+	}
 	,__class__: Main
 };
 Math.__name__ = ["Math"];

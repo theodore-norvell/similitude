@@ -27,23 +27,23 @@ class Test {
 //        trace(o);
 //        trace(folderState.circuitDiagram.get_name());
         JQuery.ajax( { type:"post",
-            url: "http://127.0.0.1:3000/app/users?username=test&new=false&folder=root&fileName="+folderState.circuitDiagram.get_name(),
+            url: "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root&fileName="+folderState.circuitDiagram.get_name(),
             contentType: "application/json",
             dataType:"text",
             data:o}
         )
         .done( function (text) {
-            trace(text);
-            trace( "This is the text" + text ) ;
-            trace( "It is a " + Type.getClass( text ) ) ;
+//            trace(text);
+//            trace( "This is the text" + text ) ;
+//            trace( "It is a " + Type.getClass( text ) ) ;
 //            trace(TJSON.parse(haxe.Json.stringify(text)));
 //            trace(Type.getClass(TJSON.parse(haxe.Json.stringify(text))));
-            var t=cast(TJSON.parse(text),CircuitDiagramI);
-            trace(t);
-            for(i in t.get_componentIterator()){
-                trace(i.get_componentKind());
-            }
-            folderState.load(TJSON.parse(text));
+//            var t=cast(TJSON.parse(text),CircuitDiagramI);
+//            trace(t);
+//            for(i in t.get_componentIterator()){
+//                trace(i.get_componentKind());
+//            }
+//            folderState.load(TJSON.parse(text));
 
         });
     }

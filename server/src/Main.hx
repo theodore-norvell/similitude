@@ -25,26 +25,23 @@ import tjson.TJSON;
     autoIndex: true
 })
 typedef StuffData = {
-folder : {
-    parentid : String,
-    currentFolderName : String,
-    isFolder : Bool
-},
-version : {
-    fileName: String,
-    number : Array<Int>,
-    contents : Array<String>,
-    modified : Date
-},
-metainformation : {
-    fileType : String,
-    owner : String,
-    permissions : {
-        group : Array<String>,
-        permission : String
-    },
-    created : Date
-}
+    parentid:String,
+    isFolder:Bool,
+    fileName:String,
+    version:Array<{
+        number:Int,
+        contents:String,
+        modified:Date
+    }>,
+    metainformation:{
+        fileType:String,
+        owner:String,
+        permissions:Array<{
+            group:String,
+            permission:String
+        }>,
+        created:Date
+    }
 }
 class Stuff extends Model<StuffData>{}
 class StuffManager extends js.npm.mongoose.macro.Manager<StuffData,Stuff>{}
@@ -69,8 +66,10 @@ class Main implements util.Async
                          });
         var stuffMan : StuffManager = StuffManager.build(database, "test");
 
-        var err,stuff = @async stuffMan.find({"folder.currentFolderName" : "root", "folder.isFolder" : true});
-            trace(stuff);
+
+
+        var err,stuff = @async stuffMan.find({"fileName" : "root", "isFolder" : true});
+            trace(stuff[0]);
 
 
 //        console.log("about to remove");
@@ -215,25 +214,22 @@ class Main implements util.Async
                 console.log("new client registered, username : "+_req.body.username);
                 var stufftemp : StuffManager = StuffManager.build(database, _req.body.username);
                 var d : StuffData = {
-                    folder : {
-                        parentid : "",
-                        currentFolderName : "root",
-                        isFolder : true
-                    },
-                    version : {
-                        fileName : "",
-                        number : [1],
-                        contents : [],
-                        modified : Date.now(),
-                    },
-                    metainformation : {
-                        fileType : "circuit",
-                        owner : _req.body.username,
-                        permissions : {
-                            group : ["personal"],
-                            permission : "true"
-                        },
-                        created : Date.now()
+                    parentid:"",
+                    isFolder:true,
+                    fileName:"root",
+                    version:[{
+                        number:1,
+                        contents:"",
+                        modified:Date.now()
+                    }],
+                    metainformation:{
+                        fileType:"folder",
+                        owner:_req.body.username,
+                        permissions:[{
+                            group:"a",
+                            permission:"read&write"
+                        }],
+                        created:Date.now()
                     }
                 }
 
@@ -270,25 +266,22 @@ class Main implements util.Async
             var _req : Dynamic = req;
 
             var d : StuffData = {
-                folder : {
-                    parentid : "",
-                    currentFolderName : "NewFolder",
-                    isFolder : false
-                },
-                version : {
-                    fileName : "",
-                    number : [1],
-                    contents : [_req.body],
-                    modified : Date.now(),
-                },
-                metainformation : {
-                    fileType : "circuit",
-                    owner : "test",
-                    permissions : {
-                        group : ["a"],
-                        permission : "true"
-                    },
-                    created : Date.now()
+                parentid:"",
+                isFolder:true,
+                fileName:"root",
+                version:[{
+                    number:1,
+                    contents:"",
+                    modified:Date.now()
+                }],
+                metainformation:{
+                    fileType:"folder",
+                    owner:_req.body.username,
+                    permissions:[{
+                        group:"a",
+                        permission:"read&write"
+                    }],
+                    created:Date.now()
                 }
             }
 
@@ -300,8 +293,8 @@ class Main implements util.Async
 //            res.send(_req.body);
 
             stuffMan.find({"_id": "5a86e271ed10310f8c7f49fc"},function (err : Null<Error>, stuff) : Void {
-                trace(stuff[0].version.contents[0]);
-                res.send(stuff[0].version.contents[0]);
+//                trace(stuff[0].version.contents[0]);
+//                res.send(stuff[0].version.contents[0]);
             });
 
         });
@@ -322,7 +315,7 @@ class Main implements util.Async
                 var find: Bool = true;
                 do{
                     if(i==0){
-                        stufftemp.find({"folder.parentid" : "", "folder.currentFolderName" : temp[0], "folder.isFolder" : true},
+                        stufftemp.find({"parentid" : "", "fileName" : temp[0], "isFolder" : true},
                         function (err : Null<Error>, stuff) : Void {
                         trace(stuff);
                         s=Std.string(stuff[0]._id);
@@ -331,7 +324,7 @@ class Main implements util.Async
 
                     }
                     else{
-                        stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[i], "folder.isFolder" : true},
+                        stufftemp.find({"parentid" : s, "fileName" : temp[i], "isFolder" : true},
                         function (err : Null<Error>, stuff) : Void {
                             if(stuff!=null){
                                 s=Std.string(stuff[0]._id);
@@ -346,29 +339,26 @@ class Main implements util.Async
                 }while(i<temp.length-1);
 
                 if(find == true){
-                    stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[temp.length-1], "folder.isFolder" : true},
+                    stufftemp.find({"parentid" : s, "fileName" : temp[temp.length-1], "isFolder" : true},
                     function (err : Null<Error>, stuff) : Void {
                         if(stuff == null){
                             var d : StuffData = {
-                                folder : {
-                                    parentid : s,
-                                    currentFolderName : temp[temp.length-1],
-                                    isFolder : true
-                                },
-                                version : {
-                                    fileName : "",
-                                    number : [1],
-                                    contents : [""],
-                                    modified : Date.now(),
-                                },
-                                metainformation : {
-                                    fileType : "circuit",
-                                    owner : req.param('username'),
-                                    permissions : {
-                                        group : ["personal"],
-                                        permission : "true"
-                                    },
-                                    created : Date.now()
+                                parentid:"",
+                                isFolder:true,
+                                fileName:"root",
+                                version:[{
+                                    number:1,
+                                    contents:"",
+                                    modified:Date.now()
+                                }],
+                                metainformation:{
+                                    fileType:"folder",
+                                    owner:_req.body.username,
+                                    permissions:[{
+                                        group:"a",
+                                        permission:"read&write"
+                                    }],
+                                    created:Date.now()
                                 }
                             }
 
@@ -388,60 +378,33 @@ class Main implements util.Async
                 }
             }
             else{
-                var temp : Array<String> =req.param("folder").split("/");
-                var i:Int=0;
-                var s="";
-                var find: Bool = true;
-                do{
-                    if(i==0){
-                        stufftemp.find({ "folder.currentFolderName" : temp[0], "folder.isFolder" : true},
-                        function (err : Null<Error>, stuff) : Void {
-                            s=Std.string(stuff[0]._id);
-                            trace("test1  "+s);
-                        });
-                        i++;
-                    }
-                    else{
-                        stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[i], "folder.isFolder" : true},
-                        function (err : Null<Error>, stuff) : Void {
-                            if(stuff!=null){
-                                s=Std.string(stuff[0]._id);
-                                i++;
-                            }
-                            else{
-                                find=false;
-                                i=temp.length;
-                            }
-                        });
-                    }
-                }while(i<temp.length);
-                trace("test2   "+s);
+                var path : Array<String> =req.param("folder").split("/");
+                var idOfFolder:String = "";
+                @async findFileId(idOfFolder,path,stufftemp);
+                trace("test2   "+idOfFolder);
 
-                if(find==true){
-                    stufftemp.find({"folder.parentid" : s, "folder.currentFolderName" : temp[temp.length-1],
-                        "folder.isFolder" : false, "fileName" : req.param('fileName')},
+                if( idOfFolder != null ){
+                    stufftemp.find({"parentid" : idOfFolder,
+                        "isFolder" : false, "fileName" : req.param('fileName')},
                     function (err : Null<Error>, stuff) : Void {
                         if(stuff == null){
                             var d : StuffData = {
-                                folder : {
-                                    parentid : s,
-                                    currentFolderName : temp[temp.length-1],
-                                    isFolder : true
-                                },
-                                version : {
-                                    fileName : req.param('fileName'),
-                                    number :[1],
-                                    contents : [_req.body],
-                                    modified : Date.now(),
-                                },
-                                metainformation : {
-                                    fileType : "circuit",
-                                    owner : req.param('username'),
-                                    permissions : {
-                                        group : ["personal"],
-                                        permission : "true"
-                                    },
-                                    created : Date.now()
+                                parentid:idOfFolder,
+                                isFolder:false,
+                                fileName:req.param("fileName"),
+                                version:[{
+                                    number:1,
+                                    contents:_req.body,
+                                    modified:Date.now()
+                                }],
+                                metainformation:{
+                                    fileType:"CircuitDiagram",
+                                    owner:req.param("username"),
+                                    permissions:[{
+                                        group:"a",
+                                        permission:"read&write"
+                                    }],
+                                    created:Date.now()
                                 }
                             }
 
@@ -451,8 +414,7 @@ class Main implements util.Async
                             });
                         }
                         else{
-                            stuff[0].version.number.push(stuff[0].version.number.length);
-                            stuff[0].version.contents.push(_req.body);
+
                         }
                     });
 
@@ -545,7 +507,30 @@ class Main implements util.Async
 
     }
 
-    
+
+    function findFileId(idOfFolder:String, path:Array<String>, manager : StuffManager):Void{
+        var err,rootModel = @async manager.find({ "fileName" : path[0], "isFolder" : true});
+        if( err != null ) trace(err);
+        var idOfFolder =Std.string(rootModel[0]._id);
+        trace("id of root is "+idOfFolder);
+        findFileIdHelper(1,idOfFolder,path,manager) ;
+    }
+
+    function findFileIdHelper(i:Int, idOfCurrent:String,path:Array<String>, manager : StuffManager):Void{
+        if(i < path.length ){
+            var err,results = @async manager.find({"parentid" : idOfCurrent, "fileName" : path[i]} );
+            if( err != null) trace(err) ;
+            if(results != null){
+                idOfCurrent=Std.string(results[0]._id);
+                findFileIdHelper( i+1, idOfCurrent, path,manager) ;
+            }
+            else{
+                idOfCurrent=null;
+            }
+
+        }
+
+    }
 
     static public function main()
     {

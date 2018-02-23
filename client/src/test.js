@@ -1012,20 +1012,8 @@ Test.prototype = {
 	folderState: null
 	,b: null
 	,regist: function() {
-		var _gthis = this;
 		var o = tjson_TJSON.encode(this.folderState.circuitDiagram);
-		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users?username=test&new=false&folder=root&fileName=" + this.folderState.circuitDiagram.get_name(), contentType : "application/json", dataType : "text", data : o}).done(function(text) {
-			haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 36, className : "Test", methodName : "regist"});
-			haxe_Log.trace("This is the text" + text,{ fileName : "Test.hx", lineNumber : 37, className : "Test", methodName : "regist"});
-			haxe_Log.trace("It is a " + Std.string(text == null ? null : js_Boot.getClass(text)),{ fileName : "Test.hx", lineNumber : 38, className : "Test", methodName : "regist"});
-			var t = js_Boot.__cast(tjson_TJSON.parse(text) , com_mun_model_component_CircuitDiagramI);
-			haxe_Log.trace(t,{ fileName : "Test.hx", lineNumber : 42, className : "Test", methodName : "regist"});
-			var i = t.get_componentIterator();
-			while(i.hasNext()) {
-				var i1 = i.next();
-				haxe_Log.trace(i1.get_componentKind(),{ fileName : "Test.hx", lineNumber : 44, className : "Test", methodName : "regist"});
-			}
-			_gthis.folderState.load(tjson_TJSON.parse(text));
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root&fileName=" + this.folderState.circuitDiagram.get_name(), contentType : "application/json", dataType : "text", data : o}).done(function(text) {
 		});
 	}
 	,__class__: Test
