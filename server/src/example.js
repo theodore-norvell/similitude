@@ -431,8 +431,8 @@ var Main = function() {
 		m1[f] = proto[f];
 	}
 	var stuffMan = m1;
-	stuffMan.find({ "fileName" : "root", "isFolder" : true},function(err1,stuff) {
-		console.log(stuff[0]);
+	stuffMan.find({ _id : "5a95aeebe2e0fe2aecf77a48"},function(err1,stuff) {
+		console.log(stuff[0].version);
 		var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
 		app.set("port",3000);
 		var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
@@ -531,7 +531,9 @@ var Main = function() {
 			var d_fileName = "root";
 			var d_version = [{ number : 1, contents : "", modified : new Date()}];
 			var d_metainformation = { fileType : "folder", owner : _req3.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
-			stuffMan.find({ "_id" : "5a86e271ed10310f8c7f49fc"},function(err3,stuff2) {
+			stuffMan.find({ "_id" : "5a95aeebe2e0fe2aecf77a48"},function(err3,stuff2) {
+				console.log(stuff2[0].version[0].contents);
+				res5.send(stuff2[0].version[0].contents);
 			});
 		});
 		app.post("/app/users/folder",function(req6,res6,next2) {
@@ -550,67 +552,54 @@ var Main = function() {
 			}
 			var stufftemp1 = m5;
 			if(req6.param("new") == "true") {
-				var temp = req6.param("folder").split("/");
-				var i2 = 0;
-				var s = "";
-				var find = true;
-				while(true) {
-					if(i2 == 0) {
-						stufftemp1.find({ "parentid" : "", "fileName" : temp[0], "isFolder" : true},function(err4,stuff3) {
-							console.log(stuff3);
-							s = Std.string(stuff3[0]._id);
-							i2 += 1;
-						});
-					} else {
-						stufftemp1.find({ "parentid" : s, "fileName" : temp[i2], "isFolder" : true},function(err5,stuff4) {
-							if(stuff4 != null) {
-								s = Std.string(stuff4[0]._id);
-								i2 += 1;
+				var path = req6.param("folder").split("/");
+				path.pop();
+				_gthis.findFileId(path,stufftemp1,function(err4,id) {
+					path = req6.param("folder").split("/");
+					if(id != null) {
+						stufftemp1.find({ "parentid" : id, "fileName" : path[path.length - 1], "isFolder" : true},function(err5,stuff3) {
+							if(stuff3.length == 0) {
+								var path1 = path[path.length - 1];
+								var d1 = [{ number : 0, contents : "", modified : new Date()}];
+								var d2 = { parentid : id, isFolder : true, fileName : path1, version : d1, metainformation : { fileType : "folder", owner : _req4.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+								stufftemp1.create(d2,function(err6,stuff4) {
+									console.log("inside callback err is " + err6 + " stuff is " + Std.string(stuff4));
+									res6.send("success");
+								});
 							} else {
-								find = false;
-								i2 = temp.length - 1;
+								id = null;
 							}
 						});
 					}
-					if(!(i2 < temp.length - 1)) {
-						break;
+					if(id == null) {
+						res6.send("patherror");
 					}
-				}
-				if(find == true) {
-					stufftemp1.find({ "parentid" : s, "fileName" : temp[temp.length - 1], "isFolder" : true},function(err6,stuff5) {
-						if(stuff5 == null) {
-							var d1 = { parentid : "", isFolder : true, fileName : "root", version : [{ number : 1, contents : "", modified : new Date()}], metainformation : { fileType : "folder", owner : _req4.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-							stufftemp1.create(d1,function(err7,stuff6) {
-								console.log("inside callback err is " + err7 + " stuff is " + Std.string(stuff6));
-								res6.send("success");
-							});
-						} else {
-							find = false;
-						}
-					});
-				}
-				if(find == false) {
-					res6.send("patherror");
-				}
+				});
 			} else {
-				var path = req6.param("folder").split("/");
-				var idOfFolder = "";
-				_gthis.findFileId(idOfFolder,path,stufftemp1);
-				console.log("test2   " + idOfFolder);
-				if(idOfFolder != null) {
-					stufftemp1.find({ "parentid" : idOfFolder, "isFolder" : false, "fileName" : req6.param("fileName")},function(err8,stuff7) {
-						if(stuff7 == null) {
-							var d2 = req6.param("fileName");
-							var d3 = [{ number : 1, contents : _req4.body, modified : new Date()}];
-							var d4 = req6.param("username");
-							var d5 = { parentid : idOfFolder, isFolder : false, fileName : d2, version : d3, metainformation : { fileType : "CircuitDiagram", owner : d4, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-							stufftemp1.create(d5,function(err9,stuff8) {
-								console.log("inside callback err is " + err9 + " stuff is " + Std.string(stuff8));
-								res6.send("success");
-							});
-						}
-					});
-				}
+				var path2 = req6.param("folder").split("/");
+				_gthis.findFileId(path2,stufftemp1,function(err7,id1) {
+					console.log("test2  err is " + err7);
+					console.log("test2  id is " + id1);
+					if(id1 != null) {
+						stufftemp1.find({ "parentid" : id1, "isFolder" : false, "fileName" : req6.param("fileName")},function(err8,stuff5) {
+							if(stuff5.length == 0) {
+								var d3 = req6.param("fileName");
+								var d4 = [{ number : 0, contents : JSON.stringify(_req4.body), modified : new Date()}];
+								var d5 = req6.param("username");
+								var d6 = { parentid : id1, isFolder : false, fileName : d3, version : d4, metainformation : { fileType : "CircuitDiagram", owner : d5, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+								stufftemp1.create(d6,function(err9,stuff6) {
+									console.log("inside callback err is " + err9 + " stuff is " + Std.string(stuff6));
+									res6.send("success");
+								});
+							} else {
+								stuff5[0].version.push({ number : stuff5[0].version.length, contents : JSON.stringify(_req4.body), modified : new Date()});
+								stufftemp1.update({ "_id" : stuff5[0]._id},{ "version" : stuff5[0].version},function(err10,id2) {
+									console.log("error is: " + err10 + "data is: " + Std.string(id2));
+								});
+							}
+						});
+					}
+				});
 			}
 		});
 		app.get("/forgot",function(req7,res7) {
@@ -622,23 +611,23 @@ var Main = function() {
 			var db2 = new HaxeLow("db.json");
 			var user2 = db2.col(User);
 			var flag1 = false;
-			var temp1 = "";
+			var temp = "";
 			var pass = "";
 			var _g6 = 0;
 			while(_g6 < user2.length) {
-				var i3 = user2[_g6];
+				var i2 = user2[_g6];
 				++_g6;
-				if(i3.getname() == username1) {
+				if(i2.getname() == username1) {
 					flag1 = true;
-					temp1 = i3.getmail();
-					pass = i3.getpassword();
+					temp = i2.getmail();
+					pass = i2.getpassword();
 				}
 			}
 			if(flag1 == true) {
-				var options = { from : "web.circuitdiagram@hotmail.com", to : temp1, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
-				mailTransport.sendMail(options,function(err10,msg) {
-					if(err10) {
-						console.log(err10);
+				var options = { from : "web.circuitdiagram@hotmail.com", to : temp, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
+				mailTransport.sendMail(options,function(err11,msg) {
+					if(err11) {
+						console.log(err11);
 					} else {
 						console.log("email sent to user: " + Std.string(username1));
 					}
@@ -659,10 +648,10 @@ var Main = function() {
 			var flag2 = true;
 			var _g7 = 0;
 			while(_g7 < user3.length) {
-				var i4 = user3[_g7];
+				var i3 = user3[_g7];
 				++_g7;
-				if(i4.getname() == username2) {
-					flag2 = i4.changepass(_req6.body.oldp,_req6.body.newp);
+				if(i3.getname() == username2) {
+					flag2 = i3.changepass(_req6.body.oldp,_req6.body.newp);
 					break;
 				}
 			}
@@ -690,31 +679,35 @@ Main.main = function() {
 };
 Main.prototype = {
 	server: null
-	,findFileId: function(idOfFolder,path,manager) {
+	,findFileId: function(path,manager,callback) {
 		var _gthis = this;
 		manager.find({ "fileName" : path[0], "isFolder" : true},function(err,rootModel) {
 			if(err != null) {
 				console.log(err);
+				callback(err,null);
+			} else {
+				var idOfFolder = Std.string(rootModel[0]._id);
+				console.log("id of root is " + idOfFolder);
+				_gthis.findFileIdHelper(1,idOfFolder,path,manager,callback);
 			}
-			var idOfFolder1 = Std.string(rootModel[0]._id);
-			console.log("id of root is " + idOfFolder1);
-			_gthis.findFileIdHelper(1,idOfFolder1,path,manager);
 		});
 	}
-	,findFileIdHelper: function(i,idOfCurrent,path,manager) {
+	,findFileIdHelper: function(i,idOfCurrent,path,manager,callback) {
 		var _gthis = this;
-		if(i != path.length) {
+		if(i < path.length) {
 			manager.find({ "parentid" : idOfCurrent, "fileName" : path[i]},function(err,results) {
 				if(err != null) {
 					console.log(err);
-				}
-				if(results != null) {
+					callback(err,null);
+				} else if(results.length != 0) {
 					idOfCurrent = Std.string(results[0]._id);
-					_gthis.findFileIdHelper(i + 1,idOfCurrent,path,manager);
+					_gthis.findFileIdHelper(i + 1,idOfCurrent,path,manager,callback);
 				} else {
-					idOfCurrent = null;
+					callback(null,null);
 				}
 			});
+		} else {
+			callback(null,idOfCurrent);
 		}
 	}
 	,__class__: Main

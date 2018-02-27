@@ -46,7 +46,7 @@ class Component extends Observable{
     var inportsNum:Int;//init
     //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
-    var list:Map<String,Pair>=new Map<String,Pair>();
+    var list:Array<Pair>=new Array<Pair>();
     var cd:CircuitDiagram;
     /**
     *   create component
@@ -86,49 +86,78 @@ class Component extends Observable{
         }
         for(n in componentKind.getAttr()){
             if(n.getName()=="delay"){
-                list.set(n.getName(),new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
+                list.push(new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
             }
             else if(n.getName()=="name"){
-                list.set(n.getName(),new NamePair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
+                list.push(new NamePair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
             }
             else if(n.getName()=="orientation"){
-                list.set(n.getName(),new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
+                list.push(new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
             }
         }
-        list.get("orientation").update(this,new OrientationValue(orientation));
+        for(i in list){
+            if(i.getAttr().getName()=="orientation"){
+                i.update(this,new OrientationValue(orientation));
+            }
+        }
     }
 
-    public function getmap(){
+    public function getArray(){
         return list;
     }
 
     public function hasAttr(s:String):Bool{
-        return list.exists(s);
+        var flag:Bool=false;
+        for(i in list){
+            if(i.getAttr().getName()==s){
+                flag=true;
+            }
+        }
+        return flag;
     }
 
-    public function getAttr(s:String):AttrValue{
-        Assert.assert(list.exists(s));
-        return list.get(s).getAttrValue();
-    }
-
-    public function getAttrInt(s:String):Int{
-        Assert.assert(list.exists(s));
-        return list.get(s).getAttrValue().getvalue();
+    public function getAttrValue(s:String):AttrValue{
+        Assert.assert(hasAttr(s));
+        var temp:AttrValue;
+        if(s=="delay"){
+            temp=new IntValue(0);
+        }
+        else if(s=="name"){
+            temp=new StringValue("");
+        }
+        else{
+            temp=new OrientationValue(ORIENTATION.EAST);
+        }
+        for(i in list){
+            if(i.getAttr().getName()==s){
+                temp=i.getAttrValue();
+            }
+        }
+        return temp;
     }
 
     public function canupdate(s:String,v:AttrValue):Bool{
-        Assert.assert(list.exists(s));
-        if(list.exists(s)){
-            return list.get(s).canupdate(this,v);
+        Assert.assert(hasAttr(s));
+        if(hasAttr(s)){
+            for(i in list){
+                if(i.getAttr().getName()==s){
+                    return i.canupdate(this,v);
+                }
+            }
         }
         return false;
     }
 
     public function update(s:String, v:AttrValue):Bool{
-        Assert.assert(list.exists(s));
-        if(list.exists(s)){
-            if(list.get(s).canupdate(this,v)){
-                return list.get(s).update(this,v);
+        trace(hasAttr(s));
+        Assert.assert(hasAttr(s));
+        if(hasAttr(s)){
+            for(i in list){
+                if(i.getAttr().getName()==s){
+                    if(i.canupdate(this,v)){
+                        return i.update(this,v);
+                    }
+                }
             }
         }
         return false;
@@ -155,11 +184,16 @@ class Component extends Observable{
     }
 
     public function get_orientation():ORIENTATION {
-        return list.get("orientation").getAttrValue().getvalue();
+
+        return  getAttrValue("orientation").getvalue();
     }
 
     public function set_orientation(value:ORIENTATION) {
-        list.get("orientation").update(this,new OrientationValue(value));
+        for(i in list){
+            if(i.getAttr().getName()=="orientation"){
+                i.update(this,new OrientationValue(value));
+            }
+        }
     }
 
     public function get_componentKind():ComponentKind {
@@ -194,11 +228,16 @@ class Component extends Observable{
     }
 
     public function get_name():String {
-        return list.get("name").getAttrValue().getvalue();
+        return getAttrValue("name").getvalue();
     }
 
     public function set_name(value:String) {
-        list.get("name").update(this,new StringValue(value));
+        for(i in list){
+            trace(i.getAttr().getName());
+            if(i.getAttr().getName()=="name"){
+                i.update(this,new StringValue(value));
+            }
+        }
     }
 
     public function get_height():Float {
@@ -218,11 +257,15 @@ class Component extends Observable{
     }
 
     public function get_delay():Int {
-        return list.get("delay").getAttrValue().getvalue();
+        return getAttrValue("delay").getvalue();
     }
 
     public function set_delay(value:Int) {
-        return list.get("delay").update(this,new IntValue(value));
+        for(i in list){
+            if(i.getAttr().getName()=="delay"){
+                i.update(this,new IntValue(value));
+            }
+        }
     }
 
     public function get_inportsNum():Int {
@@ -247,7 +290,7 @@ class Component extends Observable{
                 return false;
             }
         }
-        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
+        this.inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, getAttrValue("orientation").getvalue());
         return true;
     }
 
@@ -255,8 +298,8 @@ class Component extends Observable{
         return inportArray.remove(inport);
     }
     public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{
-        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
+        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, getAttrValue("orientation").getvalue());
+        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, getAttrValue("orientation").getvalue());
         return this;
     }
 
@@ -321,8 +364,8 @@ class Component extends Observable{
                 }
             }
 
-            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
+            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, getAttrValue("orientation").getvalue());
+            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, getAttrValue("orientation").getvalue());
         }
         if(this.componentKind.getname()!= "CC"){
             componentKind.drawComponent(drawingAdpater, highLight);
@@ -340,13 +383,13 @@ class Component extends Observable{
     }
 
     public function createJSon():String{
-        var jsonString:String = "{ \"name\": \"" + this.list.get("name").getAttrValue().getvalue() + "\",";
+        var jsonString:String = "{ \"name\": \"" + this.getAttrValue("name").getvalue() + "\",";
         jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
         jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
         jsonString += " \"height\": \"" + this.height + "\",";
         jsonString += " \"width\": \"" + this.width + "\",";
-        jsonString += " \"orientation\": \"" + list.get("orientation").getAttrValue().getvalue() + "\",";
-        jsonString += " \"delay\": \"" + list.get("delay").getAttrValue().getvalue() + "\",";
+        jsonString += " \"orientation\": \"" + getAttrValue("orientation").getvalue() + "\",";
+        jsonString += " \"delay\": \"" + getAttrValue("delay").getvalue() + "\",";
         jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
         jsonString += " \"nameOfTheComponentKind\": \"" + this.componentKind.getname() + "\",";
 

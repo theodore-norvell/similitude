@@ -16,6 +16,7 @@ import js.npm.mongoose.*;
 import js.npm.mongoose.macro.Manager;
 import js.npm.mongoose.macro.Model;
 import js.support.Error;
+import js.support.Callback;
 import com.mun.model.component.CircuitDiagram;
 
 import tjson.TJSON;
@@ -68,8 +69,8 @@ class Main implements util.Async
 
 
 
-        var err,stuff = @async stuffMan.find({"fileName" : "root", "isFolder" : true});
-            trace(stuff[0]);
+        var err,stuff = @async stuffMan.find({_id:"5a95aeebe2e0fe2aecf77a48"});
+            trace(stuff[0].version);
 
 
 //        console.log("about to remove");
@@ -292,9 +293,9 @@ class Main implements util.Async
 
 //            res.send(_req.body);
 
-            stuffMan.find({"_id": "5a86e271ed10310f8c7f49fc"},function (err : Null<Error>, stuff) : Void {
-//                trace(stuff[0].version.contents[0]);
-//                res.send(stuff[0].version.contents[0]);
+            stuffMan.find({"_id": "5a95aeebe2e0fe2aecf77a48"},function (err : Null<Error>, stuff) : Void {
+                trace(stuff[0].version[0].contents);
+                res.send(stuff[0].version[0].contents);
             });
 
         });
@@ -309,45 +310,21 @@ class Main implements util.Async
             *
 **/
             if(req.param('new')=="true"){
-                var temp : Array<String> =req.param('folder').split("/");
-                var i:Int=0;
-                var s:String="";
-                var find: Bool = true;
-                do{
-                    if(i==0){
-                        stufftemp.find({"parentid" : "", "fileName" : temp[0], "isFolder" : true},
-                        function (err : Null<Error>, stuff) : Void {
-                        trace(stuff);
-                        s=Std.string(stuff[0]._id);
-                        i++;
-                        });
+                var path : Array<String> =req.param('folder').split("/");
+                path.pop();
+                var err, id = @async findFileId(path,stufftemp);
+                path =req.param('folder').split("/");
 
-                    }
-                    else{
-                        stufftemp.find({"parentid" : s, "fileName" : temp[i], "isFolder" : true},
-                        function (err : Null<Error>, stuff) : Void {
-                            if(stuff!=null){
-                                s=Std.string(stuff[0]._id);
-                                i++;
-                            }
-                            else{
-                                find=false;
-                                i=temp.length-1;
-                            }
-                        });
-                    }
-                }while(i<temp.length-1);
-
-                if(find == true){
-                    stufftemp.find({"parentid" : s, "fileName" : temp[temp.length-1], "isFolder" : true},
+                if(id != null){
+                    stufftemp.find({"parentid" : id, "fileName" : path[path.length-1], "isFolder" : true},
                     function (err : Null<Error>, stuff) : Void {
-                        if(stuff == null){
+                        if(stuff.length==0){
                             var d : StuffData = {
-                                parentid:"",
+                                parentid:id,
                                 isFolder:true,
-                                fileName:"root",
+                                fileName:path[path.length-1],
                                 version:[{
-                                    number:1,
+                                    number:0,
                                     contents:"",
                                     modified:Date.now()
                                 }],
@@ -368,33 +345,36 @@ class Main implements util.Async
                             });
                         }
                         else{
-                            find = false;
+                            id=null;
                         }
                     });
 
                 }
-                if(find == false){
+                if(id==null){
                     res.send("patherror");
                 }
             }
             else{
                 var path : Array<String> =req.param("folder").split("/");
-                var idOfFolder:String = "";
-                @async findFileId(idOfFolder,path,stufftemp);
-                trace("test2   "+idOfFolder);
 
-                if( idOfFolder != null ){
-                    stufftemp.find({"parentid" : idOfFolder,
+                var err, id = @async findFileId(path,stufftemp);
+                // TODO Check for error
+
+                trace("test2  err is "+err);
+                trace("test2  id is "+id);
+
+                if( id != null ){
+                    stufftemp.find({"parentid" : id,
                         "isFolder" : false, "fileName" : req.param('fileName')},
                     function (err : Null<Error>, stuff) : Void {
-                        if(stuff == null){
+                        if(stuff.length==0){
                             var d : StuffData = {
-                                parentid:idOfFolder,
+                                parentid:id,
                                 isFolder:false,
                                 fileName:req.param("fileName"),
                                 version:[{
-                                    number:1,
-                                    contents:_req.body,
+                                    number:0,
+                                    contents:haxe.Json.stringify(_req.body),
                                     modified:Date.now()
                                 }],
                                 metainformation:{
@@ -409,12 +389,19 @@ class Main implements util.Async
                             }
 
                             stufftemp.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
+                                // TODO check for error
                                 console.log("inside callback err is " + err + " stuff is " + stuff);
                                 res.send("success");
                             });
                         }
                         else{
-
+                            stuff[0].version.push({
+                                number:stuff[0].version.length,
+                                contents:haxe.Json.stringify(_req.body),
+                                modified:Date.now()
+                            });
+                            var err, id= @async stufftemp.update({"_id" : stuff[0]._id},{"version":stuff[0].version});
+                            trace("error is: "+err+"data is: "+id);
                         }
                     });
 
@@ -508,28 +495,31 @@ class Main implements util.Async
     }
 
 
-    function findFileId(idOfFolder:String, path:Array<String>, manager : StuffManager):Void{
+    function findFileId(path:Array<String>, manager : StuffManager, callback : Callback<String>):Void{
         var err,rootModel = @async manager.find({ "fileName" : path[0], "isFolder" : true});
-        if( err != null ) trace(err);
-        var idOfFolder =Std.string(rootModel[0]._id);
-        trace("id of root is "+idOfFolder);
-        findFileIdHelper(1,idOfFolder,path,manager) ;
+        if( err != null ) { trace(err); callback(err, null) ; }
+        else {
+            var idOfFolder =Std.string(rootModel[0]._id);
+            trace("id of root is "+idOfFolder);
+            findFileIdHelper(1,idOfFolder,path,manager, callback) ; }
     }
 
-    function findFileIdHelper(i:Int, idOfCurrent:String,path:Array<String>, manager : StuffManager):Void{
+    function findFileIdHelper(i:Int,
+                              idOfCurrent:String,
+                              path:Array<String>,
+                              manager : StuffManager,
+                              callback : Callback<String>):Void{
         if(i < path.length ){
             var err,results = @async manager.find({"parentid" : idOfCurrent, "fileName" : path[i]} );
-            if( err != null) trace(err) ;
-            if(results != null){
+            if( err != null) {
+                trace(err); callback(err, null) ; }
+            else if(results.length!=0){
                 idOfCurrent=Std.string(results[0]._id);
-                findFileIdHelper( i+1, idOfCurrent, path,manager) ;
-            }
-            else{
-                idOfCurrent=null;
-            }
-
+                findFileIdHelper( i+1, idOfCurrent, path,manager, callback) ; }
+            else{callback(null,null);}
         }
-
+        else {
+            callback( null, idOfCurrent ) ; }
     }
 
     static public function main()

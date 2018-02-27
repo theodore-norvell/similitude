@@ -1012,8 +1012,14 @@ Test.prototype = {
 	folderState: null
 	,b: null
 	,regist: function() {
+		var _gthis = this;
 		var o = tjson_TJSON.encode(this.folderState.circuitDiagram);
-		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root&fileName=" + this.folderState.circuitDiagram.get_name(), contentType : "application/json", dataType : "text", data : o}).done(function(text) {
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users?username=test&new=true&folder=root/abc/dd/cd&fileName=" + this.folderState.circuitDiagram.get_name(), contentType : "application/json", dataType : "text", data : o}).done(function(text) {
+			haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 36, className : "Test", methodName : "regist"});
+			var tmp = haxe_Log.trace;
+			var o1 = tjson_TJSON.parse(text);
+			tmp(o1 == null ? null : js_Boot.getClass(o1),{ fileName : "Test.hx", lineNumber : 47, className : "Test", methodName : "regist"});
+			_gthis.folderState.load(tjson_TJSON.parse(text));
 		});
 	}
 	,__class__: Test
@@ -4590,7 +4596,7 @@ com_mun_model_observe_Observable.prototype = {
 	,__class__: com_mun_model_observe_Observable
 };
 var com_mun_model_component_Component = function(xPosition,yPosition,height,width,orientation,componentKind,inportNum) {
-	this.list = new haxe_ds_StringMap();
+	this.list = [];
 	this.outportArray = [];
 	this.inportArray = [];
 	com_mun_model_observe_Observable.call(this);
@@ -4621,39 +4627,22 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 		var n = _g11[_g2];
 		++_g2;
 		if(n.getName() == "delay") {
-			var this1 = this.list;
-			var key = n.getName();
-			var value = new com_mun_model_attribute_DelayPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue());
-			var _this = this1;
-			if(__map_reserved[key] != null) {
-				_this.setReserved(key,value);
-			} else {
-				_this.h[key] = value;
-			}
+			this.list.push(new com_mun_model_attribute_DelayPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue()));
 		} else if(n.getName() == "name") {
-			var this2 = this.list;
-			var key1 = n.getName();
-			var value1 = new com_mun_model_attribute_NamePair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue());
-			var _this1 = this2;
-			if(__map_reserved[key1] != null) {
-				_this1.setReserved(key1,value1);
-			} else {
-				_this1.h[key1] = value1;
-			}
+			this.list.push(new com_mun_model_attribute_NamePair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue()));
 		} else if(n.getName() == "orientation") {
-			var this3 = this.list;
-			var key2 = n.getName();
-			var value2 = new com_mun_model_attribute_OrientationPair(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr),(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr)).getdefaultvalue());
-			var _this2 = this3;
-			if(__map_reserved[key2] != null) {
-				_this2.setReserved(key2,value2);
-			} else {
-				_this2.h[key2] = value2;
-			}
+			this.list.push(new com_mun_model_attribute_OrientationPair(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr),(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr)).getdefaultvalue()));
 		}
 	}
-	var _this3 = this.list;
-	(__map_reserved["orientation"] != null ? _this3.getReserved("orientation") : _this3.h["orientation"]).update(this,new com_mun_model_attribute_OrientationValue(orientation));
+	var _g3 = 0;
+	var _g12 = this.list;
+	while(_g3 < _g12.length) {
+		var i = _g12[_g3];
+		++_g3;
+		if(i.getAttr().getName() == "orientation") {
+			i.update(this,new com_mun_model_attribute_OrientationValue(orientation));
+		}
+	}
 };
 $hxClasses["com.mun.model.component.Component"] = com_mun_model_component_Component;
 com_mun_model_component_Component.__name__ = ["com","mun","model","component","Component"];
@@ -4670,104 +4659,93 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 	,boxType: null
 	,list: null
 	,cd: null
-	,getmap: function() {
+	,getArray: function() {
 		return this.list;
 	}
 	,hasAttr: function(s) {
-		var _this = this.list;
-		if(__map_reserved[s] != null) {
-			return _this.existsReserved(s);
+		var flag = false;
+		var _g = 0;
+		var _g1 = this.list;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(i.getAttr().getName() == s) {
+				flag = true;
+			}
+		}
+		return flag;
+	}
+	,getAttrValue: function(s) {
+		var _tmp0 = $bind(this,this.hasAttr);
+		var _tmp1 = s;
+		var _tmp2 = _tmp0(_tmp1);
+		if(!_tmp2) {
+			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 120, className : "com.mun.model.component.Component", methodName : "getAttrValue"});
+			throw new js__$Boot_HaxeError(e);
+		}
+		var temp;
+		if(s == "delay") {
+			temp = new com_mun_model_attribute_IntValue(0);
+		} else if(s == "name") {
+			temp = new com_mun_model_attribute_StringValue("");
 		} else {
-			return _this.h.hasOwnProperty(s);
+			temp = new com_mun_model_attribute_OrientationValue(com_mun_model_enumeration_ORIENTATION.EAST);
 		}
-	}
-	,getAttr: function(s) {
-		var _tmp0 = this.list;
-		var _e = _tmp0;
-		var _tmp1 = function(key) {
-			if(__map_reserved[key] != null) {
-				return _e.existsReserved(key);
-			} else {
-				return _e.h.hasOwnProperty(key);
+		var _g = 0;
+		var _g1 = this.list;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(i.getAttr().getName() == s) {
+				temp = i.getAttrValue();
 			}
-		};
-		var _tmp2 = s;
-		var _tmp3 = _tmp1(_tmp2);
-		if(!_tmp3) {
-			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 110, className : "com.mun.model.component.Component", methodName : "getAttr"});
-			throw new js__$Boot_HaxeError(e);
 		}
-		var _this = this.list;
-		return (__map_reserved[s] != null ? _this.getReserved(s) : _this.h[s]).getAttrValue();
-	}
-	,getAttrInt: function(s) {
-		var _tmp0 = this.list;
-		var _e = _tmp0;
-		var _tmp1 = function(key) {
-			if(__map_reserved[key] != null) {
-				return _e.existsReserved(key);
-			} else {
-				return _e.h.hasOwnProperty(key);
-			}
-		};
-		var _tmp2 = s;
-		var _tmp3 = _tmp1(_tmp2);
-		if(!_tmp3) {
-			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 115, className : "com.mun.model.component.Component", methodName : "getAttrInt"});
-			throw new js__$Boot_HaxeError(e);
-		}
-		var _this = this.list;
-		return (__map_reserved[s] != null ? _this.getReserved(s) : _this.h[s]).getAttrValue().getvalue();
+		return temp;
 	}
 	,canupdate: function(s,v) {
-		var _tmp0 = this.list;
-		var _e = _tmp0;
-		var _tmp1 = function(key) {
-			if(__map_reserved[key] != null) {
-				return _e.existsReserved(key);
-			} else {
-				return _e.h.hasOwnProperty(key);
-			}
-		};
-		var _tmp2 = s;
-		var _tmp3 = _tmp1(_tmp2);
-		if(!_tmp3) {
-			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 120, className : "com.mun.model.component.Component", methodName : "canupdate"});
+		var _tmp0 = $bind(this,this.hasAttr);
+		var _tmp1 = s;
+		var _tmp2 = _tmp0(_tmp1);
+		if(!_tmp2) {
+			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 140, className : "com.mun.model.component.Component", methodName : "canupdate"});
 			throw new js__$Boot_HaxeError(e);
 		}
-		var _this = this.list;
-		if(__map_reserved[s] != null ? _this.existsReserved(s) : _this.h.hasOwnProperty(s)) {
-			var _this1 = this.list;
-			return (__map_reserved[s] != null ? _this1.getReserved(s) : _this1.h[s]).canupdate(this,v);
+		if(this.hasAttr(s)) {
+			var _g = 0;
+			var _g1 = this.list;
+			while(_g < _g1.length) {
+				var i = _g1[_g];
+				++_g;
+				if(i.getAttr().getName() == s) {
+					return i.canupdate(this,v);
+				}
+			}
 		}
 		return false;
 	}
 	,update: function(s,v) {
-		var _tmp0 = this.list;
-		var _e = _tmp0;
-		var _tmp1 = function(key) {
-			if(__map_reserved[key] != null) {
-				return _e.existsReserved(key);
-			} else {
-				return _e.h.hasOwnProperty(key);
-			}
-		};
-		var _tmp2 = s;
-		var _tmp3 = _tmp1(_tmp2);
-		if(!_tmp3) {
-			var e = new com_mun_assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 128, className : "com.mun.model.component.Component", methodName : "update"});
+		haxe_Log.trace(this.hasAttr(s),{ fileName : "Component.hx", lineNumber : 152, className : "com.mun.model.component.Component", methodName : "update"});
+		var _tmp0 = $bind(this,this.hasAttr);
+		var _tmp1 = s;
+		var _tmp2 = _tmp0(_tmp1);
+		if(!_tmp2) {
+			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 153, className : "com.mun.model.component.Component", methodName : "update"});
 			throw new js__$Boot_HaxeError(e);
 		}
-		var _this = this.list;
-		if(__map_reserved[s] != null ? _this.existsReserved(s) : _this.h.hasOwnProperty(s)) {
-			var _this1 = this.list;
-			if((__map_reserved[s] != null ? _this1.getReserved(s) : _this1.h[s]).canupdate(this,v)) {
-				var _this2 = this.list;
-				return (__map_reserved[s] != null ? _this2.getReserved(s) : _this2.h[s]).update(this,v);
+		if(this.hasAttr(s)) {
+			var _g = 0;
+			var _g1 = this.list;
+			while(_g < _g1.length) {
+				var i = _g1[_g];
+				++_g;
+				if(i.getAttr().getName() == s) {
+					if(i.canupdate(this,v)) {
+						return i.update(this,v);
+					}
+				}
 			}
 		}
 		return false;
@@ -4788,12 +4766,18 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return this.yPosition = value;
 	}
 	,get_orientation: function() {
-		var _this = this.list;
-		return (__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue();
+		return this.getAttrValue("orientation").getvalue();
 	}
 	,set_orientation: function(value) {
-		var _this = this.list;
-		(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).update(this,new com_mun_model_attribute_OrientationValue(value));
+		var _g = 0;
+		var _g1 = this.list;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(i.getAttr().getName() == "orientation") {
+				i.update(this,new com_mun_model_attribute_OrientationValue(value));
+			}
+		}
 	}
 	,get_componentKind: function() {
 		return this.componentKind;
@@ -4820,12 +4804,19 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return HxOverrides.iter(this.outportArray);
 	}
 	,get_name: function() {
-		var _this = this.list;
-		return (__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).getAttrValue().getvalue();
+		return this.getAttrValue("name").getvalue();
 	}
 	,set_name: function(value) {
-		var _this = this.list;
-		(__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).update(this,new com_mun_model_attribute_StringValue(value));
+		var _g = 0;
+		var _g1 = this.list;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			haxe_Log.trace(i.getAttr().getName(),{ fileName : "Component.hx", lineNumber : 236, className : "com.mun.model.component.Component", methodName : "set_name"});
+			if(i.getAttr().getName() == "name") {
+				i.update(this,new com_mun_model_attribute_StringValue(value));
+			}
+		}
 	}
 	,get_height: function() {
 		return this.height;
@@ -4840,12 +4831,18 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return this.width = value;
 	}
 	,get_delay: function() {
-		var _this = this.list;
-		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).getAttrValue().getvalue();
+		return this.getAttrValue("delay").getvalue();
 	}
 	,set_delay: function(value) {
-		var _this = this.list;
-		return (__map_reserved["delay"] != null ? _this.getReserved("delay") : _this.h["delay"]).update(this,new com_mun_model_attribute_IntValue(value));
+		var _g = 0;
+		var _g1 = this.list;
+		while(_g < _g1.length) {
+			var i = _g1[_g];
+			++_g;
+			if(i.getAttr().getName() == "delay") {
+				i.update(this,new com_mun_model_attribute_IntValue(value));
+			}
+		}
 	}
 	,get_inportsNum: function() {
 		return this.inportsNum;
@@ -4868,18 +4865,15 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 				return false;
 			}
 		}
-		var _this = this.list;
-		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.getAttrValue("orientation").getvalue());
 		return true;
 	}
 	,removeInport: function(inport) {
 		return HxOverrides.remove(this.inportArray,inport);
 	}
 	,updateMoveComponentPortPosition: function(xPosition,yPosition) {
-		var _this = this.list;
-		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
-		var _this1 = this.list;
-		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
+		this.inportArray = this.componentKind.updateInPortPosition(this.inportArray,xPosition,yPosition,this.height,this.width,this.getAttrValue("orientation").getvalue());
+		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,this.getAttrValue("orientation").getvalue());
 		return this;
 	}
 	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray) {
@@ -4957,10 +4951,8 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 					HxOverrides.remove(this.outportArray,i3);
 				}
 			}
-			var _this = this.list;
-			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this.getReserved("orientation") : _this.h["orientation"]).getAttrValue().getvalue());
-			var _this1 = this.list;
-			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
+			this.componentKind.updateInPortPosition(this.inportArray,this.xPosition,this.yPosition,this.height,this.width,this.getAttrValue("orientation").getvalue());
+			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,this.getAttrValue("orientation").getvalue());
 		}
 		if(this.componentKind.getname() != "CC") {
 			this.componentKind.drawComponent(drawingAdpater,highLight);
@@ -4975,16 +4967,13 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return this.componentKind.findWorldPoint(coordinate,mode);
 	}
 	,createJSon: function() {
-		var _this = this.list;
-		var jsonString = "{ \"name\": \"" + Std.string((__map_reserved["name"] != null ? _this.getReserved("name") : _this.h["name"]).getAttrValue().getvalue()) + "\",";
+		var jsonString = "{ \"name\": \"" + Std.string(this.getAttrValue("name").getvalue()) + "\",";
 		jsonString += " \"xPosition\": \"" + this.xPosition + "\",";
 		jsonString += " \"yPosition\": \"" + this.yPosition + "\",";
 		jsonString += " \"height\": \"" + this.height + "\",";
 		jsonString += " \"width\": \"" + this.width + "\",";
-		var _this1 = this.list;
-		jsonString += " \"orientation\": \"" + Std.string((__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue()) + "\",";
-		var _this2 = this.list;
-		jsonString += " \"delay\": \"" + Std.string((__map_reserved["delay"] != null ? _this2.getReserved("delay") : _this2.h["delay"]).getAttrValue().getvalue()) + "\",";
+		jsonString += " \"orientation\": \"" + Std.string(this.getAttrValue("orientation").getvalue()) + "\",";
+		jsonString += " \"delay\": \"" + Std.string(this.getAttrValue("delay").getvalue()) + "\",";
 		jsonString += " \"inportsNum\": \"" + this.inportsNum + "\",";
 		jsonString += " \"nameOfTheComponentKind\": \"" + this.componentKind.getname() + "\",";
 		jsonString += "\"componentKind\":";
@@ -7192,7 +7181,6 @@ com_mun_model_gates_NOT.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 		return portArray;
 	}
 	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
-		haxe_Log.trace(this.component,{ fileName : "NOT.hx", lineNumber : 153, className : "com.mun.model.gates.NOT", methodName : "drawComponent"});
 		var drawComponent = new com_mun_view_drawComponents_DrawNOT(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");

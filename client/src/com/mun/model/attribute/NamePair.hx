@@ -8,7 +8,7 @@ class NamePair implements Pair{
         nameValue=cast(nv,StringValue);
     }
 
-    public function getAttr():Attribute{+
+    public function getAttr():Attribute{
         return nameAttr;
 
     }
