@@ -50,6 +50,7 @@ class Test {
                            data:o}
                           )
             .done( function( text : String ) {
+                trace(text);
                 new JQuery('#nametag').text("*Username");
                 new JQuery('#emailtag').text("*Email");
                        if( text == "t" ) {

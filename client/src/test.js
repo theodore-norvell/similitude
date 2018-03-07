@@ -1007,20 +1007,26 @@ Test.__name__ = ["Test"];
 Test.main = function() {
 	var folderState = new com_mun_controller_controllerState_FolderState();
 	var test = new Test(folderState);
+	var r = new EReg("\\s+","");
+	var t = new EReg("^\\w*$","");
+	haxe_Log.trace(r.match("ABC    "),{ fileName : "Test.hx", lineNumber : 53, className : "Test", methodName : "main"});
+	var a = "ABC 123".replace(r.r,"_");
+	haxe_Log.trace("ABC 123".replace(r.r,"_"),{ fileName : "Test.hx", lineNumber : 55, className : "Test", methodName : "main"});
+	haxe_Log.trace(t.match(a),{ fileName : "Test.hx", lineNumber : 56, className : "Test", methodName : "main"});
 };
 Test.prototype = {
 	folderState: null
 	,b: null
 	,regist: function() {
-		var _gthis = this;
 		var o = tjson_TJSON.encode(this.folderState.circuitDiagram);
-		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users?username=test&new=true&folder=root/abc/dd/cd&fileName=" + this.folderState.circuitDiagram.get_name(), contentType : "application/json", dataType : "text", data : o}).done(function(text) {
-			haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 36, className : "Test", methodName : "regist"});
-			var tmp = haxe_Log.trace;
-			var o1 = tjson_TJSON.parse(text);
-			tmp(o1 == null ? null : js_Boot.getClass(o1),{ fileName : "Test.hx", lineNumber : 47, className : "Test", methodName : "regist"});
-			_gthis.folderState.load(tjson_TJSON.parse(text));
-		});
+		var exp_r = new RegExp("\\s+","".split("u").join(""));
+		var check = new EReg("^\\w*$","");
+		var cdname = this.folderState.circuitDiagram.get_name().replace(exp_r,"_");
+		if(check.match(cdname)) {
+			$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root/test&fileName=" + cdname, contentType : "application/json", dataType : "text", data : o}).done(function(text) {
+				haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 40, className : "Test", methodName : "regist"});
+			});
+		}
 	}
 	,__class__: Test
 };
@@ -3264,6 +3270,7 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 	,__class__: com_mun_controller_controllerState_ControllerCanvasContext
 };
 var com_mun_controller_controllerState_FolderState = function() {
+	this.fileListCount = 0;
 	this.currentIndex = -1;
 	var _gthis = this;
 	this.updateCircuitDiagramMap = new haxe_ds_ObjectMap();
@@ -3317,15 +3324,29 @@ var com_mun_controller_controllerState_FolderState = function() {
 		$("#nameofcd").val(_gthis.circuitDiagram.get_name());
 		$("#nameofcddiv").removeClass("has-error");
 	});
+	window.document.getElementById("fileClose").onclick = function() {
+		$("#alert").css("opacity",0.5).hide();
+		$("#alert2").css("opacity",1).hide();
+		$("#text1").css("opacity",1).hide();
+		$("#text2").css("opacity",1).hide();
+	};
 	window.document.getElementById("download").onclick = function() {
-		var blob = new Blob([JSON.stringify(_gthis.circuitDiagram.createJSon())],{ type : "application/json"});
-		var a = window.document.createElement("a");
-		var url = URL.createObjectURL(blob);
-		var filename = _gthis.circuitDiagram.get_name() + ".json";
-		a.setAttribute("href",url);
-		a.setAttribute("download",filename);
-		a.click();
-		URL.revokeObjectURL(url);
+		$("#alert").css("opacity",0.5).show();
+		$("#alert2").css("opacity",1).show();
+		$("#text1").css("opacity",1).show();
+		$("#text2").css("opacity",1).show();
+		var url = window.location.href.split("?");
+		var username = url[1].split("=")[1];
+		$("#FileCollapseList").html("<a data-toggle=\"collapse\" href=\"#FileCollapseList" + (_gthis.fileListCount == null ? "null" : "" + _gthis.fileListCount) + "\" id=\"path" + username + "\">" + username + "</a>");
+		$("#FileCollapseList").append("<div id=\"FileCollapseList" + (_gthis.fileListCount == null ? "null" : "" + _gthis.fileListCount) + "\" class=\"panel-collapse collapse out\" >\r\n                            <div class=\"container-fluid\" id=\"Fieldpath_root" + username + "\">\r\n                            </div>\r\n                        </div>\r\n                    </div>");
+		_gthis.fileListCount++;
+		window.document.getElementById("path" + username).onclick = function() {
+			$("#Fieldpath_root" + username).html("");
+			var path = [];
+			path.push("root");
+			path.push(username);
+			_gthis.newCollapse(path);
+		};
 	};
 	window.document.getElementById("import").onclick = function() {
 		var files = document.getElementById("selectFiles").files;
@@ -3369,6 +3390,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 	,circuitDiagramArray: null
 	,previouseCircuitDiagramArray: null
 	,currentIndex: null
+	,fileListCount: null
 	,searchName: null
 	,checkState: function() {
 		var _gthis = this;
@@ -3696,6 +3718,55 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		} else {
 			$(button).removeAttr("disabled");
 		}
+	}
+	,newCollapse: function(pathArray) {
+		var _gthis = this;
+		var path = "";
+		var _g = 0;
+		while(_g < pathArray.length) {
+			var t = pathArray[_g];
+			++_g;
+			path = path + t + "/";
+		}
+		path = path.substring(0,path.length - 1);
+		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 565, className : "com.mun.controller.controllerState.FolderState", methodName : "newCollapse"});
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/showfolder?username=test&folder=" + path, contentType : "application/json", dataType : "text"}).done(function(text) {
+			if(text != "fail") {
+				var list = JSON.parse(text);
+				if(list.length != 0) {
+					var _g1 = 0;
+					while(_g1 < list.length) {
+						var i = [list[_g1]];
+						++_g1;
+						var tempArray = [[]];
+						var _g11 = 0;
+						while(_g11 < pathArray.length) {
+							var k = pathArray[_g11];
+							++_g11;
+							tempArray[0].push(k);
+						}
+						var tempString = [""];
+						var _g12 = 0;
+						while(_g12 < tempArray[0].length) {
+							var i1 = tempArray[0][_g12];
+							++_g12;
+							tempString[0] += i1;
+						}
+						haxe_Log.trace("Fieldpath_" + tempString[0],{ fileName : "FolderState.hx", lineNumber : 586, className : "com.mun.controller.controllerState.FolderState", methodName : "newCollapse"});
+						$("#Fieldpath_" + tempString[0]).append("<a data-toggle=\"collapse\" href=\"#FileCollapseList" + (_gthis.fileListCount == null ? "null" : "" + _gthis.fileListCount) + "\" id=\"path_" + tempString[0] + i[0].fileName + "\">" + i[0].fileName + "</a>");
+						$("#Fieldpath_" + tempString[0]).append("<div id=\"FileCollapseList" + (_gthis.fileListCount == null ? "null" : "" + _gthis.fileListCount) + "\" class=\"panel-collapse collapse out\" >\r\n                            <div class=\"container-fluid\" id=\"Fieldpath_" + tempString[0] + i[0].fileName + "\">\r\n\r\n                            </div>\r\n                        </div>\r\n                    </div><br>");
+						_gthis.fileListCount++;
+						tempArray[0].push(i[0].fileName);
+						window.document.getElementById("path_" + tempString[0] + i[0].fileName).onclick = (function(tempString1,tempArray1,i2) {
+							return function() {
+								$("#Fieldpath_" + tempString1[0] + i2[0].fileName).html("");
+								_gthis.newCollapse(tempArray1[0]);
+							};
+						})(tempString,tempArray,i);
+					}
+				}
+			}
+		});
 	}
 	,__class__: com_mun_controller_controllerState_FolderState
 };

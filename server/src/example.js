@@ -32,233 +32,6 @@ EReg.prototype = {
 	}
 	,__class__: EReg
 };
-var HaxeLowDisk = function() { };
-$hxClasses["HaxeLowDisk"] = HaxeLowDisk;
-HaxeLowDisk.__name__ = ["HaxeLowDisk"];
-HaxeLowDisk.prototype = {
-	readFileSync: null
-	,writeFile: null
-	,__class__: HaxeLowDisk
-};
-var NodeJsDisk = function() {
-	this.steno = require("steno");
-	try {
-		this.fs = require("graceful-fs");
-	} catch( e ) {
-		this.fs = require("steno/node_modules/graceful-fs");
-	}
-	if(this.steno == null) {
-		throw new js__$Boot_HaxeError("Node.js error: package 'steno' not found. Please install with 'npm install --save steno'");
-	}
-};
-$hxClasses["NodeJsDisk"] = NodeJsDisk;
-NodeJsDisk.__name__ = ["NodeJsDisk"];
-NodeJsDisk.__interfaces__ = [HaxeLowDisk];
-NodeJsDisk.prototype = {
-	steno: null
-	,fs: null
-	,readFileSync: function(file) {
-		if(this.fs.existsSync(file)) {
-			return this.fs.readFileSync(file,{ encoding : "utf8"});
-		} else {
-			return null;
-		}
-	}
-	,writeFile: function(file,data) {
-		this.steno.writeFile(file,data,function(err) {
-			if(err) {
-				throw new js__$Boot_HaxeError(err);
-			}
-		});
-	}
-	,__class__: NodeJsDisk
-};
-var NodeJsDiskSync = function() {
-	this.steno = require("steno");
-	this.fs = require("graceful-fs");
-	if(this.steno == null) {
-		throw new js__$Boot_HaxeError("Node.js error: package 'steno' not found. Please install with 'npm install --save steno'");
-	}
-};
-$hxClasses["NodeJsDiskSync"] = NodeJsDiskSync;
-NodeJsDiskSync.__name__ = ["NodeJsDiskSync"];
-NodeJsDiskSync.__interfaces__ = [HaxeLowDisk];
-NodeJsDiskSync.prototype = {
-	steno: null
-	,fs: null
-	,readFileSync: function(file) {
-		if(this.fs.existsSync(file)) {
-			return this.fs.readFileSync(file,{ encoding : "utf8"});
-		} else {
-			return null;
-		}
-	}
-	,writeFile: function(file,data) {
-		this.steno.writeFileSync(file,data);
-	}
-	,__class__: NodeJsDiskSync
-};
-var SysDisk = function() {
-};
-$hxClasses["SysDisk"] = SysDisk;
-SysDisk.__name__ = ["SysDisk"];
-SysDisk.__interfaces__ = [HaxeLowDisk];
-SysDisk.prototype = {
-	readFileSync: function(file) {
-		if(sys_FileSystem.exists(file)) {
-			return js_node_Fs.readFileSync(file,{ encoding : "utf8"});
-		} else {
-			return null;
-		}
-	}
-	,writeFile: function(file,data) {
-		js_node_Fs.writeFileSync(file,data);
-	}
-	,__class__: SysDisk
-};
-var HaxeLow = function(file,disk) {
-	this.file = file;
-	this.disk = disk;
-	this.db = { };
-	if(disk == null && file != null) {
-		this.disk = new NodeJsDisk();
-	}
-	if(this.file != null) {
-		if(this.disk == null) {
-			throw new js__$Boot_HaxeError("HaxeLow: no disk storage set.");
-		}
-		this.checksum = this.disk.readFileSync(this.file);
-		if(this.checksum != null) {
-			this.restore(this.checksum);
-		}
-	}
-};
-$hxClasses["HaxeLow"] = HaxeLow;
-HaxeLow.__name__ = ["HaxeLow"];
-HaxeLow.uuid = function() {
-	var uid_b = "";
-	var a = 8;
-	uid_b += Std.string(StringTools.hex(new Date().getTime() | 0,8));
-	while(a++ < 36) uid_b += Std.string((a * 51 & 52) != 0 ? StringTools.hex((a ^ 15) != 0 ? 8 ^ (Math.random() * ((a ^ 20) != 0 ? 16 : 4) | 0) : 4) : "-");
-	return uid_b.toLowerCase();
-};
-HaxeLow.prototype = {
-	file: null
-	,db: null
-	,checksum: null
-	,disk: null
-	,backup: function(file) {
-		var backup = tjson_TJSON.encode(this.db,"fancy");
-		if(file != null) {
-			this.disk.writeFile(file,backup);
-		}
-		return backup;
-	}
-	,restore: function(s) {
-		try {
-			this.db = tjson_TJSON.parse(s);
-			this.checksum = null;
-		} catch( e ) {
-			if (e instanceof js__$Boot_HaxeError) e = e.val;
-			throw new js__$Boot_HaxeError("HaxeLow: JSON parsing failed: file \"" + this.file + "\" is corrupt. " + Std.string(e));
-		}
-		return this;
-	}
-	,save: function() {
-		if(this.file == null) {
-			return this;
-		}
-		var data = this.backup();
-		if(data == this.checksum) {
-			return this;
-		}
-		this.checksum = data;
-		this.disk.writeFile(this.file,data);
-		return this;
-	}
-	,col: function(cls) {
-		var name = Type.getClassName(cls);
-		if(!Object.prototype.hasOwnProperty.call(this.db,name)) {
-			this.db[name] = [];
-			this.save();
-		}
-		return Reflect.field(this.db,name);
-	}
-	,keyCol: function(cls,keyField,keyType) {
-		var this1 = this.col(cls);
-		if(keyField != null) {
-			this1["__haxeLowId"] = keyField;
-		}
-		return this1;
-	}
-	,idCol: function(cls,keyType) {
-		return this.keyCol(cls,"id",keyType);
-	}
-	,_idCol: function(cls,keyType) {
-		return this.keyCol(cls,"_id",keyType);
-	}
-	,__class__: HaxeLow
-};
-var _$HaxeLowCol_HaxeLowCol_$Impl_$ = {};
-$hxClasses["_HaxeLowCol.HaxeLowCol_Impl_"] = _$HaxeLowCol_HaxeLowCol_$Impl_$;
-_$HaxeLowCol_HaxeLowCol_$Impl_$.__name__ = ["_HaxeLowCol","HaxeLowCol_Impl_"];
-_$HaxeLowCol_HaxeLowCol_$Impl_$._new = function(array,keyField) {
-	var this1 = array;
-	if(keyField != null) {
-		this1["__haxeLowId"] = keyField;
-	}
-	return this1;
-};
-_$HaxeLowCol_HaxeLowCol_$Impl_$.idGet = function(this1,id) {
-	return Lambda.find(this1,function(o) {
-		return Reflect.field(o,Reflect.field(this1,"__haxeLowId")) == id;
-	});
-};
-_$HaxeLowCol_HaxeLowCol_$Impl_$.idInsert = function(this1,obj) {
-	if(_$HaxeLowCol_HaxeLowCol_$Impl_$.idGet(this1,Reflect.field(obj,Reflect.field(this1,"__haxeLowId"))) == null) {
-		this1.push(obj);
-		return true;
-	}
-	return false;
-};
-_$HaxeLowCol_HaxeLowCol_$Impl_$.idUpdate = function(this1,id,props) {
-	var exists = _$HaxeLowCol_HaxeLowCol_$Impl_$.idGet(this1,id);
-	if(exists == null) {
-		return null;
-	}
-	var _g = 0;
-	var _g1 = Type.getInstanceFields(exists == null ? null : js_Boot.getClass(exists));
-	while(_g < _g1.length) {
-		var field = _g1[_g];
-		++_g;
-		if(Object.prototype.hasOwnProperty.call(props,field)) {
-			Reflect.setProperty(exists,field,Reflect.field(props,field));
-		}
-	}
-	return exists;
-};
-_$HaxeLowCol_HaxeLowCol_$Impl_$.idReplace = function(this1,obj) {
-	var exists = _$HaxeLowCol_HaxeLowCol_$Impl_$.idGet(this1,Reflect.field(obj,Reflect.field(this1,"__haxeLowId")));
-	if(exists != null) {
-		if(exists == obj) {
-			return false;
-		}
-		HxOverrides.remove(this1,exists);
-	}
-	this1.push(obj);
-	return exists != null;
-};
-_$HaxeLowCol_HaxeLowCol_$Impl_$.idRemove = function(this1,id) {
-	var exists = _$HaxeLowCol_HaxeLowCol_$Impl_$.idGet(this1,id);
-	if(exists == null) {
-		return null;
-	}
-	HxOverrides.remove(this1,exists);
-	return exists;
-};
-_$HaxeLowCol_HaxeLowCol_$Impl_$.keyValue = function(this1,obj) {
-	return Reflect.field(obj,Reflect.field(this1,"__haxeLowId"));
-};
 var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
 HxOverrides.__name__ = ["HxOverrides"];
@@ -295,19 +68,6 @@ HxOverrides.iter = function(a) {
 	}, next : function() {
 		return this.arr[this.cur++];
 	}};
-};
-var Lambda = function() { };
-$hxClasses["Lambda"] = Lambda;
-Lambda.__name__ = ["Lambda"];
-Lambda.find = function(it,f) {
-	var v = $iterator(it)();
-	while(v.hasNext()) {
-		var v1 = v.next();
-		if(f(v1)) {
-			return v1;
-		}
-	}
-	return null;
 };
 var List = function() { };
 $hxClasses["List"] = List;
@@ -355,10 +115,9 @@ js_npm_mongoose_macro_Model.prototype = $extend(js_npm_mongoose_TModel.prototype
 var Stuff = function() { };
 $hxClasses["Stuff"] = Stuff;
 Stuff.__name__ = ["Stuff"];
-Stuff.__properties__ = {get_Schema:"get_Schema"};
 Stuff.get_Schema = function() {
 	if(Stuff._schema == null) {
-		Stuff._schema = new js_npm_mongoose_Schema({ fileName : { type : String}, isFolder : { type : Boolean}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : [{ group : { type : String}, permission : { type : String}}]}}}, parentid : { type : String}, version : { type : [{ contents : { type : String}, modified : { type : Date}, number : { type : Number}}]}},{ });
+		Stuff._schema = new js_npm_mongoose_Schema({ fileList : { type : [{ fileName : { type : String}, id : { type : String}}], optional : true}, fileName : { type : String}, isFolder : { type : Boolean}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : [{ group : { type : String}, permission : { type : String}}]}}}, parentid : { type : String}, version : { type : [{ contents : { type : String}, modified : { type : Date}, number : { type : Number}}]}},{ });
 		var proto1 = Stuff.prototype;
 		var _g = 0;
 		var _g1 = Reflect.fields(proto1);
@@ -376,13 +135,43 @@ Stuff.get_Schema = function() {
 };
 Stuff.__super__ = js_npm_mongoose_macro_Model;
 Stuff.prototype = $extend(js_npm_mongoose_macro_Model.prototype,{
-	fileName: null
+	fileList: null
+	,fileName: null
 	,isFolder: null
 	,metainformation: null
 	,parentid: null
 	,version: null
 	,_id: null
 	,__class__: Stuff
+});
+var Account = function() { };
+$hxClasses["Account"] = Account;
+Account.__name__ = ["Account"];
+Account.get_Schema = function() {
+	if(Account._schema == null) {
+		Account._schema = new js_npm_mongoose_Schema({ email : { type : String}, password : { type : String}, username : { type : String}},{ });
+		var proto1 = Account.prototype;
+		var _g = 0;
+		var _g1 = Reflect.fields(proto1);
+		while(_g < _g1.length) {
+			var f = _g1[_g];
+			++_g;
+			var v = proto1[f];
+			var _g2 = Type["typeof"](v);
+			if(_g2[1] == 5) {
+				Account._schema.methods[f] = v;
+			}
+		}
+	}
+	return Account._schema;
+};
+Account.__super__ = js_npm_mongoose_macro_Model;
+Account.prototype = $extend(js_npm_mongoose_macro_Model.prototype,{
+	email: null
+	,password: null
+	,username: null
+	,_id: null
+	,__class__: Account
 });
 var js_npm_mongoose_macro_Manager = function() { };
 $hxClasses["js.npm.mongoose.macro.Manager"] = js_npm_mongoose_macro_Manager;
@@ -410,6 +199,25 @@ StuffManager.__super__ = js_npm_mongoose_macro_Manager;
 StuffManager.prototype = $extend(js_npm_mongoose_macro_Manager.prototype,{
 	__class__: StuffManager
 });
+var AccountManager = function() { };
+$hxClasses["AccountManager"] = AccountManager;
+AccountManager.__name__ = ["AccountManager"];
+AccountManager.build = function(mongoose,name,collectionName,skipInit) {
+	var m = mongoose.model(name,Account.get_Schema(),collectionName,skipInit);
+	var proto = AccountManager.prototype;
+	var _g = 0;
+	var _g1 = Reflect.fields(proto);
+	while(_g < _g1.length) {
+		var f = _g1[_g];
+		++_g;
+		m[f] = proto[f];
+	}
+	return m;
+};
+AccountManager.__super__ = js_npm_mongoose_macro_Manager;
+AccountManager.prototype = $extend(js_npm_mongoose_macro_Manager.prototype,{
+	__class__: AccountManager
+});
 var util_Async = function() { };
 $hxClasses["util.Async"] = util_Async;
 util_Async.__name__ = ["util","Async"];
@@ -420,19 +228,28 @@ var Main = function() {
 	database.connect("mongodb://localhost/test_mongoose",function(err) {
 		console.log("inside callback for connect err is " + err);
 	});
-	var m = Stuff.get_Schema();
-	var m1 = database.model("test",m,null,null);
+	var m = database.model("test",Stuff.get_Schema(),null,null);
 	var proto = StuffManager.prototype;
 	var _g = 0;
 	var _g1 = Reflect.fields(proto);
 	while(_g < _g1.length) {
 		var f = _g1[_g];
 		++_g;
-		m1[f] = proto[f];
+		m[f] = proto[f];
 	}
-	var stuffMan = m1;
-	stuffMan.find({ _id : "5a95aeebe2e0fe2aecf77a48"},function(err1,stuff) {
-		console.log(stuff[0].version);
+	var stuffMan = m;
+	var m1 = database.model("account",Account.get_Schema(),null,null);
+	var proto1 = AccountManager.prototype;
+	var _g2 = 0;
+	var _g11 = Reflect.fields(proto1);
+	while(_g2 < _g11.length) {
+		var f1 = _g11[_g2];
+		++_g2;
+		m1[f1] = proto1[f1];
+	}
+	var accountMan = m1;
+	stuffMan.find({ _id : "5a9dfedcf3246128f0f01797"},function(errk,datak) {
+		console.log(datak[0].fileList);
 		var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
 		app.set("port",3000);
 		var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
@@ -446,82 +263,83 @@ var Main = function() {
 		});
 		app.post("/",jsonParser,function(req1,res1) {
 			var _req = req1;
-			var db = new HaxeLow("db.json");
-			var user = db.col(User);
-			var flag = false;
-			var _g2 = 0;
-			while(_g2 < user.length) {
-				var i = user[_g2];
-				++_g2;
-				flag = i.check(_req.body.username,_req.body.password);
-				if(flag == true) {
-					break;
+			accountMan.find({ "username" : _req.body.username, "password" : _req.body.password},function(err1,account) {
+				if(err1 == null) {
+					if(account.length != 0) {
+						console.log(Std.string(_req.body.username) + " login success");
+						res1.send("y");
+					} else {
+						console.log(Std.string(_req.body.username) + " login fail, wrong password");
+						res1.send("n");
+					}
+				} else {
+					console.log("login error:" + err1);
+					res1.send("n");
 				}
-			}
-			if(flag == true) {
-				console.log("login");
-				res1.send("y");
-			} else {
-				console.log("login fail");
-				res1.send("n");
-			}
+			});
 		});
 		app.get("/regist",function(req2,res2) {
 			res2.sendfile(__dirname + "/regist.html");
 		});
 		app.post("/regist",jsonParser,function(req3,res3) {
 			var _req1 = req3;
-			var db1 = new HaxeLow("db.json");
-			var user1 = db1.col(User);
-			var emailflag = true;
-			var usernameflag = true;
-			var _g3 = 0;
-			while(_g3 < user1.length) {
-				var i1 = user1[_g3];
-				++_g3;
-				if(i1.getname() == _req1.body.username) {
-					usernameflag = false;
-				}
-				if(i1.getmail() == _req1.body.email) {
-					emailflag = false;
-				}
-			}
-			if(emailflag == true && usernameflag == true) {
-				user1.push(_req1.body);
-				db1.save();
-				console.log("new client registered, username : " + Std.string(_req1.body.username));
-				var name = _req1.body.username;
-				var m2 = Stuff.get_Schema();
-				var m3 = database.model(name,m2,null,null);
-				var proto1 = StuffManager.prototype;
-				var _g4 = 0;
-				var _g11 = Reflect.fields(proto1);
-				while(_g4 < _g11.length) {
-					var f1 = _g11[_g4];
-					++_g4;
-					m3[f1] = proto1[f1];
-				}
-				var stufftemp = m3;
-				var d = { parentid : "", isFolder : true, fileName : "root", version : [{ number : 1, contents : "", modified : new Date()}], metainformation : { fileType : "folder", owner : _req1.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-				stufftemp.create(d,function(err2,stuff1) {
-					console.log("inside callback err is " + err2 + " stuff is " + Std.string(stuff1));
-				});
-				res3.send("t");
-			} else {
-				if(usernameflag == false) {
-					console.log("username");
+			accountMan.find({ "username" : _req1.body.username},function(err0,namedata) {
+				if(err0 == null) {
+					if(namedata.length == 0) {
+						accountMan.find({ "email" : _req1.body.email},function(err11,emaildata) {
+							if(err11 == null) {
+								if(emaildata.length == 0) {
+									var ac = { username : _req1.body.username, password : _req1.body.password, email : _req1.body.email};
+									accountMan.create(ac,function(err3,newdata) {
+										console.log("creating new account error is: " + err3 + " stuff is " + Std.string(newdata));
+										if(err3 == null) {
+											var d = { parentid : "", isFolder : true, fileName : _req1.body.username, version : [{ number : 1, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : _req1.body.username, permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
+											stuffMan.create(d,function(err6,newfolder) {
+												console.log("creating new folder error is: " + err6 + " stuff is " + Std.string(newfolder));
+												stuffMan.find({ "fileName" : "", "isFolder" : true},function(err4,root) {
+													if(err4 == null) {
+														if(root.length != 0) {
+															root[0].fileList.push({ fileName : _req1.body.username, id : Std.string(newfolder._id)});
+															stuffMan.update({ "_id" : root[0]._id},{ "fileList" : root[0].fileList},function(err5,root1) {
+																if(err5 == null) {
+																	console.log("new account register: " + Std.string(_req1.body.username));
+																	res3.send("t");
+																} else {
+																	res3.send("fail");
+																}
+															});
+														} else {
+															res3.send("fail");
+														}
+													} else {
+														res3.send("fail");
+													}
+												});
+											});
+										} else {
+											res3.send("fail");
+										}
+									});
+								} else {
+									res3.send("email");
+								}
+							} else {
+								console.log("register error: " + err0);
+								res3.send("email");
+							}
+						});
+					} else {
+						res3.send("username");
+					}
+				} else {
+					console.log("register error: " + err0);
 					res3.send("username");
 				}
-				if(emailflag == false) {
-					console.log("email");
-					res3.send("email");
-				}
-			}
+			});
 		});
 		app.get("/app/users",function(req4,res4,next) {
 			var _req2 = req4;
 			var username = req4.param("username");
-			console.log(username);
 			res4.sendfile(__dirname.substring(0,__dirname.indexOf("server\\src")) + "\\client\\app.html");
 		});
 		app.post("/app/users",jsonParser,function(req5,res5,next1) {
@@ -529,45 +347,56 @@ var Main = function() {
 			var d_parentid = "";
 			var d_isFolder = true;
 			var d_fileName = "root";
-			var d_version = [{ number : 1, contents : "", modified : new Date()}];
-			var d_metainformation = { fileType : "folder", owner : _req3.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
-			stuffMan.find({ "_id" : "5a95aeebe2e0fe2aecf77a48"},function(err3,stuff2) {
-				console.log(stuff2[0].version[0].contents);
-				res5.send(stuff2[0].version[0].contents);
+			var d_version = [{ number : 1, contents : JSON.stringify(_req3.body), modified : new Date()}];
+			var d_fileList = [];
+			var d_metainformation = { fileType : "folder", owner : "test", permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
+			stuffMan.find({ "_id" : "5a99837266a081105cc8b355"},function(err2,stuff) {
+				res5.send(stuff[0].version[0].contents);
 			});
 		});
 		app.post("/app/users/folder",function(req6,res6,next2) {
 			var _req4 = req6;
 			console.log(req6.param("new") + req6.param("username") + req6.param("folder").split("/")[0] + req6.param("fileName"));
-			var name1 = req6.param("username");
-			var m4 = Stuff.get_Schema();
-			var m5 = database.model(name1,m4,null,null);
-			var proto2 = StuffManager.prototype;
-			var _g5 = 0;
-			var _g12 = Reflect.fields(proto2);
-			while(_g5 < _g12.length) {
-				var f2 = _g12[_g5];
-				++_g5;
-				m5[f2] = proto2[f2];
-			}
-			var stufftemp1 = m5;
+			var stufftemp = stuffMan;
 			if(req6.param("new") == "true") {
 				var path = req6.param("folder").split("/");
 				path.pop();
-				_gthis.findFileId(path,stufftemp1,function(err4,id) {
+				_gthis.findFileId(path,stufftemp,function(err7,id) {
 					path = req6.param("folder").split("/");
 					if(id != null) {
-						stufftemp1.find({ "parentid" : id, "fileName" : path[path.length - 1], "isFolder" : true},function(err5,stuff3) {
-							if(stuff3.length == 0) {
-								var path1 = path[path.length - 1];
-								var d1 = [{ number : 0, contents : "", modified : new Date()}];
-								var d2 = { parentid : id, isFolder : true, fileName : path1, version : d1, metainformation : { fileType : "folder", owner : _req4.body.username, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-								stufftemp1.create(d2,function(err6,stuff4) {
-									console.log("inside callback err is " + err6 + " stuff is " + Std.string(stuff4));
-									res6.send("success");
-								});
+						stufftemp.find({ _id : id},function(err8,stuff1) {
+							if(stuff1.length != 0) {
+								var flag = true;
+								var _g3 = 0;
+								var _g12 = stuff1[0].fileList;
+								while(_g3 < _g12.length) {
+									var i = _g12[_g3];
+									++_g3;
+									if(path[path.length - 1] == i.fileName) {
+										flag = false;
+									}
+								}
+								if(flag == true) {
+									var path1 = path[path.length - 1];
+									var d1 = [{ number : 0, contents : "", modified : new Date()}];
+									var d2 = req6.param("username");
+									var d3 = { parentid : id, isFolder : true, fileName : path1, version : d1, fileList : [], metainformation : { fileType : "folder", owner : d2, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+									stufftemp.create(d3,function(err9,NewData) {
+										console.log(Std.string(req6.param("username")) + " create new folder callback err is " + err9 + " stuff is " + Std.string(NewData));
+										stufftemp.find({ _id : id},function(err12,Folder) {
+											console.log("finding parent folder find error:" + err12);
+											Folder[0].fileList.push({ fileName : path[path.length - 1], id : Std.string(NewData._id)});
+											stufftemp.update({ "_id" : id},{ "fileList" : Folder[0].fileList},function(err21,id1) {
+												console.log(err21);
+												res6.send("success");
+											});
+										});
+									});
+								} else {
+									res6.send("existed");
+								}
 							} else {
-								id = null;
+								res6.send("patherror");
 							}
 						});
 					}
@@ -577,96 +406,197 @@ var Main = function() {
 				});
 			} else {
 				var path2 = req6.param("folder").split("/");
-				_gthis.findFileId(path2,stufftemp1,function(err7,id1) {
-					console.log("test2  err is " + err7);
-					console.log("test2  id is " + id1);
-					if(id1 != null) {
-						stufftemp1.find({ "parentid" : id1, "isFolder" : false, "fileName" : req6.param("fileName")},function(err8,stuff5) {
-							if(stuff5.length == 0) {
-								var d3 = req6.param("fileName");
-								var d4 = [{ number : 0, contents : JSON.stringify(_req4.body), modified : new Date()}];
-								var d5 = req6.param("username");
-								var d6 = { parentid : id1, isFolder : false, fileName : d3, version : d4, metainformation : { fileType : "CircuitDiagram", owner : d5, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-								stufftemp1.create(d6,function(err9,stuff6) {
-									console.log("inside callback err is " + err9 + " stuff is " + Std.string(stuff6));
-									res6.send("success");
-								});
+				_gthis.findFileId(path2,stufftemp,function(err10,id2) {
+					console.log("test2  err is " + err10);
+					console.log("test2  id is " + id2);
+					if(id2 != null) {
+						stufftemp.find({ _id : id2},function(err13,parentFolder) {
+							console.log(err13);
+							var fileId = "";
+							if(parentFolder.length != 0) {
+								var _g4 = 0;
+								var _g13 = parentFolder[0].fileList;
+								while(_g4 < _g13.length) {
+									var i1 = _g13[_g4];
+									++_g4;
+									if(i1.fileName == req6.param("fileName")) {
+										fileId = i1.id;
+									}
+								}
+								console.log(fileId);
+								if(fileId == "") {
+									var d4 = req6.param("fileName");
+									var d5 = [{ number : 0, contents : JSON.stringify(_req4.body), modified : new Date()}];
+									var d6 = req6.param("username");
+									var d7 = { parentid : id2, isFolder : false, fileName : d4, version : d5, fileList : [], metainformation : { fileType : "CircuitDiagram", owner : d6, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+									stufftemp.create(d7,function(err14,NewData1) {
+										console.log("inside callback err is " + err14 + " stuff is " + Std.string(NewData1));
+										stufftemp.find({ _id : id2},function(err15,Folder1) {
+											console.log(err15);
+											Folder1[0].fileList.push({ fileName : req6.param("fileName"), id : Std.string(NewData1._id)});
+											stufftemp.update({ "_id" : id2},{ "fileList" : Folder1[0].fileList},function(err16,updated) {
+												console.log(err16);
+												res6.send("success");
+											});
+										});
+									});
+								} else {
+									stufftemp.find({ _id : fileId},function(err17,stuff2) {
+										console.log(err17);
+										if(stuff2.length != 0) {
+											stuff2[0].version.push({ number : stuff2[0].version.length, contents : JSON.stringify(_req4.body), modified : new Date()});
+											stufftemp.update({ "_id" : stuff2[0]._id},{ "version" : stuff2[0].version},function(err18,id3) {
+												console.log("error is: " + err18 + "data is: " + Std.string(id3));
+												res6.send("success");
+											});
+										} else {
+											res6.send("fail");
+										}
+									});
+								}
 							} else {
-								stuff5[0].version.push({ number : stuff5[0].version.length, contents : JSON.stringify(_req4.body), modified : new Date()});
-								stufftemp1.update({ "_id" : stuff5[0]._id},{ "version" : stuff5[0].version},function(err10,id2) {
-									console.log("error is: " + err10 + "data is: " + Std.string(id2));
-								});
+								res6.send("fail");
 							}
 						});
-					}
-				});
-			}
-		});
-		app.get("/forgot",function(req7,res7) {
-			res7.sendfile(__dirname + "/forgot.html");
-		});
-		app.post("/forgot/users",jsonParser,function(req8,res8,next3) {
-			var _req5 = req8;
-			var username1 = req8.param("username");
-			var db2 = new HaxeLow("db.json");
-			var user2 = db2.col(User);
-			var flag1 = false;
-			var temp = "";
-			var pass = "";
-			var _g6 = 0;
-			while(_g6 < user2.length) {
-				var i2 = user2[_g6];
-				++_g6;
-				if(i2.getname() == username1) {
-					flag1 = true;
-					temp = i2.getmail();
-					pass = i2.getpassword();
-				}
-			}
-			if(flag1 == true) {
-				var options = { from : "web.circuitdiagram@hotmail.com", to : temp, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  " + pass + "！</h1>", attachments : []};
-				mailTransport.sendMail(options,function(err11,msg) {
-					if(err11) {
-						console.log(err11);
 					} else {
-						console.log("email sent to user: " + Std.string(username1));
+						res6.send("fail");
 					}
 				});
-				res8.send("y");
-			} else {
-				res8.send("n");
 			}
 		});
-		app.get("/changepassword",function(req9,res9) {
-			res9.sendfile(__dirname + "/changepassword.html");
+		app.post("/app/users/delete",function(req7,res7,next3) {
+			var path3 = req7.param("folder").split("/");
+			_gthis.findFileId(path3,stuffMan,function(err19,id4) {
+				stuffMan.remove({ "parentid" : id4, "fileName" : req7.param("fileName")},function(err20) {
+					console.log("inside callback err is " + err20);
+				});
+			});
 		});
-		app.post("/changepassword/users",jsonParser,function(req10,res10,next4) {
-			var _req6 = req10;
-			var username2 = req10.param("username");
-			var db3 = new HaxeLow("db.json");
-			var user3 = db3.col(User);
-			var flag2 = true;
-			var _g7 = 0;
-			while(_g7 < user3.length) {
-				var i3 = user3[_g7];
-				++_g7;
-				if(i3.getname() == username2) {
-					flag2 = i3.changepass(_req6.body.oldp,_req6.body.newp);
-					break;
+		app.post("/app/users/download",function(req8,res8,next4) {
+			var path4 = req8.param("folder").split("/");
+			_gthis.findFileId(path4,stuffMan,function(err22,FolderId) {
+				if(err22 != null) {
+					console.log(err22);
+					res8.send("fail");
+				} else if(FolderId != null) {
+					stuffMan.find({ "parentid" : FolderId, "fileName" : req8.param("fileName")},function(err110,data) {
+						if(err22 != null) {
+							console.log(err22);
+							res8.send("fail");
+						}
+						var flag1 = false;
+						if(data.length != 0) {
+							var _g5 = 0;
+							var _g14 = data[0].version;
+							while(_g5 < _g14.length) {
+								var i2 = _g14[_g5];
+								++_g5;
+								if(i2.number == Std.parseInt(req8.param("version"))) {
+									flag1 = true;
+									res8.send(i2.contents);
+								}
+							}
+						}
+						if(flag1 == false) {
+							res8.send("fail");
+						}
+					});
+				} else {
+					res8.send("fail");
 				}
-			}
-			if(flag2 == true) {
-				db3.save();
-				res10.send("y");
-			} else {
-				res10.send("n");
-			}
+			});
 		});
-		app["use"](function(req11,res11,next5) {
-			res11.status(404).send("404");
+		app.post("/app/users/showfolder",function(req9,res9,next5) {
+			var path5 = req9.param("folder").split("/");
+			_gthis.findFileId(path5,stuffMan,function(err23,FolderId1) {
+				if(err23 != null) {
+					console.log(err23);
+					res9.send("fail");
+				} else if(FolderId1 != null) {
+					stuffMan.find({ _id : FolderId1},function(err111,data1) {
+						if(err23 != null) {
+							console.log(err23);
+							res9.send("fail");
+						}
+						if(data1.length != 0) {
+							var tmp2 = JSON.stringify(data1[0].fileList);
+							res9.send(tmp2);
+						} else {
+							res9.send("fail");
+						}
+					});
+				} else {
+					res9.send("fail");
+				}
+			});
 		});
-		var tmp2 = app.get("port");
-		app.listen(tmp2,function() {
+		app.get("/forgot",function(req10,res10) {
+			res10.sendfile(__dirname + "/forgot.html");
+		});
+		app.post("/forgot/users",jsonParser,function(req11,res11,next6) {
+			var _req5 = req11;
+			var username1 = req11.param("username");
+			accountMan.find({ "username" : username1},function(err24,account1) {
+				if(err24 == null) {
+					if(account1.length != 0) {
+						var options = { from : "web.circuitdiagram@hotmail.com", to : account1[0].email, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  </h1>" + "<h1 style=\"color:red\">" + account1[0].password + "</h1>", attachments : []};
+						mailTransport.sendMail(options,function(err25,msg) {
+							if(err25) {
+								console.log(err25);
+							} else {
+								console.log("email sent to user: " + Std.string(username1));
+							}
+						});
+						res11.send("y");
+					} else {
+						res11.send("n");
+					}
+				} else {
+					res11.send("n");
+				}
+			});
+		});
+		app.get("/changepassword",function(req12,res12) {
+			res12.sendfile(__dirname + "/changepassword.html");
+		});
+		app.post("/initial",function(req13,res13) {
+			stuffMan.find({ "fileName" : "", "isFolder" : true},function(errpath,rootModel) {
+				if(errpath != null) {
+					console.log(errpath);
+				} else if(rootModel.length == 0) {
+					var d8 = { parentid : "", isFolder : true, fileName : "", version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : "", permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
+					stuffMan.create(d8,function(err26,stuff3) {
+						console.log("inside callback err is " + err26 + " stuff is " + Std.string(stuff3));
+					});
+				}
+			});
+		});
+		app.post("/changepassword/users",jsonParser,function(req14,res14,next7) {
+			var _req6 = req14;
+			var username2 = req14.param("username");
+			accountMan.find({ "username" : username2, "password" : _req6.body.oldp},function(err27,account2) {
+				if(err27 == null) {
+					if(account2.length != 0) {
+						accountMan.update({ "username" : username2, "password" : _req6.body.oldp},{ "password" : _req6.body.newp},function(err112,updated1) {
+							if(err112 == null) {
+								res14.send("y");
+							} else {
+								res14.send("n");
+							}
+						});
+					} else {
+						res14.send("n");
+					}
+				} else {
+					res14.send("n");
+				}
+			});
+		});
+		app["use"](function(req15,res15,next8) {
+			res15.status(404).send("404");
+		});
+		var tmp3 = app.get("port");
+		app.listen(tmp3,function() {
 			console.log("Express server listening on port " + Std.string(app.get("port")));
 		});
 	});
@@ -681,27 +611,47 @@ Main.prototype = {
 	server: null
 	,findFileId: function(path,manager,callback) {
 		var _gthis = this;
-		manager.find({ "fileName" : path[0], "isFolder" : true},function(err,rootModel) {
-			if(err != null) {
-				console.log(err);
-				callback(err,null);
-			} else {
-				var idOfFolder = Std.string(rootModel[0]._id);
-				console.log("id of root is " + idOfFolder);
-				_gthis.findFileIdHelper(1,idOfFolder,path,manager,callback);
-			}
-		});
+		if(path[0] == "root") {
+			manager.find({ "fileName" : "", "isFolder" : true},function(err,rootModel) {
+				if(err != null) {
+					console.log(err);
+					callback(err,null);
+				} else if(rootModel.length != 0) {
+					var idOfFolder = Std.string(rootModel[0]._id);
+					console.log("id of root is " + idOfFolder);
+					_gthis.findFileIdHelper(1,idOfFolder,path,manager,callback);
+				} else {
+					callback(err,null);
+				}
+			});
+		} else {
+			callback(null,null);
+		}
 	}
 	,findFileIdHelper: function(i,idOfCurrent,path,manager,callback) {
 		var _gthis = this;
 		if(i < path.length) {
-			manager.find({ "parentid" : idOfCurrent, "fileName" : path[i]},function(err,results) {
+			manager.find({ "_id" : idOfCurrent},function(err,results) {
 				if(err != null) {
 					console.log(err);
 					callback(err,null);
 				} else if(results.length != 0) {
-					idOfCurrent = Std.string(results[0]._id);
-					_gthis.findFileIdHelper(i + 1,idOfCurrent,path,manager,callback);
+					var flag = true;
+					var _g = 0;
+					var _g1 = results[0].fileList;
+					while(_g < _g1.length) {
+						var t = _g1[_g];
+						++_g;
+						if(t.fileName == path[i]) {
+							idOfCurrent = t.id;
+							flag = false;
+						}
+					}
+					if(flag == false) {
+						_gthis.findFileIdHelper(i + 1,idOfCurrent,path,manager,callback);
+					} else {
+						callback(null,null);
+					}
 				} else {
 					callback(null,null);
 				}
@@ -721,21 +671,6 @@ Reflect.field = function(o,field) {
 		return o[field];
 	} catch( e ) {
 		return null;
-	}
-};
-Reflect.setProperty = function(o,field,value) {
-	var tmp;
-	var tmp1;
-	if(o.__properties__) {
-		tmp = o.__properties__["set_" + field];
-		tmp1 = tmp;
-	} else {
-		tmp1 = false;
-	}
-	if(tmp1) {
-		o[tmp](value);
-	} else {
-		o[field] = value;
 	}
 };
 Reflect.fields = function(o) {
@@ -800,21 +735,6 @@ StringTools.startsWith = function(s,start) {
 };
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
-};
-StringTools.hex = function(n,digits) {
-	var s = "";
-	var hexChars = "0123456789ABCDEF";
-	while(true) {
-		s = hexChars.charAt(n & 15) + s;
-		n >>>= 4;
-		if(!(n > 0)) {
-			break;
-		}
-	}
-	if(digits != null) {
-		while(s.length < digits) s = "0" + s;
-	}
-	return s;
 };
 var ValueType = { __ename__ : true, __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -903,43 +823,6 @@ Type["typeof"] = function(v) {
 	default:
 		return ValueType.TUnknown;
 	}
-};
-var User = function(u,p,e) {
-	this.username = u;
-	this.password = p;
-	this.email = e;
-};
-$hxClasses["User"] = User;
-User.__name__ = ["User"];
-User.prototype = {
-	username: null
-	,password: null
-	,email: null
-	,getname: function() {
-		return this.username;
-	}
-	,getmail: function() {
-		return this.email;
-	}
-	,check: function(name,pass) {
-		if(name == this.username && pass == this.password) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,getpassword: function() {
-		return this.password;
-	}
-	,changepass: function(oldp,newp) {
-		if(this.password == oldp) {
-			this.password = newp;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	,__class__: User
 };
 var com_mun_assertions_Assert = function() { };
 $hxClasses["com.mun.assertions.Assert"] = com_mun_assertions_Assert;
@@ -2606,7 +2489,6 @@ com_mun_type_Coordinate.prototype = {
 		return this.yPosition = value;
 	}
 	,__class__: com_mun_type_Coordinate
-	,__properties__: {set_yPosition:"set_yPosition",get_yPosition:"get_yPosition",set_xPosition:"set_xPosition",get_xPosition:"get_xPosition"}
 };
 var com_mun_type_HitObject = function() {
 };
@@ -3454,7 +3336,6 @@ js_Boot.__isNativeObj = function(o) {
 js_Boot.__resolveNativeClass = function(name) {
 	return $global[name];
 };
-var js_node_Fs = require("fs");
 var js_node_Path = require("path");
 var js_node_buffer_Buffer = require("buffer").Buffer;
 var js_npm_Express = require("express");
@@ -3493,17 +3374,6 @@ org_bsonspec_ObjectID.prototype = {
 	}
 	,bytes: null
 	,__class__: org_bsonspec_ObjectID
-};
-var sys_FileSystem = function() { };
-$hxClasses["sys.FileSystem"] = sys_FileSystem;
-sys_FileSystem.__name__ = ["sys","FileSystem"];
-sys_FileSystem.exists = function(path) {
-	try {
-		js_node_Fs.accessSync(path);
-		return true;
-	} catch( _ ) {
-		return false;
-	}
 };
 var tjson_TJSON = function() { };
 $hxClasses["tjson.TJSON"] = tjson_TJSON;

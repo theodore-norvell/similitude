@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import tjson.TJSON;
 import js.html.KeyboardEvent;
 import js.jquery.Event;
 import js.html.CanvasRenderingContext2D;
@@ -43,6 +44,8 @@ class FolderState {
     var circuitDiagramArray:Array<CircuitDiagramI>;
     var previouseCircuitDiagramArray:Array<CircuitDiagramI>;
     var currentIndex:Int = -1;
+
+    var fileListCount:Int =0;
 
     var searchName:String;
 
@@ -104,16 +107,38 @@ class FolderState {
             new JQuery("#nameofcddiv").removeClass("has-error");
         });
 
+        Browser.document.getElementById("fileClose").onclick = function(){
+            new JQuery('#alert').css('opacity', 0.5).hide();
+            new JQuery('#alert2').css('opacity', 1).hide();
+            new JQuery('#text1').css('opacity', 1).hide();
+            new JQuery('#text2').css('opacity', 1).hide();
+        }
+
         Browser.document.getElementById("download").onclick = function(){
-            var blob:Blob = new Blob([Json.stringify(circuitDiagram.createJSon())], {type: "application/json"});
-            var a:DOMElement = Browser.document.createAnchorElement();
-            var url = URL.createObjectURL(blob);
-            var filename = circuitDiagram.get_name()+'.json';
-            a.setAttribute("href", url);
-            a.setAttribute("download", filename);
-            a.click();
-            URL.revokeObjectURL(url);
+            new JQuery('#alert').css('opacity', 0.5).show();
+            new JQuery('#alert2').css('opacity', 1).show();
+            new JQuery('#text1').css('opacity', 1).show();
+            new JQuery('#text2').css('opacity', 1).show();
+            var url = Browser.window.location.href.split("?");
+            var username:String = (url[1].split("="))[1];
+            new JQuery('#FileCollapseList').html("<a data-toggle=\"collapse\" href=\"#FileCollapseList"+Std.string(fileListCount)+"\" id=\"path"+username+"\">"+username+"</a>");
+
+            new JQuery('#FileCollapseList').append("<div id=\"FileCollapseList"+Std.string(fileListCount)+"\" class=\"panel-collapse collapse out\" >
+                            <div class=\"container-fluid\" id=\"Fieldpath_root"+username+"\">
+                            </div>
+                        </div>
+                    </div>");
+            fileListCount++;
+            Browser.document.getElementById("path"+username).onclick = function(){
+                new JQuery('#Fieldpath_root'+username).html("");
+                var path:Array<String>=new Array<String>();
+                path.push("root");
+                path.push(username);
+                newCollapse(path);
+            };
         };
+
+//        Browser.document.getElementById('')
 
         Browser.document.getElementById("import").onclick = function(){
             var files = untyped document.getElementById('selectFiles').files;
@@ -530,4 +555,53 @@ class FolderState {
             new JQuery(button).removeAttr("disabled");
         }
     }
+
+    function newCollapse(pathArray:Array<String>){
+        var path:String="";
+        for(t in pathArray){
+            path=path+t+"/";
+        }
+        path=path.substring(0,path.length-1);
+        trace(path);
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/showfolder?username=test&folder="+path,
+            contentType: "application/json",
+            dataType:"text",
+            }
+        )
+        .done( function (text) {
+            if(text=="fail"){}
+            else{
+                var list:Array<{_id:String,fileName:String,id:String}>=haxe.Json.parse(text);
+                if(list.length!=0){
+                    for(i in list){
+                        var tempArray:Array<String>=new Array<String>();
+                        for(k in pathArray){
+                            tempArray.push(k);
+                        }
+                        var tempString:String="";
+                        for(i in tempArray){
+                            tempString=tempString+i;
+                        }
+                        trace("Fieldpath_"+tempString);
+                        new JQuery('#Fieldpath_'+tempString).append("<a data-toggle=\"collapse\" href=\"#FileCollapseList"+Std.string(fileListCount)+"\" id=\"path_"+tempString+i.fileName+"\">"+i.fileName+"</a>");
+                        new JQuery('#Fieldpath_'+tempString).append("<div id=\"FileCollapseList"+Std.string(fileListCount)+"\" class=\"panel-collapse collapse out\" >
+                            <div class=\"container-fluid\" id=\"Fieldpath_"+tempString+i.fileName+"\">
+
+                            </div>
+                        </div>
+                    </div><br>");
+                        fileListCount++;
+                        tempArray.push(i.fileName);
+                        Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
+                            new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
+                            newCollapse(tempArray);
+                        };
+                    }
+                }
+            }
+
+        });
+    }
+
 }

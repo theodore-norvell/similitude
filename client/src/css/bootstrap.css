@@ -6754,4 +6754,37 @@ button.close {
     display: none !important;
   }
 }
+
+.fileList{
+display: none;
+    background: black;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+.fileList2{
+display: none;
+    transition: all 5s ease-in-out;
+    position: fixed;
+    left: 10%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+    z-index: 150;
+    background: #fff;
+      border-radius: 10px;
+}
+
+.fileListContainer{
+position: relative;
+    left: 5%;
+    top: 5%;
+    width: 90%;
+    height: 90%;
+    z-index: 200;
+}
 /*# sourceMappingURL=bootstrap.css.map */

@@ -1,5 +1,6 @@
 package ;
 
+import js.RegExp;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.CircuitDiagram;
 import tjson.TJSON;
@@ -20,38 +21,39 @@ class Test {
         folderState=f;
         b= Browser.document.getElementById("upload");
         b.addEventListener('click', regist, false);
+
     }
 
     public function regist(){
         var o = TJSON.encode(folderState.circuitDiagram);
-//        trace(o);
-//        trace(folderState.circuitDiagram.get_name());
-        JQuery.ajax( { type:"post",
-            url: "http://127.0.0.1:3000/app/users?username=test&new=true&folder=root/abc/dd/cd&fileName="+folderState.circuitDiagram.get_name(),
-            contentType: "application/json",
-            dataType:"text",
-            data:o}
-        )
-        .done( function (text) {
-            trace(text);
-//            trace(text);
-//            trace( "This is the text" + text ) ;
-//            trace( "It is a " + Type.getClass( text ) ) ;
-//            trace(TJSON.parse(haxe.Json.stringify(text)));
-//            trace(Type.getClass(TJSON.parse(haxe.Json.stringify(text))));
-//            var t=cast(TJSON.parse(text),CircuitDiagramI);
-//            trace(t);
-//            for(i in t.get_componentIterator()){
-//                trace(i.get_componentKind());
-//            }
-            trace(Type.getClass(TJSON.parse(text)));
-            folderState.load(TJSON.parse(text));
+        var exp= ~/\s+/;
+        var check=~/^\w*$/;
+        var cdname=exp.replace(folderState.circuitDiagram.get_name(),"_");
+        if(check.match(cdname)){
+            JQuery.ajax( { type:"post",
+                url: "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root/test&fileName="+cdname,
+                contentType: "application/json",
+                dataType:"text",
+                data:o}
+            )
+            .done( function (text) {
+                trace(text);
+//            trace(Type.getClass(TJSON.parse(text)));
+//            folderState.load(TJSON.parse(text));
 
-        });
+            });
+        }
     }
     static public function main() {
         var folderState:FolderState = new FolderState() ;
         var test:Test = new Test(folderState);
+
+        var r = ~/\s+/;
+        var t = ~/^\w*$/;
+        trace(r.match("ABC    "));
+        var a=r.replace("ABC 123","_");
+        trace(r.replace("ABC 123","_"));
+        trace(t.match(a));
 
 
     }

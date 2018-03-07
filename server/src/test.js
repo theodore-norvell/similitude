@@ -850,8 +850,8 @@ Test.prototype = {
 		var c_password = $("#confirm_password").val();
 		var email = $("#regist_email").val();
 		if(c_password != password) {
-			$("#confirm_passwordtag").html("*Confirm Password\r\n            <font color=" + "red" + ">password don't match</font>");
-		} else if(username != "" && password != "" && email != "") {
+			$("#confirm_passwordtag").html("*Confirm Password <br>\r\n            <font color=" + "red" + ">password don't match</font>");
+		} else if(username != "" && password != "" && email != "" && c_password != "") {
 			var u = new User(username,password,email);
 			var s_username = username;
 			var s_password = password;
@@ -859,10 +859,11 @@ Test.prototype = {
 			var o = tjson_TJSON.encode(u);
 			haxe_Log.trace(o,{ fileName : "Test.hx", lineNumber : 41, className : "Test", methodName : "regist"});
 			$.ajax({ type : "post", url : "http://127.0.0.1:3000/regist", contentType : "application/json", data : o}).done(function(text) {
+				haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 53, className : "Test", methodName : "regist"});
 				$("#nametag").text("*Username");
 				$("#emailtag").text("*Email");
 				if(text == "t") {
-					haxe_Log.trace("logged in",{ fileName : "Test.hx", lineNumber : 56, className : "Test", methodName : "regist"});
+					haxe_Log.trace("logged in",{ fileName : "Test.hx", lineNumber : 57, className : "Test", methodName : "regist"});
 					$("#alert").css("opacity",0.5).fadeIn();
 					$("#alert2").css("opacity",1).fadeIn();
 					$("#text1").css("opacity",1).fadeIn();
@@ -1136,6 +1137,14 @@ User.prototype = {
 	}
 	,getpassword: function() {
 		return this.password;
+	}
+	,changepass: function(oldp,newp) {
+		if(this.password == oldp) {
+			this.password = newp;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	,__class__: User
 };
