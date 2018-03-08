@@ -117,7 +117,7 @@ $hxClasses["Stuff"] = Stuff;
 Stuff.__name__ = ["Stuff"];
 Stuff.get_Schema = function() {
 	if(Stuff._schema == null) {
-		Stuff._schema = new js_npm_mongoose_Schema({ fileList : { type : [{ fileName : { type : String}, id : { type : String}}], optional : true}, fileName : { type : String}, isFolder : { type : Boolean}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : [{ group : { type : String}, permission : { type : String}}]}}}, parentid : { type : String}, version : { type : [{ contents : { type : String}, modified : { type : Date}, number : { type : Number}}]}},{ });
+		Stuff._schema = new js_npm_mongoose_Schema({ fileList : { type : [{ fileName : { type : String}, fileType : { type : String}, id : { type : String}}], optional : true}, fileName : { type : String}, isFolder : { type : Boolean}, metainformation : { type : { created : { type : Date}, fileType : { type : String}, owner : { type : String}, permissions : { type : [{ group : { type : String}, permission : { type : String}}]}}}, version : { type : [{ contents : { type : String}, modified : { type : Date}, number : { type : Number}}]}},{ });
 		var proto1 = Stuff.prototype;
 		var _g = 0;
 		var _g1 = Reflect.fields(proto1);
@@ -139,7 +139,6 @@ Stuff.prototype = $extend(js_npm_mongoose_macro_Model.prototype,{
 	,fileName: null
 	,isFolder: null
 	,metainformation: null
-	,parentid: null
 	,version: null
 	,_id: null
 	,__class__: Stuff
@@ -248,41 +247,40 @@ var Main = function() {
 		m1[f1] = proto1[f1];
 	}
 	var accountMan = m1;
-	stuffMan.find({ _id : "5a9dfedcf3246128f0f01797"},function(errk,datak) {
-		console.log(datak[0].fileList);
-		var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
-		app.set("port",3000);
-		var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
-		app["use"](new js_npm_express_Static(tmp));
-		var tmp1 = js_npm_express_BodyParser.json();
-		app["use"](tmp1);
-		var jsonParser = js_npm_express_BodyParser.json();
-		console.log(__dirname.substring(0,__dirname.indexOf("server\\src")) + "client\\src");
-		app.get("/",function(req,res) {
-			res.sendfile(__dirname + "/login.html");
-		});
-		app.post("/",jsonParser,function(req1,res1) {
-			var _req = req1;
-			accountMan.find({ "username" : _req.body.username, "password" : _req.body.password},function(err1,account) {
-				if(err1 == null) {
-					if(account.length != 0) {
-						console.log(Std.string(_req.body.username) + " login success");
-						res1.send("y");
-					} else {
-						console.log(Std.string(_req.body.username) + " login fail, wrong password");
-						res1.send("n");
-					}
+	var mailTransport = js_npm_Nodemailer.createTransport({ service : "Gmail", auth : { user : "web.circuitdiagram@gmail.com", pass : "Webapplication"}});
+	app.set("port",3000);
+	var tmp = js_node_Path.join(__dirname.substring(0,__dirname.indexOf("server\\src")));
+	app["use"](new js_npm_express_Static(tmp));
+	var tmp1 = js_npm_express_BodyParser.json();
+	app["use"](tmp1);
+	var jsonParser = js_npm_express_BodyParser.json();
+	console.log(__dirname.substring(0,__dirname.indexOf("server\\src")) + "client\\src");
+	app.get("/",function(req,res) {
+		res.sendfile(__dirname + "/login.html");
+	});
+	app.post("/",jsonParser,function(req1,res1) {
+		var _req = req1;
+		accountMan.find({ "username" : _req.body.username, "password" : _req.body.password},function(err1,account) {
+			if(err1 == null) {
+				if(account.length != 0) {
+					console.log(Std.string(_req.body.username) + " login success");
+					res1.send("y");
 				} else {
-					console.log("login error:" + err1);
+					console.log(Std.string(_req.body.username) + " login fail, wrong password");
 					res1.send("n");
 				}
-			});
+			} else {
+				console.log("login error:" + err1);
+				res1.send("n");
+			}
 		});
-		app.get("/regist",function(req2,res2) {
-			res2.sendfile(__dirname + "/regist.html");
-		});
-		app.post("/regist",jsonParser,function(req3,res3) {
-			var _req1 = req3;
+	});
+	app.get("/regist",function(req2,res2) {
+		res2.sendfile(__dirname + "/regist.html");
+	});
+	app.post("/regist",jsonParser,function(req3,res3) {
+		var _req1 = req3;
+		if(_req1.body.username != "") {
 			accountMan.find({ "username" : _req1.body.username},function(err0,namedata) {
 				if(err0 == null) {
 					if(namedata.length == 0) {
@@ -293,13 +291,13 @@ var Main = function() {
 									accountMan.create(ac,function(err3,newdata) {
 										console.log("creating new account error is: " + err3 + " stuff is " + Std.string(newdata));
 										if(err3 == null) {
-											var d = { parentid : "", isFolder : true, fileName : _req1.body.username, version : [{ number : 1, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : _req1.body.username, permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
+											var d = { isFolder : true, fileName : _req1.body.username, version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "Folder", owner : _req1.body.username, permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
 											stuffMan.create(d,function(err6,newfolder) {
 												console.log("creating new folder error is: " + err6 + " stuff is " + Std.string(newfolder));
 												stuffMan.find({ "fileName" : "", "isFolder" : true},function(err4,root) {
 													if(err4 == null) {
 														if(root.length != 0) {
-															root[0].fileList.push({ fileName : _req1.body.username, id : Std.string(newfolder._id)});
+															root[0].fileList.push({ fileName : _req1.body.username, id : Std.string(newfolder._id), fileType : "Folder"});
 															stuffMan.update({ "_id" : root[0]._id},{ "fileList" : root[0].fileList},function(err5,root1) {
 																if(err5 == null) {
 																	console.log("new account register: " + Std.string(_req1.body.username));
@@ -336,269 +334,278 @@ var Main = function() {
 					res3.send("username");
 				}
 			});
+		} else {
+			res3.send("fail");
+		}
+	});
+	app.get("/app/users",function(req4,res4,next) {
+		var _req2 = req4;
+		var username = req4.param("username");
+		res4.sendfile(__dirname.substring(0,__dirname.indexOf("server\\src")) + "\\client\\app.html");
+	});
+	app.post("/app/users",jsonParser,function(req5,res5,next1) {
+		var _req3 = req5;
+		var d_isFolder = true;
+		var d_fileName = "root";
+		var d_version = [{ number : 0, contents : JSON.stringify(_req3.body), modified : new Date()}];
+		var d_fileList = [];
+		var d_metainformation = { fileType : "folder", owner : "test", permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
+		stuffMan.find({ "_id" : "5a99837266a081105cc8b355"},function(err2,stuff) {
+			res5.send(stuff[0].version[0].contents);
 		});
-		app.get("/app/users",function(req4,res4,next) {
-			var _req2 = req4;
-			var username = req4.param("username");
-			res4.sendfile(__dirname.substring(0,__dirname.indexOf("server\\src")) + "\\client\\app.html");
-		});
-		app.post("/app/users",jsonParser,function(req5,res5,next1) {
-			var _req3 = req5;
-			var d_parentid = "";
-			var d_isFolder = true;
-			var d_fileName = "root";
-			var d_version = [{ number : 1, contents : JSON.stringify(_req3.body), modified : new Date()}];
-			var d_fileList = [];
-			var d_metainformation = { fileType : "folder", owner : "test", permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
-			stuffMan.find({ "_id" : "5a99837266a081105cc8b355"},function(err2,stuff) {
-				res5.send(stuff[0].version[0].contents);
-			});
-		});
-		app.post("/app/users/folder",function(req6,res6,next2) {
-			var _req4 = req6;
-			console.log(req6.param("new") + req6.param("username") + req6.param("folder").split("/")[0] + req6.param("fileName"));
-			var stufftemp = stuffMan;
-			if(req6.param("new") == "true") {
-				var path = req6.param("folder").split("/");
-				path.pop();
-				_gthis.findFileId(path,stufftemp,function(err7,id) {
-					path = req6.param("folder").split("/");
-					if(id != null) {
-						stufftemp.find({ _id : id},function(err8,stuff1) {
-							if(stuff1.length != 0) {
-								var flag = true;
-								var _g3 = 0;
-								var _g12 = stuff1[0].fileList;
-								while(_g3 < _g12.length) {
-									var i = _g12[_g3];
-									++_g3;
-									if(path[path.length - 1] == i.fileName) {
-										flag = false;
-									}
+	});
+	app.post("/app/users/folder",function(req6,res6,next2) {
+		var _req4 = req6;
+		console.log(req6.param("new") + req6.param("username") + req6.param("folder").split("/")[0] + req6.param("fileName"));
+		var stufftemp = stuffMan;
+		if(req6.param("new") == "true") {
+			var path = req6.param("folder").split("/");
+			path.pop();
+			_gthis.findFileId(path,stufftemp,function(err7,id) {
+				path = req6.param("folder").split("/");
+				if(id != null) {
+					stufftemp.find({ _id : id},function(err8,stuff1) {
+						if(stuff1.length != 0) {
+							var flag = true;
+							var _g3 = 0;
+							var _g12 = stuff1[0].fileList;
+							while(_g3 < _g12.length) {
+								var i = _g12[_g3];
+								++_g3;
+								if(path[path.length - 1] == i.fileName) {
+									flag = false;
 								}
-								if(flag == true) {
-									var path1 = path[path.length - 1];
-									var d1 = [{ number : 0, contents : "", modified : new Date()}];
-									var d2 = req6.param("username");
-									var d3 = { parentid : id, isFolder : true, fileName : path1, version : d1, fileList : [], metainformation : { fileType : "folder", owner : d2, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-									stufftemp.create(d3,function(err9,NewData) {
-										console.log(Std.string(req6.param("username")) + " create new folder callback err is " + err9 + " stuff is " + Std.string(NewData));
-										stufftemp.find({ _id : id},function(err12,Folder) {
-											console.log("finding parent folder find error:" + err12);
-											Folder[0].fileList.push({ fileName : path[path.length - 1], id : Std.string(NewData._id)});
-											stufftemp.update({ "_id" : id},{ "fileList" : Folder[0].fileList},function(err21,id1) {
-												console.log(err21);
-												res6.send("success");
-											});
+							}
+							if(flag == true) {
+								var d1 = { isFolder : true, fileName : path[path.length - 1], version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "Folder", owner : req6.param("username"), permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+								stufftemp.create(d1,function(err9,NewData) {
+									console.log(Std.string(req6.param("username")) + " create new folder callback err is " + err9 + " stuff is " + Std.string(NewData));
+									stufftemp.find({ _id : id},function(err12,Folder) {
+										console.log("finding parent folder find error:" + err12);
+										Folder[0].fileList.push({ fileName : path[path.length - 1], id : Std.string(NewData._id), fileType : "Folder"});
+										stufftemp.update({ "_id" : id},{ "fileList" : Folder[0].fileList},function(err21,id1) {
+											console.log(err21);
+											res6.send("success");
 										});
 									});
-								} else {
-									res6.send("existed");
-								}
+								});
 							} else {
-								res6.send("patherror");
+								res6.send("existed");
 							}
-						});
+						} else {
+							res6.send("patherror");
+						}
+					});
+				}
+				if(id == null) {
+					res6.send("patherror");
+				}
+			});
+		} else {
+			var path1 = req6.param("folder").split("/");
+			_gthis.findFileId(path1,stufftemp,function(err10,id2) {
+				console.log("test2  err is " + err10);
+				console.log("test2  id is " + id2);
+				if(id2 != null) {
+					stufftemp.find({ _id : id2},function(err13,parentFolder) {
+						console.log(err13);
+						var fileId = "";
+						if(parentFolder.length != 0) {
+							var _g4 = 0;
+							var _g13 = parentFolder[0].fileList;
+							while(_g4 < _g13.length) {
+								var i1 = _g13[_g4];
+								++_g4;
+								if(i1.fileName == req6.param("fileName")) {
+									fileId = i1.id;
+								}
+							}
+							console.log(fileId);
+							if(fileId == "") {
+								var d2 = { isFolder : false, fileName : req6.param("fileName"), version : [{ number : 0, contents : JSON.stringify(_req4.body), modified : new Date()}], fileList : [], metainformation : { fileType : "Circuit", owner : req6.param("username"), permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+								stufftemp.create(d2,function(err14,NewData1) {
+									console.log("inside callback err is " + err14 + " stuff is " + Std.string(NewData1));
+									stufftemp.find({ _id : id2},function(err15,Folder1) {
+										console.log(err15);
+										Folder1[0].fileList.push({ fileName : req6.param("fileName"), id : Std.string(NewData1._id), fileType : "Circuit"});
+										stufftemp.update({ "_id" : id2},{ "fileList" : Folder1[0].fileList},function(err16,updated) {
+											console.log(err16);
+											res6.send("success");
+										});
+									});
+								});
+							} else {
+								stufftemp.find({ _id : fileId},function(err17,stuff2) {
+									console.log(err17);
+									if(stuff2.length != 0) {
+										stuff2[0].version.push({ number : stuff2[0].version.length, contents : JSON.stringify(_req4.body), modified : new Date()});
+										stufftemp.update({ "_id" : stuff2[0]._id},{ "version" : stuff2[0].version},function(err18,id3) {
+											console.log("error is: " + err18 + "data is: " + Std.string(id3));
+											res6.send("success");
+										});
+									} else {
+										res6.send("fail");
+									}
+								});
+							}
+						} else {
+							res6.send("fail");
+						}
+					});
+				} else {
+					res6.send("fail");
+				}
+			});
+		}
+	});
+	app.post("/app/users/delete",function(req7,res7,next3) {
+		var path2 = req7.param("folder").split("/");
+		_gthis.findFileId(path2,stuffMan,function(err19,id4) {
+			stuffMan.remove({ "parentid" : id4, "fileName" : req7.param("fileName")},function(err20) {
+				console.log("inside callback err is " + err20);
+			});
+		});
+	});
+	app.post("/app/users/download",function(req8,res8,next4) {
+		var path3 = req8.param("folder").split("/");
+		_gthis.findFileId(path3,stuffMan,function(err22,FolderId) {
+			if(err22 != null) {
+				console.log(err22);
+				res8.send("fail");
+			} else if(FolderId != null) {
+				stuffMan.find({ "parentid" : FolderId, "fileName" : req8.param("fileName")},function(err110,data) {
+					if(err22 != null) {
+						console.log(err22);
+						res8.send("fail");
 					}
-					if(id == null) {
-						res6.send("patherror");
+					var flag1 = false;
+					if(data.length != 0) {
+						var _g5 = 0;
+						var _g14 = data[0].version;
+						while(_g5 < _g14.length) {
+							var i2 = _g14[_g5];
+							++_g5;
+							if(i2.number == Std.parseInt(req8.param("version"))) {
+								flag1 = true;
+								res8.send(i2.contents);
+							}
+						}
+					}
+					if(flag1 == false) {
+						res8.send("fail");
 					}
 				});
 			} else {
-				var path2 = req6.param("folder").split("/");
-				_gthis.findFileId(path2,stufftemp,function(err10,id2) {
-					console.log("test2  err is " + err10);
-					console.log("test2  id is " + id2);
-					if(id2 != null) {
-						stufftemp.find({ _id : id2},function(err13,parentFolder) {
-							console.log(err13);
-							var fileId = "";
-							if(parentFolder.length != 0) {
-								var _g4 = 0;
-								var _g13 = parentFolder[0].fileList;
-								while(_g4 < _g13.length) {
-									var i1 = _g13[_g4];
-									++_g4;
-									if(i1.fileName == req6.param("fileName")) {
-										fileId = i1.id;
-									}
-								}
-								console.log(fileId);
-								if(fileId == "") {
-									var d4 = req6.param("fileName");
-									var d5 = [{ number : 0, contents : JSON.stringify(_req4.body), modified : new Date()}];
-									var d6 = req6.param("username");
-									var d7 = { parentid : id2, isFolder : false, fileName : d4, version : d5, fileList : [], metainformation : { fileType : "CircuitDiagram", owner : d6, permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-									stufftemp.create(d7,function(err14,NewData1) {
-										console.log("inside callback err is " + err14 + " stuff is " + Std.string(NewData1));
-										stufftemp.find({ _id : id2},function(err15,Folder1) {
-											console.log(err15);
-											Folder1[0].fileList.push({ fileName : req6.param("fileName"), id : Std.string(NewData1._id)});
-											stufftemp.update({ "_id" : id2},{ "fileList" : Folder1[0].fileList},function(err16,updated) {
-												console.log(err16);
-												res6.send("success");
-											});
-										});
-									});
-								} else {
-									stufftemp.find({ _id : fileId},function(err17,stuff2) {
-										console.log(err17);
-										if(stuff2.length != 0) {
-											stuff2[0].version.push({ number : stuff2[0].version.length, contents : JSON.stringify(_req4.body), modified : new Date()});
-											stufftemp.update({ "_id" : stuff2[0]._id},{ "version" : stuff2[0].version},function(err18,id3) {
-												console.log("error is: " + err18 + "data is: " + Std.string(id3));
-												res6.send("success");
-											});
-										} else {
-											res6.send("fail");
-										}
-									});
-								}
-							} else {
-								res6.send("fail");
-							}
-						});
-					} else {
-						res6.send("fail");
+				res8.send("fail");
+			}
+		});
+	});
+	app.post("/app/users/showfolder",function(req9,res9,next5) {
+		var path4 = req9.param("folder").split("/");
+		_gthis.findFileId(path4,stuffMan,function(err23,FolderId1) {
+			if(err23 != null) {
+				console.log(err23);
+				res9.send("fail");
+			} else if(FolderId1 != null) {
+				stuffMan.find({ _id : FolderId1},function(err111,data1) {
+					if(err23 != null) {
+						console.log(err23);
+						res9.send("fail");
 					}
+					if(data1.length != 0) {
+						var tmp2 = JSON.stringify(data1[0].fileList);
+						res9.send(tmp2);
+					} else {
+						res9.send("fail");
+					}
+				});
+			} else {
+				res9.send("fail");
+			}
+		});
+	});
+	app.post("/app/users/showversion",function(req10,res10,next6) {
+		var id5 = req10.param("id");
+		stuffMan.find({ _id : id5},function(err24,data2) {
+			if(err24 == null) {
+				if(data2.length != 0) {
+					res10.send(Std.string(data2[0].version.length));
+				} else {
+					res10.send("fail");
+				}
+			} else {
+				res10.send("fail");
+			}
+		});
+	});
+	app.get("/forgot",function(req11,res11) {
+		res11.sendfile(__dirname + "/forgot.html");
+	});
+	app.post("/forgot/users",jsonParser,function(req12,res12,next7) {
+		var _req5 = req12;
+		var username1 = req12.param("username");
+		accountMan.find({ "username" : username1},function(err25,account1) {
+			if(err25 == null) {
+				if(account1.length != 0) {
+					var options = { from : "web.circuitdiagram@hotmail.com", to : account1[0].email, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  </h1>" + "<h1 style=\"color:red\">" + account1[0].password + "</h1>", attachments : []};
+					mailTransport.sendMail(options,function(err26,msg) {
+						if(err26) {
+							console.log(err26);
+						} else {
+							console.log("email sent to user: " + Std.string(username1));
+						}
+					});
+					res12.send("y");
+				} else {
+					res12.send("n");
+				}
+			} else {
+				res12.send("n");
+			}
+		});
+	});
+	app.get("/changepassword",function(req13,res13) {
+		res13.sendfile(__dirname + "/changepassword.html");
+	});
+	app.post("/initial",function(req14,res14) {
+		stuffMan.find({ "fileName" : "", "isFolder" : true},function(errpath,rootModel) {
+			if(errpath != null) {
+				console.log(errpath);
+			} else if(rootModel.length == 0) {
+				var d3 = { isFolder : true, fileName : "", version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : "", permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
+				stuffMan.create(d3,function(err27,stuff3) {
+					console.log("inside callback err is " + err27 + " stuff is " + Std.string(stuff3));
 				});
 			}
 		});
-		app.post("/app/users/delete",function(req7,res7,next3) {
-			var path3 = req7.param("folder").split("/");
-			_gthis.findFileId(path3,stuffMan,function(err19,id4) {
-				stuffMan.remove({ "parentid" : id4, "fileName" : req7.param("fileName")},function(err20) {
-					console.log("inside callback err is " + err20);
-				});
-			});
-		});
-		app.post("/app/users/download",function(req8,res8,next4) {
-			var path4 = req8.param("folder").split("/");
-			_gthis.findFileId(path4,stuffMan,function(err22,FolderId) {
-				if(err22 != null) {
-					console.log(err22);
-					res8.send("fail");
-				} else if(FolderId != null) {
-					stuffMan.find({ "parentid" : FolderId, "fileName" : req8.param("fileName")},function(err110,data) {
-						if(err22 != null) {
-							console.log(err22);
-							res8.send("fail");
-						}
-						var flag1 = false;
-						if(data.length != 0) {
-							var _g5 = 0;
-							var _g14 = data[0].version;
-							while(_g5 < _g14.length) {
-								var i2 = _g14[_g5];
-								++_g5;
-								if(i2.number == Std.parseInt(req8.param("version"))) {
-									flag1 = true;
-									res8.send(i2.contents);
-								}
-							}
-						}
-						if(flag1 == false) {
-							res8.send("fail");
-						}
-					});
-				} else {
-					res8.send("fail");
-				}
-			});
-		});
-		app.post("/app/users/showfolder",function(req9,res9,next5) {
-			var path5 = req9.param("folder").split("/");
-			_gthis.findFileId(path5,stuffMan,function(err23,FolderId1) {
-				if(err23 != null) {
-					console.log(err23);
-					res9.send("fail");
-				} else if(FolderId1 != null) {
-					stuffMan.find({ _id : FolderId1},function(err111,data1) {
-						if(err23 != null) {
-							console.log(err23);
-							res9.send("fail");
-						}
-						if(data1.length != 0) {
-							var tmp2 = JSON.stringify(data1[0].fileList);
-							res9.send(tmp2);
+	});
+	app.post("/changepassword/users",jsonParser,function(req15,res15,next8) {
+		var _req6 = req15;
+		var username2 = req15.param("username");
+		accountMan.find({ "username" : username2, "password" : _req6.body.oldp},function(err28,account2) {
+			if(err28 == null) {
+				if(account2.length != 0) {
+					accountMan.update({ "username" : username2, "password" : _req6.body.oldp},{ "password" : _req6.body.newp},function(err112,updated1) {
+						if(err112 == null) {
+							res15.send("y");
 						} else {
-							res9.send("fail");
+							res15.send("n");
 						}
 					});
 				} else {
-					res9.send("fail");
+					res15.send("n");
 				}
-			});
+			} else {
+				res15.send("n");
+			}
 		});
-		app.get("/forgot",function(req10,res10) {
-			res10.sendfile(__dirname + "/forgot.html");
-		});
-		app.post("/forgot/users",jsonParser,function(req11,res11,next6) {
-			var _req5 = req11;
-			var username1 = req11.param("username");
-			accountMan.find({ "username" : username1},function(err24,account1) {
-				if(err24 == null) {
-					if(account1.length != 0) {
-						var options = { from : "web.circuitdiagram@hotmail.com", to : account1[0].email, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  </h1>" + "<h1 style=\"color:red\">" + account1[0].password + "</h1>", attachments : []};
-						mailTransport.sendMail(options,function(err25,msg) {
-							if(err25) {
-								console.log(err25);
-							} else {
-								console.log("email sent to user: " + Std.string(username1));
-							}
-						});
-						res11.send("y");
-					} else {
-						res11.send("n");
-					}
-				} else {
-					res11.send("n");
-				}
-			});
-		});
-		app.get("/changepassword",function(req12,res12) {
-			res12.sendfile(__dirname + "/changepassword.html");
-		});
-		app.post("/initial",function(req13,res13) {
-			stuffMan.find({ "fileName" : "", "isFolder" : true},function(errpath,rootModel) {
-				if(errpath != null) {
-					console.log(errpath);
-				} else if(rootModel.length == 0) {
-					var d8 = { parentid : "", isFolder : true, fileName : "", version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : "", permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
-					stuffMan.create(d8,function(err26,stuff3) {
-						console.log("inside callback err is " + err26 + " stuff is " + Std.string(stuff3));
-					});
-				}
-			});
-		});
-		app.post("/changepassword/users",jsonParser,function(req14,res14,next7) {
-			var _req6 = req14;
-			var username2 = req14.param("username");
-			accountMan.find({ "username" : username2, "password" : _req6.body.oldp},function(err27,account2) {
-				if(err27 == null) {
-					if(account2.length != 0) {
-						accountMan.update({ "username" : username2, "password" : _req6.body.oldp},{ "password" : _req6.body.newp},function(err112,updated1) {
-							if(err112 == null) {
-								res14.send("y");
-							} else {
-								res14.send("n");
-							}
-						});
-					} else {
-						res14.send("n");
-					}
-				} else {
-					res14.send("n");
-				}
-			});
-		});
-		app["use"](function(req15,res15,next8) {
-			res15.status(404).send("404");
-		});
-		var tmp3 = app.get("port");
-		app.listen(tmp3,function() {
-			console.log("Express server listening on port " + Std.string(app.get("port")));
-		});
+	});
+	app["use"](function(req16,res16,next9) {
+		res16.status(404).send("404");
+	});
+	var tmp3 = app.get("port");
+	app.listen(tmp3,function() {
+		console.log("Express server listening on port " + Std.string(app.get("port")));
 	});
 };
 $hxClasses["Main"] = Main;

@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import Std;
 import tjson.TJSON;
 import js.html.KeyboardEvent;
 import js.jquery.Event;
@@ -129,11 +130,25 @@ class FolderState {
                         </div>
                     </div>");
             fileListCount++;
+            new JQuery('#downloadFile').hide();
+            new JQuery('#versionList').hide();
             Browser.document.getElementById("path"+username).onclick = function(){
+                new JQuery('#FolderNameLabel').show();
+                new JQuery('#createFolder').show();
+                new JQuery('#downloadFile').hide();
+                new JQuery('#versionList').hide();
                 new JQuery('#Fieldpath_root'+username).html("");
                 var path:Array<String>=new Array<String>();
                 path.push("root");
                 path.push(username);
+                Browser.document.getElementById("createFolder").onclick= function(){
+                    if(Browser.document.getElementById("FolderNameLabel").itemValue!=""){
+                        createFolder(username,"root/"+username+"/"+Std.string(new JQuery('#newFolderName').val()));
+                    }
+                    else{
+
+                    }
+                };
                 newCollapse(path);
             };
         };
@@ -562,9 +577,11 @@ class FolderState {
             path=path+t+"/";
         }
         path=path.substring(0,path.length-1);
-        trace(path);
+        var url = Browser.window.location.href.split("?");
+        var username:String = (url[1].split("="))[1];
+        trace(pathArray);
         JQuery.ajax( { type:"post",
-            url: "http://127.0.0.1:3000/app/users/showfolder?username=test&folder="+path,
+            url: "http://127.0.0.1:3000/app/users/showfolder?username="+username+"&folder="+path,
             contentType: "application/json",
             dataType:"text",
             }
@@ -572,7 +589,7 @@ class FolderState {
         .done( function (text) {
             if(text=="fail"){}
             else{
-                var list:Array<{_id:String,fileName:String,id:String}>=haxe.Json.parse(text);
+                var list:Array<{_id:String,fileName:String,id:String,fileType:String}>=haxe.Json.parse(text);
                 if(list.length!=0){
                     for(i in list){
                         var tempArray:Array<String>=new Array<String>();
@@ -593,14 +610,76 @@ class FolderState {
                     </div><br>");
                         fileListCount++;
                         tempArray.push(i.fileName);
-                        Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
-                            new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
-                            newCollapse(tempArray);
-                        };
+                        if(i.fileType=="Folder"){
+                            Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
+                                new JQuery('#downloadFile').hide();
+                                new JQuery('#versionList').hide();
+                                new JQuery('#FolderNameLabel').show();
+                                new JQuery('#createFolder').show();
+                                new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
+                                Browser.document.getElementById("createFolder").onclick= function(){
+                                    if(Browser.document.getElementById("FolderNameLabel").itemValue!=""){
+                                        createFolder(username,path+"/"+i.fileName+"/"+Std.string(new JQuery('#newFolderName').val()));
+                                    }
+                                    else{
+
+                                    }
+                                };
+                                newCollapse(tempArray);
+                            };
+                        }
+                        else if(i.fileType=="Circuit"){
+                            Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
+                                new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
+                                selectVersion(i.id);
+
+                            };
+                        }
+
                     }
                 }
             }
 
+        });
+    }
+
+
+    function createFolder(username:String,path:String){
+        trace(path);
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/folder?username="+username+"&new=true&folder="+path,
+            contentType: "application/json",
+            dataType:"text"}
+        )
+        .done( function (text) {
+            trace(text);
+        });
+    }
+
+    function selectVersion(id:String){
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/showversion?id="+id,
+            contentType: "application/json",
+            dataType:"text",
+        }
+        )
+        .done( function (text){
+            if(text=="fail"){
+
+            }
+            else{
+                new JQuery('#FolderNameLabel').hide();
+                new JQuery('#createFolder').hide();
+                new JQuery('#selectList').html("");
+                var count:Int = Std.parseInt(text);
+                var i:Int = 0;
+                while(i<count){
+                    new JQuery('#selectList').append("<option>"+Std.string(i)+"</option>");
+                    i++;
+                }
+                new JQuery('#downloadFile').show();
+                new JQuery('#versionList').show();
+            }
         });
     }
 

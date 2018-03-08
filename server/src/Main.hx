@@ -28,7 +28,6 @@ import tjson.TJSON;
     autoIndex: true
 })
 typedef StuffData = {
-    parentid:String,
     isFolder:Bool,
     fileName:String,
     version:Array<{
@@ -38,7 +37,8 @@ typedef StuffData = {
     }>,
     ?fileList:Array<{
     fileName:String,
-    id:String
+    id:String,
+    fileType:String
     }>,
     metainformation:{
         fileType:String,
@@ -81,14 +81,6 @@ class Main implements util.Async
         var stuffMan : StuffManager = StuffManager.build(database, "test");
         var accountMan: AccountManager = AccountManager.build(database, "account");
 
-//        var pathk:Array<String>=new Array<String>();
-//        pathk.push("root");
-//        pathk.push("test");
-//        var err, FolderId = @async findFileId(pathk,stuffMan);
-//        trace(FolderId);
-
-        var errk,datak = @async stuffMan.find({_id:"5a9dfedcf3246128f0f01797"});
-        trace(datak[0].fileList);
 
 
 
@@ -171,50 +163,54 @@ class Main implements util.Async
 
         app.post('/regist', jsonParser,function (req : Request, res : Response) {
             var _req : Dynamic = req;
-            var err0,namedata = @async accountMan.find({"username":_req.body.username});
-            if(err0==null){
-                if(namedata.length==0){
-                    var err1,emaildata = @async accountMan.find({"email":_req.body.email});
-                    if(err1==null){
-                        if(emaildata.length==0){
-                            var ac : AccountData = {
-                                username:_req.body.username,
-                                password:_req.body.password,
-                                email:_req.body.email
-                            }
-                            var err3,newdata = @async accountMan.create( ac);
-                            console.log("creating new account error is: " + err3 + " stuff is " + newdata);
-                            if(err3==null){
-                                var d : StuffData = {
-                                    parentid:"",
-                                    isFolder:true,
-                                    fileName:_req.body.username,
-                                    version:[{
-                                        number:1,
-                                        contents:"",
-                                        modified:Date.now()
-                                    }],
-                                    fileList:[],
-                                    metainformation:{
-                                        fileType:"folder",
-                                        owner:_req.body.username,
-                                        permissions:[{
-                                            group:"",
-                                            permission:"read&write"
-                                        }],
-                                        created:Date.now()
-                                    }
+            if(_req.body.username!=""){
+                var err0,namedata = @async accountMan.find({"username":_req.body.username});
+                if(err0==null){
+                    if(namedata.length==0){
+                        var err1,emaildata = @async accountMan.find({"email":_req.body.email});
+                        if(err1==null){
+                            if(emaildata.length==0){
+                                var ac : AccountData = {
+                                    username:_req.body.username,
+                                    password:_req.body.password,
+                                    email:_req.body.email
                                 }
-                                var err6,newfolder = @async stuffMan.create( d);
+                                var err3,newdata = @async accountMan.create( ac);
+                                console.log("creating new account error is: " + err3 + " stuff is " + newdata);
+                                if(err3==null){
+                                    var d : StuffData = {
+                                        isFolder:true,
+                                        fileName:_req.body.username,
+                                        version:[{
+                                            number:0,
+                                            contents:"",
+                                            modified:Date.now()
+                                        }],
+                                        fileList:[],
+                                        metainformation:{
+                                            fileType:"Folder",
+                                            owner:_req.body.username,
+                                            permissions:[{
+                                                group:"",
+                                                permission:"read&write"
+                                            }],
+                                            created:Date.now()
+                                        }
+                                    }
+                                    var err6,newfolder = @async stuffMan.create( d);
                                     console.log("creating new folder error is: " + err6 + " stuff is " + newfolder);
-                                var err4,root = @async stuffMan.find({"fileName":"","isFolder":true});
-                                if(err4==null){
-                                    if(root.length!=0){
-                                        root[0].fileList.push({fileName:_req.body.username,id:Std.string(newfolder._id)});
-                                        var err5, root1= @async stuffMan.update({"_id" : root[0]._id},{"fileList":root[0].fileList});
-                                        if(err5==null){
-                                            console.log("new account register: "+_req.body.username);
-                                            res.send("t");
+                                    var err4,root = @async stuffMan.find({"fileName":"","isFolder":true});
+                                    if(err4==null){
+                                        if(root.length!=0){
+                                            root[0].fileList.push({fileName:_req.body.username,id:Std.string(newfolder._id),fileType:"Folder"});
+                                            var err5, root1= @async stuffMan.update({"_id" : root[0]._id},{"fileList":root[0].fileList});
+                                            if(err5==null){
+                                                console.log("new account register: "+_req.body.username);
+                                                res.send("t");
+                                            }
+                                            else{
+                                                res.send("fail");
+                                            }
                                         }
                                         else{
                                             res.send("fail");
@@ -227,29 +223,30 @@ class Main implements util.Async
                                 else{
                                     res.send("fail");
                                 }
+
                             }
                             else{
-                                res.send("fail");
+                                res.send("email");
                             }
-
                         }
                         else{
+                            console.log("register error: "+err0);
                             res.send("email");
                         }
                     }
                     else{
-                        console.log("register error: "+err0);
-                        res.send("email");
+                        res.send("username");
                     }
                 }
                 else{
+                    console.log("register error: "+err0);
                     res.send("username");
                 }
             }
             else{
-                console.log("register error: "+err0);
-                res.send("username");
+                res.send("fail");
             }
+
         });
 
 
@@ -265,11 +262,10 @@ class Main implements util.Async
             var _req : Dynamic = req;
 
             var d : StuffData = {
-                parentid:"",
                 isFolder:true,
                 fileName:"root",
                 version:[{
-                    number:1,
+                    number:0,
                     contents:haxe.Json.stringify(_req.body),
                     modified:Date.now()
                 }],
@@ -325,7 +321,6 @@ class Main implements util.Async
                             }
                             if(flag==true){
                                 var d : StuffData = {
-                                    parentid:id,
                                     isFolder:true,
                                     fileName:path[path.length-1],
                                     version:[{
@@ -335,7 +330,7 @@ class Main implements util.Async
                                     }],
                                     fileList:[],
                                     metainformation:{
-                                        fileType:"folder",
+                                        fileType:"Folder",
                                         owner:req.param('username'),
                                         permissions:[{
                                             group:"a",
@@ -351,7 +346,7 @@ class Main implements util.Async
 
                                 var err1, Folder= @async stufftemp.find({_id:id});
                                 console.log("finding parent folder find error:"+err1);
-                                Folder[0].fileList.push({fileName:path[path.length-1],id:Std.string(NewData._id)});
+                                Folder[0].fileList.push({fileName:path[path.length-1],id:Std.string(NewData._id),fileType:"Folder"});
                                 var err2, id= @async stufftemp.update({"_id" : id},{"fileList":Folder[0].fileList});
                                 console.log(err2);
                                 res.send("success");
@@ -391,7 +386,6 @@ class Main implements util.Async
                         trace(fileId);
                         if(fileId==""){
                             var d : StuffData = {
-                                parentid:id,
                                 isFolder:false,
                                 fileName:req.param("fileName"),
                                 version:[{
@@ -401,7 +395,7 @@ class Main implements util.Async
                                 }],
                                 fileList:[],
                                 metainformation:{
-                                    fileType:"CircuitDiagram",
+                                    fileType:"Circuit",
                                     owner:req.param("username"),
                                     permissions:[{
                                         group:"a",
@@ -417,7 +411,7 @@ class Main implements util.Async
 
                             var err, Folder= @async stufftemp.find({_id:id});
                             trace(err);
-                            Folder[0].fileList.push({fileName:req.param("fileName"),id:Std.string(NewData._id)});
+                            Folder[0].fileList.push({fileName:req.param("fileName"),id:Std.string(NewData._id),fileType:"Circuit"});
                             var err, updated= @async stufftemp.update({"_id" : id},{"fileList":Folder[0].fileList});
                             trace(err);
                             res.send("success");
@@ -516,8 +510,23 @@ class Main implements util.Async
             else{
                 res.send("fail");
             }
+        });
 
 
+        app.post('/app/users/showversion',function(req:Request,res:Response,next){
+            var id:String=req.param("id");
+            var err,data = @async stuffMan.find({_id:id});
+            if(err==null){
+                if(data.length!=0){
+                    res.send(Std.string(data[0].version.length));
+                }
+                else{
+                    res.send("fail");
+                }
+            }
+            else{
+                res.send("fail");
+            }
 
         });
 
@@ -569,7 +578,6 @@ class Main implements util.Async
             if(errpath!=null){console.log(errpath);}
             else if(rootModel.length==0){
                 var d : StuffData = {
-                    parentid:"",
                     isFolder:true,
                     fileName:"",
                     version:[{
@@ -627,7 +635,6 @@ class Main implements util.Async
         app.listen(app.get('port'), function(){
             trace('Express server listening on port ' + app.get('port'));
         });
-
     }
 
 

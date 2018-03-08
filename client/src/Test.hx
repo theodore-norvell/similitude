@@ -31,7 +31,7 @@ class Test {
         var cdname=exp.replace(folderState.circuitDiagram.get_name(),"_");
         if(check.match(cdname)){
             JQuery.ajax( { type:"post",
-                url: "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root/test&fileName="+cdname,
+                url: "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root/test/abc&fileName="+cdname,
                 contentType: "application/json",
                 dataType:"text",
                 data:o}
