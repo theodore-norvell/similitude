@@ -1,5 +1,10 @@
 package ;
 
+import haxe.Unserializer;
+import haxe.Serializer;
+import haxe.Unserializer;
+import com.mun.model.enumeration.ORIENTATION;
+import tjson.TJSON;
 import js.RegExp;
 import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.component.CircuitDiagram;
@@ -10,6 +15,8 @@ import tjson.TJSON;
 import js.html.DOMElement;
 import js.Browser;
 import com.mun.model.component.Component;
+import haxe.Serializer;
+import haxe.Unserializer;
 
 
 // TODO Rename this class to ClientMain
@@ -25,35 +32,45 @@ class Test {
     }
 
     public function regist(){
-        var o = TJSON.encode(folderState.circuitDiagram);
+        Serializer.USE_CACHE=true;
+        Serializer.USE_ENUM_INDEX=true;
+        var o = Serializer.run(folderState.circuitDiagram);
+        trace(o);
+        trace("test00");
+        trace(Type.getClass(Unserializer.run(o)));
+        trace("test01");
+        var tempJson = {circuit: o};
         var exp= ~/\s+/;
         var check=~/^\w*$/;
         var cdname=exp.replace(folderState.circuitDiagram.get_name(),"_");
         if(check.match(cdname)){
+            trace("pass");
             JQuery.ajax( { type:"post",
-                url: "http://127.0.0.1:3000/app/users/folder?username=test&new=false&folder=root/test/abc&fileName="+cdname,
+                url: "http://127.0.0.1:3000/app/users?username=test&new=false&folder=root/test/abc&fileName="+cdname,
                 contentType: "application/json",
-                dataType:"text",
-                data:o}
+                data:haxe.Json.stringify(tempJson)}
             )
             .done( function (text) {
                 trace(text);
+                trace(Type.getClass(Unserializer.run(text)));
 //            trace(Type.getClass(TJSON.parse(text)));
-//            folderState.load(TJSON.parse(text));
+            folderState.load(Unserializer.run(text));
 
             });
+        }
+        else{
+            trace("name error");
         }
     }
     static public function main() {
         var folderState:FolderState = new FolderState() ;
         var test:Test = new Test(folderState);
 
-        var r = ~/\s+/;
-        var t = ~/^\w*$/;
-        trace(r.match("ABC    "));
-        var a=r.replace("ABC 123","_");
-        trace(r.replace("ABC 123","_"));
-        trace(t.match(a));
+//        var serializer = new Serializer();
+//        serializer.serialize(ORIENTATION.EAST);
+//        trace(Type.getClass(Serializer.run(ORIENTATION.EAST)));
+//        trace("abc");
+
 
 
     }

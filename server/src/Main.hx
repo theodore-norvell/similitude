@@ -82,13 +82,8 @@ class Main implements util.Async
         var accountMan: AccountManager = AccountManager.build(database, "account");
 
 
-
-
-
-
-
-//        stuffMan.find({ _id:"5a96105fd7b3122cccb603c0"},function (err : Null<Error>, stuff) : Void {
-//            trace(stuff[0]);
+//        stuffMan.find({ "fileList.id":"5aabcbcab1e4b911d0de08de"},function (err : Null<Error>, stuff) : Void {
+//            trace(stuff[0].fileList[0]);
 //        });
 
 
@@ -282,16 +277,10 @@ class Main implements util.Async
             }
 
 
-//            stuffMan.create( d, function (err : Null<Error>, stuff : Stuff) : Void {
-//            console.log("inside callback err is " + err + " stuff is " + stuff);
-//            });
+            var errk,datak = @async stuffMan.find({_id:"5aab092ca8b48b227462332f"});
 
-//            res.send(_req.body);
+            res.send(datak[0].version[0].contents);
 
-            stuffMan.find({"_id": "5a99837266a081105cc8b355"},function (err : Null<Error>, stuff) : Void {
-//                trace(stuff[0].version[0].contents);
-                res.send(stuff[0].version[0].contents);
-            });
 
         });
 
@@ -383,14 +372,13 @@ class Main implements util.Async
                                 fileId=i.id;
                             }
                         }
-                        trace(fileId);
                         if(fileId==""){
                             var d : StuffData = {
                                 isFolder:false,
                                 fileName:req.param("fileName"),
                                 version:[{
                                     number:0,
-                                    contents:haxe.Json.stringify(_req.body),
+                                    contents:_req.body.circuit,
                                     modified:Date.now()
                                 }],
                                 fileList:[],
@@ -422,7 +410,7 @@ class Main implements util.Async
                             if(stuff.length!=0){
                                 stuff[0].version.push({
                                     number:stuff[0].version.length,
-                                    contents:haxe.Json.stringify(_req.body),
+                                    contents:_req.body.circuit,
                                     modified:Date.now()
                                 });
                                 var err, id= @async stufftemp.update({"_id" : stuff[0]._id},{"version":stuff[0].version});
@@ -454,30 +442,12 @@ class Main implements util.Async
         });
 
         app.post('/app/users/download',function(req:Request,res:Response,next){
-            var path : Array<String> =req.param('folder').split("/");
-            var err, FolderId = @async findFileId(path,stuffMan);
-            if(err!=null){
-                console.log(err);
-                res.send("fail");
-
-            }
-            else if(FolderId!=null){
-                var err1, data = @async stuffMan.find({"parentid":FolderId,"fileName":req.param("fileName")});
-                if(err!=null){
-                    console.log(err);
-                    res.send("fail");
-
+            var err2, data1 = @async stuffMan.find({_id:req.param("id")});
+            if(err2==null){
+                if(data1.length!=0){
+                    res.send(data1[0].version[req.param("version")].contents);
                 }
-                var flag:Bool=false;
-                if(data.length!=0){
-                    for(i in data[0].version){
-                        if(i.number==Std.parseInt(req.param("version"))){
-                            flag=true;
-                            res.send(i.contents);
-                        }
-                    }
-                }
-                if(flag==false){
+                else{
                     res.send("fail");
                 }
             }

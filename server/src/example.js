@@ -350,8 +350,8 @@ var Main = function() {
 		var d_version = [{ number : 0, contents : JSON.stringify(_req3.body), modified : new Date()}];
 		var d_fileList = [];
 		var d_metainformation = { fileType : "folder", owner : "test", permissions : [{ group : "a", permission : "read&write"}], created : new Date()};
-		stuffMan.find({ "_id" : "5a99837266a081105cc8b355"},function(err2,stuff) {
-			res5.send(stuff[0].version[0].contents);
+		stuffMan.find({ _id : "5aab092ca8b48b227462332f"},function(errk,datak) {
+			res5.send(datak[0].version[0].contents);
 		});
 	});
 	app.post("/app/users/folder",function(req6,res6,next2) {
@@ -361,14 +361,14 @@ var Main = function() {
 		if(req6.param("new") == "true") {
 			var path = req6.param("folder").split("/");
 			path.pop();
-			_gthis.findFileId(path,stufftemp,function(err7,id) {
+			_gthis.findFileId(path,stufftemp,function(err2,id) {
 				path = req6.param("folder").split("/");
 				if(id != null) {
-					stufftemp.find({ _id : id},function(err8,stuff1) {
-						if(stuff1.length != 0) {
+					stufftemp.find({ _id : id},function(err7,stuff) {
+						if(stuff.length != 0) {
 							var flag = true;
 							var _g3 = 0;
-							var _g12 = stuff1[0].fileList;
+							var _g12 = stuff[0].fileList;
 							while(_g3 < _g12.length) {
 								var i = _g12[_g3];
 								++_g3;
@@ -378,8 +378,8 @@ var Main = function() {
 							}
 							if(flag == true) {
 								var d1 = { isFolder : true, fileName : path[path.length - 1], version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "Folder", owner : req6.param("username"), permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-								stufftemp.create(d1,function(err9,NewData) {
-									console.log(Std.string(req6.param("username")) + " create new folder callback err is " + err9 + " stuff is " + Std.string(NewData));
+								stufftemp.create(d1,function(err8,NewData) {
+									console.log(Std.string(req6.param("username")) + " create new folder callback err is " + err8 + " stuff is " + Std.string(NewData));
 									stufftemp.find({ _id : id},function(err12,Folder) {
 										console.log("finding parent folder find error:" + err12);
 										Folder[0].fileList.push({ fileName : path[path.length - 1], id : Std.string(NewData._id), fileType : "Folder"});
@@ -403,8 +403,8 @@ var Main = function() {
 			});
 		} else {
 			var path1 = req6.param("folder").split("/");
-			_gthis.findFileId(path1,stufftemp,function(err10,id2) {
-				console.log("test2  err is " + err10);
+			_gthis.findFileId(path1,stufftemp,function(err9,id2) {
+				console.log("test2  err is " + err9);
 				console.log("test2  id is " + id2);
 				if(id2 != null) {
 					stufftemp.find({ _id : id2},function(err13,parentFolder) {
@@ -420,27 +420,26 @@ var Main = function() {
 									fileId = i1.id;
 								}
 							}
-							console.log(fileId);
 							if(fileId == "") {
-								var d2 = { isFolder : false, fileName : req6.param("fileName"), version : [{ number : 0, contents : JSON.stringify(_req4.body), modified : new Date()}], fileList : [], metainformation : { fileType : "Circuit", owner : req6.param("username"), permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
-								stufftemp.create(d2,function(err14,NewData1) {
-									console.log("inside callback err is " + err14 + " stuff is " + Std.string(NewData1));
-									stufftemp.find({ _id : id2},function(err15,Folder1) {
-										console.log(err15);
+								var d2 = { isFolder : false, fileName : req6.param("fileName"), version : [{ number : 0, contents : _req4.body.circuit, modified : new Date()}], fileList : [], metainformation : { fileType : "Circuit", owner : req6.param("username"), permissions : [{ group : "a", permission : "read&write"}], created : new Date()}};
+								stufftemp.create(d2,function(err10,NewData1) {
+									console.log("inside callback err is " + err10 + " stuff is " + Std.string(NewData1));
+									stufftemp.find({ _id : id2},function(err14,Folder1) {
+										console.log(err14);
 										Folder1[0].fileList.push({ fileName : req6.param("fileName"), id : Std.string(NewData1._id), fileType : "Circuit"});
-										stufftemp.update({ "_id" : id2},{ "fileList" : Folder1[0].fileList},function(err16,updated) {
-											console.log(err16);
+										stufftemp.update({ "_id" : id2},{ "fileList" : Folder1[0].fileList},function(err15,updated) {
+											console.log(err15);
 											res6.send("success");
 										});
 									});
 								});
 							} else {
-								stufftemp.find({ _id : fileId},function(err17,stuff2) {
-									console.log(err17);
-									if(stuff2.length != 0) {
-										stuff2[0].version.push({ number : stuff2[0].version.length, contents : JSON.stringify(_req4.body), modified : new Date()});
-										stufftemp.update({ "_id" : stuff2[0]._id},{ "version" : stuff2[0].version},function(err18,id3) {
-											console.log("error is: " + err18 + "data is: " + Std.string(id3));
+								stufftemp.find({ _id : fileId},function(err16,stuff1) {
+									console.log(err16);
+									if(stuff1.length != 0) {
+										stuff1[0].version.push({ number : stuff1[0].version.length, contents : _req4.body.circuit, modified : new Date()});
+										stufftemp.update({ "_id" : stuff1[0]._id},{ "version" : stuff1[0].version},function(err17,id3) {
+											console.log("error is: " + err17 + "data is: " + Std.string(id3));
 											res6.send("success");
 										});
 									} else {
@@ -460,61 +459,43 @@ var Main = function() {
 	});
 	app.post("/app/users/delete",function(req7,res7,next3) {
 		var path2 = req7.param("folder").split("/");
-		_gthis.findFileId(path2,stuffMan,function(err19,id4) {
-			stuffMan.remove({ "parentid" : id4, "fileName" : req7.param("fileName")},function(err20) {
-				console.log("inside callback err is " + err20);
+		_gthis.findFileId(path2,stuffMan,function(err18,id4) {
+			stuffMan.remove({ "parentid" : id4, "fileName" : req7.param("fileName")},function(err19) {
+				console.log("inside callback err is " + err19);
 			});
 		});
 	});
 	app.post("/app/users/download",function(req8,res8,next4) {
-		var path3 = req8.param("folder").split("/");
-		_gthis.findFileId(path3,stuffMan,function(err22,FolderId) {
-			if(err22 != null) {
-				console.log(err22);
-				res8.send("fail");
-			} else if(FolderId != null) {
-				stuffMan.find({ "parentid" : FolderId, "fileName" : req8.param("fileName")},function(err110,data) {
-					if(err22 != null) {
-						console.log(err22);
-						res8.send("fail");
-					}
-					var flag1 = false;
-					if(data.length != 0) {
-						var _g5 = 0;
-						var _g14 = data[0].version;
-						while(_g5 < _g14.length) {
-							var i2 = _g14[_g5];
-							++_g5;
-							if(i2.number == Std.parseInt(req8.param("version"))) {
-								flag1 = true;
-								res8.send(i2.contents);
-							}
-						}
-					}
-					if(flag1 == false) {
-						res8.send("fail");
-					}
-				});
+		var tmp2 = req8.param("id");
+		stuffMan.find({ _id : tmp2},function(err22,data1) {
+			if(err22 == null) {
+				if(data1.length != 0) {
+					var data11 = data1[0].version;
+					var tmp3 = req8.param("version");
+					res8.send(data11[tmp3].contents);
+				} else {
+					res8.send("fail");
+				}
 			} else {
 				res8.send("fail");
 			}
 		});
 	});
 	app.post("/app/users/showfolder",function(req9,res9,next5) {
-		var path4 = req9.param("folder").split("/");
-		_gthis.findFileId(path4,stuffMan,function(err23,FolderId1) {
-			if(err23 != null) {
-				console.log(err23);
+		var path3 = req9.param("folder").split("/");
+		_gthis.findFileId(path3,stuffMan,function(err20,FolderId) {
+			if(err20 != null) {
+				console.log(err20);
 				res9.send("fail");
-			} else if(FolderId1 != null) {
-				stuffMan.find({ _id : FolderId1},function(err111,data1) {
-					if(err23 != null) {
-						console.log(err23);
+			} else if(FolderId != null) {
+				stuffMan.find({ _id : FolderId},function(err110,data) {
+					if(err20 != null) {
+						console.log(err20);
 						res9.send("fail");
 					}
-					if(data1.length != 0) {
-						var tmp2 = JSON.stringify(data1[0].fileList);
-						res9.send(tmp2);
+					if(data.length != 0) {
+						var tmp4 = JSON.stringify(data[0].fileList);
+						res9.send(tmp4);
 					} else {
 						res9.send("fail");
 					}
@@ -526,8 +507,8 @@ var Main = function() {
 	});
 	app.post("/app/users/showversion",function(req10,res10,next6) {
 		var id5 = req10.param("id");
-		stuffMan.find({ _id : id5},function(err24,data2) {
-			if(err24 == null) {
+		stuffMan.find({ _id : id5},function(err23,data2) {
+			if(err23 == null) {
 				if(data2.length != 0) {
 					res10.send(Std.string(data2[0].version.length));
 				} else {
@@ -544,13 +525,13 @@ var Main = function() {
 	app.post("/forgot/users",jsonParser,function(req12,res12,next7) {
 		var _req5 = req12;
 		var username1 = req12.param("username");
-		accountMan.find({ "username" : username1},function(err25,account1) {
-			if(err25 == null) {
+		accountMan.find({ "username" : username1},function(err24,account1) {
+			if(err24 == null) {
 				if(account1.length != 0) {
 					var options = { from : "web.circuitdiagram@hotmail.com", to : account1[0].email, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  </h1>" + "<h1 style=\"color:red\">" + account1[0].password + "</h1>", attachments : []};
-					mailTransport.sendMail(options,function(err26,msg) {
-						if(err26) {
-							console.log(err26);
+					mailTransport.sendMail(options,function(err25,msg) {
+						if(err25) {
+							console.log(err25);
 						} else {
 							console.log("email sent to user: " + Std.string(username1));
 						}
@@ -573,8 +554,8 @@ var Main = function() {
 				console.log(errpath);
 			} else if(rootModel.length == 0) {
 				var d3 = { isFolder : true, fileName : "", version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : "", permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
-				stuffMan.create(d3,function(err27,stuff3) {
-					console.log("inside callback err is " + err27 + " stuff is " + Std.string(stuff3));
+				stuffMan.create(d3,function(err26,stuff2) {
+					console.log("inside callback err is " + err26 + " stuff is " + Std.string(stuff2));
 				});
 			}
 		});
@@ -582,11 +563,11 @@ var Main = function() {
 	app.post("/changepassword/users",jsonParser,function(req15,res15,next8) {
 		var _req6 = req15;
 		var username2 = req15.param("username");
-		accountMan.find({ "username" : username2, "password" : _req6.body.oldp},function(err28,account2) {
-			if(err28 == null) {
+		accountMan.find({ "username" : username2, "password" : _req6.body.oldp},function(err27,account2) {
+			if(err27 == null) {
 				if(account2.length != 0) {
-					accountMan.update({ "username" : username2, "password" : _req6.body.oldp},{ "password" : _req6.body.newp},function(err112,updated1) {
-						if(err112 == null) {
+					accountMan.update({ "username" : username2, "password" : _req6.body.oldp},{ "password" : _req6.body.newp},function(err111,updated1) {
+						if(err111 == null) {
 							res15.send("y");
 						} else {
 							res15.send("n");
@@ -603,8 +584,8 @@ var Main = function() {
 	app["use"](function(req16,res16,next9) {
 		res16.status(404).send("404");
 	});
-	var tmp3 = app.get("port");
-	app.listen(tmp3,function() {
+	var tmp5 = app.get("port");
+	app.listen(tmp5,function() {
 		console.log("Express server listening on port " + Std.string(app.get("port")));
 	});
 };

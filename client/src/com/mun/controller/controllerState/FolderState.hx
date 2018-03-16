@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import haxe.Unserializer;
 import Std;
 import tjson.TJSON;
 import js.html.KeyboardEvent;
@@ -21,6 +22,10 @@ import com.mun.model.component.Folder;
 import com.mun.model.component.FolderI;
 import com.mun.model.enumeration.F_STATE;
 import com.mun.global.Constant.*;
+import haxe.Serializer;
+import haxe.Unserializer;
+
+
 class FolderState {
     var currentState:F_STATE;
 
@@ -122,7 +127,7 @@ class FolderState {
             new JQuery('#text2').css('opacity', 1).show();
             var url = Browser.window.location.href.split("?");
             var username:String = (url[1].split("="))[1];
-            new JQuery('#FileCollapseList').html("<a data-toggle=\"collapse\" href=\"#FileCollapseList"+Std.string(fileListCount)+"\" id=\"path"+username+"\">"+username+"</a>");
+            new JQuery('#FileCollapseList').html("<a data-toggle=\"collapse\" href=\"#FileCollapseList"+Std.string(fileListCount)+"\" id=\"path"+username+"\"><img src=\"/client/src/icon/folder.png\">"+username+"</a>");
 
             new JQuery('#FileCollapseList').append("<div id=\"FileCollapseList"+Std.string(fileListCount)+"\" class=\"panel-collapse collapse out\" >
                             <div class=\"container-fluid\" id=\"Fieldpath_root"+username+"\">
@@ -135,6 +140,7 @@ class FolderState {
             Browser.document.getElementById("path"+username).onclick = function(){
                 new JQuery('#FolderNameLabel').show();
                 new JQuery('#createFolder').show();
+                new JQuery('#uploadCircuit').show();
                 new JQuery('#downloadFile').hide();
                 new JQuery('#versionList').hide();
                 new JQuery('#Fieldpath_root'+username).html("");
@@ -148,6 +154,13 @@ class FolderState {
                     else{
 
                     }
+                };
+                new JQuery('#selectCircuit').html("");
+                for(i in circuitDiagramArray){
+                    new JQuery('#selectCircuit').append("<option>"+i.get_name()+"</option>");
+                }
+                Browser.document.getElementById("uploadCD").onclick= function(){
+                    uploadCircuit(Std.string(new JQuery('#selectList').val()),"root/"+username,username);
                 };
                 newCollapse(path);
             };
@@ -579,7 +592,7 @@ class FolderState {
         path=path.substring(0,path.length-1);
         var url = Browser.window.location.href.split("?");
         var username:String = (url[1].split("="))[1];
-        trace(pathArray);
+        //trace(pathArray);
         JQuery.ajax( { type:"post",
             url: "http://127.0.0.1:3000/app/users/showfolder?username="+username+"&folder="+path,
             contentType: "application/json",
@@ -600,7 +613,7 @@ class FolderState {
                         for(i in tempArray){
                             tempString=tempString+i;
                         }
-                        trace("Fieldpath_"+tempString);
+                        //trace("Fieldpath_"+tempString);
                         new JQuery('#Fieldpath_'+tempString).append("<a data-toggle=\"collapse\" href=\"#FileCollapseList"+Std.string(fileListCount)+"\" id=\"path_"+tempString+i.fileName+"\">"+i.fileName+"</a>");
                         new JQuery('#Fieldpath_'+tempString).append("<div id=\"FileCollapseList"+Std.string(fileListCount)+"\" class=\"panel-collapse collapse out\" >
                             <div class=\"container-fluid\" id=\"Fieldpath_"+tempString+i.fileName+"\">
@@ -610,12 +623,15 @@ class FolderState {
                     </div><br>");
                         fileListCount++;
                         tempArray.push(i.fileName);
+                        trace(i.fileType);
                         if(i.fileType=="Folder"){
+                            new JQuery('#path_'+tempString+i.fileName).html("<img src=\"/client/src/icon/folder.png\">"+i.fileName);
                             Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
                                 new JQuery('#downloadFile').hide();
                                 new JQuery('#versionList').hide();
                                 new JQuery('#FolderNameLabel').show();
                                 new JQuery('#createFolder').show();
+                                new JQuery('#uploadCircuit').show();
                                 new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
                                 Browser.document.getElementById("createFolder").onclick= function(){
                                     if(Browser.document.getElementById("FolderNameLabel").itemValue!=""){
@@ -625,10 +641,18 @@ class FolderState {
 
                                     }
                                 };
+                                new JQuery('#selectCircuit').html("");
+                                for(i in circuitDiagramArray){
+                                    new JQuery('#selectCircuit').append("<option>"+i.get_name()+"</option>");
+                                }
+                                Browser.document.getElementById("uploadCD").onclick= function(){
+                                    uploadCircuit(Std.string(new JQuery('#selectCircuit').val()),path+"/"+i.fileName,username);
+                                };
                                 newCollapse(tempArray);
                             };
                         }
                         else if(i.fileType=="Circuit"){
+                            new JQuery('#path_'+tempString+i.fileName).html("<img src=\"/client/src/icon/circuit.png\">"+i.fileName);
                             Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
                                 new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
                                 selectVersion(i.id);
@@ -670,6 +694,7 @@ class FolderState {
             else{
                 new JQuery('#FolderNameLabel').hide();
                 new JQuery('#createFolder').hide();
+                new JQuery('#uploadCircuit').hide();
                 new JQuery('#selectList').html("");
                 var count:Int = Std.parseInt(text);
                 var i:Int = 0;
@@ -678,9 +703,61 @@ class FolderState {
                     i++;
                 }
                 new JQuery('#downloadFile').show();
+                Browser.document.getElementById("downloadFile").onclick = function(){
+                    downloadCircuit(id,Std.string(new JQuery('#selectList').val()));
+                };
                 new JQuery('#versionList').show();
             }
         });
+    }
+
+    function downloadCircuit(id:String,version:String){
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/download?id="+id+"&version="+version,
+            contentType: "application/json",
+            dataType:"text",
+        }
+        )
+        .done( function (text){
+            var cd:CircuitDiagramI = Unserializer.run(text);
+            var flag:Bool=true;
+            for(i in circuitDiagramArray){
+                if(i.get_name()==cd.get_name()){
+                    flag=false;
+                }
+            }
+            if(flag==true){
+                load(cd);
+            }
+            else{
+                trace("fail");
+            }
+        });
+    }
+
+    function uploadCircuit(name:String,path:String,username:String){
+        for(i in circuitDiagramArray){
+            if(i.get_name()==name){
+                Serializer.USE_CACHE=true;
+                Serializer.USE_ENUM_INDEX=true;
+                var o = Serializer.run(i);
+                var tempJson = {circuit: o};
+                var exp= ~/\s+/;
+                var check=~/^\w*$/;
+                var cdname=exp.replace(i.get_name(),"_");
+                if(check.match(cdname)){
+                    JQuery.ajax( { type:"post",
+                        url: "http://127.0.0.1:3000/app/users/folder?username="+username+"&new=false&folder="+path+"&fileName="+i.get_name(),
+                        contentType: "application/json",
+                        data:haxe.Json.stringify(tempJson)}
+                    )
+                    .done( function (text) {
+                        trace(text);
+
+                    });
+                }
+            }
+        }
     }
 
 }
