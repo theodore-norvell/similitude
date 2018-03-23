@@ -24,6 +24,13 @@ interface CircuitDiagramI {
     **/
     public function set_commandManager(value:CommandManager):Void;
 
+
+    /**
+    * @:getter component array from the circuit diagram
+     * @return the Array
+    **/
+    public function get_componentArray():Array<Component>;
+
     /**
     * @:getter component array from the circuit diagram
      * @return the iterator

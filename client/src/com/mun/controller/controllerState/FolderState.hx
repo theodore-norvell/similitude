@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import com.mun.model.gates.CompoundComponent;
 import haxe.Unserializer;
 import Std;
 import tjson.TJSON;
@@ -24,6 +25,8 @@ import com.mun.model.enumeration.F_STATE;
 import com.mun.global.Constant.*;
 import haxe.Serializer;
 import haxe.Unserializer;
+import js.support.Error;
+import js.support.Callback;
 
 
 class FolderState {
@@ -137,12 +140,14 @@ class FolderState {
             fileListCount++;
             new JQuery('#downloadFile').hide();
             new JQuery('#versionList').hide();
+            new JQuery('#deleteFile').hide();
             Browser.document.getElementById("path"+username).onclick = function(){
                 new JQuery('#FolderNameLabel').show();
                 new JQuery('#createFolder').show();
                 new JQuery('#uploadCircuit').show();
                 new JQuery('#downloadFile').hide();
                 new JQuery('#versionList').hide();
+                new JQuery('#deleteFile').hide();
                 new JQuery('#Fieldpath_root'+username).html("");
                 var path:Array<String>=new Array<String>();
                 path.push("root");
@@ -623,7 +628,6 @@ class FolderState {
                     </div><br>");
                         fileListCount++;
                         tempArray.push(i.fileName);
-                        trace(i.fileType);
                         if(i.fileType=="Folder"){
                             new JQuery('#path_'+tempString+i.fileName).html("<img src=\"/client/src/icon/folder.png\">"+i.fileName);
                             Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
@@ -632,6 +636,7 @@ class FolderState {
                                 new JQuery('#FolderNameLabel').show();
                                 new JQuery('#createFolder').show();
                                 new JQuery('#uploadCircuit').show();
+                                new JQuery('#deleteFile').show();
                                 new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
                                 Browser.document.getElementById("createFolder").onclick= function(){
                                     if(Browser.document.getElementById("FolderNameLabel").itemValue!=""){
@@ -648,6 +653,10 @@ class FolderState {
                                 Browser.document.getElementById("uploadCD").onclick= function(){
                                     uploadCircuit(Std.string(new JQuery('#selectCircuit').val()),path+"/"+i.fileName,username);
                                 };
+                                Browser.document.getElementById("deleteFile").onclick = function(){
+                                    delete(i.id);
+                                    Browser.document.getElementById("path_"+tempString).click();
+                                };
                                 newCollapse(tempArray);
                             };
                         }
@@ -655,7 +664,14 @@ class FolderState {
                             new JQuery('#path_'+tempString+i.fileName).html("<img src=\"/client/src/icon/circuit.png\">"+i.fileName);
                             Browser.document.getElementById("path_"+tempString+i.fileName).onclick=function(){
                                 new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
+                                new JQuery('#FolderNameLabel').hide();
+                                new JQuery('#createFolder').hide();
+                                new JQuery('#uploadCircuit').hide();
                                 selectVersion(i.id);
+                                Browser.document.getElementById("deleteFile").onclick = function(){
+                                    delete(i.id);
+                                    Browser.document.getElementById("path_"+tempString).click();
+                                };
 
                             };
                         }
@@ -676,7 +692,7 @@ class FolderState {
             dataType:"text"}
         )
         .done( function (text) {
-            trace(text);
+
         });
     }
 
@@ -692,9 +708,6 @@ class FolderState {
 
             }
             else{
-                new JQuery('#FolderNameLabel').hide();
-                new JQuery('#createFolder').hide();
-                new JQuery('#uploadCircuit').hide();
                 new JQuery('#selectList').html("");
                 var count:Int = Std.parseInt(text);
                 var i:Int = 0;
@@ -727,12 +740,42 @@ class FolderState {
                 }
             }
             if(flag==true){
+                downloadSubCircuit(cd);
                 load(cd);
             }
             else{
-                trace("fail");
+                trace("exited on canvas");
             }
         });
+    }
+
+    function downloadSubCircuit(cd:CircuitDiagramI){
+        for(i in cd.get_componentIterator()){
+            if(i.getNameOfTheComponentKind()=="CC"){
+                trace(i.get_id());
+                if(i.get_id()!=""){
+                    JQuery.ajax( { type:"post",
+                        url: "http://127.0.0.1:3000/app/users/downloadSub?id="+i.get_id(),
+                        contentType: "application/json",
+                        dataType:"text",
+                    }
+                    )
+                    .done( function (text){
+                        if(text!="fail"){
+                            var tempcd:CircuitDiagramI = Unserializer.run(text);
+                            downloadSubCircuit(tempcd);
+                            cast(i.get_componentKind(),CompoundComponent).loadCircuit(tempcd);
+                        }
+                        else{
+                            cd.get_componentArray().remove(i);
+                        }
+                    });
+                }
+                else{
+                    cd.get_componentArray().remove(i);
+                }
+            }
+        }
     }
 
     function uploadCircuit(name:String,path:String,username:String){
@@ -740,14 +783,20 @@ class FolderState {
             if(i.get_name()==name){
                 Serializer.USE_CACHE=true;
                 Serializer.USE_ENUM_INDEX=true;
-                var o = Serializer.run(i);
-                var tempJson = {circuit: o};
                 var exp= ~/\s+/;
                 var check=~/^\w*$/;
                 var cdname=exp.replace(i.get_name(),"_");
                 if(check.match(cdname)){
+                    var err = @async uploadSubCircuit(i,path,username);
+                    for(k in i.get_componentIterator()){
+                        if(k.getNameOfTheComponentKind()=="CC"){
+                            trace(k.get_id());
+                        }
+                    }
+                    var o = Serializer.run(i);
+                    var tempJson = {circuit: o};
                     JQuery.ajax( { type:"post",
-                        url: "http://127.0.0.1:3000/app/users/folder?username="+username+"&new=false&folder="+path+"&fileName="+i.get_name(),
+                        url: "http://127.0.0.1:3000/app/users/folder?username="+username+"&new=false&folder="+path+"&fileName="+cdname,
                         contentType: "application/json",
                         data:haxe.Json.stringify(tempJson)}
                     )
@@ -758,6 +807,52 @@ class FolderState {
                 }
             }
         }
+    }
+
+
+    function uploadSubCircuit(cd:CircuitDiagramI,path:String,username:String,callback : Callback0){
+        for(i in cd.get_componentIterator()){
+            if(i.getNameOfTheComponentKind()=="CC"){
+                if(i.get_id()==""){
+                    uploadSubCircuit(i.get_componentKind().getInnerCircuitDiagram(),path,username,callback);
+                    Serializer.USE_CACHE=true;
+                    Serializer.USE_ENUM_INDEX=true;
+                    var o = Serializer.run(i.get_componentKind().getInnerCircuitDiagram());
+                    var tempJson = {circuit: o};
+                    var exp= ~/\s+/;
+                    var check=~/^\w*$/;
+                    var cdname=exp.replace(i.get_componentKind().getInnerCircuitDiagram().get_name(),"_");
+                    cdname=cdname+"_SubCircuitOf_"+exp.replace(cd.get_name(),"_");
+                    if(check.match(cdname)){
+                        JQuery.ajax( { type:"post",
+                            url: "http://127.0.0.1:3000/app/users/folder?username="+username+"&new=false&folder="+path+"&fileName="+cdname,
+                            contentType: "application/json",
+                            data:haxe.Json.stringify(tempJson)}
+                        )
+                        .done( function (text) {
+                            trace(text);
+                            if(text!="fail"){
+                                i.set_id(text);
+                                trace(i.get_id());
+                            }
+                        });
+                    }
+                }
+
+            }
+        }
+        callback(null);
+    }
+
+    function delete(id:String){
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/delete?id="+id,
+            contentType: "application/json",
+            }
+        )
+        .done( function (text) {
+            trace(text);
+        });
     }
 
 }

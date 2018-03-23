@@ -82,14 +82,14 @@ class Main implements util.Async
         var accountMan: AccountManager = AccountManager.build(database, "account");
 
 
-//        stuffMan.find({ "fileList.id":"5aabcbcab1e4b911d0de08de"},function (err : Null<Error>, stuff) : Void {
-//            trace(stuff[0].fileList[0]);
-//        });
+        stuffMan.find({ "fileList.id":"5ab26446b9920407b0b8fab0"},function (err : Null<Error>, stuff) : Void {
+            trace(stuff[0].fileList);
+        });
 
 
-//        stuffMan.remove( {_id:"5a9610fb28608225a0ed5181"},function (err : Null<Error>) : Void {
-//            console.log("inside callback err is " + err);
-//        } ) ;
+        stuffMan.remove( {_id:"5a9610fb28608225a0ed5181"},function (err : Null<Error>) : Void {
+            console.log("inside callback err is " + err);
+        } ) ;
 
 
         var mailTransport = Nodemailer.createTransport({
@@ -284,9 +284,9 @@ class Main implements util.Async
 
         });
 
-        app.post('/app/users/folder',function (req : Request, res : Response,next ) {
+        app.post('/app/users/folder',@async function (req : Request, res : Response,next ) {
             var _req : Dynamic = req;
-            console.log(req.param('new')+req.param('username')+req.param('folder').split("/")[0]+req.param('fileName'));
+            console.log(req.param('new')+req.param('username')+req.param('folder')+req.param('fileName'));
             var stufftemp =stuffMan;
             /**
             *
@@ -349,7 +349,7 @@ class Main implements util.Async
                             res.send("patherror");
                         }
                 }
-                if(id==null){
+                else if(id==null){
                     res.send("patherror");
                 }
             }
@@ -402,7 +402,7 @@ class Main implements util.Async
                             Folder[0].fileList.push({fileName:req.param("fileName"),id:Std.string(NewData._id),fileType:"Circuit"});
                             var err, updated= @async stufftemp.update({"_id" : id},{"fileList":Folder[0].fileList});
                             trace(err);
-                            res.send("success");
+                            res.send(Std.string(NewData._id));
                         }
                         else{
                             var err, stuff = @async stufftemp.find({_id:fileId});
@@ -434,11 +434,30 @@ class Main implements util.Async
 
 
         app.post('/app/users/delete',function(req:Request,res:Response,next){
-            var path : Array<String> =req.param('folder').split("/");
-            var err, id = @async findFileId(path,stuffMan);
-            stuffMan.remove( {"parentid":id,"fileName":req.param("fileName")},function (err : Null<Error>) : Void {
-            console.log("inside callback err is " + err);
-            } ) ;
+            var err,data = @async stuffMan.find({"fileList.id":req.param("id")});
+            if(err==null){
+                if(data.length!=0){
+                    for(i in data[0].fileList){
+                        if(i.id==req.param("id")){
+                            data[0].fileList.remove(i);
+                        }
+                    }
+                    var err1, updatedata = @async stuffMan.update({_id: data[0]._id},{"fileList":data[0].fileList});
+                    if(err1==null){
+                        res.send("success");
+                    }
+                    else{
+                        res.send("fail");
+                    }
+                }
+                else{
+                    res.send("fail");
+                }
+            }
+            else{
+                res.send("fail");
+            }
+
         });
 
         app.post('/app/users/download',function(req:Request,res:Response,next){
@@ -446,6 +465,21 @@ class Main implements util.Async
             if(err2==null){
                 if(data1.length!=0){
                     res.send(data1[0].version[req.param("version")].contents);
+                }
+                else{
+                    res.send("fail");
+                }
+            }
+            else{
+                res.send("fail");
+            }
+        });
+
+        app.post('/app/users/downloadSub',function(req:Request,res:Response,next){
+            var err2, data1 = @async stuffMan.find({_id:req.param("id")});
+            if(err2==null){
+                if(data1.length!=0){
+                    res.send(data1[0].version[data1[0].version.length-1].contents);
                 }
                 else{
                     res.send("fail");

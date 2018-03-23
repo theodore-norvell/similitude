@@ -27,9 +27,6 @@ interface ComponentKind {
 
     public function getname():String;
 
-    public function getDelay():Int;
-
-    public function setDelay(value:Int):Int;
 
     public function getAttr():Array<Attribute>;
 

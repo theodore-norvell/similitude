@@ -25,6 +25,7 @@ import com.mun.model.attribute.AttrValue;
 import com.mun.model.attribute.StringValue;
 import com.mun.model.attribute.IntValue;
 import com.mun.model.attribute.OrientationValue;
+import com.mun.model.enumeration.AttrType;
 
 /**
  * Component composite by gates and ports, in this class
@@ -85,13 +86,13 @@ class Component extends Observable{
 
         }
         for(n in componentKind.getAttr()){
-            if(n.getName()=="delay"){
+            if(n.getAttrType()==AttrType.INT){
                 list.push(new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
             }
-            else if(n.getName()=="name"){
+            else if(n.getAttrType()==AttrType.STRING){
                 list.push(new NamePair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
             }
-            else if(n.getName()=="orientation"){
+            else if(n.getAttrType()==AttrType.Orientation){
                 list.push(new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
             }
         }
@@ -196,6 +197,26 @@ class Component extends Observable{
         }
     }
 
+    public function get_id():String{
+        if(hasAttr("id")){
+            return  getAttrValue("id").getvalue();
+        }
+        else{
+            return null;
+        }
+    }
+
+    public function set_id(id:String){
+        if(hasAttr("id")){
+            for(i in list){
+                if(i.getAttr().getName()=="id"){
+                    i.update(this,new StringValue(id));
+                }
+            }
+        }
+    }
+
+
     public function get_componentKind():ComponentKind {
         return componentKind;
     }
@@ -233,7 +254,6 @@ class Component extends Observable{
 
     public function set_name(value:String) {
         for(i in list){
-            trace(i.getAttr().getName());
             if(i.getAttr().getName()=="name"){
                 i.update(this,new StringValue(value));
             }

@@ -3353,12 +3353,14 @@ var com_mun_controller_controllerState_FolderState = function() {
 		_gthis.fileListCount++;
 		$("#downloadFile").hide();
 		$("#versionList").hide();
+		$("#deleteFile").hide();
 		window.document.getElementById("path" + username).onclick = function() {
 			$("#FolderNameLabel").show();
 			$("#createFolder").show();
 			$("#uploadCircuit").show();
 			$("#downloadFile").hide();
 			$("#versionList").hide();
+			$("#deleteFile").hide();
 			$("#Fieldpath_root" + username).html("");
 			var path = [];
 			path.push("root");
@@ -3793,7 +3795,6 @@ com_mun_controller_controllerState_FolderState.prototype = {
 						$("#Fieldpath_" + tempString[0]).append("<div id=\"FileCollapseList" + (_gthis.fileListCount == null ? "null" : "" + _gthis.fileListCount) + "\" class=\"panel-collapse collapse out\" >\r\n                            <div class=\"container-fluid\" id=\"Fieldpath_" + tempString[0] + i[0].fileName + "\">\r\n\r\n                            </div>\r\n                        </div>\r\n                    </div><br>");
 						_gthis.fileListCount++;
 						tempArray[0].push(i[0].fileName);
-						haxe_Log.trace(i[0].fileType,{ fileName : "FolderState.hx", lineNumber : 626, className : "com.mun.controller.controllerState.FolderState", methodName : "newCollapse"});
 						if(i[0].fileType == "Folder") {
 							$("#path_" + tempString[0] + i[0].fileName).html("<img src=\"/client/src/icon/folder.png\">" + i[0].fileName);
 							window.document.getElementById("path_" + tempString[0] + i[0].fileName).onclick = (function(tempString1,tempArray1,i2) {
@@ -3803,6 +3804,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 									$("#FolderNameLabel").show();
 									$("#createFolder").show();
 									$("#uploadCircuit").show();
+									$("#deleteFile").show();
 									$("#Fieldpath_" + tempString1[0] + i2[0].fileName).html("");
 									window.document.getElementById("createFolder").onclick = (function(i3) {
 										return function() {
@@ -3826,15 +3828,30 @@ com_mun_controller_controllerState_FolderState.prototype = {
 											_gthis.uploadCircuit(tmp1,path + "/" + i5[0].fileName,username);
 										};
 									})(i2);
+									window.document.getElementById("deleteFile").onclick = (function(tempString2,i6) {
+										return function() {
+											_gthis["delete"](i6[0].id);
+											window.document.getElementById("path_" + tempString2[0]).click();
+										};
+									})(tempString1,i2);
 									_gthis.newCollapse(tempArray1[0]);
 								};
 							})(tempString,tempArray,i);
 						} else if(i[0].fileType == "Circuit") {
 							$("#path_" + tempString[0] + i[0].fileName).html("<img src=\"/client/src/icon/circuit.png\">" + i[0].fileName);
-							window.document.getElementById("path_" + tempString[0] + i[0].fileName).onclick = (function(tempString2,i6) {
+							window.document.getElementById("path_" + tempString[0] + i[0].fileName).onclick = (function(tempString3,i7) {
 								return function() {
-									$("#Fieldpath_" + tempString2[0] + i6[0].fileName).html("");
-									_gthis.selectVersion(i6[0].id);
+									$("#Fieldpath_" + tempString3[0] + i7[0].fileName).html("");
+									$("#FolderNameLabel").hide();
+									$("#createFolder").hide();
+									$("#uploadCircuit").hide();
+									_gthis.selectVersion(i7[0].id);
+									window.document.getElementById("deleteFile").onclick = (function(tempString4,i8) {
+										return function() {
+											_gthis["delete"](i8[0].id);
+											window.document.getElementById("path_" + tempString4[0]).click();
+										};
+									})(tempString3,i7);
 								};
 							})(tempString,i);
 						}
@@ -3844,18 +3861,14 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		});
 	}
 	,createFolder: function(username,path) {
-		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 672, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
+		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 686, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=true&folder=" + path, contentType : "application/json", dataType : "text"}).done(function(text) {
-			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 679, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
 		});
 	}
 	,selectVersion: function(id) {
 		var _gthis = this;
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/showversion?id=" + id, contentType : "application/json", dataType : "text"}).done(function(text) {
 			if(text != "fail") {
-				$("#FolderNameLabel").hide();
-				$("#createFolder").hide();
-				$("#uploadCircuit").hide();
 				$("#selectList").html("");
 				var count = Std.parseInt(text);
 				var i = 0;
@@ -3887,11 +3900,38 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				}
 			}
 			if(flag == true) {
+				_gthis.downloadSubCircuit(cd);
 				_gthis.load(cd);
 			} else {
-				haxe_Log.trace("fail",{ fileName : "FolderState.hx", lineNumber : 733, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
+				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 745, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
 			}
 		});
+	}
+	,downloadSubCircuit: function(cd) {
+		var _gthis = this;
+		var i = cd.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var i2 = [i1];
+			if(i2[0].getNameOfTheComponentKind() == "CC") {
+				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 753, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
+				if(i2[0].get_id() != "") {
+					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/downloadSub?id=" + i2[0].get_id(), contentType : "application/json", dataType : "text"}).done((function(i3) {
+						return function(text) {
+							if(text != "fail") {
+								var tempcd = haxe_Unserializer.run(text);
+								_gthis.downloadSubCircuit(tempcd);
+								(js_Boot.__cast(i3[0].get_componentKind() , com_mun_model_gates_CompoundComponent)).loadCircuit(tempcd);
+							} else {
+								HxOverrides.remove(cd.get_componentArray(),i3[0]);
+							}
+						};
+					})(i2));
+				} else {
+					HxOverrides.remove(cd.get_componentArray(),i2[0]);
+				}
+			}
+		}
 	}
 	,uploadCircuit: function(name,path,username) {
 		var _g = 0;
@@ -3902,18 +3942,62 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			if(i.get_name() == name) {
 				haxe_Serializer.USE_CACHE = true;
 				haxe_Serializer.USE_ENUM_INDEX = true;
-				var o = haxe_Serializer.run(i);
-				var tempJson = { circuit : o};
 				var exp_r = new RegExp("\\s+","".split("u").join(""));
 				var check = new EReg("^\\w*$","");
 				var cdname = i.get_name().replace(exp_r,"_");
 				if(check.match(cdname)) {
-					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + i.get_name(), contentType : "application/json", data : JSON.stringify(tempJson)}).done(function(text) {
-						haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 755, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
+					this.uploadSubCircuit(i,path,username);
+					var k = i.get_componentIterator();
+					while(k.hasNext()) {
+						var k1 = k.next();
+						if(k1.getNameOfTheComponentKind() == "CC") {
+							haxe_Log.trace(k1.get_id(),{ fileName : "FolderState.hx", lineNumber : 791, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
+						}
+					}
+					var o = haxe_Serializer.run(i);
+					var tempJson = { circuit : o};
+					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done(function(text) {
+						haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 802, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
 					});
 				}
 			}
 		}
+	}
+	,uploadSubCircuit: function(cd,path,username) {
+		var i = cd.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var i2 = [i1];
+			if(i2[0].getNameOfTheComponentKind() == "CC") {
+				if(i2[0].get_id() == "") {
+					this.uploadSubCircuit(i2[0].get_componentKind().getInnerCircuitDiagram(),path,username);
+					haxe_Serializer.USE_CACHE = true;
+					haxe_Serializer.USE_ENUM_INDEX = true;
+					var o = haxe_Serializer.run(i2[0].get_componentKind().getInnerCircuitDiagram());
+					var tempJson = { circuit : o};
+					var exp_r = new RegExp("\\s+","".split("u").join(""));
+					var check = new EReg("^\\w*$","");
+					var cdname = i2[0].get_componentKind().getInnerCircuitDiagram().get_name().replace(exp_r,"_");
+					cdname = cdname + "_SubCircuitOf_" + cd.get_name().replace(exp_r,"_");
+					if(check.match(cdname)) {
+						$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done((function(i3) {
+							return function(text) {
+								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 831, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
+								if(text != "fail") {
+									i3[0].set_id(text);
+									haxe_Log.trace(i3[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 834, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
+								}
+							};
+						})(i2));
+					}
+				}
+			}
+		}
+	}
+	,'delete': function(id) {
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/delete?id=" + id, contentType : "application/json"}).done(function(text) {
+			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 851, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
+		});
 	}
 	,__class__: com_mun_controller_controllerState_FolderState
 };
@@ -4336,6 +4420,7 @@ com_mun_model_attribute_StringAttr.prototype = {
 	,__class__: com_mun_model_attribute_StringAttr
 };
 var com_mun_model_attribute_StringValue = function(s) {
+	this.name = "";
 	this.name = s;
 };
 $hxClasses["com.mun.model.attribute.StringValue"] = com_mun_model_attribute_StringValue;
@@ -4366,6 +4451,7 @@ com_mun_model_component_CircuitDiagramI.__name__ = ["com","mun","model","compone
 com_mun_model_component_CircuitDiagramI.prototype = {
 	get_commandManager: null
 	,set_commandManager: null
+	,get_componentArray: null
 	,get_componentIterator: null
 	,get_componentReverseIterator: null
 	,get_linkReverseIterator: null
@@ -4517,6 +4603,9 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 	}
 	,set_commandManager: function(value) {
 		this.commandManager = value;
+	}
+	,get_componentArray: function() {
+		return this.componentArray;
 	}
 	,get_componentIterator: function() {
 		if(this.componentArrayReverseFlag) {
@@ -4844,11 +4933,11 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 	while(_g2 < _g11.length) {
 		var n = _g11[_g2];
 		++_g2;
-		if(n.getName() == "delay") {
+		if(n.getAttrType() == com_mun_model_enumeration_AttrType.INT) {
 			this.list.push(new com_mun_model_attribute_DelayPair(js_Boot.__cast(n , com_mun_model_attribute_IntAttr),(js_Boot.__cast(n , com_mun_model_attribute_IntAttr)).getdefaultvalue()));
-		} else if(n.getName() == "name") {
+		} else if(n.getAttrType() == com_mun_model_enumeration_AttrType.STRING) {
 			this.list.push(new com_mun_model_attribute_NamePair(js_Boot.__cast(n , com_mun_model_attribute_StringAttr),(js_Boot.__cast(n , com_mun_model_attribute_StringAttr)).getdefaultvalue()));
-		} else if(n.getName() == "orientation") {
+		} else if(n.getAttrType() == com_mun_model_enumeration_AttrType.Orientation) {
 			this.list.push(new com_mun_model_attribute_OrientationPair(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr),(js_Boot.__cast(n , com_mun_model_attribute_OrientationAttr)).getdefaultvalue()));
 		}
 	}
@@ -4899,7 +4988,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp2 = _tmp0(_tmp1);
 		if(!_tmp2) {
 			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 120, className : "com.mun.model.component.Component", methodName : "getAttrValue"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 121, className : "com.mun.model.component.Component", methodName : "getAttrValue"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var temp;
@@ -4927,7 +5016,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp2 = _tmp0(_tmp1);
 		if(!_tmp2) {
 			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 140, className : "com.mun.model.component.Component", methodName : "canupdate"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 141, className : "com.mun.model.component.Component", methodName : "canupdate"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		if(this.hasAttr(s)) {
@@ -4944,13 +5033,13 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return false;
 	}
 	,update: function(s,v) {
-		haxe_Log.trace(this.hasAttr(s),{ fileName : "Component.hx", lineNumber : 152, className : "com.mun.model.component.Component", methodName : "update"});
+		haxe_Log.trace(this.hasAttr(s),{ fileName : "Component.hx", lineNumber : 153, className : "com.mun.model.component.Component", methodName : "update"});
 		var _tmp0 = $bind(this,this.hasAttr);
 		var _tmp1 = s;
 		var _tmp2 = _tmp0(_tmp1);
 		if(!_tmp2) {
 			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 153, className : "com.mun.model.component.Component", methodName : "update"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 154, className : "com.mun.model.component.Component", methodName : "update"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		if(this.hasAttr(s)) {
@@ -4997,6 +5086,26 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 			}
 		}
 	}
+	,get_id: function() {
+		if(this.hasAttr("id")) {
+			return this.getAttrValue("id").getvalue();
+		} else {
+			return null;
+		}
+	}
+	,set_id: function(id) {
+		if(this.hasAttr("id")) {
+			var _g = 0;
+			var _g1 = this.list;
+			while(_g < _g1.length) {
+				var i = _g1[_g];
+				++_g;
+				if(i.getAttr().getName() == "id") {
+					i.update(this,new com_mun_model_attribute_StringValue(id));
+				}
+			}
+		}
+	}
 	,get_componentKind: function() {
 		return this.componentKind;
 	}
@@ -5030,7 +5139,6 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			haxe_Log.trace(i.getAttr().getName(),{ fileName : "Component.hx", lineNumber : 236, className : "com.mun.model.component.Component", methodName : "set_name"});
 			if(i.getAttr().getName() == "name") {
 				i.update(this,new com_mun_model_attribute_StringValue(value));
 			}
@@ -6044,8 +6152,6 @@ com_mun_model_gates_ComponentKind.__name__ = ["com","mun","model","gates","Compo
 com_mun_model_gates_ComponentKind.prototype = {
 	getLeastInportNumber: null
 	,getname: null
-	,getDelay: null
-	,setDelay: null
 	,getAttr: null
 	,algorithm: null
 	,createPorts: null
@@ -6189,7 +6295,6 @@ com_mun_model_gates_AND.prototype = $extend(com_mun_model_gates_GateAbstract.pro
 });
 var com_mun_model_gates_CompoundComponent = function(circuitDiagram) {
 	this.attr = [];
-	this.delay = 0;
 	this.nameOfTheComponentKind = "CC";
 	this.circuitDiagram = circuitDiagram;
 	var inputCounter = 0;
@@ -6204,21 +6309,18 @@ var com_mun_model_gates_CompoundComponent = function(circuitDiagram) {
 		}
 	}
 	com_mun_model_gates_GateAbstract.call(this,inputCounter);
-	this.attr.push(new com_mun_model_attribute_IntAttr("delay"));
 	this.attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.attr.push(new com_mun_model_attribute_OrientationAttr());
+	this.attr.push(new com_mun_model_attribute_StringAttr("id"));
 };
 $hxClasses["com.mun.model.gates.CompoundComponent"] = com_mun_model_gates_CompoundComponent;
 com_mun_model_gates_CompoundComponent.__name__ = ["com","mun","model","gates","CompoundComponent"];
 com_mun_model_gates_CompoundComponent.__interfaces__ = [com_mun_model_gates_ComponentKind];
 com_mun_model_gates_CompoundComponent.__super__ = com_mun_model_gates_GateAbstract;
 com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_GateAbstract.prototype,{
-	Ob: null
-	,Obable: null
-	,circuitDiagram: null
+	circuitDiagram: null
 	,outputCounter: null
 	,nameOfTheComponentKind: null
-	,delay: null
 	,attr: null
 	,getAttr: function() {
 		return this.attr;
@@ -6226,16 +6328,14 @@ com_mun_model_gates_CompoundComponent.prototype = $extend(com_mun_model_gates_Ga
 	,setname: function(s) {
 		this.nameOfTheComponentKind = s;
 	}
-	,getDelay: function() {
-		return this.delay;
-	}
-	,setDelay: function(value) {
-		var a = this.delay;
-		this.delay = value;
-		return a;
-	}
 	,getname: function() {
 		return this.nameOfTheComponentKind;
+	}
+	,resetCircuit: function() {
+		this.circuitDiagram = null;
+	}
+	,loadCircuit: function(cd) {
+		this.circuitDiagram = cd;
 	}
 	,getInnerCircuitDiagram: function() {
 		return this.circuitDiagram;
@@ -15455,6 +15555,7 @@ if(typeof($) != "undefined" && $.fn != null) {
 	};
 }
 StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
+com_mun_controller_controllerState_FolderState.__meta__ = { fields : { uploadSubCircuit : { async : null}}};
 com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
 com_mun_global_Constant.pointToEndpointDistance = 6;

@@ -150,6 +150,10 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
         this.commandManager = value;
     }
 
+    public function get_componentArray():Array<Component>{
+        return componentArray;
+    }
+
     public function get_componentIterator():Iterator<Component>{
         if(componentArrayReverseFlag){
             componentArrayReverse();

@@ -28,12 +28,9 @@ import com.mun.model.component.Port;
 * compound Component
 **/
 class CompoundComponent implements ComponentKind extends GateAbstract{
-    var Ob:Observer;
-    var Obable:Observable;
     var circuitDiagram:CircuitDiagramI;
     var outputCounter:Int;
     var nameOfTheComponentKind:String="CC";
-    var delay:Int=0;//delay of the component
     var attr:Array<Attribute>=new Array<Attribute>();
 
     public function getAttr():Array<Attribute>{
@@ -45,18 +42,17 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         nameOfTheComponentKind=s;
     }
 
-    public function getDelay():Int{
-        return delay;
-    }
-
-    public function setDelay(value:Int):Int{
-        var a:Int=delay;
-        delay=value;
-        return a;
-    }
 
     public function getname():String{
         return nameOfTheComponentKind;
+    }
+
+    public function resetCircuit(){
+        circuitDiagram=null;
+    }
+
+    public function loadCircuit(cd:CircuitDiagramI){
+        circuitDiagram=cd;
     }
 
 
@@ -72,11 +68,10 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
                 outputCounter++;
             }
         }
-
         super(inputCounter);
-        attr.push(new IntAttr("delay"));
         attr.push(new StringAttr("name"));
         attr.push(new OrientationAttr());
+        attr.push(new StringAttr("id"));
     }
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{
