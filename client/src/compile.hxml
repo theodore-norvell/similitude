@@ -1,5 +1,5 @@
 -lib tjson
--lib js-kit
+-lib continuation
 -js test.js
 -main Test
 -D js-flatten

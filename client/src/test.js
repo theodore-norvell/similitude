@@ -1267,6 +1267,9 @@ Type.enumIndex = function(e) {
 Type.allEnums = function(e) {
 	return e.__empty_constructs__;
 };
+var com_dongxiguo_continuation_Async = function() { };
+$hxClasses["com.dongxiguo.continuation.Async"] = com_dongxiguo_continuation_Async;
+com_dongxiguo_continuation_Async.__name__ = ["com","dongxiguo","continuation","Async"];
 var com_mun_assertions_Assert = function() { };
 $hxClasses["com.mun.assertions.Assert"] = com_mun_assertions_Assert;
 com_mun_assertions_Assert.__name__ = ["com","mun","assertions","Assert"];
@@ -3386,6 +3389,18 @@ var com_mun_controller_controllerState_FolderState = function() {
 			_gthis.newCollapse(path);
 		};
 	};
+	var CurrentUrl = window.location.href.split("?");
+	var CurrentUsername = CurrentUrl[1].split("=")[1];
+	var CurrentfileListCount = 0;
+	$("#righttab").html("<a data-toggle=\"collapse\" href=\"#CurrentFileCollapseList" + (CurrentfileListCount == null ? "null" : "" + CurrentfileListCount) + "\" id=\"Currentpath" + CurrentUsername + "\"><img src=\"/client/src/icon/folder.png\">" + CurrentUsername + "</a>" + "<div id=\"CurrentFileCollapseList" + (CurrentfileListCount == null ? "null" : "" + CurrentfileListCount) + "\" class=\"panel-collapse collapse out\" >\r\n                            <div class=\"container-fluid\" id=\"CurrentFieldpath_root" + CurrentUsername + "\">\r\n                            </div>\r\n                        </div>\r\n                    </div>");
+	CurrentfileListCount += 1;
+	window.document.getElementById("Currentpath" + CurrentUsername).onclick = function() {
+		$("#CurrentFieldpath_root" + CurrentUsername).html("");
+		var Currentpath = [];
+		Currentpath.push("root");
+		Currentpath.push(CurrentUsername);
+		_gthis.currentnewCollapse(Currentpath,CurrentfileListCount);
+	};
 	window.document.getElementById("import").onclick = function() {
 		var files = document.getElementById("selectFiles").files;
 		var fr = new FileReader();
@@ -3407,6 +3422,7 @@ var com_mun_controller_controllerState_FolderState = function() {
 };
 $hxClasses["com.mun.controller.controllerState.FolderState"] = com_mun_controller_controllerState_FolderState;
 com_mun_controller_controllerState_FolderState.__name__ = ["com","mun","controller","controllerState","FolderState"];
+com_mun_controller_controllerState_FolderState.__interfaces__ = [com_dongxiguo_continuation_Async];
 com_mun_controller_controllerState_FolderState.prototype = {
 	currentState: null
 	,folder: null
@@ -3860,8 +3876,60 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			}
 		});
 	}
+	,currentnewCollapse: function(pathArray,CurrentfileListCount) {
+		var _gthis = this;
+		var path = "";
+		var _g = 0;
+		while(_g < pathArray.length) {
+			var t = pathArray[_g];
+			++_g;
+			path = path + t + "/";
+		}
+		path = path.substring(0,path.length - 1);
+		var url = window.location.href.split("?");
+		var username = url[1].split("=")[1];
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/showfolder?username=" + username + "&folder=" + path, contentType : "application/json", dataType : "text"}).done(function(text) {
+			if(text != "fail") {
+				var list = JSON.parse(text);
+				if(list.length != 0) {
+					var _g1 = 0;
+					while(_g1 < list.length) {
+						var i = [list[_g1]];
+						++_g1;
+						var tempArray = [[]];
+						var _g11 = 0;
+						while(_g11 < pathArray.length) {
+							var k = pathArray[_g11];
+							++_g11;
+							tempArray[0].push(k);
+						}
+						var tempString = [""];
+						var _g12 = 0;
+						while(_g12 < tempArray[0].length) {
+							var i1 = tempArray[0][_g12];
+							++_g12;
+							tempString[0] += i1;
+						}
+						if(i[0].fileType == "Folder") {
+							$("#CurrentFieldpath_" + tempString[0]).append("<a data-toggle=\"collapse\" href=\"#CurrentFileCollapseList" + (CurrentfileListCount == null ? "null" : "" + CurrentfileListCount) + "\" id=\"Currentpath_" + tempString[0] + i[0].fileName + "\">" + i[0].fileName + "</a>");
+							$("#CurrentFieldpath_" + tempString[0]).append("<div id=\"CurrentFileCollapseList" + (CurrentfileListCount == null ? "null" : "" + CurrentfileListCount) + "\" class=\"panel-collapse collapse out\" >\r\n                            <div class=\"container-fluid\" id=\"CurrentFieldpath_" + tempString[0] + i[0].fileName + "\">\r\n\r\n                            </div>\r\n                        </div>\r\n                    </div><br>");
+							CurrentfileListCount += 1;
+							tempArray[0].push(i[0].fileName);
+							$("#Currentpath_" + tempString[0] + i[0].fileName).html("<img src=\"/client/src/icon/folder.png\">" + i[0].fileName);
+							window.document.getElementById("Currentpath_" + tempString[0] + i[0].fileName).onclick = (function(tempString1,tempArray1,i2) {
+								return function() {
+									$("#CurrentFieldpath_" + tempString1[0] + i2[0].fileName).html("");
+									_gthis.currentnewCollapse(tempArray1[0],CurrentfileListCount);
+								};
+							})(tempString,tempArray,i);
+						}
+					}
+				}
+			}
+		});
+	}
 	,createFolder: function(username,path) {
-		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 686, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
+		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 762, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=true&folder=" + path, contentType : "application/json", dataType : "text"}).done(function(text) {
 		});
 	}
@@ -3903,7 +3971,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				_gthis.downloadSubCircuit(cd);
 				_gthis.load(cd);
 			} else {
-				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 745, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
+				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 821, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
 			}
 		});
 	}
@@ -3914,7 +3982,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			var i1 = i.next();
 			var i2 = [i1];
 			if(i2[0].getNameOfTheComponentKind() == "CC") {
-				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 753, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
+				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 829, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
 				if(i2[0].get_id() != "") {
 					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/downloadSub?id=" + i2[0].get_id(), contentType : "application/json", dataType : "text"}).done((function(i3) {
 						return function(text) {
@@ -3946,31 +4014,35 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				var check = new EReg("^\\w*$","");
 				var cdname = i.get_name().replace(exp_r,"_");
 				if(check.match(cdname)) {
-					this.uploadSubCircuit(i,path,username);
+					this.uploadSubCircuit(i,path,username,function() {
+					});
 					var k = i.get_componentIterator();
 					while(k.hasNext()) {
 						var k1 = k.next();
 						if(k1.getNameOfTheComponentKind() == "CC") {
-							haxe_Log.trace(k1.get_id(),{ fileName : "FolderState.hx", lineNumber : 791, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
+							haxe_Log.trace(k1.get_id(),{ fileName : "FolderState.hx", lineNumber : 867, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
 						}
 					}
 					var o = haxe_Serializer.run(i);
 					var tempJson = { circuit : o};
 					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done(function(text) {
-						haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 802, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
+						haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 878, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
 					});
 				}
 			}
 		}
 	}
-	,uploadSubCircuit: function(cd,path,username) {
+	,uploadSubCircuit: function(cd,path,username,__return) {
 		var i = cd.get_componentIterator();
 		while(i.hasNext()) {
 			var i1 = i.next();
 			var i2 = [i1];
 			if(i2[0].getNameOfTheComponentKind() == "CC") {
 				if(i2[0].get_id() == "") {
-					this.uploadSubCircuit(i2[0].get_componentKind().getInnerCircuitDiagram(),path,username);
+					this.uploadSubCircuit(i2[0].get_componentKind().getInnerCircuitDiagram(),path,username,(function() {
+						return function() {
+						};
+					})());
 					haxe_Serializer.USE_CACHE = true;
 					haxe_Serializer.USE_ENUM_INDEX = true;
 					var o = haxe_Serializer.run(i2[0].get_componentKind().getInnerCircuitDiagram());
@@ -3982,10 +4054,9 @@ com_mun_controller_controllerState_FolderState.prototype = {
 					if(check.match(cdname)) {
 						$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done((function(i3) {
 							return function(text) {
-								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 831, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
+								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 907, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
 								if(text != "fail") {
 									i3[0].set_id(text);
-									haxe_Log.trace(i3[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 834, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
 								}
 							};
 						})(i2));
@@ -3993,10 +4064,11 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				}
 			}
 		}
+		__return();
 	}
 	,'delete': function(id) {
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/delete?id=" + id, contentType : "application/json"}).done(function(text) {
-			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 851, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
+			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 926, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
 		});
 	}
 	,__class__: com_mun_controller_controllerState_FolderState
@@ -15555,7 +15627,6 @@ if(typeof($) != "undefined" && $.fn != null) {
 	};
 }
 StringTools.winMetaCharacters = [32,40,41,37,33,94,34,60,62,38,124,10,13,44,59];
-com_mun_controller_controllerState_FolderState.__meta__ = { fields : { uploadSubCircuit : { async : null}}};
 com_mun_global_Constant.portRadius = 3;
 com_mun_global_Constant.pointToLineDistance = 5;
 com_mun_global_Constant.pointToEndpointDistance = 6;

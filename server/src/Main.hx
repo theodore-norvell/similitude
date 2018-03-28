@@ -1,11 +1,7 @@
 package ;
 
-import tjson.TJSON;
-import tjson.TJSON;
 import Std;
 import String;
-import tjson.TJSON;
-import tjson.TJSON;
 import org.bsonspec.ObjectID;
 import js.Node;
 import js.node.Http;
@@ -20,8 +16,6 @@ import js.npm.mongoose.macro.Model;
 import js.support.Error;
 import js.support.Callback;
 import com.mun.model.component.CircuitDiagram;
-
-import tjson.TJSON;
 
 
 @:schemaOptions({
@@ -87,9 +81,9 @@ class Main implements util.Async
         });
 
 
-        stuffMan.remove( {_id:"5a9610fb28608225a0ed5181"},function (err : Null<Error>) : Void {
-            console.log("inside callback err is " + err);
-        } ) ;
+//        stuffMan.remove( {_id:"5a9610fb28608225a0ed5181"},function (err : Null<Error>) : Void {
+//            console.log("inside callback err is " + err);
+//        } ) ;
 
 
         var mailTransport = Nodemailer.createTransport({

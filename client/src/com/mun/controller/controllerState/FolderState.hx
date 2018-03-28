@@ -25,11 +25,10 @@ import com.mun.model.enumeration.F_STATE;
 import com.mun.global.Constant.*;
 import haxe.Serializer;
 import haxe.Unserializer;
-import js.support.Error;
-import js.support.Callback;
+import com.dongxiguo.continuation.Async;
 
 
-class FolderState {
+class FolderState implements Async{
     var currentState:F_STATE;
 
     var folder:FolderI;
@@ -171,7 +170,27 @@ class FolderState {
             };
         };
 
-//        Browser.document.getElementById('')
+
+        var CurrentUrl = Browser.window.location.href.split("?");
+        var CurrentUsername:String = (CurrentUrl[1].split("="))[1];
+        var CurrentfileListCount:Int = 0;
+        new JQuery('#righttab').html("<a data-toggle=\"collapse\" href=\"#CurrentFileCollapseList"+Std.string(CurrentfileListCount)+"\" id=\"Currentpath"+CurrentUsername+"\"><img src=\"/client/src/icon/folder.png\">"+CurrentUsername+"</a>"
+                                      +"<div id=\"CurrentFileCollapseList"+Std.string(CurrentfileListCount)+"\" class=\"panel-collapse collapse out\" >
+                            <div class=\"container-fluid\" id=\"CurrentFieldpath_root"+CurrentUsername+"\">
+                            </div>
+                        </div>
+                    </div>");
+        CurrentfileListCount++;
+        Browser.document.getElementById("Currentpath"+CurrentUsername).onclick = function(){
+            new JQuery('#CurrentFieldpath_root'+CurrentUsername).html("");
+            var Currentpath:Array<String>=new Array<String>();
+            Currentpath.push("root");
+            Currentpath.push(CurrentUsername);
+            currentnewCollapse(Currentpath,CurrentfileListCount);
+        };
+
+
+
 
         Browser.document.getElementById("import").onclick = function(){
             var files = untyped document.getElementById('selectFiles').files;
@@ -187,6 +206,7 @@ class FolderState {
 
             fr.readAsText(files.item(0));
         };
+
 
         Browser.document.getElementById("createNewCircuitDiagram").onclick = function(){
             new JQuery("li[id$='-li']").removeClass("active");
@@ -684,6 +704,60 @@ class FolderState {
     }
 
 
+    function currentnewCollapse(pathArray:Array<String>,CurrentfileListCount:Int){
+        var path:String="";
+        for(t in pathArray){
+            path=path+t+"/";
+        }
+        path=path.substring(0,path.length-1);
+        var url = Browser.window.location.href.split("?");
+        var username:String = (url[1].split("="))[1];
+        //trace(pathArray);
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/showfolder?username="+username+"&folder="+path,
+            contentType: "application/json",
+            dataType:"text",
+        }
+        )
+        .done( function (text) {
+            if(text=="fail"){}
+            else{
+                var list:Array<{_id:String,fileName:String,id:String,fileType:String}>=haxe.Json.parse(text);
+                if(list.length!=0){
+                    for(i in list){
+                        var tempArray:Array<String>=new Array<String>();
+                        for(k in pathArray){
+                            tempArray.push(k);
+                        }
+                        var tempString:String="";
+                        for(i in tempArray){
+                            tempString=tempString+i;
+                        }
+                        //trace("Fieldpath_"+tempString);
+                        if(i.fileType=="Folder"){
+                            new JQuery('#CurrentFieldpath_'+tempString).append("<a data-toggle=\"collapse\" href=\"#CurrentFileCollapseList"+Std.string(CurrentfileListCount)+"\" id=\"Currentpath_"+tempString+i.fileName+"\">"+i.fileName+"</a>");
+                            new JQuery('#CurrentFieldpath_'+tempString).append("<div id=\"CurrentFileCollapseList"+Std.string(CurrentfileListCount)+"\" class=\"panel-collapse collapse out\" >
+                            <div class=\"container-fluid\" id=\"CurrentFieldpath_"+tempString+i.fileName+"\">
+
+                            </div>
+                        </div>
+                    </div><br>");
+                            CurrentfileListCount++;
+                            tempArray.push(i.fileName);
+                            new JQuery('#Currentpath_'+tempString+i.fileName).html("<img src=\"/client/src/icon/folder.png\">"+i.fileName);
+                            Browser.document.getElementById("Currentpath_"+tempString+i.fileName).onclick=function(){
+                                new JQuery('#CurrentFieldpath_'+tempString+i.fileName).html("");
+                                currentnewCollapse(tempArray,CurrentfileListCount);
+                            };
+                        }
+                    }
+                }
+            }
+
+        });
+    }
+
+
     function createFolder(username:String,path:String){
         trace(path);
         JQuery.ajax( { type:"post",
@@ -787,7 +861,7 @@ class FolderState {
                 var check=~/^\w*$/;
                 var cdname=exp.replace(i.get_name(),"_");
                 if(check.match(cdname)){
-                    var err = @async uploadSubCircuit(i,path,username);
+                    uploadSubCircuit(i,path,username,function(){});
                     for(k in i.get_componentIterator()){
                         if(k.getNameOfTheComponentKind()=="CC"){
                             trace(k.get_id());
@@ -810,11 +884,11 @@ class FolderState {
     }
 
 
-    function uploadSubCircuit(cd:CircuitDiagramI,path:String,username:String,callback : Callback0){
+    @async function uploadSubCircuit(cd:CircuitDiagramI,path:String,username:String){
         for(i in cd.get_componentIterator()){
             if(i.getNameOfTheComponentKind()=="CC"){
                 if(i.get_id()==""){
-                    uploadSubCircuit(i.get_componentKind().getInnerCircuitDiagram(),path,username,callback);
+                    uploadSubCircuit(i.get_componentKind().getInnerCircuitDiagram(),path,username,function(){});
                     Serializer.USE_CACHE=true;
                     Serializer.USE_ENUM_INDEX=true;
                     var o = Serializer.run(i.get_componentKind().getInnerCircuitDiagram());
@@ -833,7 +907,6 @@ class FolderState {
                             trace(text);
                             if(text!="fail"){
                                 i.set_id(text);
-                                trace(i.get_id());
                             }
                         });
                     }
@@ -841,7 +914,6 @@ class FolderState {
 
             }
         }
-        callback(null);
     }
 
     function delete(id:String){
