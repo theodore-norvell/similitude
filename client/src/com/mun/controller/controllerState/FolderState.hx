@@ -52,6 +52,7 @@ class FolderState implements Async{
     var circuitDiagramArray:Array<CircuitDiagramI>;
     var previouseCircuitDiagramArray:Array<CircuitDiagramI>;
     var currentIndex:Int = -1;
+    var selectedPath:String="";
 
     var fileListCount:Int =0;
 
@@ -140,6 +141,7 @@ class FolderState implements Async{
             new JQuery('#downloadFile').hide();
             new JQuery('#versionList').hide();
             new JQuery('#deleteFile').hide();
+            new JQuery('#deleteBox').hide();
             Browser.document.getElementById("path"+username).onclick = function(){
                 new JQuery('#FolderNameLabel').show();
                 new JQuery('#createFolder').show();
@@ -147,6 +149,7 @@ class FolderState implements Async{
                 new JQuery('#downloadFile').hide();
                 new JQuery('#versionList').hide();
                 new JQuery('#deleteFile').hide();
+                new JQuery('#deleteBox').hide();
                 new JQuery('#Fieldpath_root'+username).html("");
                 var path:Array<String>=new Array<String>();
                 path.push("root");
@@ -181,11 +184,14 @@ class FolderState implements Async{
                         </div>
                     </div>");
         CurrentfileListCount++;
+        new JQuery('#CurrentPathLabel').html(CurrentUsername);
+        selectedPath="root/"+CurrentUsername;
         Browser.document.getElementById("Currentpath"+CurrentUsername).onclick = function(){
             new JQuery('#CurrentFieldpath_root'+CurrentUsername).html("");
             var Currentpath:Array<String>=new Array<String>();
             Currentpath.push("root");
             Currentpath.push(CurrentUsername);
+            new JQuery('#CurrentPathLabel').html(CurrentUsername);
             currentnewCollapse(Currentpath,CurrentfileListCount);
         };
 
@@ -657,6 +663,7 @@ class FolderState implements Async{
                                 new JQuery('#createFolder').show();
                                 new JQuery('#uploadCircuit').show();
                                 new JQuery('#deleteFile').show();
+                                new JQuery('#deleteBox').show();
                                 new JQuery('#Fieldpath_'+tempString+i.fileName).html("");
                                 Browser.document.getElementById("createFolder").onclick= function(){
                                     if(Browser.document.getElementById("FolderNameLabel").itemValue!=""){
@@ -747,6 +754,8 @@ class FolderState implements Async{
                             new JQuery('#Currentpath_'+tempString+i.fileName).html("<img src=\"/client/src/icon/folder.png\">"+i.fileName);
                             Browser.document.getElementById("Currentpath_"+tempString+i.fileName).onclick=function(){
                                 new JQuery('#CurrentFieldpath_'+tempString+i.fileName).html("");
+                                new JQuery('#CurrentPathLabel').html(path.substring(5,path.length)+"/"+i.fileName);
+                                selectedPath=path+"/"+i.fileName;
                                 currentnewCollapse(tempArray,CurrentfileListCount);
                             };
                         }
