@@ -997,49 +997,11 @@ StringTools.quoteWinArg = function(argument,escapeMetaCharacters) {
 		return argument;
 	}
 };
-var Test = function(f) {
-	this.folderState = f;
-	this.b = window.document.getElementById("upload");
-	this.b.addEventListener("click",$bind(this,this.regist),false);
-};
+var Test = function() { };
 $hxClasses["Test"] = Test;
 Test.__name__ = ["Test"];
 Test.main = function() {
 	var folderState = new com_mun_controller_controllerState_FolderState();
-	var test = new Test(folderState);
-};
-Test.prototype = {
-	folderState: null
-	,b: null
-	,regist: function() {
-		var _gthis = this;
-		haxe_Serializer.USE_CACHE = true;
-		haxe_Serializer.USE_ENUM_INDEX = true;
-		var o = haxe_Serializer.run(this.folderState.circuitDiagram);
-		haxe_Log.trace(o,{ fileName : "Test.hx", lineNumber : 38, className : "Test", methodName : "regist"});
-		haxe_Log.trace("test00",{ fileName : "Test.hx", lineNumber : 39, className : "Test", methodName : "regist"});
-		var tmp = haxe_Log.trace;
-		var o1 = haxe_Unserializer.run(o);
-		tmp(o1 == null ? null : js_Boot.getClass(o1),{ fileName : "Test.hx", lineNumber : 40, className : "Test", methodName : "regist"});
-		haxe_Log.trace("test01",{ fileName : "Test.hx", lineNumber : 41, className : "Test", methodName : "regist"});
-		var tempJson = { circuit : o};
-		var exp_r = new RegExp("\\s+","".split("u").join(""));
-		var check = new EReg("^\\w*$","");
-		var cdname = this.folderState.circuitDiagram.get_name().replace(exp_r,"_");
-		if(check.match(cdname)) {
-			haxe_Log.trace("pass",{ fileName : "Test.hx", lineNumber : 47, className : "Test", methodName : "regist"});
-			$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users?username=test&new=false&folder=root/test/abc&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done(function(text) {
-				haxe_Log.trace(text,{ fileName : "Test.hx", lineNumber : 54, className : "Test", methodName : "regist"});
-				var tmp1 = haxe_Log.trace;
-				var o2 = haxe_Unserializer.run(text);
-				tmp1(o2 == null ? null : js_Boot.getClass(o2),{ fileName : "Test.hx", lineNumber : 55, className : "Test", methodName : "regist"});
-				_gthis.folderState.load(haxe_Unserializer.run(text));
-			});
-		} else {
-			haxe_Log.trace("name error",{ fileName : "Test.hx", lineNumber : 62, className : "Test", methodName : "regist"});
-		}
-	}
-	,__class__: Test
 };
 var ValueType = $hxClasses["ValueType"] = { __ename__ : ["ValueType"], __constructs__ : ["TNull","TInt","TFloat","TBool","TObject","TFunction","TClass","TEnum","TUnknown"] };
 ValueType.TNull = ["TNull",0];
@@ -3285,8 +3247,12 @@ com_mun_controller_controllerState_ControllerCanvasContext.prototype = {
 };
 var com_mun_controller_controllerState_FolderState = function() {
 	this.fileListCount = 0;
+	this.selectedPath = "";
 	this.currentIndex = -1;
 	var _gthis = this;
+	var initalUrl = window.location.href.split("?");
+	var initialUsername = initalUrl[1].split("=")[1];
+	this.selectedPath = "root/" + initialUsername;
 	this.updateCircuitDiagramMap = new haxe_ds_ObjectMap();
 	this.updateToolBarMap = new haxe_ds_ObjectMap();
 	this.updateCanvasMap = new haxe_ds_ObjectMap();
@@ -3332,6 +3298,8 @@ var com_mun_controller_controllerState_FolderState = function() {
 			} else {
 				$("#nameofcddiv").removeClass("has-success").addClass("has-error");
 			}
+			$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/changename?id=" + _gthis.circuitDiagram.get_id() + "&name=" + newName, contentType : "application/json", dataType : "text"}).done(function(text) {
+			});
 		}
 	});
 	$("#nameofcd").bind("focusout",function() {
@@ -3385,7 +3353,7 @@ var com_mun_controller_controllerState_FolderState = function() {
 				$("#selectCircuit").append("<option>" + i2.get_name() + "</option>");
 			}
 			window.document.getElementById("uploadCD").onclick = function() {
-				var tmp2 = Std.string($("#selectList").val());
+				var tmp2 = Std.string($("#selectCircuit").val());
 				_gthis.uploadCircuit(tmp2,"root/" + username,username);
 			};
 			_gthis.newCollapse(path);
@@ -3403,6 +3371,7 @@ var com_mun_controller_controllerState_FolderState = function() {
 		Currentpath.push("root");
 		Currentpath.push(CurrentUsername);
 		$("#CurrentPathLabel").html(CurrentUsername);
+		_gthis.selectedPath = "root/" + CurrentUsername;
 		_gthis.currentnewCollapse(Currentpath,CurrentfileListCount);
 	};
 	window.document.getElementById("import").onclick = function() {
@@ -3448,6 +3417,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 	,circuitDiagramArray: null
 	,previouseCircuitDiagramArray: null
 	,currentIndex: null
+	,selectedPath: null
 	,fileListCount: null
 	,searchName: null
 	,checkState: function() {
@@ -3592,6 +3562,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.controllerCanvasContext.boxTypeList();
 	}
 	,createATotallyNewCircuitDiagram: function() {
+		var _gthis = this;
 		this.circuitDiagram = this.folder.createNewCircuitDiagram();
 		this.circuitDiagramArray.push(this.circuitDiagram);
 		this.addNewCicruitDiagramTab();
@@ -3607,6 +3578,39 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		this.sideBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.updateToolBar.setControllerCanvasContext(this.controllerCanvasContext);
 		this.pushToMap();
+		var url = window.location.href.split("?");
+		var username = url[1].split("=")[1];
+		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/showfolder?username=" + username + "&folder=" + this.selectedPath, contentType : "application/json", dataType : "text"}).done(function(text) {
+			if(text != "fail") {
+				var list = JSON.parse(text);
+				var count = 1;
+				var exp_r = new RegExp("\\s+","".split("u").join(""));
+				while(true) {
+					var tmp = _gthis.circuitDiagram.get_name().replace(exp_r,"_");
+					if(!_gthis.checkexit(tmp,list)) {
+						break;
+					}
+					var oldname = _gthis.circuitDiagram.get_name();
+					var newName = "Untitled_" + count;
+					if(_gthis.folder.changeCircuitDiagramName(_gthis.circuitDiagram.get_name(),"Untitled_" + count,_gthis.circuitDiagram)) {
+						$("#nameofcddiv").removeClass("has-error").addClass("has-success");
+						_gthis.changeNameForHTMLStuff(oldname,newName);
+						var i = _gthis.sideBarMap.iterator();
+						while(i.hasNext()) {
+							var i1 = i.next();
+							if(i1.isGateNameExist(oldname)) {
+								i1.removeCompoundComponentToGateNameArray(oldname);
+								i1.pushCompoundComponentToGateNameArray(newName);
+							}
+						}
+					}
+					++count;
+				}
+			}
+		}).then(function() {
+			var tmp1 = _gthis.circuitDiagram.get_name();
+			_gthis.uploadCircuit(tmp1,_gthis.selectedPath,username);
+		});
 	}
 	,load: function(cd) {
 		$("li[id$='-li']").removeClass("active");
@@ -3677,41 +3681,74 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		$("#circuitdiagramul").append(liHtmlString);
 		$("#circuitdiagramcanvas").append(canvasHTMLString);
 		window.document.getElementById(this.circuitDiagram.get_name() + "-li").onclick = function(event) {
-			var id = event.target.id;
-			id = id.substring(0,id.indexOf("-"));
-			_gthis.previouseCircuitDiagramArray.push(_gthis.circuitDiagram);
-			_gthis.setToCurrentCircuitDiagram(id);
-			$(".tab-pane[id$='-panel']").removeClass("active");
-			$(".tab-pane[id$='-sidebar']").removeClass("active");
-			$(".tab-pane[id^='" + id + "-panel']").addClass("active");
-			$(".tab-pane[id^='" + id + "-sidebar']").addClass("active");
-			_gthis.currentIndex = _gthis.circuitDiagramArray.indexOf(_gthis.circuitDiagram);
-			_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
-			_gthis.checkState();
+			haxe_Serializer.USE_CACHE = true;
+			haxe_Serializer.USE_ENUM_INDEX = true;
+			var exp_r = new RegExp("\\s+","".split("u").join(""));
+			var check = new EReg("^\\w*$","");
+			var cdname = _gthis.circuitDiagram.get_name().replace(exp_r,"_");
+			if(check.match(cdname)) {
+				var tempList = [];
+				var k = _gthis.circuitDiagram.get_componentIterator();
+				while(k.hasNext()) {
+					var k1 = k.next();
+					if(k1.getNameOfTheComponentKind() == "CC") {
+						var tmp = k1.get_componentKind().getInnerCircuitDiagram();
+						tempList.push(tmp);
+						(js_Boot.__cast(k1.get_componentKind() , com_mun_model_gates_CompoundComponent)).resetCircuit();
+					}
+				}
+				var o = haxe_Serializer.run(_gthis.circuitDiagram);
+				var tempJson = { circuit : o};
+				$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/update?id=" + _gthis.circuitDiagram.get_id(), contentType : "application/json", data : JSON.stringify(tempJson)}).done(function(text) {
+					haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 568, className : "com.mun.controller.controllerState.FolderState", methodName : "addNewCicruitDiagramTab"});
+					if(text != "fail") {
+						var count = 0;
+						var k2 = _gthis.circuitDiagram.get_componentIterator();
+						while(k2.hasNext()) {
+							var k3 = k2.next();
+							if(k3.getNameOfTheComponentKind() == "CC") {
+								(js_Boot.__cast(k3.get_componentKind() , com_mun_model_gates_CompoundComponent)).loadCircuit(tempList[count]);
+								++count;
+							}
+						}
+					}
+				}).then(function() {
+					var id = event.target.id;
+					id = id.substring(0,id.indexOf("-"));
+					_gthis.previouseCircuitDiagramArray.push(_gthis.circuitDiagram);
+					_gthis.setToCurrentCircuitDiagram(id);
+					$(".tab-pane[id$='-panel']").removeClass("active");
+					$(".tab-pane[id$='-sidebar']").removeClass("active");
+					$(".tab-pane[id^='" + id + "-panel']").addClass("active");
+					$(".tab-pane[id^='" + id + "-sidebar']").addClass("active");
+					_gthis.currentIndex = _gthis.circuitDiagramArray.indexOf(_gthis.circuitDiagram);
+					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+					_gthis.checkState();
+					haxe_Log.trace("switchtab",{ fileName : "FolderState.hx", lineNumber : 593, className : "com.mun.controller.controllerState.FolderState", methodName : "addNewCicruitDiagramTab"});
+				});
+			}
 		};
 		this.registerCloseButton(this.circuitDiagram.get_name());
 	}
 	,registerCloseButton: function(closeButtonNamePrefix) {
 		var _gthis = this;
 		window.document.getElementById(closeButtonNamePrefix + "-close").onclick = function(event) {
-			if(window.confirm("Close this Diagram means delete it forever, do you still want to do it?")) {
-				var id = event.target.id;
-				id = id.substring(0,id.indexOf("-"));
-				window.document.getElementById(id + "-li").remove();
-				window.document.getElementById(id + "-panel").remove();
-				window.document.getElementById(id + "-sidebar").remove();
-				_gthis.deleteCircuitDiagram(id);
-				if(_gthis.circuitDiagramArray.length == 0) {
-					_gthis.circuitDiagram = null;
-					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
-					_gthis.checkState();
-				} else {
-					_gthis.currentState = com_mun_model_enumeration_F_$STATE.PREVIOUS;
-					_gthis.checkState();
-					$("[id^='" + _gthis.circuitDiagram.get_name() + "']").addClass("active");
-					_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
-					_gthis.checkState();
-				}
+			var id = event.target.id;
+			id = id.substring(0,id.indexOf("-"));
+			window.document.getElementById(id + "-li").remove();
+			window.document.getElementById(id + "-panel").remove();
+			window.document.getElementById(id + "-sidebar").remove();
+			_gthis.deleteCircuitDiagram(id);
+			if(_gthis.circuitDiagramArray.length == 0) {
+				_gthis.circuitDiagram = null;
+				_gthis.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
+				_gthis.checkState();
+			} else {
+				_gthis.currentState = com_mun_model_enumeration_F_$STATE.PREVIOUS;
+				_gthis.checkState();
+				$("[id^='" + _gthis.circuitDiagram.get_name() + "']").addClass("active");
+				_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+				_gthis.checkState();
 			}
 		};
 	}
@@ -3866,6 +3903,8 @@ com_mun_controller_controllerState_FolderState.prototype = {
 									$("#FolderNameLabel").hide();
 									$("#createFolder").hide();
 									$("#uploadCircuit").hide();
+									$("#deleteFile").show();
+									$("#deleteBox").show();
 									_gthis.selectVersion(i7[0].id);
 									window.document.getElementById("deleteFile").onclick = (function(tempString4,i8) {
 										return function() {
@@ -3925,6 +3964,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 								return function() {
 									$("#CurrentFieldpath_" + tempString1[0] + i2[0].fileName).html("");
 									$("#CurrentPathLabel").html(path.substring(5,path.length) + "/" + i2[0].fileName);
+									_gthis.selectedPath = path + "/" + i2[0].fileName;
 									_gthis.currentnewCollapse(tempArray1[0],CurrentfileListCount);
 								};
 							})(tempString,tempArray,i);
@@ -3935,7 +3975,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		});
 	}
 	,createFolder: function(username,path) {
-		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 768, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
+		haxe_Log.trace(path,{ fileName : "FolderState.hx", lineNumber : 858, className : "com.mun.controller.controllerState.FolderState", methodName : "createFolder"});
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=true&folder=" + path, contentType : "application/json", dataType : "text"}).done(function(text) {
 		});
 	}
@@ -3977,7 +4017,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				_gthis.downloadSubCircuit(cd);
 				_gthis.load(cd);
 			} else {
-				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 827, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
+				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 917, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
 			}
 		});
 	}
@@ -3988,14 +4028,25 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			var i1 = i.next();
 			var i2 = [i1];
 			if(i2[0].getNameOfTheComponentKind() == "CC") {
-				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 835, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
+				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 925, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
 				if(i2[0].get_id() != "") {
 					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/downloadSub?id=" + i2[0].get_id(), contentType : "application/json", dataType : "text"}).done((function(i3) {
 						return function(text) {
 							if(text != "fail") {
 								var tempcd = haxe_Unserializer.run(text);
-								_gthis.downloadSubCircuit(tempcd);
-								(js_Boot.__cast(i3[0].get_componentKind() , com_mun_model_gates_CompoundComponent)).loadCircuit(tempcd);
+								if(_gthis.downloadSubCircuit(tempcd) == true) {
+									(js_Boot.__cast(i3[0].get_componentKind() , com_mun_model_gates_CompoundComponent)).loadCircuit(tempcd);
+									_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
+									_gthis.checkState();
+									_gthis.updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(_gthis.updateCircuitDiagram);
+									_gthis.updateCircuitDiagram.setUpdateToolBar(_gthis.updateToolBar);
+									_gthis.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(_gthis.circuitDiagram,_gthis.canvas,_gthis.context);
+									_gthis.updateCircuitDiagram.setUpdateCanvas(_gthis.updateCanvas);
+									_gthis.sideBar = new com_mun_controller_controllerState_SideBar(_gthis.updateCircuitDiagram,_gthis.circuitDiagram,_gthis.folder);
+									_gthis.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(_gthis.circuitDiagram,_gthis.updateCircuitDiagram,_gthis.sideBar,_gthis.updateToolBar,_gthis.canvas,_gthis.updateCanvas);
+									_gthis.sideBar.setControllerCanvasContext(_gthis.controllerCanvasContext);
+									_gthis.updateToolBar.setControllerCanvasContext(_gthis.controllerCanvasContext);
+								}
 							} else {
 								HxOverrides.remove(cd.get_componentArray(),i3[0]);
 							}
@@ -4006,34 +4057,49 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				}
 			}
 		}
+		return true;
 	}
 	,uploadCircuit: function(name,path,username) {
 		var _g = 0;
 		var _g1 = this.circuitDiagramArray;
 		while(_g < _g1.length) {
-			var i = _g1[_g];
+			var i = [_g1[_g]];
 			++_g;
-			if(i.get_name() == name) {
+			if(i[0].get_name() == name) {
 				haxe_Serializer.USE_CACHE = true;
 				haxe_Serializer.USE_ENUM_INDEX = true;
 				var exp_r = new RegExp("\\s+","".split("u").join(""));
 				var check = new EReg("^\\w*$","");
-				var cdname = i.get_name().replace(exp_r,"_");
+				var cdname = i[0].get_name().replace(exp_r,"_");
 				if(check.match(cdname)) {
-					this.uploadSubCircuit(i,path,username,function() {
-					});
-					var k = i.get_componentIterator();
+					var tempList = [[]];
+					var k = i[0].get_componentIterator();
 					while(k.hasNext()) {
 						var k1 = k.next();
 						if(k1.getNameOfTheComponentKind() == "CC") {
-							haxe_Log.trace(k1.get_id(),{ fileName : "FolderState.hx", lineNumber : 873, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
+							var tmp = k1.get_componentKind().getInnerCircuitDiagram();
+							tempList[0].push(tmp);
+							(js_Boot.__cast(k1.get_componentKind() , com_mun_model_gates_CompoundComponent)).resetCircuit();
 						}
 					}
-					var o = haxe_Serializer.run(i);
+					var o = haxe_Serializer.run(i[0]);
 					var tempJson = { circuit : o};
-					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done(function(text) {
-						haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 884, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadCircuit"});
-					});
+					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done((function(tempList1,i1) {
+						return function(text) {
+							if(text != "fail") {
+								var count = 0;
+								var k2 = i1[0].get_componentIterator();
+								while(k2.hasNext()) {
+									var k3 = k2.next();
+									if(k3.getNameOfTheComponentKind() == "CC") {
+										(js_Boot.__cast(k3.get_componentKind() , com_mun_model_gates_CompoundComponent)).loadCircuit(tempList1[0][count]);
+										++count;
+									}
+								}
+								i1[0].set_id(text);
+							}
+						};
+					})(tempList,i));
 				}
 			}
 		}
@@ -4060,7 +4126,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 					if(check.match(cdname)) {
 						$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done((function(i3) {
 							return function(text) {
-								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 913, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
+								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 1028, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
 								if(text != "fail") {
 									i3[0].set_id(text);
 								}
@@ -4074,8 +4140,19 @@ com_mun_controller_controllerState_FolderState.prototype = {
 	}
 	,'delete': function(id) {
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/delete?id=" + id, contentType : "application/json"}).done(function(text) {
-			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 932, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
+			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 1047, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
 		});
+	}
+	,checkexit: function(cdname,list) {
+		var _g = 0;
+		while(_g < list.length) {
+			var i = list[_g];
+			++_g;
+			if(cdname == i.fileName) {
+				return true;
+			}
+		}
+		return false;
 	}
 	,__class__: com_mun_controller_controllerState_FolderState
 };
@@ -4527,7 +4604,9 @@ var com_mun_model_component_CircuitDiagramI = function() { };
 $hxClasses["com.mun.model.component.CircuitDiagramI"] = com_mun_model_component_CircuitDiagramI;
 com_mun_model_component_CircuitDiagramI.__name__ = ["com","mun","model","component","CircuitDiagramI"];
 com_mun_model_component_CircuitDiagramI.prototype = {
-	get_commandManager: null
+	get_id: null
+	,set_id: null
+	,get_commandManager: null
 	,set_commandManager: null
 	,get_componentArray: null
 	,get_componentIterator: null
@@ -4592,6 +4671,7 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 	,yMax: null
 	,margin: null
 	,componentAndLinkCenter: null
+	,id: null
 	,computeDiagramSize: function() {
 		this.xMin = 99999999;
 		this.yMin = 99999999;
@@ -4654,6 +4734,12 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 		} else {
 			this.diagramHeight = this.diagramWidth;
 		}
+	}
+	,get_id: function() {
+		return this.id;
+	}
+	,set_id: function(s) {
+		this.id = s;
 	}
 	,getComponentAndLinkCenterCoordinate: function() {
 		return this.componentAndLinkCenter;
@@ -4727,6 +4813,7 @@ com_mun_model_component_CircuitDiagram.prototype = $extend(com_mun_model_observe
 		this.linkArray.push(link);
 	}
 	,addComponent: function(component) {
+		haxe_Log.trace("pass",{ fileName : "CircuitDiagram.hx", lineNumber : 217, className : "com.mun.model.component.CircuitDiagram", methodName : "addComponent"});
 		this.componentArray.push(component);
 		component.addObserver(this);
 	}
@@ -5028,6 +5115,10 @@ var com_mun_model_component_Component = function(xPosition,yPosition,height,widt
 			i.update(this,new com_mun_model_attribute_OrientationValue(orientation));
 		}
 	}
+	if(this.getNameOfTheComponentKind() == "CC") {
+		this.set_id(this.get_componentKind().getInnerCircuitDiagram().get_id());
+		haxe_Log.trace(this.get_id(),{ fileName : "Component.hx", lineNumber : 107, className : "com.mun.model.component.Component", methodName : "new"});
+	}
 };
 $hxClasses["com.mun.model.component.Component"] = com_mun_model_component_Component;
 com_mun_model_component_Component.__name__ = ["com","mun","model","component","Component"];
@@ -5066,7 +5157,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp2 = _tmp0(_tmp1);
 		if(!_tmp2) {
 			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 121, className : "com.mun.model.component.Component", methodName : "getAttrValue"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 126, className : "com.mun.model.component.Component", methodName : "getAttrValue"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var temp;
@@ -5094,7 +5185,7 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		var _tmp2 = _tmp0(_tmp1);
 		if(!_tmp2) {
 			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 141, className : "com.mun.model.component.Component", methodName : "canupdate"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 146, className : "com.mun.model.component.Component", methodName : "canupdate"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		if(this.hasAttr(s)) {
@@ -5111,13 +5202,13 @@ com_mun_model_component_Component.prototype = $extend(com_mun_model_observe_Obse
 		return false;
 	}
 	,update: function(s,v) {
-		haxe_Log.trace(this.hasAttr(s),{ fileName : "Component.hx", lineNumber : 153, className : "com.mun.model.component.Component", methodName : "update"});
+		haxe_Log.trace(this.hasAttr(s),{ fileName : "Component.hx", lineNumber : 158, className : "com.mun.model.component.Component", methodName : "update"});
 		var _tmp0 = $bind(this,this.hasAttr);
 		var _tmp1 = s;
 		var _tmp2 = _tmp0(_tmp1);
 		if(!_tmp2) {
 			var e = new com_mun_assertions_AssertionFailure("hasAttr(s)",[{ expr : "hasAttr", value : _tmp0},{ expr : "s", value : _tmp1},{ expr : "hasAttr(s)", value : _tmp2}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 154, className : "com.mun.model.component.Component", methodName : "update"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "Component.hx", lineNumber : 159, className : "com.mun.model.component.Component", methodName : "update"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		if(this.hasAttr(s)) {
@@ -6390,6 +6481,7 @@ var com_mun_model_gates_CompoundComponent = function(circuitDiagram) {
 	this.attr.push(new com_mun_model_attribute_StringAttr("name"));
 	this.attr.push(new com_mun_model_attribute_OrientationAttr());
 	this.attr.push(new com_mun_model_attribute_StringAttr("id"));
+	this.attr.push(new com_mun_model_attribute_IntAttr("delay"));
 };
 $hxClasses["com.mun.model.gates.CompoundComponent"] = com_mun_model_gates_CompoundComponent;
 com_mun_model_gates_CompoundComponent.__name__ = ["com","mun","model","gates","CompoundComponent"];

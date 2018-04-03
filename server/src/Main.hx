@@ -528,6 +528,63 @@ class Main implements util.Async
 
         });
 
+
+        app.post('/app/users/update',function(req:Request,res:Response,next){
+            var _req : Dynamic = req;
+            var fileId=req.param("id");
+            var err, stuff = @async stuffMan.find({_id:fileId});
+            trace(err);
+            if(stuff.length!=0){
+                stuff[0].version[stuff[0].version.length-1].contents=_req.body.circuit;
+                var err, id= @async stuffMan.update({"_id" : fileId},{"version":stuff[0].version});
+                console.log("error is: "+err+"data is: "+id);
+                res.send("success");
+            }
+            else{
+                res.send("fail");
+            }
+        });
+
+
+        app.post('/app/users/changename',function(req:Request,res:Response,next){
+            var _req : Dynamic = req;
+            var fileId=req.param("id");
+            var fileName=req.param("name");
+            var err2, id= @async stuffMan.update({"_id" : fileId},{"fileName":fileName});
+            console.log("error is: "+err2+"data is: "+id);
+            if(err2==null){
+                var err,data = @async stuffMan.find({"fileList.id":fileId});
+                if(err==null){
+                    if(data.length!=0){
+                        for(i in data[0].fileList){
+                            if(i.id==fileId){
+                                i.fileName=fileName;
+                            }
+                        }
+                        var err1, updatedata = @async stuffMan.update({_id: data[0]._id},{"fileList":data[0].fileList});
+                        if(err1==null){
+                            res.send("success");
+                        }
+                        else{
+                            res.send("fail");
+                        }
+                    }
+                    else{
+                        res.send("fail");
+                    }
+                }
+                else{
+                    res.send("fail");
+                }
+            }
+            else{
+                res.send("fail");
+            }
+        });
+
+
+
+
         app.get('/forgot', function (req : Request, res : Response) {
             res.sendfile(Node.__dirname+'/forgot.html');
         });

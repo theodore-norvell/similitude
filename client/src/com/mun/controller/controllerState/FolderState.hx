@@ -1,5 +1,6 @@
 package com.mun.controller.controllerState;
 
+import com.mun.model.component.CircuitDiagramI;
 import com.mun.model.gates.CompoundComponent;
 import haxe.Unserializer;
 import Std;
@@ -59,6 +60,9 @@ class FolderState implements Async{
     var searchName:String;
 
     public function new() {
+        var initalUrl = Browser.window.location.href.split("?");
+        var initialUsername:String = (initalUrl[1].split("="))[1];
+        selectedPath="root/"+initialUsername;
         updateCircuitDiagramMap = new Map<CircuitDiagramI, UpdateCircuitDiagram>();
         updateToolBarMap = new Map<CircuitDiagramI, UpdateToolBar>();
         updateCanvasMap = new Map<CircuitDiagramI, UpdateCanvas>();
@@ -108,7 +112,17 @@ class FolderState implements Async{
                 }else{
                     new JQuery("#nameofcddiv").removeClass("has-success").addClass("has-error");
                 }
+                JQuery.ajax( { type:"post",
+                    url: "http://127.0.0.1:3000/app/users/changename?id="+circuitDiagram.get_id()+"&name="+newName,
+                    contentType: "application/json",
+                    dataType:"text",
+                }
+                )
+                .done( function (text){
+
+                });
             }
+
         });
 
         new JQuery("#nameofcd").bind("focusout", function(){
@@ -167,7 +181,7 @@ class FolderState implements Async{
                     new JQuery('#selectCircuit').append("<option>"+i.get_name()+"</option>");
                 }
                 Browser.document.getElementById("uploadCD").onclick= function(){
-                    uploadCircuit(Std.string(new JQuery('#selectList').val()),"root/"+username,username);
+                    uploadCircuit(Std.string(new JQuery('#selectCircuit').val()),"root/"+username,username);
                 };
                 newCollapse(path);
             };
@@ -185,13 +199,13 @@ class FolderState implements Async{
                     </div>");
         CurrentfileListCount++;
         new JQuery('#CurrentPathLabel').html(CurrentUsername);
-        selectedPath="root/"+CurrentUsername;
         Browser.document.getElementById("Currentpath"+CurrentUsername).onclick = function(){
             new JQuery('#CurrentFieldpath_root'+CurrentUsername).html("");
             var Currentpath:Array<String>=new Array<String>();
             Currentpath.push("root");
             Currentpath.push(CurrentUsername);
             new JQuery('#CurrentPathLabel').html(CurrentUsername);
+            selectedPath="root/"+CurrentUsername;
             currentnewCollapse(Currentpath,CurrentfileListCount);
         };
 
@@ -381,7 +395,7 @@ class FolderState implements Async{
 
     function createATotallyNewCircuitDiagram(){
         circuitDiagram = folder.createNewCircuitDiagram();
-        circuitDiagramArray .push(circuitDiagram);
+        circuitDiagramArray.push(circuitDiagram);
         addNewCicruitDiagramTab();
         createNewCanvas(circuitDiagram.get_name());
 
@@ -399,15 +413,48 @@ class FolderState implements Async{
         controllerCanvasContext = new ControllerCanvasContext(circuitDiagram, updateCircuitDiagram, sideBar, updateToolBar, canvas, updateCanvas);
         sideBar.setControllerCanvasContext(controllerCanvasContext);
         updateToolBar.setControllerCanvasContext(controllerCanvasContext);
-
         pushToMap();
+        var url = Browser.window.location.href.split("?");
+        var username:String = (url[1].split("="))[1];
+        JQuery.ajax( { type:"post",
+            url: "http://127.0.0.1:3000/app/users/showfolder?username="+username+"&folder="+selectedPath,
+            contentType: "application/json",
+            dataType:"text",
+        }
+        )
+        .done( function (text) {
+            if(text=="fail"){}
+            else{
+                var list:Array<{_id:String,fileName:String,id:String,fileType:String}>=haxe.Json.parse(text);
+                var count:Int = 1;
+                var exp= ~/\s+/;
+                while(checkexit(exp.replace(circuitDiagram.get_name(),"_"),list)){
+                    var oldname:String = circuitDiagram.get_name();
+                    var newName:String = "Untitled_"+count;
+                    if(folder.changeCircuitDiagramName(circuitDiagram.get_name(),"Untitled_"+count,circuitDiagram)){
+                        new JQuery("#nameofcddiv").removeClass("has-error").addClass("has-success");
+
+                        changeNameForHTMLStuff(oldname, newName);
+                        for(i in sideBarMap.iterator()){
+                            if(i.isGateNameExist(oldname)){
+                                i.removeCompoundComponentToGateNameArray(oldname);
+                                i.pushCompoundComponentToGateNameArray(newName);
+                            }
+                        }
+                    };
+                    count++;
+                }
+            }
+        }).then(function(){
+            uploadCircuit(circuitDiagram.get_name(),selectedPath,username);
+        });
     }
 
     public function load(cd:CircuitDiagramI){
         new JQuery("li[id$='-li']").removeClass("active");
         new JQuery(".tab-pane[id$='-panel']").removeClass("active");
         new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
-        currentState = F_STATE.CREATE;
+
         if(circuitDiagram != null){
             previouseCircuitDiagramArray.push(circuitDiagram);
         }
@@ -495,20 +542,61 @@ class FolderState implements Async{
         new JQuery("#circuitdiagramcanvas").append(canvasHTMLString);
 
         Browser.document.getElementById(circuitDiagram.get_name()+"-li").onclick = function(event:Event){
-            var id:String = untyped event.target.id;
-            id = id.substring(0, id.indexOf("-"));
 
-            previouseCircuitDiagramArray.push(circuitDiagram);
-            setToCurrentCircuitDiagram(id);
-            new JQuery(".tab-pane[id$='-panel']").removeClass("active");
-            new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
-            new JQuery(".tab-pane[id^='"+id+"-panel']").addClass("active");
-            new JQuery(".tab-pane[id^='"+id+"-sidebar']").addClass("active");
+            Serializer.USE_CACHE=true;
+            Serializer.USE_ENUM_INDEX=true;
+            var exp= ~/\s+/;
+            var check=~/^\w*$/;
+            var cdname=exp.replace(circuitDiagram.get_name(),"_");
+            if(check.match(cdname)){
+//                    uploadSubCircuit(i,path,username,function(){});
+                var tempList:Array<CircuitDiagramI>= new Array<CircuitDiagramI>();
+                for(k in circuitDiagram.get_componentIterator()){
+                    if(k.getNameOfTheComponentKind()=="CC"){
+                        tempList.push(k.get_componentKind().getInnerCircuitDiagram());
+                        cast(k.get_componentKind(),CompoundComponent).resetCircuit();
+                    }
+                }
+                var o = Serializer.run(circuitDiagram);
+                var tempJson = {circuit: o};
+                JQuery.ajax( { type:"post",
+                    url: "http://127.0.0.1:3000/app/users/update?id="+circuitDiagram.get_id(),
+                    contentType: "application/json",
+                    data:haxe.Json.stringify(tempJson)}
+                )
+                .done( function (text) {
+                    trace(text);
+                    if(text!="fail"){
+                        var count:Int = 0;
+                        for(k in circuitDiagram.get_componentIterator()){
+                            if(k.getNameOfTheComponentKind()=="CC"){
+                                cast(k.get_componentKind(),CompoundComponent).loadCircuit(tempList[count]);
+                                count++;
+                            }
+                        }
+                    }
+                }).then(function (){
+                    var id:String = untyped event.target.id;
+                    id = id.substring(0, id.indexOf("-"));
 
-            currentIndex = circuitDiagramArray.indexOf(circuitDiagram);
+                    previouseCircuitDiagramArray.push(circuitDiagram);
+                    setToCurrentCircuitDiagram(id);
+                    new JQuery(".tab-pane[id$='-panel']").removeClass("active");
+                    new JQuery(".tab-pane[id$='-sidebar']").removeClass("active");
+                    new JQuery(".tab-pane[id^='"+id+"-panel']").addClass("active");
+                    new JQuery(".tab-pane[id^='"+id+"-sidebar']").addClass("active");
 
-            currentState = F_STATE.CURRENT;
-            checkState();
+                    currentIndex = circuitDiagramArray.indexOf(circuitDiagram);
+
+                    currentState = F_STATE.CURRENT;
+                    checkState();
+                    trace("switchtab");
+                }
+
+                );
+            }
+
+
         };
 
         registerCloseButton(circuitDiagram.get_name());
@@ -516,7 +604,6 @@ class FolderState implements Async{
 
     function registerCloseButton(closeButtonNamePrefix:String){
         Browser.document.getElementById(closeButtonNamePrefix+"-close").onclick = function(event:Event){
-            if(Browser.window.confirm("Close this Diagram means delete it forever, do you still want to do it?")){
                 var id:String = untyped event.target.id;
                 id = id.substring(0, id.indexOf("-"));
                 Browser.document.getElementById(id+"-li").remove();
@@ -538,7 +625,6 @@ class FolderState implements Async{
                     currentState = F_STATE.CURRENT;
                     checkState();
                 }
-            }
         };
     }
 
@@ -547,7 +633,6 @@ class FolderState implements Async{
         folder.removeCircuitDiagram(name);
         circuitDiagramArray.remove(tempCd);
         sideBar.removeCompoundComponentToGateNameArray(name);
-
         sideBarMap.remove(tempCd);
         updateCircuitDiagramMap.remove(circuitDiagram);
         updateToolBarMap.remove(circuitDiagram);
@@ -694,6 +779,8 @@ class FolderState implements Async{
                                 new JQuery('#FolderNameLabel').hide();
                                 new JQuery('#createFolder').hide();
                                 new JQuery('#uploadCircuit').hide();
+                                new JQuery('#deleteFile').show();
+                                new JQuery('#deleteBox').show();
                                 selectVersion(i.id);
                                 Browser.document.getElementById("deleteFile").onclick = function(){
                                     delete(i.id);
@@ -832,7 +919,7 @@ class FolderState implements Async{
         });
     }
 
-    function downloadSubCircuit(cd:CircuitDiagramI){
+    function downloadSubCircuit(cd:CircuitDiagramI):Bool{
         for(i in cd.get_componentIterator()){
             if(i.getNameOfTheComponentKind()=="CC"){
                 trace(i.get_id());
@@ -846,8 +933,11 @@ class FolderState implements Async{
                     .done( function (text){
                         if(text!="fail"){
                             var tempcd:CircuitDiagramI = Unserializer.run(text);
-                            downloadSubCircuit(tempcd);
-                            cast(i.get_componentKind(),CompoundComponent).loadCircuit(tempcd);
+                            if(downloadSubCircuit(tempcd)==true){
+                                cast(i.get_componentKind(),CompoundComponent).loadCircuit(tempcd);
+                                currentState = F_STATE.CURRENT;
+                                checkState();
+                            }
                         }
                         else{
                             cd.get_componentArray().remove(i);
@@ -859,6 +949,7 @@ class FolderState implements Async{
                 }
             }
         }
+        return true;
     }
 
     function uploadCircuit(name:String,path:String,username:String){
@@ -870,10 +961,12 @@ class FolderState implements Async{
                 var check=~/^\w*$/;
                 var cdname=exp.replace(i.get_name(),"_");
                 if(check.match(cdname)){
-                    uploadSubCircuit(i,path,username,function(){});
+//                    uploadSubCircuit(i,path,username,function(){});
+                    var tempList:Array<CircuitDiagramI>= new Array<CircuitDiagramI>();
                     for(k in i.get_componentIterator()){
                         if(k.getNameOfTheComponentKind()=="CC"){
-                            trace(k.get_id());
+                            tempList.push(k.get_componentKind().getInnerCircuitDiagram());
+                            cast(k.get_componentKind(),CompoundComponent).resetCircuit();
                         }
                     }
                     var o = Serializer.run(i);
@@ -884,8 +977,16 @@ class FolderState implements Async{
                         data:haxe.Json.stringify(tempJson)}
                     )
                     .done( function (text) {
-                        trace(text);
-
+                        if(text!="fail"){
+                            var count:Int = 0;
+                            for(k in i.get_componentIterator()){
+                                if(k.getNameOfTheComponentKind()=="CC"){
+                                    cast(k.get_componentKind(),CompoundComponent).loadCircuit(tempList[count]);
+                                    count++;
+                                }
+                            }
+                            i.set_id(text);
+                        }
                     });
                 }
             }
@@ -934,6 +1035,15 @@ class FolderState implements Async{
         .done( function (text) {
             trace(text);
         });
+    }
+
+    function checkexit(cdname:String,list:Array<{_id:String,fileName:String,id:String,fileType:String}>):Bool{
+        for(i in list){
+            if(cdname==i.fileName){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

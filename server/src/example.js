@@ -471,70 +471,124 @@ var Main = function() {
 			}
 		});
 	});
-	app.get("/forgot",function(req12,res12) {
-		res12.sendfile(__dirname + "/forgot.html");
+	app.post("/app/users/update",function(req12,res12,next8) {
+		var _req5 = req12;
+		var fileId1 = req12.param("id");
+		stuffMan.find({ _id : fileId1},function(err25,stuff3) {
+			console.log(err25);
+			if(stuff3.length != 0) {
+				stuff3[0].version[stuff3[0].version.length - 1].contents = _req5.body.circuit;
+				stuffMan.update({ "_id" : fileId1},{ "version" : stuff3[0].version},function(err26,id5) {
+					console.log("error is: " + err26 + "data is: " + Std.string(id5));
+					res12.send("success");
+				});
+			} else {
+				res12.send("fail");
+			}
+		});
 	});
-	app.post("/forgot/users",jsonParser,function(req13,res13,next8) {
-		var _req5 = req13;
-		var username1 = req13.param("username");
-		accountMan.find({ "username" : username1},function(err25,account1) {
-			if(err25 == null) {
+	app.post("/app/users/changename",function(req13,res13,next9) {
+		var _req6 = req13;
+		var fileId2 = req13.param("id");
+		var fileName = req13.param("name");
+		stuffMan.update({ "_id" : fileId2},{ "fileName" : fileName},function(err27,id6) {
+			console.log("error is: " + err27 + "data is: " + Std.string(id6));
+			if(err27 == null) {
+				stuffMan.find({ "fileList.id" : fileId2},function(err28,data4) {
+					if(err28 == null) {
+						if(data4.length != 0) {
+							var _g6 = 0;
+							var _g15 = data4[0].fileList;
+							while(_g6 < _g15.length) {
+								var i3 = _g15[_g6];
+								++_g6;
+								if(i3.id == fileId2) {
+									i3.fileName = fileName;
+								}
+							}
+							stuffMan.update({ _id : data4[0]._id},{ "fileList" : data4[0].fileList},function(err112,updatedata1) {
+								if(err112 == null) {
+									res13.send("success");
+								} else {
+									res13.send("fail");
+								}
+							});
+						} else {
+							res13.send("fail");
+						}
+					} else {
+						res13.send("fail");
+					}
+				});
+			} else {
+				res13.send("fail");
+			}
+		});
+	});
+	app.get("/forgot",function(req14,res14) {
+		res14.sendfile(__dirname + "/forgot.html");
+	});
+	app.post("/forgot/users",jsonParser,function(req15,res15,next10) {
+		var _req7 = req15;
+		var username1 = req15.param("username");
+		accountMan.find({ "username" : username1},function(err29,account1) {
+			if(err29 == null) {
 				if(account1.length != 0) {
 					var options = { from : "web.circuitdiagram@hotmail.com", to : account1[0].email, subject : "From web application", text : "From web application", html : "<h1>Hello, your password is:  </h1>" + "<h1 style=\"color:red\">" + account1[0].password + "</h1>", attachments : []};
-					mailTransport.sendMail(options,function(err26,msg) {
-						if(err26) {
-							console.log(err26);
+					mailTransport.sendMail(options,function(err30,msg) {
+						if(err30) {
+							console.log(err30);
 						} else {
 							console.log("email sent to user: " + Std.string(username1));
 						}
 					});
-					res13.send("y");
+					res15.send("y");
 				} else {
-					res13.send("n");
+					res15.send("n");
 				}
 			} else {
-				res13.send("n");
+				res15.send("n");
 			}
 		});
 	});
-	app.get("/changepassword",function(req14,res14) {
-		res14.sendfile(__dirname + "/changepassword.html");
+	app.get("/changepassword",function(req16,res16) {
+		res16.sendfile(__dirname + "/changepassword.html");
 	});
-	app.post("/initial",function(req15,res15) {
+	app.post("/initial",function(req17,res17) {
 		stuffMan.find({ "fileName" : "", "isFolder" : true},function(errpath,rootModel) {
 			if(errpath != null) {
 				console.log(errpath);
 			} else if(rootModel.length == 0) {
 				var d3 = { isFolder : true, fileName : "", version : [{ number : 0, contents : "", modified : new Date()}], fileList : [], metainformation : { fileType : "folder", owner : "", permissions : [{ group : "", permission : "read&write"}], created : new Date()}};
-				stuffMan.create(d3,function(err27,stuff3) {
-					console.log("inside callback err is " + err27 + " stuff is " + Std.string(stuff3));
+				stuffMan.create(d3,function(err31,stuff4) {
+					console.log("inside callback err is " + err31 + " stuff is " + Std.string(stuff4));
 				});
 			}
 		});
 	});
-	app.post("/changepassword/users",jsonParser,function(req16,res16,next9) {
-		var _req6 = req16;
-		var username2 = req16.param("username");
-		accountMan.find({ "username" : username2, "password" : _req6.body.oldp},function(err28,account2) {
-			if(err28 == null) {
+	app.post("/changepassword/users",jsonParser,function(req18,res18,next11) {
+		var _req8 = req18;
+		var username2 = req18.param("username");
+		accountMan.find({ "username" : username2, "password" : _req8.body.oldp},function(err32,account2) {
+			if(err32 == null) {
 				if(account2.length != 0) {
-					accountMan.update({ "username" : username2, "password" : _req6.body.oldp},{ "password" : _req6.body.newp},function(err112,updated1) {
-						if(err112 == null) {
-							res16.send("y");
+					accountMan.update({ "username" : username2, "password" : _req8.body.oldp},{ "password" : _req8.body.newp},function(err113,updated1) {
+						if(err113 == null) {
+							res18.send("y");
 						} else {
-							res16.send("n");
+							res18.send("n");
 						}
 					});
 				} else {
-					res16.send("n");
+					res18.send("n");
 				}
 			} else {
-				res16.send("n");
+				res18.send("n");
 			}
 		});
 	});
-	app["use"](function(req17,res17,next10) {
-		res17.status(404).send("404");
+	app["use"](function(req19,res19,next12) {
+		res19.status(404).send("404");
 	});
 	var tmp6 = app.get("port");
 	app.listen(tmp6,function() {

@@ -50,5 +50,5 @@ class Forgot {
 
     {
         var main = new Forgot();
-    }c
+    }
 }

@@ -34,6 +34,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
     var yMax:Float;
     var margin:Int;
     var componentAndLinkCenter:Coordinate;
+    var id:String;
 
     public function new() {
         super();
@@ -112,6 +113,14 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
         }else{
             diagramHeight = diagramWidth;
         }
+    }
+
+    public function get_id():String{
+        return id;
+    }
+
+    public function set_id(s:String){
+        id=s;
     }
 
     public function getComponentAndLinkCenterCoordinate():Coordinate{
@@ -205,6 +214,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
     }
 
     public function addComponent(component:Component):Void {
+        trace("pass");
         componentArray.push(component);
         component.addObserver(this);
     }

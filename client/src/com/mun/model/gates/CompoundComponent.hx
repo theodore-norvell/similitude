@@ -72,6 +72,7 @@ class CompoundComponent implements ComponentKind extends GateAbstract{
         attr.push(new StringAttr("name"));
         attr.push(new OrientationAttr());
         attr.push(new StringAttr("id"));
+        attr.push(new IntAttr("delay"));
     }
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{

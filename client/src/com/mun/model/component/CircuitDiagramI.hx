@@ -14,6 +14,11 @@ import com.mun.model.enumeration.ORIENTATION;
 * interface for CicuitDiagram
 **/
 interface CircuitDiagramI {
+
+    public function get_id():String;
+
+    public function set_id(s:String):Void;
+
     /**
     * @@:getter get command manager
     **/

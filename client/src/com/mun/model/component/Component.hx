@@ -101,6 +101,11 @@ class Component extends Observable{
                 i.update(this,new OrientationValue(orientation));
             }
         }
+
+        if(getNameOfTheComponentKind()=="CC"){
+            set_id(get_componentKind().getInnerCircuitDiagram().get_id());
+            trace(get_id());
+        }
     }
 
     public function getArray(){
