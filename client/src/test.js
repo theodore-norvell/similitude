@@ -3616,7 +3616,6 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		$("li[id$='-li']").removeClass("active");
 		$(".tab-pane[id$='-panel']").removeClass("active");
 		$(".tab-pane[id$='-sidebar']").removeClass("active");
-		this.currentState = com_mun_model_enumeration_F_$STATE.CREATE;
 		if(this.circuitDiagram != null) {
 			this.previouseCircuitDiagramArray.push(this.circuitDiagram);
 		}
@@ -4003,6 +4002,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 		var _gthis = this;
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/download?id=" + id + "&version=" + version, contentType : "application/json", dataType : "text"}).done(function(text) {
 			var cd = haxe_Unserializer.run(text);
+			cd.set_id(id);
 			var flag = true;
 			var _g = 0;
 			var _g1 = _gthis.circuitDiagramArray;
@@ -4017,7 +4017,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 				_gthis.downloadSubCircuit(cd);
 				_gthis.load(cd);
 			} else {
-				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 917, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
+				haxe_Log.trace("exited on canvas",{ fileName : "FolderState.hx", lineNumber : 918, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadCircuit"});
 			}
 		});
 	}
@@ -4028,24 +4028,17 @@ com_mun_controller_controllerState_FolderState.prototype = {
 			var i1 = i.next();
 			var i2 = [i1];
 			if(i2[0].getNameOfTheComponentKind() == "CC") {
-				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 925, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
+				haxe_Log.trace(i2[0].get_id(),{ fileName : "FolderState.hx", lineNumber : 926, className : "com.mun.controller.controllerState.FolderState", methodName : "downloadSubCircuit"});
 				if(i2[0].get_id() != "") {
 					$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/downloadSub?id=" + i2[0].get_id(), contentType : "application/json", dataType : "text"}).done((function(i3) {
 						return function(text) {
 							if(text != "fail") {
 								var tempcd = haxe_Unserializer.run(text);
+								tempcd.set_id(i3[0].get_id());
 								if(_gthis.downloadSubCircuit(tempcd) == true) {
 									(js_Boot.__cast(i3[0].get_componentKind() , com_mun_model_gates_CompoundComponent)).loadCircuit(tempcd);
 									_gthis.currentState = com_mun_model_enumeration_F_$STATE.CURRENT;
 									_gthis.checkState();
-									_gthis.updateToolBar = new com_mun_controller_componentUpdate_UpdateToolBar(_gthis.updateCircuitDiagram);
-									_gthis.updateCircuitDiagram.setUpdateToolBar(_gthis.updateToolBar);
-									_gthis.updateCanvas = new com_mun_controller_componentUpdate_UpdateCanvas(_gthis.circuitDiagram,_gthis.canvas,_gthis.context);
-									_gthis.updateCircuitDiagram.setUpdateCanvas(_gthis.updateCanvas);
-									_gthis.sideBar = new com_mun_controller_controllerState_SideBar(_gthis.updateCircuitDiagram,_gthis.circuitDiagram,_gthis.folder);
-									_gthis.controllerCanvasContext = new com_mun_controller_controllerState_ControllerCanvasContext(_gthis.circuitDiagram,_gthis.updateCircuitDiagram,_gthis.sideBar,_gthis.updateToolBar,_gthis.canvas,_gthis.updateCanvas);
-									_gthis.sideBar.setControllerCanvasContext(_gthis.controllerCanvasContext);
-									_gthis.updateToolBar.setControllerCanvasContext(_gthis.controllerCanvasContext);
 								}
 							} else {
 								HxOverrides.remove(cd.get_componentArray(),i3[0]);
@@ -4126,7 +4119,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 					if(check.match(cdname)) {
 						$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/folder?username=" + username + "&new=false&folder=" + path + "&fileName=" + cdname, contentType : "application/json", data : JSON.stringify(tempJson)}).done((function(i3) {
 							return function(text) {
-								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 1028, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
+								haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 1019, className : "com.mun.controller.controllerState.FolderState", methodName : "uploadSubCircuit"});
 								if(text != "fail") {
 									i3[0].set_id(text);
 								}
@@ -4140,7 +4133,7 @@ com_mun_controller_controllerState_FolderState.prototype = {
 	}
 	,'delete': function(id) {
 		$.ajax({ type : "post", url : "http://127.0.0.1:3000/app/users/delete?id=" + id, contentType : "application/json"}).done(function(text) {
-			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 1047, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
+			haxe_Log.trace(text,{ fileName : "FolderState.hx", lineNumber : 1038, className : "com.mun.controller.controllerState.FolderState", methodName : "delete"});
 		});
 	}
 	,checkexit: function(cdname,list) {
