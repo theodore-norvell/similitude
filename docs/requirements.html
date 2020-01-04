@@ -7,6 +7,10 @@
 
 <body>
 <h1>Requirements and specification for Similitude</h1>
+<h2>Scope and objectives</h2>
+<p>The objective is to have an visual editor in which digital circuits can be designed, simulated, and tested.</p>
+<p>The typical users will be a students, instructors, and teaching assistants in a first course in digital design.</p>
+<p>The system should be acessible via the world-wide web so that the only software a&nbsp;user needs is a standard web-browser.&nbsp; All storage is to be cloud-based, with the possibility of off-line storage in case of a loss of network connectivity.</p>
 <h2>User stories</h2>
 <p>Functional requirements: As a user I will be able to:</p>
 <ul>
@@ -75,49 +79,49 @@
 </ul>
 <h2>Domain model and definitions</h2>
 <dl>
-  <dt>Circuit</dt>
-  <dd>A circuit is&nbsp;a named arrangement of components and links. Copies of circuits exist on one or more clients and on the server. Each Circuit&nbsp;has a unique name.</dd>
-  <dt>Component</dt>
-  <dd>A&nbsp; component is an instantiaion of a component kind. Each component belongs to a single circuit.&nbsp; Each component has a number of Attributes that can be edited.(Implementation note: the state of a Component does not include any information associated with Simulations.)  </dd>
-  <dt>Component kind</dt>
-  <dd>A component kind defines how components appear, what attributes they have, the types of those attributes, and how the components behave during simulation. Components kinds are either&nbsp;primitive or compound.&nbsp;&nbsp;(Implementation note: in the implementation, circuit kinds have no mutable state. All mutable state&nbsp;associated is associated with the Component. The exception is for Compound Component Kind, q.v.)</dd>
-  <dt>Primitive Component&nbsp;Kind</dt>
-  <dd>Primitive component kinds&nbsp;are things such and gates, not&nbsp;gates, adders,&nbsp;flip-flops, that are build in.&nbsp; Primitive components also include input terminals, output terminals and </dd>
-  <dt>Compound Component Kind</dt>
-  <dd>Compound component kinds are little other than references to circuits. For each Circuit there is a corresponding component kind.&nbsp; When the circuit&nbsp;that a compound component refers to changes, the compound component kind changes implicitly. See discussion below: in <a href="onCompoundComponentKinds">section On Compound Component Kinds.</a> A component whose kind is a white box compound component kind&nbsp;is displayed by displaying the circuit inside the outline of the component. If c is the component and its kind's circuit is d, then c is displayed as a black rectangle and inside the rectangle the components and links of d are drawn, scaled, translated, and rotated appropriately.&nbsp; Assuming no rotation, the scaling and translating is such that the top left corner of d (d.minX, d.minY) maps to the top-left corner of c&nbsp;and the bottom right corner of d (d.maxX, d.maxY) maps to the bottom-right corner of c.&nbsp;If the orientation of c is not East, then these corners change appropriately.</dd>
-  <dt>Attribute;</dt>
-  <dd>Attributes of components include a position (x,y), size (w, h),  orientation.  (North, South, East, West), and flip (Up or Down). Depending on the component kind, components may have other attributes. The set of Attributes that a component has and the types of those attributes is determined by the component's Kind. For example, a component whose kind is and-gate would have attribute indicating the number of inputs (a nonnegative number) and a propagation delay (a time).  A component whose kind is D-flip-flop would have a propagation time, a set-up time, and a hold-time (all of type time). A component whose component kind is compound has an attribute saying whether it is white-box or black-box (boolean).</dd>
-  <dt>Port</dt>
-  <dd>A Port is the representation of an input or output to a component. Each Port is associated with a component.&nbsp; Each Port is an Input Port, an Output Port, or a Bidirectional Port.&nbsp; Ports may have names.&nbsp;The number of input, output, and bidirectional ports and their names are generally determined by the component kind. For example any D-flip-flop would have two Input Ports named D and CLK and one Output Port named Q. However some Component&nbsp;Kinds will allow variable numbers&nbsp;of Input or Output Ports: for example a gate would allow a variable number of Input Ports with a minumum of 2.&nbsp; The location of a port is determined by the Kind and the Component.&nbsp;For example the Kind might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.) Ports may be negated or not.&nbsp; Unnegated ports are uually not drawn. (However, it might be good to draw a&nbsp;coloured square when the mouse hovers over an unnegated port.)&nbsp; Negated ports are drawn as black circles with white fill.</dd>
-  <dt>Input Port</dt>
-  <dd>A Port used for input.&nbsp; Input ports might be represented by small triangles&nbsp;with black stroke and white fills&nbsp;pointed into the component.</dd>
+  <dt><strong>Circuit</strong></dt>
+  <dd>A <strong>circuit</strong> is&nbsp;a named arrangement of components and links. Copies of <strong>circuits</strong> exist on one or more clients and on the server. Each <strong>circuit</strong>&nbsp;has a unique name.</dd>
+  <dt><strong>Component</strong></dt>
+  <dd>A&nbsp; <strong>component</strong> is an instantiaion of a <strong>component kind</strong>. Each component belongs to a single <strong>circuit</strong>.&nbsp; Each <strong>component</strong> has a number of <strong>attributes</strong> that can be edited.(Implementation note: the state of a <strong>component</strong> does not include any information associated with <strong>simulations</strong>.) </dd>
+  <dt><strong>Component kind</strong></dt>
+  <dd>A <strong>component kind</strong> defines how <strong>components</strong> appear, what <strong>attributes</strong> they have, the types of those <strong>attributes</strong>, and how the <strong>components</strong> behave during simulation. <strong>abstract</strong> are either&nbsp;<strong>primitive</strong> or <strong>compound</strong>.&nbsp;&nbsp;(Implementation note: in the implementation, <strong>component kinds</strong> have no mutable state. All mutable state&nbsp;associated is associated with the <strong>component</strong>. The exception is for <strong>compound component kind</strong>, q.v.)</dd>
+  <dt><strong>Primitive Component&nbsp;Kind</strong></dt>
+  <dd><strong>Primitive component kinds</strong>&nbsp;are things such and gates, not&nbsp;gates, adders,&nbsp;flip-flops, that are build in.&nbsp; Primitive components also include input terminals, output terminals and </dd>
+  <dt><strong>Compound Component Kind</strong></dt>
+  <dd><strong>Compound component kinds</strong> are little other than references to <strong>circuits</strong>. For each <strong>circuit</strong> there is a corresponding <strong>compound component kind</strong>.&nbsp; When the <strong>circuit</strong>&nbsp;that a compound <strong>component</strong> refers to changes, the <strong>compound component kind</strong> changes implicitly. See discussion below: in <a href="onCompoundComponentKinds">section On Compound Component Kinds.</a> A <strong>component</strong> whose kind is a <strong>compound component kind</strong>&nbsp;(and which is displayed as &quot;white box&quot;) is displayed by displaying the <strong>circuit</strong> inside the outline of the <strong>component</strong>. If c is the <strong>component</strong> and its kind's <strong>circuit</strong> is d, then c is displayed as a black rectangle and inside the rectangle the <strong>components</strong> and <strong>links</strong> of d are drawn, scaled, translated, and rotated appropriately.&nbsp; Assuming no rotation, the scaling and translating is such that the top left corner of d (d.minX, d.minY) maps to the top-left corner of c&nbsp;and the bottom right corner of d (d.maxX, d.maxY) maps to the bottom-right corner of c.&nbsp;If the orientation of c is not East, then these corners change appropriately.</dd>
+  <dt><strong>Attribute</strong>;</dt>
+  <dd><strong>Attributes</strong> of <strong>components</strong> include a position (x,y), size (w, h),  orientation.  (North, South, East, West), and flip (Up or Down). Depending on the <strong>component kind</strong>, <strong>components</strong> may have other attributes. The set of <strong>attributes</strong> that a <strong>component</strong> has and the types of those <strong>attributes</strong> is determined by the its <strong>component kind</strong>. For example, a <strong>component</strong> whose <strong>component kind</strong> is and-gate would have <strong>attribute</strong> indicating the number of inputs (a nonnegative number) and a propagation delay (a time).  A <strong>component</strong> whose <strong>component kind</strong> is D-flip-flop would have a propagation time, a set-up time, and a hold-time (all of type time). A <strong>component</strong> whose <strong>component kind</strong> is <strong>compound</strong> has an <strong>attribute</strong> saying whether it is white-box or black-box (boolean).</dd>
+  <dt><strong>Port</strong></dt>
+  <dd>A <strong>port</strong> is the representation of an input or output to a <strong>component</strong>. Each <strong>port</strong> is associated with a <strong>component</strong>.&nbsp; Each<strong> port</strong> is an <strong>input port</strong>, an <strong>output port</strong>, or a <strong>bidirectional port</strong>.&nbsp; <strong>Ports</strong> may have names.&nbsp;The number of <strong>input</strong>, <strong>output</strong>, and <strong>bidirectional ports</strong> and their names are generally determined by the <strong>component kind</strong>. For example any D-flip-flop would have two<strong> input ports</strong> named D and CLK and one <strong>output port</strong> named Q. However some <strong>component&nbsp;kinds</strong> will allow variable numbers&nbsp;of <strong>input</strong> or <strong>output ports</strong>: for example a gate would allow a variable number of <strong>input ports</strong> with a minumum of 2.&nbsp; The location of a <strong>port</strong> is determined by the <strong>kind</strong> and the <strong>component</strong>.&nbsp;For example the <strong>kind</strong> might determine what side a port is on. Typically the inputs are on the &quot;left&quot;, &quot;top&quot; or &quot;bottom&quot; side, while outputs are on the &quot;right&quot;. (&quot;Left&quot;, &quot;right&quot;, &quot;top&quot;, &quot;bottom&quot; are assuming the orientation is the default &quot;east&quot; and the flip is the default &quot;up&quot;.) <strong>Ports</strong> may be negated or not.&nbsp; Unnegated ports are uually not drawn. (However, it might be good to draw a&nbsp;coloured square when the mouse hovers over an unnegated <strong>port</strong>.)&nbsp; Negated <strong>ports</strong> are drawn as black circles with white fill.</dd>
+  <dt><strong>Input Port</strong></dt>
+  <dd>A <strong>port</strong> used for input.&nbsp; <strong>Input ports </strong>might be represented by small triangles&nbsp;with black stroke and white fills&nbsp;pointed into the component.</dd>
   <dd>&nbsp;</dd>
-  <dt>Output Port</dt>
-  <dd>A Port used for output. Output ports might be represented by small  triangles&nbsp;with black stroke and white fills&nbsp;pointed into the component.</dd>
-  <dt>Bidirectional Port</dt>
-  <dd>A Port used for both input and output. Bidirectional ports might be represented by small diamonds with black stroke and white fill.</dd>
-  <dt>Links</dt>
-  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles (black input and black fill), unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
-  <dt>Connected</dt>
-  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is Connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
-  <dt>Net</dt>
-  <dd>A maximal set of Ports and Links that are all connected to each other is called a Net.&nbsp; Note that each Port and Link is a member of exactly one Net. (Implementation note:&nbsp; There is no need to represent Nets explicitely. However, it will be useful for simulation if we can calculate the Net of a Port or Link.</dd>
-  <dt>World coordinates</dt>
-  <dd>Each Circuit is laid out on the real plane.&nbsp; Each circuit diagram has a minium and a maximum x&nbsp;and a minimum&nbsp;and maximum y, although these may change as componenst and links are added, moved, and removed.&nbsp;Let d be a Circuit and c&nbsp; is a component or link belonging to that circuit. The following invariants should be observed:
+  <dt><strong>Output Port</strong></dt>
+  <dd>A <strong>port</strong> used for output. <strong>Output ports</strong> might be represented by small  triangles&nbsp;with black stroke and white fills&nbsp;pointed out of the component.</dd>
+  <dt><strong>Bidirectional Port</strong></dt>
+  <dd>A <strong>port</strong> used for both input and output. <strong>Bidirectional ports</strong> might be represented by small diamonds with black stroke and white fill.</dd>
+  <dt><strong>Links</strong></dt>
+  <dd>A <strong>link</strong>&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles (black input and black fill), unless the endpoint is connected to a port. The <strong>link</strong> itself is shown as a straight  line.&nbsp; The colour of the <strong>Link</strong> and its endpoints are by default black. If there is an active <strong>simulation</strong> the colour may be determined by the state of the <strong>simulation</strong>. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
+  <dt><strong>Connected</strong></dt>
+  <dd>A <strong>Link</strong> is directly <strong>Connected</strong> to a&nbsp;port if one of its end points&nbsp;has the same <strong>World Coordiates</strong> as the <strong>port</strong>.&nbsp; Two different <strong>Links</strong> are directly <strong>Connected</strong> to each other if they they have end points at the same <strong>World</strong> <strong>Coordinates</strong> if one has an end point that is on the line formed by the other.&nbsp; Two <strong>ports</strong>, two <strong>links</strong>, or a <strong>port</strong> and a <strong>link</strong> are <strong>Connected</strong> to each other if they are either directly connected or connected by 1 or more intermediary <strong>links</strong>.&nbsp; Also every <strong>Port</strong> and <strong>Link</strong> is <strong>Connected</strong> to itself. The&nbsp;relation of being <strong>connected</strong> is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
+  <dt><strong>Net</strong></dt>
+  <dd>A maximal set of <strong>Ports</strong> and <strong>Links</strong> that are all <strong>connected</strong> to each other is called a <strong>Net</strong>.&nbsp; Note that each <strong>Port</strong> and <strong>Link</strong> is a member of exactly one <strong>Net</strong>. (Implementation note:&nbsp; There is no need to represent <strong>Nets</strong> explicitely. However, it will be useful for simulation if we can calculate the <strong>Net</strong> of a <strong>Port</strong> or <strong>Link</strong>.)</dd>
+  <dt><strong>World coordinates</strong></dt>
+  <dd>Each <strong>Circuit</strong> is laid out on the real plane.&nbsp; Each circuit diagram has a minium and a maximum x&nbsp;and a minimum&nbsp;and maximum y, although these may change as componenst and links are added, moved, and removed.&nbsp;Let d be a <strong>Circuit</strong> and c&nbsp; is a component or link belonging to that circuit. The following invariants should be observed:
     <ul>
       <li>d.minX &lt; c.minX &lt; c.maxX &lt; d.maxX </li>
       <li>d.minY &lt; c.minY &lt; c.maxY &lt; c.maxY  </li>
     </ul>
     A world coordinate is 
   really a pair (d, (x,y)) where d is a Circuit and (x, y) is a point on the plane.</dd>
-  <dt>View coordinates</dt>
+  <dt><strong>View coordinates</strong></dt>
   <dd>The coordinates of the canvas on which the circuit is displayed.</dd>
-  <dt>Folder</dt>
-  <dd>A folder is a collection of Files and Folders. Folders form a Tree such that each Folder (apart from the root) has&nbsp;a parent Folder&nbsp;and each File is in one Folder</dd>
-  <dt>Home Folder</dt>
-  <dd>Each User has a home folder, as does each Course.</dd>
-  <dt>File</dt>
-  <dd>A file is one of the following: A Saved Circuit, an Unsaved Circuit, a Saved Test, an Unsaved Test.</dd>
+  <dt><strong>Folder</strong></dt>
+  <dd>A <strong>folder</strong> is a collection of <strong>Files</strong> and <strong>Folders</strong>. <strong>Folders</strong> form a Tree such that each <strong>Folder</strong> (apart from the root) has&nbsp;a parent <strong>Folder</strong>&nbsp;and each <strong>File</strong> is in one <strong>Folder</strong></dd>
+  <dt><strong>simulation</strong></dt>
+  <dd>Each <strong>user</strong> has a <strong>home folder</strong>, as does each <strong>Course</strong>.</dd>
+  <dt><strong>File</strong></dt>
+  <dd>A <strong>file</strong> is ...</dd>
   <dt>abc</dt>
   <dd>def</dd>
   <dt>abc</dt>
@@ -126,10 +130,12 @@
 <h2>UI</h2>
 <h3>Layout of the  UI</h3>
 <h4>Main screen</h4>
+<p>[Diagram to be added!]</p>
 <p>Along the top&nbsp;of the client screen is tool bar that contains buttons for the various command.</p>
 <p>To the right is a tool bar (or pallette) that contains icons representing various tools. This will include tools for the most common component kinds.</p>
 <p>In the middle, is the drawing canvas containing a visualization of the circuit being edited.&nbsp;Above the canvas is the name of the current circuit. The canvas is surrounded by four buttons for panning (i.e. scrolling) the canvas.&nbsp; The</p>
 <p>During simulation, the bottom part of the main screen contains the simulation panel.</p>
+<p>[Diagram to be added!]</p>
 <h3>Selection model</h3>
 <p>At each point in time a set of components and links on each  diagram are considered selected. Selected components are displayed in a distinctive colour. Selected components may belong to diagrams that are inside of compound components, so it is possible that not all selected components and links belong to the same diagram.</p>
 <h3>Use cases for editing</h3>
