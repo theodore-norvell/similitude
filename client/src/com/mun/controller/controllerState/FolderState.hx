@@ -903,6 +903,7 @@ class FolderState implements Async{
         )
         .done( function (text){
             var cd:CircuitDiagramI = Unserializer.run(text);
+            cd.set_id(id);
             var flag:Bool=true;
             for(i in circuitDiagramArray){
                 if(i.get_name()==cd.get_name()){
@@ -933,6 +934,7 @@ class FolderState implements Async{
                     .done( function (text){
                         if(text!="fail"){
                             var tempcd:CircuitDiagramI = Unserializer.run(text);
+                            tempcd.set_id(i.get_id());
                             if(downloadSubCircuit(tempcd)==true){
                                 cast(i.get_componentKind(),CompoundComponent).loadCircuit(tempcd);
                                 currentState = F_STATE.CURRENT;

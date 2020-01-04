@@ -99,19 +99,6 @@ class Main implements util.Async
 
 
 
-        /**
-        mailTransport.sendMail(options, function(err, msg){
-            if(err){
-                console.log(err);
-            }
-            else {
-                console.log(msg);
-            }
-        });**/
-
-
-
-
 
         app.set('port', 3000);
         app.use(new Static(Path.join((Node.__dirname).substring(0,(Node.__dirname).indexOf('server\\src')))));
@@ -247,36 +234,6 @@ class Main implements util.Async
             res.sendfile((Node.__dirname).substring(0,(Node.__dirname).indexOf('server\\src'))+"\\client\\app.html");
         });
 
-        app.post('/app/users', jsonParser, function (req : Request, res : Response,next ) {
-            var _req : Dynamic = req;
-
-            var d : StuffData = {
-                isFolder:true,
-                fileName:"root",
-                version:[{
-                    number:0,
-                    contents:haxe.Json.stringify(_req.body),
-                    modified:Date.now()
-                }],
-                fileList:[],
-                metainformation:{
-                    fileType:"folder",
-                    owner:"test",
-                    permissions:[{
-                        group:"a",
-                        permission:"read&write"
-                    }],
-                    created:Date.now()
-                }
-            }
-
-
-            var errk,datak = @async stuffMan.find({_id:"5aab092ca8b48b227462332f"});
-
-            res.send(datak[0].version[0].contents);
-
-
-        });
 
         app.post('/app/users/folder',@async function (req : Request, res : Response,next ) {
             var _req : Dynamic = req;

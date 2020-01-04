@@ -386,34 +386,76 @@
 Description: get Login page.
 </p>
 <p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL: /      &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;    <br> 
-Description: login as user. Recieve a Json file containing a username and password     <br>
-Success Status code:  200  <br>
-Fail Status code: 401  &emsp;&emsp;&emsp;  incorrect username or password
+Description: login as user. Recieve a Json file containing a username and password  then match with database   <br>
+username: _req.body.username<br>
+  password:_req.body.password<br>
+  send "y" if success, send "n" if match fail
 </p>
 <p>Method: GET  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL: /register &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;   <br>
 Description: get Register page
 </p>
 <p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL: /register  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
-Description: register an account. Recieve a Json file containing a username, password and email address.  <br> 
-Success Status code:  200  <br>
-Fail Status code: 401  &emsp;&emsp;&emsp;  username or email already exist.
+Description: register an account. Recieve a Json file containing a username, password and email address.  <br>
+  username: _req.body.username<br>
+  password:_req.body.password<br>
+  email:_req.body.email<br>
 </p>
-<p>Method: GET  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL: /app/(user ID) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
-Description: get web application and download user's circuit diagrams
+<p>Method: GET &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/forgot &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: send forgot password page to client   <br>
 </p>
-<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/(user ID) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; <br>
-Description: upload user's circuit diagrams Recieve a Json file containing all circuit diagram under this ID <br>
-Success Status code:  200
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/forgot/users?username=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: send password to client's emailbox   <br>
+  Using username to search data in collection<br>
+  send password to client's email box.
 </p>
-<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/(user ID)/folder &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
-Description: create a new folder under this ID. Recieve a Json file containing a name for this folder  <br>
-Success Status code:  200  <br>
-Fail Status code: 401  &emsp;&emsp;&emsp; folder already exist.
+<p>Method: GET &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/changepassword &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: send change password page to client   <br>
 </p>
-<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/(user ID)/(folder name) &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
-Description: upload circuit diagrams to this folder. Recieve a Json file containing a circuit diagram   <br>
-Success Status code:  200  <br>
-Fail Status code: 401  &emsp;&emsp;&emsp; folder doesn't exist.
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/changepassword/users?username=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: change password  <br>
+  Using username and password to search for data<br>
+  change password if data found.
 </p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/initial &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: initialize database  <br>
+clean up database and create root folder.
+</p>
+
+<p>Method: GET  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL: /app/users?username=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+Description: get web application and retrieve folder list.
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/folder?username=value1&new=value2&folder=value3&fileName=value4 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; <br>
+Description: upload user's circuit diagrams or create new folder <br>
+if value2 == true then create new folder else upload circuit<br>
+
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/delete?id=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+Description: delete the links to this file <br>
+Using Query to find parent folder and delete link.
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/download?id=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+Description: download circuit according to id   <br>
+  Using Query to search file and send to client.
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/showfolder?folder=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: show fileList under certain path   <br>
+  A file list is send to client<br>
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/showversion?id=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: show version list of circuit diagram   <br>
+  Using id to search for circuit diagram in collection<br>
+  A version list of a circuit diagram is send to client<br>
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/update?id=value1 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: update circuit diagram without updating version   <br>
+  Using id to search for circuit diagram in collection<br>
+  Update content of the latest version<br>
+</p>
+<p>Method: POST &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  URL:/app/users/changename?id=value1&name=value2 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  <br>
+  Description: update circuit diagram name   <br>
+  Using id to search for circuit diagram in collection<br>
+  Update file name<br>
+</p>
+
 </body>
 </html>
