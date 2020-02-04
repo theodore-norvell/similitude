@@ -9,7 +9,7 @@ import haxe.Json;
 import js.html.FileReader;
 import js.html.Blob;
 import js.html.URL;
-import js.jquery.JQuery;
+import js.jquery.*;
 import js.html.DOMElement;
 import com.mun.controller.componentUpdate.UpdateCanvas;
 import com.mun.controller.componentUpdate.UpdateToolBar;

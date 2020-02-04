@@ -1,0 +1,21 @@
+## Class path
+-cp ./
+
+## Additional libraries needed by haxe
+-lib hx3compat
+
+## Main class
+-main Test
+
+## Conditional compilation flag
+-D js-flatten
+
+
+-dce no
+
+## Extra compiler options
+# verbose build
+-v 
+
+## target
+-js test.js
