@@ -12,3 +12,4 @@ client/.idea
 server/.idea
 .idea
 test.js
+*.code-workspace
