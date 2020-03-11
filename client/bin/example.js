@@ -1187,15 +1187,15 @@ controller_controllers_AbstractController.__name__ = "controller.controllers.Abs
 controller_controllers_AbstractController.__interfaces__ = [controller_listenerInterfaces_ViewListener];
 controller_controllers_AbstractController.prototype = {
 	viewUpdater: null
-	,activeCircuitDiagram: null
+	,activeTab: null
 	,setViewUpdater: function(viewUpdater) {
 		this.viewUpdater = viewUpdater;
 	}
-	,setActiveCircuitDiagram: function(circuitDiagram) {
-		this.activeCircuitDiagram = circuitDiagram;
+	,setActiveTab: function(activeTabModel) {
+		this.activeTab = activeTabModel;
 	}
-	,getActiveCircuitDiagram: function() {
-		return this.activeCircuitDiagram;
+	,getActiveTab: function() {
+		return this.activeTab;
 	}
 	,update: function(a) {
 	}
@@ -6901,17 +6901,25 @@ model_component_Inport.prototype = {
 	}
 	,__class__: model_component_Inport
 };
-var model_component_Link = function(leftEndpoint,rightEndpoint) {
+var model_component_Link = function(leftEndpoint,rightEndpoint,circuitDiagram) {
 	this.leftEndpoint = leftEndpoint;
 	this.rightEndpoint = rightEndpoint;
+	this.circuitDiagram = circuitDiagram;
 };
 $hxClasses["model.component.Link"] = model_component_Link;
 model_component_Link.__name__ = "model.component.Link";
 model_component_Link.prototype = {
 	leftEndpoint: null
 	,rightEndpoint: null
+	,circuitDiagram: null
 	,getLinkLength: function() {
 		return Math.sqrt(Math.pow(Math.abs(this.leftEndpoint.get_xPosition() - this.rightEndpoint.get_xPosition()),2) + Math.pow(Math.abs(this.leftEndpoint.get_yPosition() - this.rightEndpoint.get_yPosition()),2));
+	}
+	,getCircuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,setCircuitDiagram: function(circuitDiagram) {
+		this.circuitDiagram = circuitDiagram;
 	}
 	,get_leftEndpoint: function() {
 		return this.leftEndpoint;
@@ -7108,6 +7116,74 @@ model_gates_ComponentKind.prototype = {
 	,getInnerCircuitDiagram: null
 	,setname: null
 	,__class__: model_gates_ComponentKind
+};
+var model_selectionModel_SelectionModel = function(linkArray,componentArray) {
+	this.selectedComponents = componentArray;
+	this.selectedLinks = linkArray;
+};
+$hxClasses["model.selectionModel.SelectionModel"] = model_selectionModel_SelectionModel;
+model_selectionModel_SelectionModel.__name__ = "model.selectionModel.SelectionModel";
+model_selectionModel_SelectionModel.prototype = {
+	selectedComponents: null
+	,selectedLinks: null
+	,getSelectedComponents: function() {
+		return this.selectedComponents;
+	}
+	,getSelectedLinks: function() {
+		return this.selectedLinks;
+	}
+	,addLinkToSelection: function(link) {
+		this.selectedLinks.push(link);
+	}
+	,addComponentToSelection: function(component) {
+		this.selectedComponents.push(component);
+	}
+	,removeLinkFromSelection: function(link) {
+		HxOverrides.remove(this.selectedLinks,link);
+	}
+	,removeComponentFromSelection: function(component) {
+		HxOverrides.remove(this.selectedComponents,component);
+	}
+	,__class__: model_selectionModel_SelectionModel
+};
+var model_tabModel_TabModel = function(circuitDiagram) {
+	this.circuitDiagram = circuitDiagram;
+	this.selectionModel = new model_selectionModel_SelectionModel([],[]);
+};
+$hxClasses["model.tabModel.TabModel"] = model_tabModel_TabModel;
+model_tabModel_TabModel.__name__ = "model.tabModel.TabModel";
+model_tabModel_TabModel.prototype = {
+	selectionModel: null
+	,circuitDiagram: null
+	,getCircuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,getSelectionModel: function() {
+		return this.selectionModel;
+	}
+	,addLinksToSelection: function(links) {
+		this.selectionModel.getSelectedLinks().concat(links);
+	}
+	,addComponentsToSelection: function(components) {
+		this.selectionModel.getSelectedComponents().concat(components);
+	}
+	,removeLinksFromSelection: function(links) {
+		var _g = 0;
+		while(_g < links.length) {
+			var link = links[_g];
+			++_g;
+			this.selectionModel.removeLinkFromSelection(link);
+		}
+	}
+	,removeComponentsFromSelection: function(components) {
+		var _g = 0;
+		while(_g < components.length) {
+			var component = components[_g];
+			++_g;
+			this.selectionModel.removeComponentFromSelection(component);
+		}
+	}
+	,__class__: model_tabModel_TabModel
 };
 var type_Coordinate = function(xPosition,yPosition) {
 	this.set_xPosition(xPosition);

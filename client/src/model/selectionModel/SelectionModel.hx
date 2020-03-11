@@ -8,20 +8,36 @@ import model.component.Link;
  */
 class SelectionModel 
 {
-	var selectedComponents: List<Component>;
-	var selectedLinks: List<Link>;
+	var selectedComponents: Array<Component>;
+	var selectedLinks: Array<Link>;
 
-	public function new(linkArray:List<Link>, componentArray:List<Component>) 
+	public function new(linkArray:Array<Link>, componentArray:Array<Component>) 
 	{
 		this.selectedComponents = componentArray;
 		this.selectedLinks = linkArray;
 	}
 	
-	public function getSelectedComponents() : List<Component> {
+	public function getSelectedComponents() : Array<Component> {
 		return this.selectedComponents;
 	}
 	
-	public function getSelectedComponents() : List<Component> {
+	public function getSelectedLinks() : Array<Link> {
 		return this.selectedLinks;
+	}
+	
+	public function addLinkToSelection(link: Link) : Void {
+		this.selectedLinks.push(link);
+	}
+	
+	public function addComponentToSelection(component: Component) : Void {
+		this.selectedComponents.push(component);
+	}
+	
+	public function removeLinkFromSelection(link: Link) : Void {
+		this.selectedLinks.remove(link);
+	}
+	
+	public function removeComponentFromSelection(component : Component) : Void {
+		this.selectedComponents.remove(component);
 	}
 }

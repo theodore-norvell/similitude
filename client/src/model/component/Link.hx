@@ -15,17 +15,27 @@ import model.drawingInterface.DrawingAdapterI;
 class Link{
     var leftEndpoint:Endpoint;
     var rightEndpoint:Endpoint;
+	var circuitDiagram: CircuitDiagramI;
 
-    public function new(leftEndpoint:Endpoint, rightEndpoint:Endpoint) {
+    public function new(leftEndpoint:Endpoint, rightEndpoint:Endpoint, ?circuitDiagram : CircuitDiagramI) {
         this.leftEndpoint = leftEndpoint;
         this.rightEndpoint = rightEndpoint;
+		this.circuitDiagram = circuitDiagram;
     }
 
     public function getLinkLength():Float{
         return Math.sqrt(Math.pow(Math.abs(leftEndpoint.get_xPosition() - rightEndpoint.get_xPosition()),2) +
                         Math.pow(Math.abs(leftEndpoint.get_yPosition() - rightEndpoint.get_yPosition()),2));
     }
+	
+	public function getCircuitDiagram() : CircuitDiagramI {
+		return this.circuitDiagram;
+	}
 
+	public function setCircuitDiagram(circuitDiagram: CircuitDiagramI) : Void {
+		this.circuitDiagram = circuitDiagram;
+	}
+	
     public function get_leftEndpoint():Endpoint {
         return leftEndpoint;
     }

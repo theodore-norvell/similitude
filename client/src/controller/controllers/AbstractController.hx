@@ -1,7 +1,9 @@
 package controller.controllers;
 import controller.viewUpdateInterfaces.ViewUpdate;
 import controller.listenerInterfaces.ViewListener;
+import js.html.webgl.ActiveInfo;
 import model.component.CircuitDiagramI;
+import model.tabModel.TabModel;
 
 /**
  * ...
@@ -10,18 +12,18 @@ import model.component.CircuitDiagramI;
 class AbstractController implements ViewListener
 {
 	var viewUpdater: ViewUpdate;
-	var activeCircuitDiagram: CircuitDiagramI;
+	var activeTab: TabModel;
 	
 	public function setViewUpdater(viewUpdater: ViewUpdate) {
 		this.viewUpdater = viewUpdater;
 	}
 	
-	public function setActiveCircuitDiagram(circuitDiagram: CircuitDiagramI) {
-		this.activeCircuitDiagram = circuitDiagram;
+	public function setActiveTab(activeTabModel: TabModel) {
+		this.activeTab = activeTabModel;
 	}
 	
-	public function getActiveCircuitDiagram() {
-		return this.activeCircuitDiagram;
+	public function getActiveTab() {
+		return this.activeTab;
 	}
 	
 	public function update(a: String): Void{}

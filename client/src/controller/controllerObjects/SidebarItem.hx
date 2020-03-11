@@ -10,7 +10,7 @@ import model.drawingInterface.DrawingAdapterI;
 class SidebarItem 
 {
 	var componentToDraw:Component;
-
+-
 	public function new(component: Component) 
 	{
 		this.componentToDraw = component;
