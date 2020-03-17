@@ -63,7 +63,7 @@ class SidebarUpdate extends AbstractUpdate
 	/**
 	 * responsible for poopulating the sidebar on first startup
 	 */ 
-	public function populateSidebar() {} : Void {
+	public function populateSidebar()  : Void {
 	}
 	
 	public override function updateView(string: String){
