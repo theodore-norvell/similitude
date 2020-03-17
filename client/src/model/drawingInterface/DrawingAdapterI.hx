@@ -1,6 +1,7 @@
 package model.drawingInterface;
 
-import view.drawingImpl.Transform;
+import js.html.CanvasRenderingContext2D;
+import model.drawingInterface.Transform;
 import model.enumeration.ORIENTATION;
 /**  A drawing adaptor represents a tool for outputting
  *   drawings to a part of a screen or page or similar
@@ -48,6 +49,8 @@ interface DrawingAdapterI {
 	 * @param height -- The height in world coordinates.
 	 */
     public function setClip(x:Float, y:Float, width:Float, height:Float):Void;
+	
+	public function setContext (context: CanvasRenderingContext2D) : Void;
 
     public function getTransform():Transform;
     /**

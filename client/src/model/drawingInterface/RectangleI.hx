@@ -1,4 +1,4 @@
-package view.drawingImpl;
+package model.drawingInterface;
 import type.Coordinate;
 interface RectangleI {
     /** Returns the smallest x and smallest y of the four corners */

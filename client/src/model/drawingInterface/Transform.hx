@@ -1,4 +1,5 @@
-package view.drawingImpl;
+package model.drawingInterface;
+import model.drawingInterface.Rectangle;
 import type.Coordinate;
 /**
 * this is a abstract class

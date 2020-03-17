@@ -17,7 +17,7 @@ import model.enumeration.POINT_MODE;
 import model.enumeration.BOX;
 import model.enumeration.MODE;
 import type.Coordinate;
-import view.drawingImpl.Transform;
+import model.drawingInterface.Transform;
 import model.component.Outport;
 import model.component.Inport;
 import model.drawingInterface.DrawingAdapterI;

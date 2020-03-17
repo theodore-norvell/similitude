@@ -1,5 +1,6 @@
-package view.drawingImpl;
+package model.drawingInterface;
 
+import model.drawingInterface.Box;
 import view.drawingImpl.DrawingAdapter;
 import type.Coordinate;
 import model.drawingInterface.DrawingAdapterI;
@@ -61,6 +62,10 @@ class DrawingAdapter implements DrawingAdapterI {
         var drawingAdapter:DrawingAdapterI = new DrawingAdapter(transform.compose(trans), cxt);
         return drawingAdapter;
     }
+	
+	public function setContext(context: CanvasRenderingContext2D) : Void{
+		this.cxt = context;
+	}
 
     public function setClip(x:Float, y:Float, width:Float, height:Float):Void {
         //TODO.  Do we really need to do this?

@@ -1,4 +1,4 @@
-package view.drawingImpl;
+package model.drawingInterface;
 import type.Coordinate;
 
 class Rectangle implements RectangleI{
