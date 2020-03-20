@@ -13,7 +13,7 @@ class AbstractCommand implements CommandI
 		this.circuitDiagram = circuitDiagram;
 	}
 	
-	public function setCircuitDiagram() {
+	public function getCircuitDiagram() {
 		return this.circuitDiagram;
 	}
 	

@@ -4,18 +4,27 @@ import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
 import js.Browser.document;
 import js.html.Console;
-import controller.listenerInterfaces.ViewListener;
+import model.component.CircuitDiagram;
+import model.drawingInterface.DrawingAdapter;
+import model.tabModel.TabModel;
+import model.drawingInterface.Transform;
 
 class View 
 {
 	var sidebarListener: SidebarListener;
 	var canvasListener: CanvasListener;
-
+	var activeTab: TabModel;
+	var allTabs = new Array<TabModel>();
 	/**
 	 * Populate the UI using this constructor.
 	 */
 	public function new() 
 	{
+		// letting this stay here for now
+		this.activeTab = new TabModel(new CircuitDiagram(), this);
+		// this.setActiveTab();
+		allTabs.push(activeTab);
+		
 		trace("DOM example");
 
 		document.addEventListener("DOMContentLoaded", function(event) {
@@ -23,10 +32,10 @@ class View
 
 		
 		// for testing the scrollbar
-		var sidebarPara = document.querySelector("p");
-		sidebarPara.innerText = "
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-";
+		//var sidebarPara = document.querySelector("p");
+		//sidebarPara.innerText = "
+//Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+//";
 		//var gate = document.createElement();
 		//sidebar.style.border = "solid";
 		//sidebar.style.borderRadius = "15px";
@@ -55,27 +64,8 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 			Console.log(event.dataTransfer.items);
 			event.dataTransfer.dropEffect = "move";
 		});
-		
-		var canvasDisplayScreen = document.querySelector("#displayScreen");
-		// needs this event by default for the drop target.
-		canvasDisplayScreen.addEventListener('dragover', function (event) {
-			event.preventDefault(); // called to avoid any other event from occuring when processing this one.
-			event.dataTransfer.dropEffect = "move";
-			// refer to MDN docs for more dropEffects
-			
-		});
-		// needs this event by default for the drop target.
-		canvasDisplayScreen.addEventListener('drop', function (event) {
-			event.preventDefault();
-			Console.log(event);
-			Console.log(event.dataTransfer.items);
-			var data = event.dataTransfer.getData("text/plain");
-			Console.log(data);
-			event.target.appendChild(document.querySelector("#" + data).cloneNode(true));
-			this.canvasListener.update(data);
-		});
-		
     });
+	
 	}
 	
 	public function setSidebarListener(listener: SidebarListener){
@@ -92,7 +82,30 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod 
 	}
 	
 	public function updateSidebarOptions(){
-		
+		Console.log("updateSidebarOptions has been called");
+	}
+	
+	/**
+	 * A common function that accepts JSON / Dynamic objects to update the Canvas
+	 * @param	eventObject
+	 */
+	public function updateCanvasListener(eventObject: Dynamic) {
+		// add more cases to handle more stuff
+		if (eventObject.eventType == "sidebarDrag") {
+			this.canvasListener.addComponentToCanvas(eventObject);
+		}
+	}
+	
+	public function updateCanvas() : Void {
+		Console.log('view.updateCanvas');
+		var drawingAdapter = new DrawingAdapter(Transform.identity(), this.activeTab.getCanvasContext().getContext2d());
+		this.activeTab.getCircuitDiagram().draw(drawingAdapter);
+	}
+	
+	public function setActiveTab(){
+		// do something for the active tab field
+		//after that push it to the canvas controller
+		this.canvasListener.setActiveTab(this.activeTab);
 	}
 	
 }

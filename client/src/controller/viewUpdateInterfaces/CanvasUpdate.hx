@@ -3,7 +3,7 @@ package controller.viewUpdateInterfaces;
 /**
  * @author AdvaitTrivedi
  */
-interface CanvasUpdate extends ViewUpdate
+interface CanvasUpdate
 {
-  
+	public function updateCanvas(): Void;
 }

@@ -26,6 +26,8 @@ class Main {
 	// bind the controllers to the ViewUpdate interfaces
 	sidebarController.setViewUpdater(sidebarUpdater);
 	canvasController.setViewUpdater(canvasUpdater);
+	
+	viewHandler.setActiveTab();
   }
 
   // constructor

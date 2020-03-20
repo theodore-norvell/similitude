@@ -429,6 +429,7 @@ Main.main = function() {
 	var canvasUpdater = new view_viewUpdaters_CanvasUpdate(viewHandler);
 	sidebarController.setViewUpdater(sidebarUpdater);
 	canvasController.setViewUpdater(canvasUpdater);
+	viewHandler.setActiveTab();
 };
 Math.__name__ = "Math";
 var Reflect = function() { };
@@ -1173,12 +1174,109 @@ assertions_AssertionFailure.prototype = {
 	}
 	,__class__: assertions_AssertionFailure
 };
+var controller_commandManager_CommandI = function() { };
+$hxClasses["controller.commandManager.CommandI"] = controller_commandManager_CommandI;
+controller_commandManager_CommandI.__name__ = "controller.commandManager.CommandI";
+controller_commandManager_CommandI.__isInterface__ = true;
+controller_commandManager_CommandI.prototype = {
+	execute: null
+	,undo: null
+	,redo: null
+	,__class__: controller_commandManager_CommandI
+};
+var controller_commandManager_AbstractCommand = function() { };
+$hxClasses["controller.commandManager.AbstractCommand"] = controller_commandManager_AbstractCommand;
+controller_commandManager_AbstractCommand.__name__ = "controller.commandManager.AbstractCommand";
+controller_commandManager_AbstractCommand.__interfaces__ = [controller_commandManager_CommandI];
+controller_commandManager_AbstractCommand.prototype = {
+	circuitDiagram: null
+	,setCircuitDiagram: function(circuitDiagram) {
+		this.circuitDiagram = circuitDiagram;
+	}
+	,getCircuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,execute: function() {
+	}
+	,redo: function() {
+	}
+	,undo: function() {
+	}
+	,__class__: controller_commandManager_AbstractCommand
+};
+var controller_commandManager_AddComponentCommand = function(circuitDiagram,component) {
+	this.setCircuitDiagram(circuitDiagram);
+	this.component = component;
+};
+$hxClasses["controller.commandManager.AddComponentCommand"] = controller_commandManager_AddComponentCommand;
+controller_commandManager_AddComponentCommand.__name__ = "controller.commandManager.AddComponentCommand";
+controller_commandManager_AddComponentCommand.__super__ = controller_commandManager_AbstractCommand;
+controller_commandManager_AddComponentCommand.prototype = $extend(controller_commandManager_AbstractCommand.prototype,{
+	component: null
+	,execute: function() {
+		this.circuitDiagram.addComponent(this.component);
+	}
+	,redo: function() {
+		this.execute();
+	}
+	,undo: function() {
+		this.circuitDiagram.removeComponent(this.component);
+	}
+	,__class__: controller_commandManager_AddComponentCommand
+});
+var controller_commandManager_CommandManager = function() {
+	this.redoStack = new haxe_ds_GenericStack();
+	this.undoStack = new haxe_ds_GenericStack();
+};
+$hxClasses["controller.commandManager.CommandManager"] = controller_commandManager_CommandManager;
+controller_commandManager_CommandManager.__name__ = "controller.commandManager.CommandManager";
+controller_commandManager_CommandManager.prototype = {
+	undoStack: null
+	,redoStack: null
+	,executeCommand: function(command) {
+		command.execute();
+		var _this = this.undoStack;
+		_this.head = new haxe_ds_GenericCell(command,_this.head);
+	}
+	,undoCommand: function() {
+		var _this = this.undoStack;
+		var k = _this.head;
+		var undoCommand;
+		if(k == null) {
+			undoCommand = null;
+		} else {
+			_this.head = k.next;
+			undoCommand = k.elt;
+		}
+		undoCommand.undo();
+		var _this1 = this.redoStack;
+		_this1.head = new haxe_ds_GenericCell(undoCommand,_this1.head);
+	}
+	,redoCommand: function() {
+		var _this = this.redoStack;
+		var k = _this.head;
+		var redoCommand;
+		if(k == null) {
+			redoCommand = null;
+		} else {
+			_this.head = k.next;
+			redoCommand = k.elt;
+		}
+		redoCommand.redo();
+		var _this1 = this.undoStack;
+		_this1.head = new haxe_ds_GenericCell(redoCommand,_this1.head);
+	}
+	,__class__: controller_commandManager_CommandManager
+};
 var controller_listenerInterfaces_ViewListener = function() { };
 $hxClasses["controller.listenerInterfaces.ViewListener"] = controller_listenerInterfaces_ViewListener;
 controller_listenerInterfaces_ViewListener.__name__ = "controller.listenerInterfaces.ViewListener";
 controller_listenerInterfaces_ViewListener.__isInterface__ = true;
 controller_listenerInterfaces_ViewListener.prototype = {
 	update: null
+	,setViewUpdater: null
+	,setActiveTab: null
+	,getActiveTab: null
 	,__class__: controller_listenerInterfaces_ViewListener
 };
 var controller_controllers_AbstractController = function() { };
@@ -1206,15 +1304,33 @@ $hxClasses["controller.listenerInterfaces.CanvasListener"] = controller_listener
 controller_listenerInterfaces_CanvasListener.__name__ = "controller.listenerInterfaces.CanvasListener";
 controller_listenerInterfaces_CanvasListener.__isInterface__ = true;
 controller_listenerInterfaces_CanvasListener.__interfaces__ = [controller_listenerInterfaces_ViewListener];
+controller_listenerInterfaces_CanvasListener.prototype = {
+	addComponentToCanvas: null
+	,undoLastCanvasChange: null
+	,__class__: controller_listenerInterfaces_CanvasListener
+};
 var controller_controllers_CanvasController = function() {
+	this.componentTypesSingleton = new model_enumeration_ComponentTypes(new model_component_CircuitDiagram());
+	this.commandManager = new controller_commandManager_CommandManager();
 };
 $hxClasses["controller.controllers.CanvasController"] = controller_controllers_CanvasController;
 controller_controllers_CanvasController.__name__ = "controller.controllers.CanvasController";
 controller_controllers_CanvasController.__interfaces__ = [controller_listenerInterfaces_CanvasListener];
 controller_controllers_CanvasController.__super__ = controller_controllers_AbstractController;
 controller_controllers_CanvasController.prototype = $extend(controller_controllers_AbstractController.prototype,{
-	update: function(a) {
+	commandManager: null
+	,componentTypesSingleton: null
+	,update: function(a) {
 		this.viewUpdater.updateView("The element that was added to the canvas div is :: " + a);
+	}
+	,addComponentToCanvas: function(eventObject) {
+		console.log("AAAA",eventObject.component);
+		var component = new model_component_Component(eventObject.posX,eventObject.posY,70,70,model_enumeration_ORIENTATION.EAST,this.componentTypesSingleton.toComponentKind(Type.createEnum(model_enumeration_ComponentType,eventObject.component)),0);
+		var addComponentCommand = new controller_commandManager_AddComponentCommand(this.activeTab.getCircuitDiagram(),component);
+		this.commandManager.executeCommand(addComponentCommand);
+		this.viewUpdater.updateCanvas();
+	}
+	,undoLastCanvasChange: function() {
 	}
 	,__class__: controller_controllers_CanvasController
 });
@@ -1235,10 +1351,23 @@ controller_controllers_SidebarController.prototype = $extend(controller_controll
 	}
 	,__class__: controller_controllers_SidebarController
 });
+var controller_viewUpdateInterfaces_CanvasUpdate = function() { };
+$hxClasses["controller.viewUpdateInterfaces.CanvasUpdate"] = controller_viewUpdateInterfaces_CanvasUpdate;
+controller_viewUpdateInterfaces_CanvasUpdate.__name__ = "controller.viewUpdateInterfaces.CanvasUpdate";
+controller_viewUpdateInterfaces_CanvasUpdate.__isInterface__ = true;
+controller_viewUpdateInterfaces_CanvasUpdate.prototype = {
+	updateCanvas: null
+	,__class__: controller_viewUpdateInterfaces_CanvasUpdate
+};
+var controller_viewUpdateInterfaces_SidebarUpdate = function() { };
+$hxClasses["controller.viewUpdateInterfaces.SidebarUpdate"] = controller_viewUpdateInterfaces_SidebarUpdate;
+controller_viewUpdateInterfaces_SidebarUpdate.__name__ = "controller.viewUpdateInterfaces.SidebarUpdate";
+controller_viewUpdateInterfaces_SidebarUpdate.__isInterface__ = true;
 var controller_viewUpdateInterfaces_ViewUpdate = function() { };
 $hxClasses["controller.viewUpdateInterfaces.ViewUpdate"] = controller_viewUpdateInterfaces_ViewUpdate;
 controller_viewUpdateInterfaces_ViewUpdate.__name__ = "controller.viewUpdateInterfaces.ViewUpdate";
 controller_viewUpdateInterfaces_ViewUpdate.__isInterface__ = true;
+controller_viewUpdateInterfaces_ViewUpdate.__interfaces__ = [controller_viewUpdateInterfaces_SidebarUpdate,controller_viewUpdateInterfaces_CanvasUpdate];
 controller_viewUpdateInterfaces_ViewUpdate.prototype = {
 	updateView: null
 	,__class__: controller_viewUpdateInterfaces_ViewUpdate
@@ -7019,6 +7148,151 @@ model_component_Link.prototype = {
 	}
 	,__class__: model_component_Link
 };
+var model_component_Outport = function(xPosition,yPosition) {
+	this.xPosition = xPosition;
+	this.yPosition = yPosition;
+	this.portDescription = model_enumeration_IOTYPE.OUTPUT;
+};
+$hxClasses["model.component.Outport"] = model_component_Outport;
+model_component_Outport.__name__ = "model.component.Outport";
+model_component_Outport.__interfaces__ = [model_component_Port];
+model_component_Outport.prototype = {
+	xPosition: null
+	,yPosition: null
+	,portDescription: null
+	,value: null
+	,sequence: null
+	,get_xPosition: function() {
+		return this.xPosition;
+	}
+	,get_yPosition: function() {
+		return this.yPosition;
+	}
+	,set_xPosition: function(xPosition) {
+		this.xPosition = xPosition;
+	}
+	,set_yPosition: function(yPosition) {
+		this.yPosition = yPosition;
+	}
+	,get_value: function() {
+		return this.value;
+	}
+	,set_value: function(value) {
+		this.value = value;
+	}
+	,get_portDescription: function() {
+		return this.portDescription;
+	}
+	,set_portDescription: function(value) {
+		this.portDescription = value;
+	}
+	,get_sequence: function() {
+		return this.sequence;
+	}
+	,set_sequence: function(sequence) {
+		this.sequence = sequence;
+	}
+	,createJSon: function() {
+		var jsonString = "{ \"xPosition\": \"" + this.xPosition + "\",";
+		jsonString += "\"yPosition\": \"" + this.yPosition + "\",";
+		jsonString += "\"portDescription\": \"" + Std.string(this.portDescription) + "\",";
+		jsonString += "\"value\": \"" + Std.string(this.value) + "\",";
+		jsonString += "\"sequence\": \"" + this.sequence + "\"";
+		jsonString += "}";
+		return jsonString;
+	}
+	,__class__: model_component_Outport
+};
+var model_drawingInterface_Box = function(x_position,y_position,width,height,orientation,transform) {
+	var wnw = new type_Coordinate(x_position - width / 2,y_position - height / 2);
+	var wse = new type_Coordinate(x_position + width / 2,y_position + height / 2);
+	var vnw = transform.pointConvert(wnw);
+	var vse = transform.pointConvert(wse);
+	var x0 = vnw.get_xPosition();
+	var y0 = vnw.get_yPosition();
+	var x1 = vse.get_xPosition();
+	var y1 = vse.get_yPosition();
+	switch(orientation._hx_index) {
+	case 0:
+		this.xb = x0;
+		this.yb = y0;
+		this.xc = x1;
+		this.yc = y0;
+		this.xd = x1;
+		this.yd = y1;
+		this.xa = x0;
+		this.ya = y1;
+		break;
+	case 1:
+		this.xd = x0;
+		this.yd = y0;
+		this.xa = x1;
+		this.ya = y0;
+		this.xb = x1;
+		this.yb = y1;
+		this.xc = x0;
+		this.yc = y1;
+		break;
+	case 2:
+		this.xc = x0;
+		this.yc = y0;
+		this.xd = x1;
+		this.yd = y0;
+		this.xa = x1;
+		this.ya = y1;
+		this.xb = x0;
+		this.yb = y1;
+		break;
+	case 3:
+		this.xa = x0;
+		this.ya = y0;
+		this.xb = x1;
+		this.yb = y0;
+		this.xc = x1;
+		this.yc = y1;
+		this.xd = x0;
+		this.yd = y1;
+		break;
+	default:
+	}
+};
+$hxClasses["model.drawingInterface.Box"] = model_drawingInterface_Box;
+model_drawingInterface_Box.__name__ = "model.drawingInterface.Box";
+model_drawingInterface_Box.prototype = {
+	xa: null
+	,ya: null
+	,xb: null
+	,yb: null
+	,xc: null
+	,yc: null
+	,xd: null
+	,yd: null
+	,get_xa: function() {
+		return this.xa;
+	}
+	,get_ya: function() {
+		return this.ya;
+	}
+	,get_xb: function() {
+		return this.xb;
+	}
+	,get_yb: function() {
+		return this.yb;
+	}
+	,get_xc: function() {
+		return this.xc;
+	}
+	,get_yc: function() {
+		return this.yc;
+	}
+	,get_xd: function() {
+		return this.xd;
+	}
+	,get_yd: function() {
+		return this.yd;
+	}
+	,__class__: model_drawingInterface_Box
+};
 var model_drawingInterface_DrawingAdapterI = function() { };
 $hxClasses["model.drawingInterface.DrawingAdapterI"] = model_drawingInterface_DrawingAdapterI;
 model_drawingInterface_DrawingAdapterI.__name__ = "model.drawingInterface.DrawingAdapterI";
@@ -7046,6 +7320,436 @@ model_drawingInterface_DrawingAdapterI.prototype = {
 	,drawLine: null
 	,__class__: model_drawingInterface_DrawingAdapterI
 };
+var model_drawingInterface_DrawingAdapter = function(transform,context) {
+	this.font = "8px serif";
+	this.lineWidth = 1.0;
+	this.textColor = "black";
+	this.fillColor = "gray";
+	this.strokeColor = "black";
+	this.trans = transform;
+	this.cxt = context;
+};
+$hxClasses["model.drawingInterface.DrawingAdapter"] = model_drawingInterface_DrawingAdapter;
+model_drawingInterface_DrawingAdapter.__name__ = "model.drawingInterface.DrawingAdapter";
+model_drawingInterface_DrawingAdapter.__interfaces__ = [model_drawingInterface_DrawingAdapterI];
+model_drawingInterface_DrawingAdapter.prototype = {
+	cxt: null
+	,strokeColor: null
+	,fillColor: null
+	,textColor: null
+	,lineWidth: null
+	,font: null
+	,trans: null
+	,resetDrawingParam: function() {
+		this.strokeColor = "black";
+		this.fillColor = "gray";
+		this.textColor = "black";
+		this.lineWidth = 1.0;
+		this.font = "8px serif";
+	}
+	,setStrokeColor: function(color) {
+		this.strokeColor = color;
+	}
+	,setFillColor: function(color) {
+		this.fillColor = color;
+	}
+	,setTextColor: function(color) {
+		this.textColor = color;
+	}
+	,setTextFont: function(font) {
+		this.font = font;
+	}
+	,setLineWidth: function(width) {
+		this.cxt.lineWidth = width;
+	}
+	,getTransform: function() {
+		return this.trans;
+	}
+	,transform: function(transform) {
+		var drawingAdapter = new model_drawingInterface_DrawingAdapter(transform.compose(this.trans),this.cxt);
+		return drawingAdapter;
+	}
+	,setClip: function(x,y,width,height) {
+	}
+	,drawAndShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		var vCenterCoordinate = this.trans.pointConvert(new type_Coordinate(x,y));
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.lineTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2);
+		var cxmin = Math.min(Math.min(r.get_xa(),r.get_xb()),Math.min(r.get_xc(),r.get_xd()));
+		var cymin = Math.min(Math.min(r.get_ya(),r.get_yb()),Math.min(r.get_yc(),r.get_yd()));
+		var cxmax = Math.max(Math.max(r.get_xa(),r.get_xb()),Math.max(r.get_xc(),r.get_xd()));
+		var cymax = Math.max(Math.max(r.get_ya(),r.get_yb()),Math.max(r.get_yc(),r.get_yd()));
+		switch(orientation._hx_index) {
+		case 0:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,180 * Math.PI / 180,0,Math.PI);
+			break;
+		case 1:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,0 * Math.PI / 180,0,Math.PI);
+			break;
+		case 2:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,90 * Math.PI / 180,0,Math.PI);
+			break;
+		case 3:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2,270 * Math.PI / 180,0,Math.PI);
+			break;
+		default:
+		}
+		this.cxt.lineTo(r.get_xd(),r.get_yd());
+		this.cxt.closePath();
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawNAndShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		var vCenterCoordinate = this.trans.pointConvert(new type_Coordinate(x,y));
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.lineTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2);
+		this.cxt.closePath();
+		var cxmin = Math.min(Math.min(r.get_xa(),r.get_xb()),Math.min(r.get_xc(),r.get_xd()));
+		var cymin = Math.min(Math.min(r.get_ya(),r.get_yb()),Math.min(r.get_yc(),r.get_yd()));
+		var cxmax = Math.max(Math.max(r.get_xa(),r.get_xb()),Math.max(r.get_xc(),r.get_xd()));
+		var cymax = Math.max(Math.max(r.get_ya(),r.get_yb()),Math.max(r.get_yc(),r.get_yd()));
+		var circleCentreX = (r.get_xb() + r.get_xc()) / 2;
+		var circleCentreY = (r.get_yb() + r.get_yc()) / 2;
+		var radius = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 20;
+		switch(orientation._hx_index) {
+		case 0:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,180 * Math.PI / 180,0,Math.PI);
+			break;
+		case 1:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,0 * Math.PI / 180,0,Math.PI);
+			break;
+		case 2:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,90 * Math.PI / 180,0,Math.PI);
+			break;
+		case 3:
+			this.cxt.ellipse(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition(),(cxmax - cxmin) / 2,(cymax - cymin) / 2 - 2 * radius,270 * Math.PI / 180,0,Math.PI);
+			break;
+		default:
+		}
+		this.cxt.lineTo(r.get_xd(),r.get_yd());
+		this.cxt.closePath();
+		this.cxt.moveTo(vCenterCoordinate.get_xPosition() + (cymax - cymin) / 2 - 2 * radius,vCenterCoordinate.get_yPosition());
+		this.cxt.arc(vCenterCoordinate.get_xPosition() + (cymax - cymin) / 2 - 2 * radius,vCenterCoordinate.get_yPosition(),radius,0,2 * Math.PI,false);
+		this.cxt.closePath();
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawOrShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.quadraticCurveTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2,(r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
+		this.cxt.quadraticCurveTo((r.get_xc() + r.get_xd()) / 2,(r.get_yc() + r.get_yd()) / 2,r.get_xd(),r.get_yd());
+		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
+		this.cxt.closePath();
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawNOrShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		var radius = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10;
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.quadraticCurveTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2,(r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
+		this.cxt.quadraticCurveTo((r.get_xc() + r.get_xd()) / 2,(r.get_yc() + r.get_yd()) / 2,r.get_xd(),r.get_yd());
+		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
+		this.cxt.closePath();
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawBufferShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.lineTo((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
+		this.cxt.lineTo(r.get_xd(),r.get_yd());
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.closePath();
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawNotShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.lineTo((r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
+		this.cxt.lineTo(r.get_xd(),r.get_yd());
+		this.cxt.closePath();
+		var circleCentreX = (r.get_xb() + r.get_xc()) / 2;
+		var circleCentreY = (r.get_yb() + r.get_yc()) / 2;
+		var radius = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10;
+		switch(orientation._hx_index) {
+		case 0:
+			this.cxt.arc(circleCentreX,circleCentreY + radius / 2,radius,0,2 * Math.PI,false);
+			break;
+		case 1:
+			this.cxt.arc(circleCentreX,circleCentreY - radius / 2,radius,0,2 * Math.PI,false);
+			break;
+		case 2:
+			this.cxt.arc(circleCentreX + radius / 2,circleCentreY,radius,0,2 * Math.PI,false);
+			break;
+		case 3:
+			this.cxt.arc(circleCentreX - radius / 2,circleCentreY,radius,0,2 * Math.PI,false);
+			break;
+		default:
+		}
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawXorShape: function(x,y,width,height,orientation) {
+		var r = new model_drawingInterface_Box(x,y,width,height,orientation,this.trans);
+		var vCenterCoordinate = this.trans.pointConvert(new type_Coordinate(x,y));
+		this.cxt.beginPath();
+		this.cxt.moveTo(r.get_xa(),r.get_ya());
+		this.cxt.quadraticCurveTo((r.get_xa() + r.get_xb()) / 2,(r.get_ya() + r.get_yb()) / 2,(r.get_xb() + r.get_xc()) / 2,(r.get_yb() + r.get_yc()) / 2);
+		this.cxt.quadraticCurveTo((r.get_xc() + r.get_xd()) / 2,(r.get_yc() + r.get_yd()) / 2,r.get_xd(),r.get_yd());
+		this.cxt.quadraticCurveTo(0.25 * (r.get_xa() + r.get_xb() + r.get_xc() + r.get_xd()),0.25 * (r.get_ya() + r.get_yb() + r.get_yc() + r.get_yd()),r.get_xa(),r.get_ya());
+		this.cxt.closePath();
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.fill();
+		switch(orientation._hx_index) {
+		case 0:
+			this.cxt.moveTo(r.get_xa() + (r.get_xb() - r.get_xa()) / 8,r.get_ya());
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition() + (r.get_yc() - r.get_yb()) / 7,r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
+			break;
+		case 1:
+			this.cxt.moveTo(r.get_xa() - (r.get_xb() - r.get_xa()) / 8,r.get_ya());
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition() - (r.get_yc() - r.get_yb()) / 7,r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7,r.get_ya());
+			break;
+		case 2:
+			this.cxt.moveTo(r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8);
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa()) / 7,vCenterCoordinate.get_yPosition(),r.get_xa(),r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
+			break;
+		case 3:
+			this.cxt.moveTo(r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8);
+			this.cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa()) / 7,vCenterCoordinate.get_yPosition(),r.get_xa(),r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
+			break;
+		default:
+		}
+		this.cxt.stroke();
+	}
+	,drawRect: function(x,y,width,height) {
+		var wnw = new type_Coordinate(x - width / 2,y - height / 2);
+		var wse = new type_Coordinate(x + width / 2,y + height / 2);
+		var vnw = this.trans.pointConvert(wnw);
+		var vse = this.trans.pointConvert(wse);
+		var x0 = vnw.get_xPosition();
+		var y0 = vnw.get_yPosition();
+		var x1 = vse.get_xPosition();
+		var y1 = vse.get_yPosition();
+		this.cxt.beginPath();
+		this.cxt.rect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
+		this.cxt.closePath();
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.fillRect(Math.min(x0,x1),Math.min(y0,y1),Math.abs(x1 - x0),Math.abs(y1 - y0));
+		this.cxt.stroke();
+	}
+	,drawText: function(str,x,y,width) {
+		var wCoordinate = new type_Coordinate(x - width / 2,y);
+		var eCoordinate = new type_Coordinate(x + width / 2,y);
+		var vwCoordinate = this.trans.pointConvert(wCoordinate);
+		var veCoordinate = this.trans.pointConvert(eCoordinate);
+		var x0 = vwCoordinate.get_xPosition();
+		var y0 = vwCoordinate.get_yPosition();
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.font = this.font;
+		this.cxt.fillStyle = this.textColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.beginPath();
+		this.cxt.fillText(str,x0,y0,veCoordinate.get_xPosition() - vwCoordinate.get_xPosition());
+		this.cxt.closePath();
+	}
+	,drawCricle: function(x,y,radius) {
+		var wnw = new type_Coordinate(x - radius,y);
+		var wse = new type_Coordinate(x + radius,y);
+		var vnw = this.trans.pointConvert(wnw);
+		var vse = this.trans.pointConvert(wse);
+		radius = (vse.get_xPosition() - vnw.get_xPosition()) / 2;
+		var x0 = vnw.get_xPosition() + radius;
+		var y0 = vse.get_yPosition();
+		this.cxt.beginPath();
+		this.cxt.arc(x0,y0,radius,0,2 * Math.PI,false);
+		this.cxt.closePath();
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,drawLine: function(x0,y0,x1,y1) {
+		var coordinate0 = this.trans.pointConvert(new type_Coordinate(x0,y0));
+		var coordinate1 = this.trans.pointConvert(new type_Coordinate(x1,y1));
+		var x01 = coordinate0.get_xPosition();
+		var y01 = coordinate0.get_yPosition();
+		var x11 = coordinate1.get_xPosition();
+		var y11 = coordinate1.get_yPosition();
+		this.cxt.beginPath();
+		this.cxt.moveTo(x01,y01);
+		this.cxt.lineTo(x11,y11);
+		this.cxt.closePath();
+		this.cxt.lineWidth = this.lineWidth;
+		this.cxt.fillStyle = this.fillColor;
+		this.cxt.strokeStyle = this.strokeColor;
+		this.cxt.fill();
+		this.cxt.stroke();
+	}
+	,__class__: model_drawingInterface_DrawingAdapter
+};
+var model_drawingInterface_RectangleI = function() { };
+$hxClasses["model.drawingInterface.RectangleI"] = model_drawingInterface_RectangleI;
+model_drawingInterface_RectangleI.__name__ = "model.drawingInterface.RectangleI";
+model_drawingInterface_RectangleI.__isInterface__ = true;
+model_drawingInterface_RectangleI.prototype = {
+	min: null
+	,max: null
+	,width: null
+	,height: null
+	,set_minCoordinate: null
+	,set_maxCoordinate: null
+	,__class__: model_drawingInterface_RectangleI
+};
+var model_drawingInterface_Rectangle = function(corner0,corner1) {
+	this.minCoordinate = new type_Coordinate(Math.min(corner0.get_xPosition(),corner1.get_xPosition()),Math.min(corner0.get_yPosition(),corner1.get_yPosition()));
+	this.maxCoordinate = new type_Coordinate(Math.max(corner0.get_xPosition(),corner1.get_xPosition()),Math.max(corner0.get_yPosition(),corner1.get_yPosition()));
+	this.updateWidthAndHeight();
+};
+$hxClasses["model.drawingInterface.Rectangle"] = model_drawingInterface_Rectangle;
+model_drawingInterface_Rectangle.__name__ = "model.drawingInterface.Rectangle";
+model_drawingInterface_Rectangle.__interfaces__ = [model_drawingInterface_RectangleI];
+model_drawingInterface_Rectangle.prototype = {
+	minCoordinate: null
+	,maxCoordinate: null
+	,width_: null
+	,height_: null
+	,min: function() {
+		return this.minCoordinate;
+	}
+	,max: function() {
+		return this.maxCoordinate;
+	}
+	,width: function() {
+		return this.width_;
+	}
+	,height: function() {
+		return this.height_;
+	}
+	,set_minCoordinate: function(value) {
+		this.minCoordinate = value;
+		this.updateWidthAndHeight();
+	}
+	,set_maxCoordinate: function(value) {
+		this.maxCoordinate = value;
+		this.updateWidthAndHeight();
+	}
+	,updateWidthAndHeight: function() {
+		this.width_ = this.maxCoordinate.get_xPosition() - this.minCoordinate.get_xPosition();
+		this.height_ = this.maxCoordinate.get_yPosition() - this.minCoordinate.get_yPosition();
+	}
+	,__class__: model_drawingInterface_Rectangle
+};
+var model_drawingInterface_Transform = function(m,im) {
+	this.convertMatrix = m;
+	this.invertMatrix = im;
+};
+$hxClasses["model.drawingInterface.Transform"] = model_drawingInterface_Transform;
+model_drawingInterface_Transform.__name__ = "model.drawingInterface.Transform";
+model_drawingInterface_Transform.identity = function() {
+	return new model_drawingInterface_Transform([1,0,0,0,1,0,0,0,1],[1,0,0,0,1,0,0,0,1]);
+};
+model_drawingInterface_Transform.prototype = {
+	convertMatrix: null
+	,invertMatrix: null
+	,pointConvert: function(c) {
+		return new type_Coordinate(this.convertMatrix[0] * c.get_xPosition() + this.convertMatrix[1] * c.get_yPosition() + this.convertMatrix[2],this.convertMatrix[3] * c.get_xPosition() + this.convertMatrix[4] * c.get_yPosition() + this.convertMatrix[5]);
+	}
+	,pointInvert: function(c) {
+		return new type_Coordinate(this.invertMatrix[0] * c.get_xPosition() + this.invertMatrix[1] * c.get_yPosition() + this.invertMatrix[2],this.invertMatrix[3] * c.get_xPosition() + this.invertMatrix[4] * c.get_yPosition() + this.invertMatrix[5]);
+	}
+	,rectConvert: function(c) {
+		var maxCoordinate = this.pointConvert(c.max());
+		var minCoordinate = this.pointConvert(c.min());
+		return new model_drawingInterface_Rectangle(maxCoordinate,minCoordinate);
+	}
+	,rectInvert: function(c) {
+		var maxCoordinate = this.pointInvert(c.max());
+		var minCoordinate = this.pointInvert(c.min());
+		return new model_drawingInterface_Rectangle(maxCoordinate,minCoordinate);
+	}
+	,scale: function(xRatio,yRatio) {
+		var scaleArray = [xRatio,0,0,0,yRatio,0,0,0,1];
+		var invScaleArray = [1 / xRatio,0,0,0,1 / yRatio,0,0,0,1];
+		return new model_drawingInterface_Transform(this.multiply(scaleArray,this.convertMatrix),this.multiply(this.invertMatrix,invScaleArray));
+	}
+	,translate: function(xDelta,yDelta) {
+		var translateArray = [1,0,xDelta,0,1,yDelta,0,0,1];
+		var invTranslateArray = [1,0,-xDelta,0,1,-yDelta,0,0,1];
+		return new model_drawingInterface_Transform(this.multiply(translateArray,this.convertMatrix),this.multiply(this.invertMatrix,invTranslateArray));
+	}
+	,quadrantRotate: function(n) {
+		return null;
+	}
+	,compose: function(other) {
+		return new model_drawingInterface_Transform(this.multiply(other.convertMatrix,this.convertMatrix),this.multiply(this.invertMatrix,other.invertMatrix));
+	}
+	,multiply: function(matrix1,matrix2) {
+		var n = Math.sqrt(matrix1.length);
+		var tempArray = [];
+		var _g = 0;
+		var _g1 = n;
+		while(_g < _g1) {
+			var i = _g++;
+			var _g2 = 0;
+			var _g11 = n;
+			while(_g2 < _g11) {
+				var j = _g2++;
+				tempArray[n * i + j] = 0;
+			}
+		}
+		var _g21 = 0;
+		var _g3 = n;
+		while(_g21 < _g3) {
+			var i1 = _g21++;
+			var _g22 = 0;
+			var _g31 = n;
+			while(_g22 < _g31) {
+				var j1 = _g22++;
+				var _g23 = 0;
+				var _g32 = n;
+				while(_g23 < _g32) {
+					var k = _g23++;
+					tempArray[n * i1 + j1] += matrix1[n * i1 + k] * matrix2[n * k + j1];
+				}
+			}
+		}
+		return tempArray;
+	}
+	,__class__: model_drawingInterface_Transform
+};
 var model_enumeration_AttrType = $hxEnums["model.enumeration.AttrType"] = { __ename__ : "model.enumeration.AttrType", __constructs__ : ["INT","STRING","Orientation"]
 	,INT: {_hx_index:0,__enum__:"model.enumeration.AttrType",toString:$estr}
 	,STRING: {_hx_index:1,__enum__:"model.enumeration.AttrType",toString:$estr}
@@ -7057,6 +7761,55 @@ var model_enumeration_BOX = $hxEnums["model.enumeration.BOX"] = { __ename__ : "m
 	,BLACK_BOX: {_hx_index:1,__enum__:"model.enumeration.BOX",toString:$estr}
 };
 model_enumeration_BOX.__empty_constructs__ = [model_enumeration_BOX.WHITE_BOX,model_enumeration_BOX.BLACK_BOX];
+var model_enumeration_ComponentType = $hxEnums["model.enumeration.ComponentType"] = { __ename__ : "model.enumeration.ComponentType", __constructs__ : ["AND","NAND","OR","NOR","XOR","NOT","COMPOUND_COMPONENT"]
+	,AND: {_hx_index:0,__enum__:"model.enumeration.ComponentType",toString:$estr}
+	,NAND: {_hx_index:1,__enum__:"model.enumeration.ComponentType",toString:$estr}
+	,OR: {_hx_index:2,__enum__:"model.enumeration.ComponentType",toString:$estr}
+	,NOR: {_hx_index:3,__enum__:"model.enumeration.ComponentType",toString:$estr}
+	,XOR: {_hx_index:4,__enum__:"model.enumeration.ComponentType",toString:$estr}
+	,NOT: {_hx_index:5,__enum__:"model.enumeration.ComponentType",toString:$estr}
+	,COMPOUND_COMPONENT: {_hx_index:6,__enum__:"model.enumeration.ComponentType",toString:$estr}
+};
+model_enumeration_ComponentType.__empty_constructs__ = [model_enumeration_ComponentType.AND,model_enumeration_ComponentType.NAND,model_enumeration_ComponentType.OR,model_enumeration_ComponentType.NOR,model_enumeration_ComponentType.XOR,model_enumeration_ComponentType.NOT,model_enumeration_ComponentType.COMPOUND_COMPONENT];
+var model_enumeration_ComponentTypes = function(circuitDiagram) {
+	this.notComponentKind = new model_gates_NOT();
+	this.xorComponentKind = new model_gates_XOR();
+	this.norComponentKind = new model_gates_NOR();
+	this.orComponentKind = new model_gates_OR();
+	this.nandComponentKind = new model_gates_NAND();
+	this.andComponentKind = new model_gates_AND();
+	this.compoundComponentKind = new model_gates_CompoundComponent(circuitDiagram);
+};
+$hxClasses["model.enumeration.ComponentTypes"] = model_enumeration_ComponentTypes;
+model_enumeration_ComponentTypes.__name__ = "model.enumeration.ComponentTypes";
+model_enumeration_ComponentTypes.prototype = {
+	andComponentKind: null
+	,nandComponentKind: null
+	,orComponentKind: null
+	,norComponentKind: null
+	,xorComponentKind: null
+	,notComponentKind: null
+	,compoundComponentKind: null
+	,toComponentKind: function(ct) {
+		switch(ct._hx_index) {
+		case 0:
+			return this.andComponentKind;
+		case 1:
+			return this.nandComponentKind;
+		case 2:
+			return this.orComponentKind;
+		case 3:
+			return this.norComponentKind;
+		case 4:
+			return this.xorComponentKind;
+		case 5:
+			return this.notComponentKind;
+		case 6:
+			return this.compoundComponentKind;
+		}
+	}
+	,__class__: model_enumeration_ComponentTypes
+};
 var model_enumeration_IOTYPE = $hxEnums["model.enumeration.IOTYPE"] = { __ename__ : "model.enumeration.IOTYPE", __constructs__ : ["INPUT","S","D","CLK","OUTPUT","Q","QN"]
 	,INPUT: {_hx_index:0,__enum__:"model.enumeration.IOTYPE",toString:$estr}
 	,S: {_hx_index:1,__enum__:"model.enumeration.IOTYPE",toString:$estr}
@@ -7093,6 +7846,192 @@ var model_enumeration_VALUE_$LOGIC = $hxEnums["model.enumeration.VALUE_LOGIC"] =
 	,DOWN_EDGE: {_hx_index:4,__enum__:"model.enumeration.VALUE_LOGIC",toString:$estr}
 };
 model_enumeration_VALUE_$LOGIC.__empty_constructs__ = [model_enumeration_VALUE_$LOGIC.FALSE,model_enumeration_VALUE_$LOGIC.TRUE,model_enumeration_VALUE_$LOGIC.UNDEFINED,model_enumeration_VALUE_$LOGIC.RISING_EDGE,model_enumeration_VALUE_$LOGIC.DOWN_EDGE];
+var model_gates_AbstractComponentKind = function() {
+	this.attributes = [];
+	this.sequence = -1;
+	this.attributes.push(new model_attribute_OrientationAttr());
+	this.attributes.push(new model_attribute_StringAttr("name"));
+};
+$hxClasses["model.gates.AbstractComponentKind"] = model_gates_AbstractComponentKind;
+model_gates_AbstractComponentKind.__name__ = "model.gates.AbstractComponentKind";
+model_gates_AbstractComponentKind.prototype = {
+	sequence: null
+	,component: null
+	,attributes: null
+	,getAttr: function() {
+		return this.attributes;
+	}
+	,get_component: function() {
+		return this.component;
+	}
+	,set_component: function(value) {
+		this.component = value;
+	}
+	,addInPort: function() {
+		return new model_component_Inport();
+	}
+	,addOutPort: function() {
+		return new model_component_Outport();
+	}
+	,get_sequence: function() {
+		return this.sequence;
+	}
+	,set_sequence: function(value) {
+		return this.sequence = value;
+	}
+	,updateInPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation._hx_index) {
+		case 0:
+			var _g = 0;
+			var _g1 = portArray.length;
+			while(_g < _g1) {
+				var i = _g++;
+				portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
+				portArray[i].set_yPosition(yPosition + height / 2);
+			}
+			break;
+		case 1:
+			var _g2 = 0;
+			var _g11 = portArray.length;
+			while(_g2 < _g11) {
+				var i1 = _g2++;
+				portArray[i1].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i1 + 1));
+				portArray[i1].set_yPosition(yPosition - height / 2);
+			}
+			break;
+		case 2:
+			var _g3 = 0;
+			var _g12 = portArray.length;
+			while(_g3 < _g12) {
+				var i2 = _g3++;
+				portArray[i2].set_xPosition(xPosition + width / 2);
+				portArray[i2].set_yPosition(height / (portArray.length + 1) * (i2 + 1) + (yPosition - height / 2));
+			}
+			break;
+		case 3:
+			var _g4 = 0;
+			var _g13 = portArray.length;
+			while(_g4 < _g13) {
+				var i3 = _g4++;
+				portArray[i3].set_xPosition(xPosition - width / 2);
+				portArray[i3].set_yPosition(height / (portArray.length + 1) * (i3 + 1) + (yPosition - height / 2));
+			}
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,updateOutPortPosition: function(portArray,xPosition,yPosition,height,width,orientation) {
+		switch(orientation._hx_index) {
+		case 0:
+			var _g = 0;
+			var _g1 = portArray.length;
+			while(_g < _g1) {
+				var i = _g++;
+				portArray[i].set_xPosition(xPosition);
+				portArray[i].set_yPosition(yPosition - height / 2);
+			}
+			break;
+		case 1:
+			var _g2 = 0;
+			var _g11 = portArray.length;
+			while(_g2 < _g11) {
+				var i1 = _g2++;
+				portArray[i1].set_xPosition(xPosition);
+				portArray[i1].set_yPosition(yPosition + height / 2);
+			}
+			break;
+		case 2:
+			var _g3 = 0;
+			var _g12 = portArray.length;
+			while(_g3 < _g12) {
+				var i2 = _g3++;
+				portArray[i2].set_xPosition(xPosition - width / 2);
+				portArray[i2].set_yPosition(yPosition);
+			}
+			break;
+		case 3:
+			var _g4 = 0;
+			var _g13 = portArray.length;
+			while(_g4 < _g13) {
+				var i3 = _g4++;
+				portArray[i3].set_xPosition(xPosition + width / 2);
+				portArray[i3].set_yPosition(yPosition);
+			}
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,findHitList: function(coordinate,mode) {
+		var hitObjectArray = [];
+		var component = this.isInComponent(coordinate);
+		if(component != null) {
+			var hitObject = new type_HitObject();
+			hitObject.set_component(component);
+			hitObjectArray.push(hitObject);
+		}
+		var port = this.isOnPort(coordinate);
+		if(port != null) {
+			var hitObject1 = new type_HitObject();
+			hitObject1.set_port(port);
+			hitObjectArray.push(hitObject1);
+		}
+		return hitObjectArray;
+	}
+	,isInComponent: function(coordinate) {
+		if(this.isInScope(this.component.get_xPosition(),this.component.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition(),this.component.get_height(),this.component.get_width()) == true) {
+			return this.component;
+		}
+		return null;
+	}
+	,isInScope: function(orignalXposition,orignalYposition,mouseXPosition,mouseYposition,heigh,width) {
+		if(mouseXPosition >= orignalXposition - width / 2 && mouseXPosition <= orignalXposition + width / 2 && (mouseYposition >= orignalYposition - heigh / 2 && mouseYposition <= orignalYposition + heigh / 2)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,isOnPort: function(cooridnate) {
+		var port;
+		var j = this.component.get_inportIterator();
+		while(j.hasNext()) {
+			var j1 = j.next();
+			if(this.isInCircle(cooridnate,j1.get_xPosition(),j1.get_yPosition())) {
+				port = j1;
+				return port;
+			}
+		}
+		var j2 = this.component.get_outportIterator();
+		while(j2.hasNext()) {
+			var j3 = j2.next();
+			if(this.isInCircle(cooridnate,j3.get_xPosition(),j3.get_yPosition())) {
+				port = j3;
+				return port;
+			}
+		}
+		return null;
+	}
+	,isInCircle: function(coordinate,orignalXPosition,orignalYPosition) {
+		if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= global_Constant.portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= global_Constant.portRadius) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	,findWorldPoint: function(worldCoordinate,mode) {
+		return [];
+	}
+	,getInnerCircuitDiagram: function() {
+		var e = new assertions_AssertionFailure("false",[]);
+		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/gates/AbstractComponentKind.hx", lineNumber : 235, className : "model.gates.AbstractComponentKind", methodName : "getInnerCircuitDiagram"});
+		throw new js__$Boot_HaxeError(e);
+	}
+	,checkInnerCircuitDiagramPortsChange: function() {
+		return false;
+	}
+	,__class__: model_gates_AbstractComponentKind
+};
 var model_gates_ComponentKind = function() { };
 $hxClasses["model.gates.ComponentKind"] = model_gates_ComponentKind;
 model_gates_ComponentKind.__name__ = "model.gates.ComponentKind";
@@ -7117,6 +8056,687 @@ model_gates_ComponentKind.prototype = {
 	,setname: null
 	,__class__: model_gates_ComponentKind
 };
+var model_gates_AND = function() {
+	this.nameOfTheComponentKind = "AND";
+	model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new model_attribute_IntAttr("delay"));
+};
+$hxClasses["model.gates.AND"] = model_gates_AND;
+model_gates_AND.__name__ = "model.gates.AND";
+model_gates_AND.__interfaces__ = [model_gates_ComponentKind];
+model_gates_AND.__super__ = model_gates_AbstractComponentKind;
+model_gates_AND.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	nameOfTheComponentKind: null
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		switch(orientation._hx_index) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		var drawComponent = new view_drawComponents_DrawAND(this.component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: model_gates_AND
+});
+var model_gates_CompoundComponent = function(circuitDiagram) {
+	this.nameOfTheComponentKind = "CC";
+	model_gates_AbstractComponentKind.call(this);
+	this.circuitDiagram = circuitDiagram;
+};
+$hxClasses["model.gates.CompoundComponent"] = model_gates_CompoundComponent;
+model_gates_CompoundComponent.__name__ = "model.gates.CompoundComponent";
+model_gates_CompoundComponent.__interfaces__ = [model_gates_ComponentKind];
+model_gates_CompoundComponent.__super__ = model_gates_AbstractComponentKind;
+model_gates_CompoundComponent.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	Ob: null
+	,Obable: null
+	,circuitDiagram: null
+	,nameOfTheComponentKind: null
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,getInnerCircuitDiagram: function() {
+		return this.circuitDiagram;
+	}
+	,checkInnerCircuitDiagramPortsChange: function() {
+		var inputNumberTemp = 0;
+		var outputNumberTemp = 0;
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(i1.getNameOfTheComponentKind() == "Input") {
+				++inputNumberTemp;
+			}
+			if(i1.getNameOfTheComponentKind() == "Output") {
+				++outputNumberTemp;
+			}
+		}
+		if(inputNumberTemp == this.component.get_inportIteratorLength() && outputNumberTemp == this.component.get_outportIteratorLength()) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var inportCount = 0;
+		var outportCount = 0;
+		var i = this.circuitDiagram.get_componentIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			if(i1.getNameOfTheComponentKind() == "Input") {
+				++inportCount;
+			} else if(i1.getNameOfTheComponentKind() == "Output") {
+				++outportCount;
+			}
+		}
+		var portArray = [];
+		switch(orientation._hx_index) {
+		case 0:
+			var i2 = this.circuitDiagram.get_componentIterator();
+			while(i2.hasNext()) {
+				var i3 = i2.next();
+				if(i3.getNameOfTheComponentKind() == "Input") {
+					var inport_1 = new model_component_Inport(xPosition - width / 2 + width / (inportCount + 1) * (i3.get_componentKind().get_sequence() + 1),height + height / 2);
+					inport_1.set_sequence(i3.get_componentKind().get_sequence());
+					portArray.push(inport_1);
+				} else if(i3.getNameOfTheComponentKind() == "Output") {
+					var outport_ = new model_component_Outport(xPosition - width / 2 + width / (outportCount + 1) * (i3.get_componentKind().get_sequence() + 1),height - height / 2);
+					outport_.set_sequence(i3.get_componentKind().get_sequence());
+					portArray.push(outport_);
+				}
+			}
+			break;
+		case 1:
+			var i4 = this.circuitDiagram.get_componentIterator();
+			while(i4.hasNext()) {
+				var i5 = i4.next();
+				if(i5.getNameOfTheComponentKind() == "Input") {
+					var inport_11 = new model_component_Inport(xPosition - width / 2 + width / (inportCount + 1) * (i5.get_componentKind().get_sequence() + 1),height - height / 2);
+					inport_11.set_sequence(i5.get_componentKind().get_sequence());
+					portArray.push(inport_11);
+				} else if(i5.getNameOfTheComponentKind() == "Output") {
+					var outport_1 = new model_component_Outport(xPosition - width / 2 + width / (outportCount + 1) * (i5.get_componentKind().get_sequence() + 1),height + height / 2);
+					outport_1.set_sequence(i5.get_componentKind().get_sequence());
+					portArray.push(outport_1);
+				}
+			}
+			break;
+		case 2:
+			var i6 = this.circuitDiagram.get_componentIterator();
+			while(i6.hasNext()) {
+				var i7 = i6.next();
+				if(i7.getNameOfTheComponentKind() == "Input") {
+					var inport_12 = new model_component_Inport(xPosition + width / 2,height / (inportCount + 1) * (i7.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
+					inport_12.set_sequence(i7.get_componentKind().get_sequence());
+					portArray.push(inport_12);
+				} else if(i7.getNameOfTheComponentKind() == "Output") {
+					var outport_2 = new model_component_Outport(xPosition - width / 2,height / (outportCount + 1) * (i7.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
+					outport_2.set_sequence(i7.get_componentKind().get_sequence());
+					portArray.push(outport_2);
+				}
+			}
+			break;
+		case 3:
+			var i8 = this.circuitDiagram.get_componentIterator();
+			while(i8.hasNext()) {
+				var i9 = i8.next();
+				if(i9.getNameOfTheComponentKind() == "Input") {
+					var inport_13 = new model_component_Inport(xPosition - width / 2,height / (inportCount + 1) * (i9.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
+					inport_13.set_sequence(i9.get_componentKind().get_sequence());
+					portArray.push(inport_13);
+				} else if(i9.getNameOfTheComponentKind() == "Output") {
+					var outport_3 = new model_component_Outport(xPosition + width / 2,height / (outportCount + 1) * (i9.get_componentKind().get_sequence() + 1) + (yPosition - height / 2));
+					outport_3.set_sequence(i9.get_componentKind().get_sequence());
+					portArray.push(outport_3);
+				}
+			}
+			break;
+		default:
+			var e = new assertions_AssertionFailure("false",[]);
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/gates/CompoundComponent.hx", lineNumber : 152, className : "model.gates.CompoundComponent", methodName : "createPorts"});
+			throw new js__$Boot_HaxeError(e);
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,hightLight,linkAndComponentArray) {
+		var drawingAdapterTrans = drawingAdapter.transform(this.makeTransform());
+		var drawComponent = new view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter,drawingAdapterTrans);
+		if(hightLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+		if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
+			this.circuitDiagram.draw(drawingAdapterTrans,linkAndComponentArray);
+		}
+	}
+	,makeTransform: function() {
+		var transform = model_drawingInterface_Transform.identity();
+		transform = transform.translate(-this.circuitDiagram.getComponentAndLinkCenterCoordinate().get_xPosition(),-this.circuitDiagram.getComponentAndLinkCenterCoordinate().get_yPosition()).scale(this.component.get_width() / this.circuitDiagram.get_diagramWidth(),this.component.get_height() / this.circuitDiagram.get_diagramHeight()).translate(this.component.get_xPosition(),this.component.get_yPosition());
+		return transform;
+	}
+	,findHitList: function(outerWorldCoordinates,mode) {
+		var hitObjectArray = [];
+		var hitComponent = this.isInComponent(outerWorldCoordinates);
+		if(hitComponent == null) {
+			return hitObjectArray;
+		} else if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
+			var transform = this.makeTransform();
+			var innerWorldCoordinates = transform.pointInvert(outerWorldCoordinates);
+			var result = this.circuitDiagram.findHitList(innerWorldCoordinates,mode);
+			if(result.length == 0 || mode == model_enumeration_MODE.INCLUDE_PARENTS) {
+				var hitObject = new type_HitObject();
+				hitObject.set_component(this.component);
+				result.push(hitObject);
+			}
+			return result;
+		} else {
+			var hitObject1 = new type_HitObject();
+			hitObject1.set_component(this.component);
+			hitObjectArray.push(hitObject1);
+			return hitObjectArray;
+		}
+	}
+	,findWorldPoint: function(worldCoordinate,mode) {
+		var worldPointArray = [];
+		if(this.isInComponent(worldCoordinate) == null) {
+			return worldPointArray;
+		} else if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
+			var transform = this.makeTransform();
+			var wForDiagram = transform.pointInvert(worldCoordinate);
+			return this.circuitDiagram.findWorldPoint(wForDiagram,mode);
+		} else {
+			return worldPointArray;
+		}
+	}
+	,__class__: model_gates_CompoundComponent
+});
+var model_gates_NAND = function() {
+	this.nameOfTheComponentKind = "NAND";
+	model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new model_attribute_IntAttr("delay"));
+};
+$hxClasses["model.gates.NAND"] = model_gates_NAND;
+model_gates_NAND.__name__ = "model.gates.NAND";
+model_gates_NAND.__interfaces__ = [model_gates_ComponentKind];
+model_gates_NAND.__super__ = model_gates_AbstractComponentKind;
+model_gates_NAND.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	nameOfTheComponentKind: null
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 2) {
+			inportNum = 2;
+		}
+		switch(orientation._hx_index) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		var drawComponent = new view_drawComponents_DrawNAND(this.component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: model_gates_NAND
+});
+var model_gates_NOR = function() {
+	this.nameOfTheComponentKind = "NOR";
+	model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new model_attribute_IntAttr("delay"));
+};
+$hxClasses["model.gates.NOR"] = model_gates_NOR;
+model_gates_NOR.__name__ = "model.gates.NOR";
+model_gates_NOR.__interfaces__ = [model_gates_ComponentKind];
+model_gates_NOR.__super__ = model_gates_AbstractComponentKind;
+model_gates_NOR.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	nameOfTheComponentKind: null
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 2) {
+			inportNum = 2;
+		}
+		switch(orientation._hx_index) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		var drawComponent = new view_drawComponents_DrawNOR(this.component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: model_gates_NOR
+});
+var model_gates_NOT = function() {
+	this.nameOfTheComponentKind = "NOT";
+	model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new model_attribute_IntAttr("delay"));
+};
+$hxClasses["model.gates.NOT"] = model_gates_NOT;
+model_gates_NOT.__name__ = "model.gates.NOT";
+model_gates_NOT.__interfaces__ = [model_gates_ComponentKind];
+model_gates_NOT.__super__ = model_gates_AbstractComponentKind;
+model_gates_NOT.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	nameOfTheComponentKind: null
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		inportNum = 1;
+		switch(orientation._hx_index) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		var drawComponent = new view_drawComponents_DrawNOT(this.component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: model_gates_NOT
+});
+var model_gates_OR = function() {
+	this.nameOfTheComponentKind = "OR";
+	model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new model_attribute_IntAttr("delay"));
+};
+$hxClasses["model.gates.OR"] = model_gates_OR;
+model_gates_OR.__name__ = "model.gates.OR";
+model_gates_OR.__interfaces__ = [model_gates_ComponentKind];
+model_gates_OR.__super__ = model_gates_AbstractComponentKind;
+model_gates_OR.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	nameOfTheComponentKind: null
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 3) {
+			inportNum = 2;
+		}
+		switch(orientation._hx_index) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		var drawComponent = new view_drawComponents_DrawOR(this.component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: model_gates_OR
+});
+var model_gates_XOR = function() {
+	this.nameOfTheComponentKind = "XOR";
+	model_gates_AbstractComponentKind.call(this);
+	this.attributes.push(new model_attribute_IntAttr("delay"));
+};
+$hxClasses["model.gates.XOR"] = model_gates_XOR;
+model_gates_XOR.__name__ = "model.gates.XOR";
+model_gates_XOR.__interfaces__ = [model_gates_ComponentKind];
+model_gates_XOR.__super__ = model_gates_AbstractComponentKind;
+model_gates_XOR.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
+	nameOfTheComponentKind: null
+	,setname: function(s) {
+		this.nameOfTheComponentKind = s;
+	}
+	,getname: function() {
+		return this.nameOfTheComponentKind;
+	}
+	,createPorts: function(xPosition,yPosition,height,width,orientation,inportNum) {
+		var portArray = [];
+		if(inportNum == null || inportNum < 2) {
+			inportNum = 2;
+		}
+		switch(orientation._hx_index) {
+		case 0:
+			var counter = 0;
+			while(counter < inportNum) {
+				var inport = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1),yPosition + height / 2);
+				inport.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport);
+				++counter;
+			}
+			var outport_ = new model_component_Outport(xPosition,yPosition - height / 2);
+			outport_.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_);
+			break;
+		case 1:
+			var counter1 = 0;
+			while(counter1 < inportNum) {
+				var inport1 = new model_component_Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter1 + 1),yPosition - height / 2);
+				inport1.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport1);
+				++counter1;
+			}
+			var outport_1 = new model_component_Outport(xPosition,yPosition + height / 2);
+			outport_1.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_1);
+			break;
+		case 2:
+			var counter2 = 0;
+			while(counter2 < inportNum) {
+				var inport2 = new model_component_Inport(xPosition + width / 2,height / (inportNum + 1) * (counter2 + 1) + (yPosition - height / 2));
+				inport2.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport2);
+				++counter2;
+			}
+			var outport_2 = new model_component_Outport(xPosition - width / 2,yPosition);
+			outport_2.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_2);
+			break;
+		case 3:
+			var counter3 = 0;
+			while(counter3 < inportNum) {
+				var inport3 = new model_component_Inport(xPosition - width / 2,height / (inportNum + 1) * (counter3 + 1) + (yPosition - height / 2));
+				inport3.set_portDescription(model_enumeration_IOTYPE.INPUT);
+				portArray.push(inport3);
+				++counter3;
+			}
+			var outport_3 = new model_component_Outport(xPosition + width / 2,yPosition);
+			outport_3.set_portDescription(model_enumeration_IOTYPE.OUTPUT);
+			portArray.push(outport_3);
+			break;
+		default:
+		}
+		return portArray;
+	}
+	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+		var drawComponent = new view_drawComponents_DrawXOR(this.component,drawingAdapter);
+		if(highLight) {
+			drawComponent.drawCorrespondingComponent("red");
+		} else {
+			drawComponent.drawCorrespondingComponent("black");
+		}
+	}
+	,__class__: model_gates_XOR
+});
 var model_selectionModel_SelectionModel = function(linkArray,componentArray) {
 	this.selectedComponents = componentArray;
 	this.selectedLinks = linkArray;
@@ -7146,15 +8766,39 @@ model_selectionModel_SelectionModel.prototype = {
 	}
 	,__class__: model_selectionModel_SelectionModel
 };
-var model_tabModel_TabModel = function(circuitDiagram) {
+var model_tabModel_TabModel = function(circuitDiagram,view) {
+	var _gthis = this;
+	this.view = view;
 	this.circuitDiagram = circuitDiagram;
 	this.selectionModel = new model_selectionModel_SelectionModel([],[]);
+	var canvasDisplayScreen = window.document.querySelector("#displayScreen");
+	var innerCanvas = window.document.createElement("canvas");
+	innerCanvas.id = "canvasToDraw";
+	canvasDisplayScreen.appendChild(innerCanvas);
+	innerCanvas.style.width = "100%";
+	innerCanvas.style.height = "100%";
+	canvasDisplayScreen.addEventListener("dragover",function(event) {
+		event.preventDefault();
+		event.dataTransfer.dropEffect = "move";
+	});
+	canvasDisplayScreen.addEventListener("drop",function(event1) {
+		event1.preventDefault();
+		var data = event1.dataTransfer.getData("text/plain");
+		console.log("co-ordinates ::",event1.layerX,event1.layerY);
+		var eventPassed = JSON.parse(data);
+		eventPassed.posX = event1.pageX;
+		eventPassed.posY = event1.pageY;
+		_gthis.view.updateCanvasListener(eventPassed);
+	});
+	this.canvasElement = innerCanvas;
 };
 $hxClasses["model.tabModel.TabModel"] = model_tabModel_TabModel;
 model_tabModel_TabModel.__name__ = "model.tabModel.TabModel";
 model_tabModel_TabModel.prototype = {
-	selectionModel: null
+	view: null
+	,selectionModel: null
 	,circuitDiagram: null
+	,canvasElement: null
 	,getCircuitDiagram: function() {
 		return this.circuitDiagram;
 	}
@@ -7182,6 +8826,12 @@ model_tabModel_TabModel.prototype = {
 			++_g;
 			this.selectionModel.removeComponentFromSelection(component);
 		}
+	}
+	,getCanvasContext: function() {
+		return this.canvasElement;
+	}
+	,setCanvasContext: function(canvas) {
+		this.canvasElement = canvas;
 	}
 	,__class__: model_tabModel_TabModel
 };
@@ -7409,12 +9059,13 @@ type_WorldPoint.prototype = {
 	,__class__: type_WorldPoint
 };
 var view_View = function() {
+	this.allTabs = [];
 	var _gthis = this;
-	haxe_Log.trace("DOM example",{ fileName : "src/view/View.hx", lineNumber : 19, className : "view.View", methodName : "new"});
+	this.activeTab = new model_tabModel_TabModel(new model_component_CircuitDiagram(),this);
+	this.allTabs.push(this.activeTab);
+	haxe_Log.trace("DOM example",{ fileName : "src/view/View.hx", lineNumber : 28, className : "view.View", methodName : "new"});
 	window.document.addEventListener("DOMContentLoaded",function(event) {
-		haxe_Log.trace("DOM ready",{ fileName : "src/view/View.hx", lineNumber : 22, className : "view.View", methodName : "new"});
-		var sidebarPara = window.document.querySelector("p");
-		sidebarPara.innerText = "\r\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.\r\n";
+		haxe_Log.trace("DOM ready",{ fileName : "src/view/View.hx", lineNumber : 31, className : "view.View", methodName : "new"});
 		window.document.querySelector("#clickMe").addEventListener("click",function(event1) {
 			console.log("clickable was clicked");
 			_gthis.sidebarListener.update("clickMe");
@@ -7429,22 +9080,6 @@ var view_View = function() {
 			console.log(event3.dataTransfer.items);
 			event3.dataTransfer.dropEffect = "move";
 		});
-		var canvasDisplayScreen = window.document.querySelector("#displayScreen");
-		canvasDisplayScreen.addEventListener("dragover",function(event4) {
-			event4.preventDefault();
-			event4.dataTransfer.dropEffect = "move";
-		});
-		canvasDisplayScreen.addEventListener("drop",function(event5) {
-			event5.preventDefault();
-			console.log(event5);
-			console.log(event5.dataTransfer.items);
-			var data = event5.dataTransfer.getData("text/plain");
-			console.log(data);
-			var event6 = event5.target;
-			var tmp = window.document.querySelector("#" + data).cloneNode(true);
-			event6.appendChild(tmp);
-			_gthis.canvasListener.update(data);
-		});
 	});
 };
 $hxClasses["view.View"] = view_View;
@@ -7452,6 +9087,8 @@ view_View.__name__ = "view.View";
 view_View.prototype = {
 	sidebarListener: null
 	,canvasListener: null
+	,activeTab: null
+	,allTabs: null
 	,setSidebarListener: function(listener) {
 		this.sidebarListener = listener;
 	}
@@ -7463,6 +9100,20 @@ view_View.prototype = {
 		updateThis.innerText = updateString;
 	}
 	,updateSidebarOptions: function() {
+		console.log("updateSidebarOptions has been called");
+	}
+	,updateCanvasListener: function(eventObject) {
+		if(eventObject.eventType == "sidebarDrag") {
+			this.canvasListener.addComponentToCanvas(eventObject);
+		}
+	}
+	,updateCanvas: function() {
+		console.log("view.updateCanvas");
+		var drawingAdapter = new model_drawingInterface_DrawingAdapter(model_drawingInterface_Transform.identity(),this.activeTab.getCanvasContext().getContext("2d",null));
+		this.activeTab.getCircuitDiagram().draw(drawingAdapter);
+	}
+	,setActiveTab: function() {
+		this.canvasListener.setActiveTab(this.activeTab);
 	}
 	,__class__: view_View
 };
@@ -7473,6 +9124,137 @@ view_drawComponents_DrawComponent.__isInterface__ = true;
 view_drawComponents_DrawComponent.prototype = {
 	drawCorrespondingComponent: null
 	,__class__: view_drawComponents_DrawComponent
+};
+var view_drawComponents_DrawAND = function(component,drawingAdapter) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["view.drawComponents.DrawAND"] = view_drawComponents_DrawAND;
+view_drawComponents_DrawAND.__name__ = "view.drawComponents.DrawAND";
+view_drawComponents_DrawAND.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawAND.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: view_drawComponents_DrawAND
+};
+var view_drawComponents_DrawCompoundComponent = function(component,drawingAdapter,drawingAdapterTrans) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+	this.drawingAdapterTrans = drawingAdapterTrans;
+};
+$hxClasses["view.drawComponents.DrawCompoundComponent"] = view_drawComponents_DrawCompoundComponent;
+view_drawComponents_DrawCompoundComponent.__name__ = "view.drawComponents.DrawCompoundComponent";
+view_drawComponents_DrawCompoundComponent.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawCompoundComponent.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawingAdapterTrans: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
+			this.drawingAdapter.setFillColor("white");
+		} else {
+			this.drawingAdapter.setFillColor("gray");
+		}
+		this.drawingAdapter.drawRect(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
+		this.drawingAdapter.setClip(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height());
+		if(this.component.get_boxType() == model_enumeration_BOX.BLACK_BOX) {
+			this.drawingAdapter.setTextColor("black");
+			this.drawingAdapter.drawText(this.component.get_name(),this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width());
+		}
+		this.drawInportAndOutport();
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,drawInportAndOutport: function() {
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+			if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
+				var j = this.component.get_componentKind().getInnerCircuitDiagram().get_componentIterator();
+				while(j.hasNext()) {
+					var j1 = j.next();
+					if(j1.getNameOfTheComponentKind() == "Input") {
+						if(i1.get_sequence() == j1.get_componentKind().get_sequence()) {
+							var k = j1.get_inportIterator();
+							while(k.hasNext()) {
+								var k1 = k.next();
+								var coordinate = this.drawingAdapterTrans.getTransform().pointConvert(new type_Coordinate(k1.get_xPosition(),k1.get_yPosition()));
+								coordinate = this.drawingAdapter.getTransform().pointInvert(coordinate);
+								this.drawingAdapter.drawLine(i1.get_xPosition(),i1.get_yPosition(),coordinate.get_xPosition(),coordinate.get_yPosition());
+							}
+						}
+					}
+				}
+			}
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+			if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
+				var j2 = this.component.get_componentKind().getInnerCircuitDiagram().get_componentIterator();
+				while(j2.hasNext()) {
+					var j3 = j2.next();
+					if(j3.getNameOfTheComponentKind() == "Output") {
+						if(i3.get_sequence() == j3.get_componentKind().get_sequence()) {
+							var k2 = j3.get_outportIterator();
+							while(k2.hasNext()) {
+								var k3 = k2.next();
+								var coordinate1 = this.drawingAdapterTrans.getTransform().pointConvert(new type_Coordinate(k3.get_xPosition(),k3.get_yPosition()));
+								coordinate1 = this.drawingAdapter.getTransform().pointInvert(coordinate1);
+								this.drawingAdapter.drawLine(i3.get_xPosition(),i3.get_yPosition(),coordinate1.get_xPosition(),coordinate1.get_yPosition());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	,__class__: view_drawComponents_DrawCompoundComponent
 };
 var view_drawComponents_DrawLink = function(link,drawingAdapter) {
 	this.link = link;
@@ -7493,135 +9275,175 @@ view_drawComponents_DrawLink.prototype = {
 	}
 	,__class__: view_drawComponents_DrawLink
 };
-var view_drawingImpl_RectangleI = function() { };
-$hxClasses["view.drawingImpl.RectangleI"] = view_drawingImpl_RectangleI;
-view_drawingImpl_RectangleI.__name__ = "view.drawingImpl.RectangleI";
-view_drawingImpl_RectangleI.__isInterface__ = true;
-view_drawingImpl_RectangleI.prototype = {
-	min: null
-	,max: null
-	,width: null
-	,height: null
-	,set_minCoordinate: null
-	,set_maxCoordinate: null
-	,__class__: view_drawingImpl_RectangleI
+var view_drawComponents_DrawNAND = function(component,drawingAdapter) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
 };
-var view_drawingImpl_Rectangle = function(corner0,corner1) {
-	this.minCoordinate = new type_Coordinate(Math.min(corner0.get_xPosition(),corner1.get_xPosition()),Math.min(corner0.get_yPosition(),corner1.get_yPosition()));
-	this.maxCoordinate = new type_Coordinate(Math.max(corner0.get_xPosition(),corner1.get_xPosition()),Math.max(corner0.get_yPosition(),corner1.get_yPosition()));
-	this.updateWidthAndHeight();
-};
-$hxClasses["view.drawingImpl.Rectangle"] = view_drawingImpl_Rectangle;
-view_drawingImpl_Rectangle.__name__ = "view.drawingImpl.Rectangle";
-view_drawingImpl_Rectangle.__interfaces__ = [view_drawingImpl_RectangleI];
-view_drawingImpl_Rectangle.prototype = {
-	minCoordinate: null
-	,maxCoordinate: null
-	,width_: null
-	,height_: null
-	,min: function() {
-		return this.minCoordinate;
-	}
-	,max: function() {
-		return this.maxCoordinate;
-	}
-	,width: function() {
-		return this.width_;
-	}
-	,height: function() {
-		return this.height_;
-	}
-	,set_minCoordinate: function(value) {
-		this.minCoordinate = value;
-		this.updateWidthAndHeight();
-	}
-	,set_maxCoordinate: function(value) {
-		this.maxCoordinate = value;
-		this.updateWidthAndHeight();
-	}
-	,updateWidthAndHeight: function() {
-		this.width_ = this.maxCoordinate.get_xPosition() - this.minCoordinate.get_xPosition();
-		this.height_ = this.maxCoordinate.get_yPosition() - this.minCoordinate.get_yPosition();
-	}
-	,__class__: view_drawingImpl_Rectangle
-};
-var view_drawingImpl_Transform = function(m,im) {
-	this.convertMatrix = m;
-	this.invertMatrix = im;
-};
-$hxClasses["view.drawingImpl.Transform"] = view_drawingImpl_Transform;
-view_drawingImpl_Transform.__name__ = "view.drawingImpl.Transform";
-view_drawingImpl_Transform.identity = function() {
-	return new view_drawingImpl_Transform([1,0,0,0,1,0,0,0,1],[1,0,0,0,1,0,0,0,1]);
-};
-view_drawingImpl_Transform.prototype = {
-	convertMatrix: null
-	,invertMatrix: null
-	,pointConvert: function(c) {
-		return new type_Coordinate(this.convertMatrix[0] * c.get_xPosition() + this.convertMatrix[1] * c.get_yPosition() + this.convertMatrix[2],this.convertMatrix[3] * c.get_xPosition() + this.convertMatrix[4] * c.get_yPosition() + this.convertMatrix[5]);
-	}
-	,pointInvert: function(c) {
-		return new type_Coordinate(this.invertMatrix[0] * c.get_xPosition() + this.invertMatrix[1] * c.get_yPosition() + this.invertMatrix[2],this.invertMatrix[3] * c.get_xPosition() + this.invertMatrix[4] * c.get_yPosition() + this.invertMatrix[5]);
-	}
-	,rectConvert: function(c) {
-		var maxCoordinate = this.pointConvert(c.max());
-		var minCoordinate = this.pointConvert(c.min());
-		return new view_drawingImpl_Rectangle(maxCoordinate,minCoordinate);
-	}
-	,rectInvert: function(c) {
-		var maxCoordinate = this.pointInvert(c.max());
-		var minCoordinate = this.pointInvert(c.min());
-		return new view_drawingImpl_Rectangle(maxCoordinate,minCoordinate);
-	}
-	,scale: function(xRatio,yRatio) {
-		var scaleArray = [xRatio,0,0,0,yRatio,0,0,0,1];
-		var invScaleArray = [1 / xRatio,0,0,0,1 / yRatio,0,0,0,1];
-		return new view_drawingImpl_Transform(this.multiply(scaleArray,this.convertMatrix),this.multiply(this.invertMatrix,invScaleArray));
-	}
-	,translate: function(xDelta,yDelta) {
-		var translateArray = [1,0,xDelta,0,1,yDelta,0,0,1];
-		var invTranslateArray = [1,0,-xDelta,0,1,-yDelta,0,0,1];
-		return new view_drawingImpl_Transform(this.multiply(translateArray,this.convertMatrix),this.multiply(this.invertMatrix,invTranslateArray));
-	}
-	,quadrantRotate: function(n) {
-		return null;
-	}
-	,compose: function(other) {
-		return new view_drawingImpl_Transform(this.multiply(other.convertMatrix,this.convertMatrix),this.multiply(this.invertMatrix,other.invertMatrix));
-	}
-	,multiply: function(matrix1,matrix2) {
-		var n = Math.sqrt(matrix1.length);
-		var tempArray = [];
-		var _g = 0;
-		var _g1 = n;
-		while(_g < _g1) {
-			var i = _g++;
-			var _g2 = 0;
-			var _g11 = n;
-			while(_g2 < _g11) {
-				var j = _g2++;
-				tempArray[n * i + j] = 0;
-			}
+$hxClasses["view.drawComponents.DrawNAND"] = view_drawComponents_DrawNAND;
+view_drawComponents_DrawNAND.__name__ = "view.drawComponents.DrawNAND";
+view_drawComponents_DrawNAND.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawNAND.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
 		}
-		var _g21 = 0;
-		var _g3 = n;
-		while(_g21 < _g3) {
-			var i1 = _g21++;
-			var _g22 = 0;
-			var _g31 = n;
-			while(_g22 < _g31) {
-				var j1 = _g22++;
-				var _g23 = 0;
-				var _g32 = n;
-				while(_g23 < _g32) {
-					var k = _g23++;
-					tempArray[n * i1 + j1] += matrix1[n * i1 + k] * matrix2[n * k + j1];
-				}
-			}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawNAndShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
 		}
-		return tempArray;
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.resetDrawingParam();
 	}
-	,__class__: view_drawingImpl_Transform
+	,__class__: view_drawComponents_DrawNAND
+};
+var view_drawComponents_DrawNOR = function(component,drawingAdapter) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["view.drawComponents.DrawNOR"] = view_drawComponents_DrawNOR;
+view_drawComponents_DrawNOR.__name__ = "view.drawComponents.DrawNOR";
+view_drawComponents_DrawNOR.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawNOR.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawNOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: view_drawComponents_DrawNOR
+};
+var view_drawComponents_DrawNOT = function(component,drawingAdapter) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["view.drawComponents.DrawNOT"] = view_drawComponents_DrawNOT;
+view_drawComponents_DrawNOT.__name__ = "view.drawComponents.DrawNOT";
+view_drawComponents_DrawNOT.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawNOT.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawNotShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: view_drawComponents_DrawNOT
+};
+var view_drawComponents_DrawOR = function(component,drawingAdapter) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["view.drawComponents.DrawOR"] = view_drawComponents_DrawOR;
+view_drawComponents_DrawOR.__name__ = "view.drawComponents.DrawOR";
+view_drawComponents_DrawOR.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawOR.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawOrShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: view_drawComponents_DrawOR
+};
+var view_drawComponents_DrawXOR = function(component,drawingAdapter) {
+	this.component = component;
+	this.drawingAdapter = drawingAdapter;
+};
+$hxClasses["view.drawComponents.DrawXOR"] = view_drawComponents_DrawXOR;
+view_drawComponents_DrawXOR.__name__ = "view.drawComponents.DrawXOR";
+view_drawComponents_DrawXOR.__interfaces__ = [view_drawComponents_DrawComponent];
+view_drawComponents_DrawXOR.prototype = {
+	drawingAdapter: null
+	,component: null
+	,drawCorrespondingComponent: function(strokeColor) {
+		if(strokeColor == null || strokeColor == "") {
+			strokeColor = "black";
+		}
+		this.drawingAdapter.setStrokeColor(strokeColor);
+		this.drawingAdapter.drawXorShape(this.component.get_xPosition(),this.component.get_yPosition(),this.component.get_width(),this.component.get_height(),this.component.get_orientation());
+		var i = this.component.get_inportIterator();
+		while(i.hasNext()) {
+			var i1 = i.next();
+			var port = i1;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port.get_xPosition(),port.get_yPosition(),global_Constant.portRadius);
+		}
+		var i2 = this.component.get_outportIterator();
+		while(i2.hasNext()) {
+			var i3 = i2.next();
+			var port1 = i3;
+			this.drawingAdapter.setFillColor("black");
+			this.drawingAdapter.drawCricle(port1.get_xPosition(),port1.get_yPosition(),global_Constant.portRadius);
+		}
+		this.drawingAdapter.resetDrawingParam();
+	}
+	,__class__: view_drawComponents_DrawXOR
 };
 var view_viewUpdaters_AbstractUpdate = function() { };
 $hxClasses["view.viewUpdaters.AbstractUpdate"] = view_viewUpdaters_AbstractUpdate;
@@ -7633,6 +9455,8 @@ view_viewUpdaters_AbstractUpdate.prototype = {
 		this.viewToUpdate = view1;
 	}
 	,updateView: function(string) {
+	}
+	,updateCanvas: function() {
 	}
 	,__class__: view_viewUpdaters_AbstractUpdate
 };
@@ -7646,16 +9470,83 @@ view_viewUpdaters_CanvasUpdate.prototype = $extend(view_viewUpdaters_AbstractUpd
 	updateView: function(string) {
 		this.viewToUpdate.updateThisBox(string);
 	}
+	,updateCanvas: function() {
+		console.log("view.viewUpdaters.updateCanvas");
+		this.viewToUpdate.updateCanvas();
+	}
 	,__class__: view_viewUpdaters_CanvasUpdate
 });
 var view_viewUpdaters_SidebarUpdate = function(view1) {
 	view_viewUpdaters_AbstractUpdate.prototype.setViewToUpdate.call(this,view1);
+	this.populateSidebar();
 };
 $hxClasses["view.viewUpdaters.SidebarUpdate"] = view_viewUpdaters_SidebarUpdate;
 view_viewUpdaters_SidebarUpdate.__name__ = "view.viewUpdaters.SidebarUpdate";
 view_viewUpdaters_SidebarUpdate.__super__ = view_viewUpdaters_AbstractUpdate;
 view_viewUpdaters_SidebarUpdate.prototype = $extend(view_viewUpdaters_AbstractUpdate.prototype,{
-	updateView: function(string) {
+	createSidebarItemElement: function(drawComponentString,component) {
+		var height = 50;
+		var width = 50;
+		var sidebarItem = window.document.createElement("div");
+		sidebarItem.id = "sidebarItem_" + Std.string(drawComponentString);
+		sidebarItem.style.height = height + "px";
+		sidebarItem.style.width = "100%";
+		sidebarItem.style.border = "solid 1px black";
+		sidebarItem.draggable = true;
+		sidebarItem.addEventListener("drag",function(event) {
+		});
+		sidebarItem.addEventListener("dragstart",function(event1) {
+			var draggedItemEvent = { eventType : "sidebarDrag", from : "sidebar", to : "canvas", component : Std.string(drawComponentString)};
+			var stringEvent = JSON.stringify(draggedItemEvent);
+			event1.dataTransfer.setData("text/plain",stringEvent);
+			event1.dataTransfer.dropEffect = "move";
+		});
+		var sidebarItemCanvas = window.document.createElement("canvas");
+		sidebarItem.appendChild(sidebarItemCanvas);
+		sidebarItemCanvas.style.width = "100%";
+		sidebarItemCanvas.style.height = "100%";
+		var drawingAdapter = new model_drawingInterface_DrawingAdapter(model_drawingInterface_Transform.identity(),sidebarItemCanvas.getContext("2d",null));
+		switch(drawComponentString._hx_index) {
+		case 0:
+			drawingAdapter.drawAndShape(80,75,70,70,model_enumeration_ORIENTATION.EAST);
+			break;
+		case 1:
+			drawingAdapter.drawNAndShape(80,75,70,70,model_enumeration_ORIENTATION.EAST);
+			break;
+		case 2:
+			drawingAdapter.drawOrShape(80,75,70,70,model_enumeration_ORIENTATION.EAST);
+			break;
+		case 3:
+			drawingAdapter.drawNOrShape(80,75,70,70,model_enumeration_ORIENTATION.EAST);
+			break;
+		case 4:
+			drawingAdapter.drawXorShape(80,75,70,70,model_enumeration_ORIENTATION.EAST);
+			break;
+		case 5:
+			drawingAdapter.drawNotShape(80,75,70,70,model_enumeration_ORIENTATION.EAST);
+			break;
+		case 6:
+			console.log("CC");
+			break;
+		}
+		return sidebarItem;
+	}
+	,populateSidebar: function() {
+		var defaultSidebarItems = [model_enumeration_ComponentType.AND,model_enumeration_ComponentType.NAND,model_enumeration_ComponentType.OR,model_enumeration_ComponentType.NOR,model_enumeration_ComponentType.XOR,model_enumeration_ComponentType.NOT];
+		var sidebarTable = window.document.querySelector("#sidebarTable");
+		var tableBody = sidebarTable.childNodes[1];
+		var _g = 0;
+		while(_g < defaultSidebarItems.length) {
+			var defaultItem = defaultSidebarItems[_g];
+			++_g;
+			var tr = window.document.createElement("tr");
+			var td = tr.insertCell(0);
+			td.appendChild(this.createSidebarItemElement(defaultItem));
+			tableBody.appendChild(tr);
+		}
+		this.viewToUpdate.updateSidebarOptions();
+	}
+	,updateView: function(string) {
 		this.viewToUpdate.updateThisBox(string);
 	}
 	,__class__: view_viewUpdaters_SidebarUpdate

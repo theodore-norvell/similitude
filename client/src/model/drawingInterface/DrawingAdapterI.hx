@@ -50,8 +50,6 @@ interface DrawingAdapterI {
 	 */
     public function setClip(x:Float, y:Float, width:Float, height:Float):Void;
 	
-	public function setContext (context: CanvasRenderingContext2D) : Void;
-
     public function getTransform():Transform;
     /**
     * make a IntAttr drawing Adapter
