@@ -26,10 +26,6 @@ class Input implements ComponentKind extends AbstractComponentKind {
         attributes.push(new StringAttr("name"));
     }
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
     }

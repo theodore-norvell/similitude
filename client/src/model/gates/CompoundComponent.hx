@@ -34,10 +34,6 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     var circuitDiagram:CircuitDiagramI;
     var nameOfTheComponentKind:String="CC";
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
     }

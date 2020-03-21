@@ -120,6 +120,4 @@ interface ComponentKind {
     * TODO Get rid of this.
     **/
     public function getInnerCircuitDiagram():CircuitDiagramI;
-
-    public function setname(s:String):Void;
 }

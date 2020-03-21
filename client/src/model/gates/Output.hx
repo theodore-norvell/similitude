@@ -25,10 +25,6 @@ class Output implements ComponentKind extends AbstractComponentKind {
         super() ;
     }
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
     }

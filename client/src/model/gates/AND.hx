@@ -44,10 +44,6 @@ class AND implements ComponentKind extends AbstractComponentKind {
         return nameOfTheComponentKind;
     }
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         switch (orientation){

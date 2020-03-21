@@ -36,10 +36,6 @@ class NOT implements ComponentKind extends AbstractComponentKind {
         attributes.push(new IntAttr("delay"));
     }
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
     }
