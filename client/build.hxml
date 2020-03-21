@@ -1,4 +1,4 @@
 -cp src
 -main Main
--js bin/example.js
+-js bin/similitudeClient.js
 -D dce=no
