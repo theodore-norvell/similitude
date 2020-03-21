@@ -33,11 +33,13 @@ import model.attribute.OrientationValue;
  * @author wanhui
  *
  */
-class Component extends Observable{
+class Component extends Observable { 
+    // TODO: Should xPosition, yPosition, height, width be attributes?
     var xPosition:Float;//the x position of the component
     var yPosition:Float;//the y position of the component
     var height:Float;//height
     var width:Float;//width
+    // TODO: make sequenceNumber an attribute.
     var sequenceNumber : Int ; // This should be -1 unless the component is an
                             // input or an output. In that case, it represents
                             // the component's position relative to other inputs
@@ -45,7 +47,9 @@ class Component extends Observable{
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
+    // TODO Make inportsNum an attribute for the kinds where it makes sense.
     var inportsNum:Int;//init
+    // TODO Make boxType an attribute for the kinds where it makes sense.
     var boxType:BOX;
     var list:Map<String,Pair>=new Map<String,Pair>();
     var cd:CircuitDiagram;
