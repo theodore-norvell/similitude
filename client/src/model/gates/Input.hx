@@ -6,6 +6,7 @@ import type.LinkAndComponentAndEndpointAndPortArray;
 import view.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import view.drawComponents.DrawInput;
+import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -139,7 +140,7 @@ class Input implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawInput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

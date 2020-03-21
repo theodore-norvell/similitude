@@ -8,6 +8,7 @@ import view.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import view.drawComponents.DrawOR;
 import model.selectionModel.SelectionModel ;
+import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -111,7 +112,7 @@ class OR implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
         var drawComponent:DrawComponent = new DrawOR(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");
