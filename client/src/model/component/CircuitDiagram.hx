@@ -8,7 +8,7 @@ import type.HitObject;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
 import model.drawingInterface.DrawingAdapterI;
-import type.LinkAndComponentAndEndpointAndPortArray;
+import model.selectionModel.SelectionModel ;
 import model.enumeration.ORIENTATION;
 import type.Coordinate;
 import type.WorldPoint;
@@ -265,47 +265,18 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
     * for all components, if want to draw it, must convert world coordinate to view coordinate first.
      * because draw() method only has the responsiblity to draw component itself.
     **/
-    public function draw(drawingAdapter:DrawingAdapterI,?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void{
-        var drawFlag:Bool = false;
+    public function draw( drawingAdapter:DrawingAdapterI,
+                          selection :SelectionModel)
+    : Void{
         //update component array
         for(i in componentArray){
-            if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0){
-                for(j in linkAndComponentArray.get_componentIterator()){
-                    if(j == i){
-                        i.drawComponent(drawingAdapter, true);
-                        drawFlag = true;
-                    }
-                }
-            }
-
-            if(!drawFlag){
-                if(i.getNameOfTheComponentKind() != "CC"){
-                    i.drawComponent(drawingAdapter, false);
-                }else{
-                    i.drawComponent(drawingAdapter, false, linkAndComponentArray);
-                }
-            }
-
-            drawFlag = false;
+            var highlight = selection.containsComponent( i ) ;
+            i.drawComponent(drawingAdapter, highlight, selection);
         }
 
-        drawFlag = false;
-        //update link array
         for(i in linkArray){
-            if(linkAndComponentArray != null && linkAndComponentArray.getLinkIteratorLength() != 0){
-                for(j in linkAndComponentArray.get_linkIterator()){
-                    if(j == i){
-                        i.drawLink(drawingAdapter, true);
-                        drawFlag = true;
-                    }
-                }
-            }
-
-            if(!drawFlag){
-                i.drawLink(drawingAdapter, false);
-            }
-
-            drawFlag = false;
+            var highlight = selection.containsLink( i ) ;
+            i.drawLink(drawingAdapter, highlight);
         }
     }
 

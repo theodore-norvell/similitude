@@ -1,7 +1,6 @@
 package model.gates;
 
 import model.attribute.Attribute;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import type.HitObject;
 import model.component.CircuitDiagramI;
 import model.enumeration.POINT_MODE;
@@ -10,6 +9,7 @@ import type.Coordinate;
 import type.WorldPoint;
 import model.drawingInterface.DrawingAdapterI;
 import model.component.Component;
+import model.selectionModel.SelectionModel ;
 import model.component.Port;
 import model.enumeration.ORIENTATION;
 /**
@@ -33,6 +33,7 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
+    // TODO. This function must go.
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port>;
 
     public function checkInnerCircuitDiagramPortsChange():Bool;
@@ -41,8 +42,10 @@ interface ComponentKind {
     * add an inport
      * @return the created ports
     **/
+    // TODO. This function must go.
     public function addInPort():Port;
 
+    // TODO. This function must go.
     public function addOutPort():Port;
 
     /**
@@ -55,6 +58,7 @@ interface ComponentKind {
     *  @param orientation : direction
     *  @return the array of the updated ports
     **/
+    // TODO. This function must go.
     public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
 
     /**
@@ -67,6 +71,7 @@ interface ComponentKind {
     *  @param orientation : direction
     *  @return the array of the updated ports
     **/
+    // TODO. This function must go.
     public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
 
     /**
@@ -74,7 +79,7 @@ interface ComponentKind {
      * @param component
      * @param drawingAdapter
     **/
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
 
     /**
     * get component sequence

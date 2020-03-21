@@ -4,10 +4,10 @@ import model.attribute.Attribute;
 import model.attribute.OrientationAttr;
 import model.attribute.StringAttr;
 import model.attribute.IntAttr;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import view.drawComponents.DrawAND;
 import view.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
+import model.selectionModel.SelectionModel ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -114,7 +114,7 @@ class AND implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel ){
         var drawComponent:DrawComponent = new DrawAND(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

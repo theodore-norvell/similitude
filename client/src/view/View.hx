@@ -99,7 +99,7 @@ class View
 	public function updateCanvas() : Void {
 		Console.log('view.updateCanvas');
 		var drawingAdapter = new DrawingAdapter(Transform.identity(), this.activeTab.getCanvasContext().getContext2d());
-		this.activeTab.getCircuitDiagram().draw(drawingAdapter);
+		this.activeTab.draw(drawingAdapter);
 	}
 	
 	public function setActiveTab(){

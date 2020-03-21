@@ -3379,9 +3379,9 @@ haxe_macro_MacroStringTools.toFieldExpr = function(sl,pos) {
 	if(pos == null) {
 		return Lambda.fold(sl,function(s,e) {
 			if(e == null) {
-				return { expr : haxe_macro_ExprDef.EConst(haxe_macro_Constant.CIdent(s)), pos : { file : "Z:\\software\\Haxe_toolkit_405\\haxe\\std/haxe/macro/MacroStringTools.hx", min : 2798, max : 2801}};
+				return { expr : haxe_macro_ExprDef.EConst(haxe_macro_Constant.CIdent(s)), pos : { file : "/usr/local/lib/haxe/std/haxe/macro/MacroStringTools.hx", min : 2713, max : 2716}};
 			} else {
-				return { expr : haxe_macro_ExprDef.EField(e,s), pos : { file : "Z:\\software\\Haxe_toolkit_405\\haxe\\std/haxe/macro/MacroStringTools.hx", min : 2812, max : 2817}};
+				return { expr : haxe_macro_ExprDef.EField(e,s), pos : { file : "/usr/local/lib/haxe/std/haxe/macro/MacroStringTools.hx", min : 2727, max : 2732}};
 			}
 		},null);
 	}
@@ -6407,52 +6407,22 @@ model_component_CircuitDiagram.prototype = $extend(model_observe_Observer.protot
 	,componentSetName: function(component,name) {
 		this.componentArray[this.componentArray.indexOf(component)].set_name(name);
 	}
-	,draw: function(drawingAdapter,linkAndComponentArray) {
-		var drawFlag = false;
+	,draw: function(drawingAdapter,selection) {
 		var _g = 0;
 		var _g1 = this.componentArray;
 		while(_g < _g1.length) {
 			var i = _g1[_g];
 			++_g;
-			if(linkAndComponentArray != null && linkAndComponentArray.getComponentIteratorLength() != 0) {
-				var j = linkAndComponentArray.get_componentIterator();
-				while(j.hasNext()) {
-					var j1 = j.next();
-					if(j1 == i) {
-						i.drawComponent(drawingAdapter,true);
-						drawFlag = true;
-					}
-				}
-			}
-			if(!drawFlag) {
-				if(i.getNameOfTheComponentKind() != "CC") {
-					i.drawComponent(drawingAdapter,false);
-				} else {
-					i.drawComponent(drawingAdapter,false,linkAndComponentArray);
-				}
-			}
-			drawFlag = false;
+			var highlight = selection.containsComponent(i);
+			i.drawComponent(drawingAdapter,highlight,selection);
 		}
-		drawFlag = false;
 		var _g2 = 0;
 		var _g3 = this.linkArray;
 		while(_g2 < _g3.length) {
 			var i1 = _g3[_g2];
 			++_g2;
-			if(linkAndComponentArray != null && linkAndComponentArray.getLinkIteratorLength() != 0) {
-				var j2 = linkAndComponentArray.get_linkIterator();
-				while(j2.hasNext()) {
-					var j3 = j2.next();
-					if(j3 == i1) {
-						i1.drawLink(drawingAdapter,true);
-						drawFlag = true;
-					}
-				}
-			}
-			if(!drawFlag) {
-				i1.drawLink(drawingAdapter,false);
-			}
-			drawFlag = false;
+			var highlight1 = selection.containsLink(i1);
+			i1.drawLink(drawingAdapter,highlight1);
 		}
 	}
 	,findHitList: function(coordinate,mode) {
@@ -6658,7 +6628,7 @@ model_component_Component.prototype = $extend(model_observe_Observable.prototype
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 109, className : "model.component.Component", methodName : "getAttr"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 110, className : "model.component.Component", methodName : "getAttr"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -6678,7 +6648,7 @@ model_component_Component.prototype = $extend(model_observe_Observable.prototype
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 114, className : "model.component.Component", methodName : "getAttrInt"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 115, className : "model.component.Component", methodName : "getAttrInt"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -6698,7 +6668,7 @@ model_component_Component.prototype = $extend(model_observe_Observable.prototype
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 119, className : "model.component.Component", methodName : "canupdate"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 120, className : "model.component.Component", methodName : "canupdate"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -6722,7 +6692,7 @@ model_component_Component.prototype = $extend(model_observe_Observable.prototype
 		var _tmp3 = _tmp1(_tmp2);
 		if(!_tmp3) {
 			var e = new assertions_AssertionFailure("list.exists(s)",[{ expr : "list", value : _tmp0},{ expr : "list.exists", value : _tmp1},{ expr : "s", value : _tmp2},{ expr : "list.exists(s)", value : _tmp3}]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 127, className : "model.component.Component", methodName : "update"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/component/Component.hx", lineNumber : 128, className : "model.component.Component", methodName : "update"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		var _this = this.list;
@@ -6820,7 +6790,7 @@ model_component_Component.prototype = $extend(model_observe_Observable.prototype
 		this.outportArray = this.componentKind.updateOutPortPosition(this.outportArray,xPosition,yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
 		return this;
 	}
-	,drawComponent: function(drawingAdpater,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdpater,highLight,selection) {
 		if(this.componentKind.checkInnerCircuitDiagramPortsChange()) {
 			var i = this.componentKind.getInnerCircuitDiagram().get_componentIterator();
 			while(i.hasNext()) {
@@ -6901,9 +6871,9 @@ model_component_Component.prototype = $extend(model_observe_Observable.prototype
 			this.componentKind.updateOutPortPosition(this.outportArray,this.xPosition,this.yPosition,this.height,this.width,(__map_reserved["orientation"] != null ? _this1.getReserved("orientation") : _this1.h["orientation"]).getAttrValue().getvalue());
 		}
 		if(this.componentKind.getname() != "CC") {
-			this.componentKind.drawComponent(drawingAdpater,highLight);
+			this.componentKind.drawComponent(drawingAdpater,highLight,selection);
 		} else {
-			this.componentKind.drawComponent(drawingAdpater,highLight,linkAndComponentArray);
+			this.componentKind.drawComponent(drawingAdpater,highLight,selection);
 		}
 	}
 	,findHitList: function(coordinate,mode) {
@@ -8024,7 +7994,7 @@ model_gates_AbstractComponentKind.prototype = {
 	}
 	,getInnerCircuitDiagram: function() {
 		var e = new assertions_AssertionFailure("false",[]);
-		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/gates/AbstractComponentKind.hx", lineNumber : 235, className : "model.gates.AbstractComponentKind", methodName : "getInnerCircuitDiagram"});
+		haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/gates/AbstractComponentKind.hx", lineNumber : 244, className : "model.gates.AbstractComponentKind", methodName : "getInnerCircuitDiagram"});
 		throw new js__$Boot_HaxeError(e);
 	}
 	,checkInnerCircuitDiagramPortsChange: function() {
@@ -8128,7 +8098,7 @@ model_gates_AND.prototype = $extend(model_gates_AbstractComponentKind.prototype,
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,selection) {
 		var drawComponent = new view_drawComponents_DrawAND(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -8256,12 +8226,12 @@ model_gates_CompoundComponent.prototype = $extend(model_gates_AbstractComponentK
 			break;
 		default:
 			var e = new assertions_AssertionFailure("false",[]);
-			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/gates/CompoundComponent.hx", lineNumber : 152, className : "model.gates.CompoundComponent", methodName : "createPorts"});
+			haxe_Log.trace("Throwing exception " + Std.string(e),{ fileName : "src/model/gates/CompoundComponent.hx", lineNumber : 153, className : "model.gates.CompoundComponent", methodName : "createPorts"});
 			throw new js__$Boot_HaxeError(e);
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,hightLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,hightLight,selection) {
 		var drawingAdapterTrans = drawingAdapter.transform(this.makeTransform());
 		var drawComponent = new view_drawComponents_DrawCompoundComponent(this.component,drawingAdapter,drawingAdapterTrans);
 		if(hightLight) {
@@ -8270,7 +8240,8 @@ model_gates_CompoundComponent.prototype = $extend(model_gates_AbstractComponentK
 			drawComponent.drawCorrespondingComponent("black");
 		}
 		if(this.component.get_boxType() == model_enumeration_BOX.WHITE_BOX) {
-			this.circuitDiagram.draw(drawingAdapterTrans,linkAndComponentArray);
+			drawingAdapterTrans = drawingAdapter.transform(this.makeTransform());
+			this.circuitDiagram.draw(drawingAdapterTrans,selection);
 		}
 	}
 	,makeTransform: function() {
@@ -8389,7 +8360,7 @@ model_gates_NAND.prototype = $extend(model_gates_AbstractComponentKind.prototype
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,selection) {
 		var drawComponent = new view_drawComponents_DrawNAND(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -8474,7 +8445,7 @@ model_gates_NOR.prototype = $extend(model_gates_AbstractComponentKind.prototype,
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,selection) {
 		var drawComponent = new view_drawComponents_DrawNOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -8557,7 +8528,7 @@ model_gates_NOT.prototype = $extend(model_gates_AbstractComponentKind.prototype,
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,selection) {
 		var drawComponent = new view_drawComponents_DrawNOT(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -8642,7 +8613,7 @@ model_gates_OR.prototype = $extend(model_gates_AbstractComponentKind.prototype,{
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,selection) {
 		var drawComponent = new view_drawComponents_DrawOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -8727,7 +8698,7 @@ model_gates_XOR.prototype = $extend(model_gates_AbstractComponentKind.prototype,
 		}
 		return portArray;
 	}
-	,drawComponent: function(drawingAdapter,highLight,linkAndComponentArray) {
+	,drawComponent: function(drawingAdapter,highLight,selection) {
 		var drawComponent = new view_drawComponents_DrawXOR(this.component,drawingAdapter);
 		if(highLight) {
 			drawComponent.drawCorrespondingComponent("red");
@@ -8749,8 +8720,14 @@ model_selectionModel_SelectionModel.prototype = {
 	,getSelectedComponents: function() {
 		return this.selectedComponents;
 	}
+	,containsComponent: function(c) {
+		return this.selectedComponents.indexOf(c) != -1;
+	}
 	,getSelectedLinks: function() {
 		return this.selectedLinks;
+	}
+	,containsLink: function(lnk) {
+		return this.selectedLinks.indexOf(lnk) != -1;
 	}
 	,addLinkToSelection: function(link) {
 		this.selectedLinks.push(link);
@@ -8799,6 +8776,9 @@ model_tabModel_TabModel.prototype = {
 	,selectionModel: null
 	,circuitDiagram: null
 	,canvasElement: null
+	,draw: function(drawingAdaptor) {
+		this.circuitDiagram.draw(drawingAdaptor,this.selectionModel);
+	}
 	,getCircuitDiagram: function() {
 		return this.circuitDiagram;
 	}
@@ -9110,7 +9090,7 @@ view_View.prototype = {
 	,updateCanvas: function() {
 		console.log("view.updateCanvas");
 		var drawingAdapter = new model_drawingInterface_DrawingAdapter(model_drawingInterface_Transform.identity(),this.activeTab.getCanvasContext().getContext("2d",null));
-		this.activeTab.getCircuitDiagram().draw(drawingAdapter);
+		this.activeTab.draw(drawingAdapter);
 	}
 	,setActiveTab: function() {
 		this.canvasListener.setActiveTab(this.activeTab);

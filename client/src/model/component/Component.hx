@@ -1,5 +1,6 @@
 package model.component;
 
+import model.selectionModel.SelectionModel;
 import model.attribute.Pair;
 import model.observe.Observable;
 //import js.html.CanvasRenderingContext2D;
@@ -235,9 +236,9 @@ class Component extends Observable{
         return this;
     }
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray ){
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ){
+        // This whole IF statement looks like complete crap to me.  What does this have to do with drawing?
         if(componentKind.checkInnerCircuitDiagramPortsChange()){
-
             for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
                 var inputFlag:Bool = false;
                 var outputFlag:Bool = false;
@@ -300,9 +301,9 @@ class Component extends Observable{
             componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
         }
         if(this.componentKind.getname()!= "CC"){
-            componentKind.drawComponent(drawingAdpater, highLight);
+            componentKind.drawComponent(drawingAdpater, highLight, selection );
         }else{
-            componentKind.drawComponent(drawingAdpater, highLight, linkAndComponentArray);
+            componentKind.drawComponent(drawingAdpater, highLight, selection );
         }
     }
 

@@ -3,10 +3,10 @@ package model.component;
 import haxe.ds.GenericStack;
 import type.HitObject;
 import model.enumeration.POINT_MODE;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import type.Coordinate;
 import type.WorldPoint;
 import model.enumeration.MODE;
+import model.selectionModel.SelectionModel ;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.ORIENTATION;
 /**
@@ -130,7 +130,8 @@ interface CircuitDiagramI {
     /**
     * draw the circuit diagram itself
     **/
-    public function draw(drawingAdapter:DrawingAdapterI, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void;
+    public function draw( drawingAdapter:DrawingAdapterI,
+                          selected: SelectionModel ):Void;
 
     /**
     * find the hit list
