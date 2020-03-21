@@ -38,12 +38,14 @@ class Component extends Observable{
     var yPosition:Float;//the y position of the component
     var height:Float;//height
     var width:Float;//width
-    //var orientation:ORIENTATION;//the orientation of the component
+    var sequenceNumber : Int ; // This should be -1 unless the component is an
+                            // input or an output. In that case, it represents
+                            // the component's position relative to other inputs
+                            // and outputs.
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
     var inportsNum:Int;//init
-    //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
     var list:Map<String,Pair>=new Map<String,Pair>();
     var cd:CircuitDiagram;
@@ -63,6 +65,7 @@ class Component extends Observable{
         this.yPosition = yPosition;
         this.height = height;
         this.width = width;
+        this.sequenceNumber = -1 ;
         this.componentKind = componentKind;
         this.inportsNum = inportNum;
         this.boxType = BOX.WHITE_BOX;
@@ -245,5 +248,13 @@ class Component extends Observable{
 
     public function getInnerCircuitDiagram() {
         return this.componentKind.getInnerCircuitDiagram() ;
+    }
+
+    public function set_sequence(n:Int) : Void {
+        this.sequenceNumber = n ;
+    }
+
+    public function get_sequence() : Int {
+        return this.sequenceNumber ;
     }
 }

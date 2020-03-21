@@ -33,17 +33,14 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
-    // TODO. This function must go.
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port>;
 
     /**
     * add an inport
      * @return the created ports
     **/
-    // TODO. This function must go.
     public function addInPort():Port;
 
-    // TODO. This function must go.
     public function addOutPort():Port;
 
     /**
@@ -56,7 +53,6 @@ interface ComponentKind {
     *  @param orientation : direction
     *  @return the array of the updated ports
     **/
-    // TODO. This function must go.
     public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
 
     /**
@@ -69,7 +65,6 @@ interface ComponentKind {
     *  @param orientation : direction
     *  @return the array of the updated ports
     **/
-    // TODO. This function must go.
     public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
 
     /**
@@ -78,18 +73,6 @@ interface ComponentKind {
      * @param drawingAdapter
     **/
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
-
-    /**
-    * get component sequence
-    * TODO Get rid of this.
-    **/
-    public function get_sequence():Int;
-
-    /**
-    * set component sequence
-    * TODO Get rid of this.
-    **/
-    public function set_sequence(value:Int):Int;
 
     /**
     * find the hit list

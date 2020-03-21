@@ -21,14 +21,11 @@ import global.Constant.*;
 * @author wanhui
 **/
 class AbstractComponentKind {
-    // TODO: Get rid of this.
-    private var sequence:Int;//use for input and output
     
     private var attributes:Array<Attribute>=new Array<Attribute>();
 
     private function new() {
 
-        sequence = -1;
         attributes.push(new OrientationAttr());
         attributes.push(new StringAttr("name"));
     }
@@ -37,27 +34,14 @@ class AbstractComponentKind {
         return attributes;
     }
 
-    // TODO: Get rid of this
     public function addInPort():Port {
         return new Inport();
     }
 
-    // TODO: Get rid of this
     public function addOutPort():Port {
         return new Outport();
     }
 
-    // TODO: Get rid of this
-    public function get_sequence():Int {
-        return sequence;
-    }
-
-    // TODO: Get rid of this
-    public function set_sequence(value:Int) {
-        return this.sequence = value;
-    }
-
-    // TODO This might make sense if it had a component to work on.
     public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
         switch (orientation){
             case ORIENTATION.EAST : {
@@ -90,7 +74,7 @@ class AbstractComponentKind {
         }
         return portArray;
     }
-    // TODO This might make sense if it had a component to work on. 
+    
     public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
         switch(orientation){
             case ORIENTATION.EAST : {
@@ -124,7 +108,6 @@ class AbstractComponentKind {
         return portArray;
     }
     
-    // TODO This might make sense if it had a component to work on.
     public function findHitList(component : Component, coordinate:Coordinate, mode:MODE)
     :Array<HitObject> {
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
