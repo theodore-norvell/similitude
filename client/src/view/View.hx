@@ -3,7 +3,9 @@ package view;
 import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
 import js.Browser.document;
+import js.html.CanvasElement;
 import js.html.Console;
+import haxe.Json;
 import model.component.CircuitDiagram;
 import model.drawingInterface.DrawingAdapter;
 import model.tabModel.TabModel;
@@ -106,6 +108,45 @@ class View
 		// do something for the active tab field
 		//after that push it to the canvas controller
 		this.canvasListener.setActiveTab(this.activeTab);
+	}
+	
+	public function spawnNewCanvas() : CanvasElement {
+		var canvasDisplayScreen = document.querySelector("#displayScreen");
+		
+		var innerCanvas = document.createCanvasElement();
+		// innerCanvas.id = "canvasToDraw"; // deal with this to get better and unique IDs, IF NEED BE
+		canvasDisplayScreen.appendChild(innerCanvas);
+		innerCanvas.style.width = "100%";
+		innerCanvas.style.height = "100%";
+		
+		// needs this event by default for the drop target.
+		canvasDisplayScreen.addEventListener('dragover', function (event) {
+			event.preventDefault(); // called to avoid any other event from occuring when processing this one.
+			event.dataTransfer.dropEffect = "move";
+			// refer to MDN docs for more dropEffects
+			
+		});
+		// needs this event by default for the drop target.
+		canvasDisplayScreen.addEventListener('drop', function (event) {
+			event.preventDefault();
+			var data = event.dataTransfer.getData("text/plain");
+			
+			// use this for co-ordinates of the mouse pointers on the current ancestor element
+			Console.log("co-ordinates ::", event.layerX, event.layerY);
+			// here make a function to draw on the canvas
+			// presumably move this entire block to the canvasUpdate
+			// use a command through the command manager here
+			var eventPassed = Json.parse(data);
+			// in element co-ordinates
+			//eventPassed.posX = event.layerX;
+			//eventPassed.posY = event.layerY;
+			eventPassed.posX = event.pageX;
+			eventPassed.posY = event.pageY;
+			this.updateCanvasListener(eventPassed);
+			//this.canvasListener.update(data);
+		});
+		
+		return innerCanvas;
 	}
 	
 }

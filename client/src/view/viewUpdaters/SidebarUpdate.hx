@@ -65,6 +65,7 @@ class SidebarUpdate extends AbstractUpdate
 		var drawingAdapter = new DrawingAdapter(Transform.identity(), sidebarItemCanvas.getContext2d());
 		
 		// add more defaults when needed
+		// use the optional component parameter for this.
 		switch (drawComponentString) {
 			case ComponentType.AND : drawingAdapter.drawAndShape(80,75, 70, 70, ORIENTATION.EAST);
 			case ComponentType.NAND : drawingAdapter.drawNAndShape(80,75, 70, 70, ORIENTATION.EAST);

@@ -7,7 +7,7 @@ import model.component.CircuitDiagram;
 import model.component.Component;
 import model.enumeration.ComponentType;
 import model.enumeration.ORIENTATION;
-import js.html.Console;
+// import js.html.Console;
 
 /**
  * ...
@@ -30,7 +30,7 @@ class CanvasController extends AbstractController implements CanvasListener
 	
 	public function addComponentToCanvas(eventObject: Dynamic) : Void 
 	{
-		Console.log('AAAA', eventObject.component);
+		trace('AAAA', eventObject.component);
 		// create and execute a command here 
 		// Type.createEnum(ComponentType, eventObject.component)
 		var component = new Component(eventObject.posX, eventObject.posY, 70, 70, ORIENTATION.EAST, componentTypesSingleton.toComponentKind(Type.createEnum(ComponentType, eventObject.component)), 0);

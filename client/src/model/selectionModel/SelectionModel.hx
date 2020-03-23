@@ -3,7 +3,9 @@ import model.component.Component;
 import model.component.Link;
 
 /**
- * ...
+ * This class represents a user selection.
+ * If the user selects any portion of the Circuit from the UI, this ends up happening.
+ * 
  * @author AdvaitTrivedi
  */
 class SelectionModel 
