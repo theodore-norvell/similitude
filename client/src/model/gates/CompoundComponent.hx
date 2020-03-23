@@ -1,5 +1,6 @@
 package model.gates;
 
+import model.selectionModel.SelectionModel;
 import assertions.Assert ;
 import model.observe.Observable;
 import model.attribute.OrientationAttr;
@@ -155,7 +156,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray):Void {
+    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool,  selection : SelectionModel ):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform());
         var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans);
         if(hightLight){
@@ -166,10 +167,9 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
 
         if(component.get_boxType() == BOX.WHITE_BOX){
             //compound component need to draw all the components in ComponentArray, which should make a IntAttr transfrom
-            //drawingAdapterTrans = drawingAdapter.transform(makeTransform());
-            circuitDiagram.draw(drawingAdapterTrans, linkAndComponentArray);
+            drawingAdapterTrans = drawingAdapter.transform(makeTransform());
+            circuitDiagram.draw(drawingAdapterTrans, selection);
         }
-        //context.restore();
     }
 
     function makeTransform():Transform{

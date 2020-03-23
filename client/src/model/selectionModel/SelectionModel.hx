@@ -21,8 +21,16 @@ class SelectionModel
 		return this.selectedComponents;
 	}
 	
+	public function containsComponent( c : Component ) : Bool {
+		return this.selectedComponents.indexOf(c) != -1 ;
+	}
+	
 	public function getSelectedLinks() : Array<Link> {
 		return this.selectedLinks;
+	}
+	
+	public function containsLink( lnk : Link ) : Bool {
+		return this.selectedLinks.indexOf( lnk ) != -1 ;
 	}
 	
 	public function addLinkToSelection(link: Link) : Void {

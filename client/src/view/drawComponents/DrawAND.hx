@@ -22,7 +22,6 @@ class DrawAND implements DrawComponent{
             strokeColor = "black";
         }
         drawingAdapter.setStrokeColor(strokeColor);
-
         drawingAdapter.drawAndShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
         //draw inport
         for (i in component.get_inportIterator()) {
