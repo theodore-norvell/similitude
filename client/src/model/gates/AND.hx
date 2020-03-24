@@ -52,7 +52,8 @@ class AND implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+                    var inport:Port = new Inport(xPosition - width / 2,
+                                                 height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
