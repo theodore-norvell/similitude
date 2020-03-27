@@ -48,6 +48,7 @@
 		float: left;
 		width: 90%;
 		height: 10%;
+		border: solid 1px;
 	}
 	
 	.sidebarItem{
@@ -62,6 +63,23 @@
 		height: 50px;
 		border: solid 1px black;
 		top: 500px;
+	}
+	
+	#undo {
+		position: absolute;
+		width: 50px;
+		height: 20px;
+		border: solid 1px black;
+		top: 465px;
+	}
+	
+	#redo {
+		position: absolute;
+		width: 50px;
+		height: 20px;
+		border: solid 1px black;
+		top: 465px;
+		left: 65px;
 	}
 	</style>
 </head>
@@ -79,6 +97,8 @@
 		  <div id="topNavbar"></div>
 		  <div id="displayScreen"></div>
 	  </div>
+	  <div id="undo">UNDO</div>
+	  <div id="redo">REDO</div>
 	  <div id="updateThis"></div>
   </div>
 

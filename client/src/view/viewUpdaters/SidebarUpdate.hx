@@ -1,14 +1,17 @@
 package view.viewUpdaters;
 import haxe.Json;
+import haxe.Serializer;
 import js.html.DivElement;
 import model.component.Component;
 import model.drawingInterface.DrawingAdapter;
+import model.similitudeEvents.SidebarDragAndDropEvent;
 import view.viewUpdaters.AbstractUpdate;
 import model.enumeration.ORIENTATION;
 import model.enumeration.ComponentType;
 import model.drawingInterface.Transform;
 import js.Browser.document;
 import js.html.Console;
+import model.similitudeEvents.*;
 
 /**
  * Class in charge of handling the updates sent by the controller to the UI.
@@ -51,8 +54,14 @@ class SidebarUpdate extends AbstractUpdate
 		// also set the dragStart event to send data through the drag and drop
 		sidebarItem.addEventListener('dragstart', function(event) {
 			// do not forget to set data before the transfer
-			var draggedItemEvent = {eventType:"sidebarDrag" , from: "sidebar" , to: "canvas", component: Std.string(drawComponentString)};
-			var stringEvent = Json.stringify(draggedItemEvent);
+			var dndEvent = new SidebarDragAndDropEvent();
+			dndEvent.eventTypes = EventTypesEnum.SIDEBAR_DRAG_N_DROP;
+			dndEvent.component = drawComponentString;
+			var draggedItemEvent = dndEvent;
+			//var draggedItemEvent = {eventType:"sidebarDrag" , from: "sidebar" , to: "canvas", component: Std.string(drawComponentString)};
+			//var stringEvent = Json.stringify(draggedItemEvent);
+			var stringEvent = Serializer.run(draggedItemEvent);
+			trace(stringEvent);
 			event.dataTransfer.setData("text/plain", stringEvent);
 			event.dataTransfer.dropEffect = "move";
 		});

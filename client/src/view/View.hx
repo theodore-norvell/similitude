@@ -8,22 +8,26 @@ import js.html.Console;
 import haxe.Json;
 import model.component.CircuitDiagram;
 import model.drawingInterface.DrawingAdapter;
+import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
+import view.viewModelRepresentatives.TabView;
+import haxe.Unserializer;
 
 class View 
 {
 	var sidebarListener: SidebarListener;
 	var canvasListener: CanvasListener;
-	var activeTab: TabModel;
-	var allTabs = new Array<TabModel>();
+	var activeTab: TabView;
+	var allTabs = new Array<TabView>();
 	/**
 	 * Populate the UI using this constructor.
 	 */
 	public function new() 
 	{
 		// letting this stay here for now
-		this.activeTab = new TabModel(new CircuitDiagram(), this);
+		// check out the matrix once to understand how it works.
+		this.activeTab = new TabView(new CircuitDiagram(), this, Transform.identity());
 		// this.setActiveTab();
 		allTabs.push(activeTab);
 		
@@ -31,17 +35,20 @@ class View
 
 		document.addEventListener("DOMContentLoaded", function(event) {
 		trace("DOM ready");
-
 		
-		// for testing the scrollbar
-		//var sidebarPara = document.querySelector("p");
-		//sidebarPara.innerText = "
-//Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-//";
-		//var gate = document.createElement();
-		//sidebar.style.border = "solid";
-		//sidebar.style.borderRadius = "15px";
-		//sidebar.style.border = "#224747";
+		// for undo button
+		document.querySelector("#undo").addEventListener('click', function (event) {
+            // do something
+			Console.log("undo was clicked");
+			this.canvasListener.undoLastCanvasChange();
+        });
+		
+		// for redo button
+		document.querySelector("#redo").addEventListener('click', function (event) {
+            // do something
+			Console.log("redo was clicked");
+			this.canvasListener.redoLastCanvasChange();
+        });
 		
 		// for testing the flow of the click event
 		document.querySelector("#clickMe").addEventListener('click', function (event) {
@@ -91,23 +98,21 @@ class View
 	 * A common function that accepts JSON / Dynamic objects to update the Canvas
 	 * @param	eventObject
 	 */
-	public function updateCanvasListener(eventObject: Dynamic) {
+	public function updateCanvasListener(eventObject: SidebarDragAndDropEvent) {
 		// add more cases to handle more stuff
-		if (eventObject.eventType == "sidebarDrag") {
-			this.canvasListener.addComponentToCanvas(eventObject);
-		}
+		this.canvasListener.addComponentToCanvas(eventObject);
 	}
 	
 	public function updateCanvas() : Void {
 		Console.log('view.updateCanvas');
-		var drawingAdapter = new DrawingAdapter(Transform.identity(), this.activeTab.getCanvasContext().getContext2d());
-		this.activeTab.draw(drawingAdapter);
+		var drawingAdapter = new DrawingAdapter(Transform.identity(), this.activeTab.canvasElement.getContext2d());
+		this.activeTab.tabModel.draw(drawingAdapter);
 	}
 	
 	public function setActiveTab(){
 		// do something for the active tab field
 		//after that push it to the canvas controller
-		this.canvasListener.setActiveTab(this.activeTab);
+		this.canvasListener.setActiveTab(this.activeTab.tabModel);
 	}
 	
 	public function spawnNewCanvas() : CanvasElement {
@@ -118,6 +123,7 @@ class View
 		canvasDisplayScreen.appendChild(innerCanvas);
 		innerCanvas.style.width = "100%";
 		innerCanvas.style.height = "100%";
+		innerCanvas.style.border = "solid 1px";
 		
 		// needs this event by default for the drop target.
 		canvasDisplayScreen.addEventListener('dragover', function (event) {
@@ -132,16 +138,21 @@ class View
 			var data = event.dataTransfer.getData("text/plain");
 			
 			// use this for co-ordinates of the mouse pointers on the current ancestor element
-			Console.log("co-ordinates ::", event.layerX, event.layerY);
+			//Console.log("co-ordinates ::", event.layerX, event.layerY);
 			// here make a function to draw on the canvas
 			// presumably move this entire block to the canvasUpdate
 			// use a command through the command manager here
-			var eventPassed = Json.parse(data);
+			//Console.log(event);
+			//trace(event);
+			//Console.log(Unserializer.run(data));
+			//var eventPassed = Json.parse(data);
 			// in element co-ordinates
-			//eventPassed.posX = event.layerX;
-			//eventPassed.posY = event.layerY;
-			eventPassed.posX = event.pageX;
-			eventPassed.posY = event.pageY;
+			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
+			trace(eventPassed);
+			eventPassed.draggedToX = event.layerX;
+			eventPassed.draggedToY = event.layerY;
+			//eventPassed.draggedToX = event.pageX;
+			//eventPassed.draggedToY = event.pageY;
 			this.updateCanvasListener(eventPassed);
 			//this.canvasListener.update(data);
 		});

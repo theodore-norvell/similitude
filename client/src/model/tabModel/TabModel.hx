@@ -21,15 +21,13 @@ import model.selectionModel.SelectionModel;
 class TabModel 
 // This should be Observable. TSN
 {
-	var view: view.View;
 	var selectionModel: SelectionModel;
 	var circuitDiagram: CircuitDiagramI;
 	// create this field using  the JS document and then set it using the set functionality in this class.
-	var canvasElement : CanvasElement;
 	
-	public function new(circuitDiagram: CircuitDiagramI, view: view.View) 
+	
+	public function new(circuitDiagram: CircuitDiagramI) 
 	{
-		this.view = view;
 		this.circuitDiagram = circuitDiagram;
 		this.selectionModel = new SelectionModel(new Array<Link>(), new Array<Component>());
 		
@@ -74,7 +72,7 @@ class TabModel
 		//
 		//this.canvasElement = innerCanvas;
 		
-		this.canvasElement = this.view.spawnNewCanvas();
+		
 	}
 
 	public function draw( drawingAdaptor : DrawingAdapterI ) : Void {
@@ -112,13 +110,4 @@ class TabModel
 			this.selectionModel.removeComponentFromSelection(component);
 		}
 	}
-	
-	public function getCanvasContext() : CanvasElement {
-		return this.canvasElement;
-	}
-	
-	public function setCanvasContext(canvas : CanvasElement) : Void {
-		this.canvasElement = canvas;
-	}
-	
 }
