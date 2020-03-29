@@ -1,9 +1,11 @@
-package model.drawingInterface;
+package model.drawingInterface ;
+
 import model.drawingInterface.Rectangle;
 import type.Coordinate;
+
 /**
-* this is a abstract class
-* because haxe doesn't has the abstract class
+* Represent an affine transformation between two coordinate systems
+*  and its inverse transformation.
 **/
 class Transform {
     /* The two arrays are each 9 long and represent inverse matrices */

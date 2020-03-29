@@ -1,8 +1,9 @@
-package model.drawingInterface;
+package view ;
 
-import model.drawingInterface.Box;
+import view.Box;
 import type.Coordinate;
 import model.drawingInterface.DrawingAdapterI;
+import model.drawingInterface.Transform;
 import model.enumeration.ORIENTATION;
 import js.html.CanvasRenderingContext2D;
 

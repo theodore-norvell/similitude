@@ -7,7 +7,7 @@ import js.html.CanvasElement;
 import js.html.Console;
 import haxe.Json;
 import model.component.CircuitDiagram;
-import model.drawingInterface.DrawingAdapter;
+import view.DrawingAdapter;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;

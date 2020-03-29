@@ -3,7 +3,7 @@ import haxe.Json;
 import haxe.Serializer;
 import js.html.DivElement;
 import model.component.Component;
-import model.drawingInterface.DrawingAdapter;
+import view.DrawingAdapter;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import view.viewUpdaters.AbstractUpdate;
 import model.enumeration.ORIENTATION;

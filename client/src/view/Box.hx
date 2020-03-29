@@ -1,7 +1,9 @@
-package model.drawingInterface;
+package view ;
 
 import type.Coordinate;
 import model.enumeration.ORIENTATION;
+import model.drawingInterface.Transform;
+
 class Box {
     var xa:Float;
     var ya:Float;
