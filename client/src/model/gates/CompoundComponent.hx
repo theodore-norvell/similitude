@@ -19,8 +19,6 @@ import model.enumeration.BOX;
 import model.enumeration.MODE;
 import type.Coordinate;
 import model.drawingInterface.Transform;
-import model.component.Outport;
-import model.component.Inport;
 import model.drawingInterface.DrawingAdapterI;
 import model.component.Component;
 import model.enumeration.ORIENTATION;
@@ -65,14 +63,14 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2,
+                        var inport_1:Port = new Port(xPosition - width / 2,
                                                        height / (inportCount+1) * (i.get_sequence()+1)
                                                        + (yPosition - height / 2));
                         inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition + width / 2,
+                        var outport_:Port = new Port(xPosition + width / 2,
                                                         height / (outportCount+1) * (i.get_sequence()+1)
                                                         + (yPosition - height / 2));
                         outport_.set_sequence(i.get_sequence());
@@ -84,13 +82,13 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
+                        var inport_1:Port = new Port(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
                                                        height + height/2);
                         inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
+                        var outport_:Port = new Port(xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
                                                         height - height/2);
                         outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);
@@ -101,13 +99,13 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
+                        var inport_1:Port = new Port(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
                                                        height - height/2);
                         inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport( xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
+                        var outport_:Port = new Port( xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
                                                          height + height/2);
                         outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);
@@ -118,13 +116,13 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport( xPosition + width / 2,
+                        var inport_1:Port = new Port( xPosition + width / 2,
                                                         height / (inportCount+1) * (i.get_sequence()+1) + (yPosition - height / 2));
                         inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport( xPosition - width / 2,
+                        var outport_:Port = new Port( xPosition - width / 2,
                                                          height / (outportCount+1) * (i.get_sequence()+1) + (yPosition - height / 2));
                         outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);

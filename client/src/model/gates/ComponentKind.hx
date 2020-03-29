@@ -36,14 +36,6 @@ interface ComponentKind {
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port>;
 
     /**
-    * add an inport
-     * @return the created ports
-    **/
-    public function addInPort():Port;
-
-    public function addOutPort():Port;
-
-    /**
     * update all of the position of ports in inportArray
      * @param portArray
      * @param xPosition : x position

@@ -4,7 +4,6 @@ import assertions.Assert ;
 import model.attribute.Attribute ;
 import model.attribute.OrientationAttr ;
 import model.attribute.StringAttr ;
-import model.component.Outport;
 import type.HitObject;
 import model.component.CircuitDiagramI;
 import model.enumeration.POINT_MODE;
@@ -12,7 +11,6 @@ import model.component.Component;
 import model.enumeration.MODE;
 import type.Coordinate;
 import type.WorldPoint;
-import model.component.Inport;
 import model.component.Port;
 import model.enumeration.ORIENTATION;
 import global.Constant.*;
@@ -31,16 +29,7 @@ class AbstractComponentKind {
     }
 
     public function getAttr():Array<Attribute>{
-        return attributes;
-    }
-
-    public function addInPort():Port {
-        return new Inport();
-    }
-
-    public function addOutPort():Port {
-        return new Outport();
-    }
+        return attributes; }
 
     public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
         switch (orientation){

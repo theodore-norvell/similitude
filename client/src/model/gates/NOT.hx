@@ -9,8 +9,6 @@ import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawNOT;
 import model.selectionModel.SelectionModel ;
 import model.component.Component ;
-import model.component.Inport;
-import model.component.Outport;
 import model.component.Port;
 import model.enumeration.IOTYPE;
 import model.enumeration.ORIENTATION;
@@ -51,13 +49,13 @@ class NOT implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+                    var inport:Port = new Port(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
                 }
                 //outport
-                var outport_:Port = new Outport(xPosition + width / 2, yPosition);
+                var outport_:Port = new Port(xPosition + width / 2, yPosition);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
@@ -65,13 +63,13 @@ class NOT implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition + height / 2);
+                    var inport:Port = new Port(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition + height / 2);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
                 }
                 //outport
-                var outport_:Port = new Outport(xPosition, yPosition - height / 2);
+                var outport_:Port = new Port(xPosition, yPosition - height / 2);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
@@ -79,13 +77,13 @@ class NOT implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition - height / 2);
+                    var inport:Port = new Port(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition - height / 2);
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
                 }
                 //outport
-                var outport_:Port = new Outport(xPosition, yPosition + height / 2);
+                var outport_:Port = new Port(xPosition, yPosition + height / 2);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
@@ -93,13 +91,13 @@ class NOT implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition + width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+                    var inport:Port = new Port(xPosition + width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
                 }
                 //outport
-                var outport_:Port = new Outport(xPosition - width / 2, yPosition);
+                var outport_:Port = new Port(xPosition - width / 2, yPosition);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };

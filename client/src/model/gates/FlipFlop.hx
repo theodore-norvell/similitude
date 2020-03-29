@@ -9,8 +9,6 @@ import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawFlipFlop;
 import model.component.Component ;
-import model.component.Inport;
-import model.component.Outport;
 import model.component.Port;
 import model.enumeration.IOTYPE;
 import model.enumeration.ORIENTATION;
@@ -52,65 +50,65 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind {
         switch (orientation){
             case ORIENTATION.EAST : {
                 //inport
-                var inport_D:Port = new Inport(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
+                var inport_D:Port = new Port(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_D.set_portDescription(IOTYPE.D);
                 portArray.push(inport_D);
-                var inport_CLK:Port = new Inport(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
+                var inport_CLK:Port = new Port(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
                 inport_CLK.set_portDescription(IOTYPE.CLK);
                 portArray.push(inport_CLK);
                 //outport
-                var outport_Q:Port = new Outport(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
+                var outport_Q:Port = new Port(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
                 outport_Q.set_portDescription(IOTYPE.Q);
                 portArray.push(outport_Q);
-                var outport_QN:Port = new Outport(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
+                var outport_QN:Port = new Port(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
             case ORIENTATION.WEST : {
                 //inport
-                var inport_D:Port = new Inport(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
+                var inport_D:Port = new Port(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_D.set_portDescription(IOTYPE.D);
                 portArray.push(inport_D);
-                var inport_CLK:Port = new Inport(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
+                var inport_CLK:Port = new Port(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
                 inport_CLK.set_portDescription(IOTYPE.CLK);
                 portArray.push(inport_CLK);
                 //outport
-                var outport_Q:Port = new Outport(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
+                var outport_Q:Port = new Port(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
                 outport_Q.set_portDescription(IOTYPE.Q);
                 portArray.push(outport_Q);
-                var outport_QN:Port = new Outport(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
+                var outport_QN:Port = new Port(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
             case ORIENTATION.SOUTH : {
                 //inport
-                var inport_D:Port = new Inport(xPosition - width / 2 + width / 3 * 1, yPosition - height / 2);
+                var inport_D:Port = new Port(xPosition - width / 2 + width / 3 * 1, yPosition - height / 2);
                 inport_D.set_portDescription(IOTYPE.D);
                 portArray.push(inport_D);
-                var inport_CLK:Port = new Inport(xPosition - width / 2 + width / 3 * 2, yPosition - height / 2);
+                var inport_CLK:Port = new Port(xPosition - width / 2 + width / 3 * 2, yPosition - height / 2);
                 inport_CLK.set_portDescription(IOTYPE.CLK);
                 portArray.push(inport_CLK);
                 //outport
-                var outport_Q:Port = new Outport(xPosition - width / 2 + width / 3 * 1, yPosition + height / 2);
+                var outport_Q:Port = new Port(xPosition - width / 2 + width / 3 * 1, yPosition + height / 2);
                 outport_Q.set_portDescription(IOTYPE.Q);
                 portArray.push(outport_Q);
-                var outport_QN:Port = new Outport(xPosition - width / 2 + width / 3 * 2, yPosition + height / 2);
+                var outport_QN:Port = new Port(xPosition - width / 2 + width / 3 * 2, yPosition + height / 2);
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
             case ORIENTATION.NORTH : {
                 //inport
-                var inport_D:Port = new Inport(xPosition - width / 2 + width / 3 * 1, yPosition + height / 2);
+                var inport_D:Port = new Port(xPosition - width / 2 + width / 3 * 1, yPosition + height / 2);
                 inport_D.set_portDescription(IOTYPE.D);
                 portArray.push(inport_D);
-                var inport_CLK:Port = new Inport(xPosition - width / 2 + width / 3 * 2, yPosition + height / 2);
+                var inport_CLK:Port = new Port(xPosition - width / 2 + width / 3 * 2, yPosition + height / 2);
                 inport_CLK.set_portDescription(IOTYPE.CLK);
                 portArray.push(inport_CLK);
                 //outport
-                var outport_Q:Port = new Outport(xPosition - width / 2 + width / 3 * 1, yPosition - height / 2);
+                var outport_Q:Port = new Port(xPosition - width / 2 + width / 3 * 1, yPosition - height / 2);
                 outport_Q.set_portDescription(IOTYPE.Q);
                 portArray.push(outport_Q);
-                var outport_QN:Port = new Outport(xPosition - width / 2 + width / 3 * 2, yPosition - height / 2);
+                var outport_QN:Port = new Port(xPosition - width / 2 + width / 3 * 2, yPosition - height / 2);
                 outport_QN.set_portDescription(IOTYPE.QN);
                 portArray.push(outport_QN);
             };
@@ -119,11 +117,6 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind {
             }
         }
         return portArray;
-    }
-
-    override public function addInPort():Port {
-        Assert.assert(false) ;
-        return null;//because flip-flop can't add any ports
     }
 
     /**

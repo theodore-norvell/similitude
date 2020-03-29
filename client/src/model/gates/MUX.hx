@@ -8,8 +8,6 @@ import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawMUX;
 import model.component.Component ;
-import model.component.Inport;
-import model.component.Outport;
 import model.component.Port;
 import model.enumeration.IOTYPE;
 import model.enumeration.ORIENTATION;
@@ -56,65 +54,65 @@ class MUX implements ComponentKind extends AbstractComponentKind {
         switch (orientation){
             case ORIENTATION.EAST : {
                 //inport
-                var inport_S:Port = new Inport(xPosition, yPosition - height / 2);
+                var inport_S:Port = new Port(xPosition, yPosition - height / 2);
                 inport_S.set_portDescription(IOTYPE.S);
                 portArray.push(inport_S);
-                var inport_1:Port = new Inport(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
+                var inport_1:Port = new Port(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_1.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_1);
-                var inport_2:Port = new Inport(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
+                var inport_2:Port = new Port(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
                 inport_2.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_2);
                 //outport
-                var outport_:Port = new Outport(xPosition + width / 2, yPosition);
+                var outport_:Port = new Port(xPosition + width / 2, yPosition);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
             case ORIENTATION.WEST : {
                 //inport
-                var inport_S:Port = new Inport(xPosition, yPosition - height / 2);
+                var inport_S:Port = new Port(xPosition, yPosition - height / 2);
                 inport_S.set_portDescription(IOTYPE.S);
                 portArray.push(inport_S);
-                var inport_1:Port = new Inport(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
+                var inport_1:Port = new Port(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
                 inport_1.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_1);
-                var inport_2:Port = new Inport(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
+                var inport_2:Port = new Port(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
                 inport_2.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_2);
                 //outport
-                var outport_:Port = new Outport(xPosition - width / 2, yPosition);
+                var outport_:Port = new Port(xPosition - width / 2, yPosition);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
             case ORIENTATION.SOUTH : {
                 //inport
-                var inport_S:Port = new Inport(xPosition - width / 2, yPosition);
+                var inport_S:Port = new Port(xPosition - width / 2, yPosition);
                 inport_S.set_portDescription(IOTYPE.S);
                 portArray.push(inport_S);
-                var inport_1:Port = new Inport(xPosition - width / 2 + height / 3 * 2, yPosition - height / 2);
+                var inport_1:Port = new Port(xPosition - width / 2 + height / 3 * 2, yPosition - height / 2);
                 inport_1.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_1);
-                var inport_2:Port = new Inport(xPosition - width / 2 + width / 3, yPosition - height / 2);
+                var inport_2:Port = new Port(xPosition - width / 2 + width / 3, yPosition - height / 2);
                 inport_2.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_2);
                 //outport
-                var outport_:Port = new Outport(xPosition, yPosition + height / 2);
+                var outport_:Port = new Port(xPosition, yPosition + height / 2);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };
             case ORIENTATION.NORTH : {
                 //inport
-                var inport_S:Port = new Inport(xPosition + width / 2, yPosition);
+                var inport_S:Port = new Port(xPosition + width / 2, yPosition);
                 inport_S.set_portDescription(IOTYPE.S);
                 portArray.push(inport_S);
-                var inport_1:Port = new Inport(xPosition - width / 2 + height / 3 * 2, yPosition + height / 2);
+                var inport_1:Port = new Port(xPosition - width / 2 + height / 3 * 2, yPosition + height / 2);
                 inport_1.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_1);
-                var inport_2:Port = new Inport(xPosition - width / 2 + width / 3, yPosition + height / 2);
+                var inport_2:Port = new Port(xPosition - width / 2 + width / 3, yPosition + height / 2);
                 inport_2.set_portDescription(IOTYPE.INPUT);
                 portArray.push(inport_2);
                 //outport
-                var outport_:Port = new Outport(xPosition, yPosition - height / 2);
+                var outport_:Port = new Port(xPosition, yPosition - height / 2);
                 outport_.set_portDescription(IOTYPE.OUTPUT);
                 portArray.push(outport_);
             };

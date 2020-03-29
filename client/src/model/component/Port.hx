@@ -7,46 +7,48 @@ import model.enumeration.IOTYPE;
  * @author wanhui
  *
  */
-interface Port {
-    /** get the x position of this port
-    *
-    **/
-    public function get_xPosition():Float;
+class Port {
 
-    /** get the y position of this port
-    *
-    **/
-    public function get_yPosition():Float;
+    var xPosition:Float;
+    var yPosition:Float;
+    var sequence:Int = -1;
+    var description : IOTYPE ;
 
-    /** set the x position of this port
-    *
-    **/
-    public function set_xPosition(xPosition:Float):Void;
+    public function new(xPosition:Float, yPosition:Float) {
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
+        this.description = IOTYPE.OUTPUT ; 
+    }
 
-    /** set the y position of this port
-    *
-    **/
-    public function set_yPosition(yPosition:Float):Void;
+    public function get_xPosition():Float {
+        return xPosition;
+    }
 
-    /** get the port description, Inport or outport
-    *
-    **/
-    public function get_portDescription():IOTYPE;
+    public function get_yPosition():Float {
+        return yPosition;
+    }
 
-    /** get the port description, Inport or outport
-    *
-    **/
-    public function set_portDescription(value:IOTYPE):Void;
+    public function set_xPosition(xPosition:Float):Void {
+        this.xPosition = xPosition;
+    }
 
-    /** get the sequence of this port
-    *
-    **/
-    public function get_sequence():Int;
+    public function set_yPosition(yPosition:Float):Void {
+        this.yPosition = yPosition;
+    }
 
-    /** set the sequence of this port
-    *
-    **/
-    public function set_sequence(sequence:Int):Void;
+    public function get_sequence():Int {
+        return this.sequence;
+    }
 
-    public function createJSon():String;
+    public function set_sequence(sequence:Int):Void {
+        this.sequence = sequence;
+    }
+
+    public function get_portDescription():IOTYPE {
+        return this.description ;
+    }
+
+    public function set_portDescription(description:IOTYPE):Void {
+        this.description = description;
+    }
 }

@@ -234,7 +234,7 @@ class Component extends CircuitElement {
         return this.componentKind.getname();
     }
 
-    public function removeInport(inport:Inport):Bool {
+    public function removeInport(inport:Port):Bool {
         return inportArray.remove(inport);
     }
     public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{

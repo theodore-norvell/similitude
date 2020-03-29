@@ -109,6 +109,8 @@ interface CircuitDiagramI {
 
     /**
     * find the hit list
+    * TODO replace this method with one that uses a SelectionModel.
+    * TODO Get rid of the HitObject class.
     **/
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>;
 
