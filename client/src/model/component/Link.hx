@@ -5,6 +5,7 @@ package model.component;
  * @author wanhui
  *
  */
+import model.observe.Observer;
 import type.HitObject;
 import global.Constant.*;
 import model.enumeration.MODE;
@@ -13,56 +14,58 @@ import model.drawComponents.DrawComponent;
 import model.drawComponents.DrawLink;
 import model.drawingInterface.DrawingAdapterI;
 
-class Link extends CircuitElement {
-    var leftEndpoint:Endpoint;
-    var rightEndpoint:Endpoint;
+class Link extends CircuitElement implements Observer {
+    var endpoints : Array<Endpoint>;
 
-    public function new(circuitDiagram : CircuitDiagramI, leftEndpoint:Endpoint, rightEndpoint:Endpoint ) {
+
+    public function new(circuitDiagram : CircuitDiagramI, x0 : Float, y0 : Float, x1 : Float, y1 : Float ) {
         super(circuitDiagram) ;
-        this.leftEndpoint = leftEndpoint;
-        this.rightEndpoint = rightEndpoint;
+        var zero = new Endpoint(circuitDiagram, x0, y0) ;
+        var one = new Endpoint(circuitDiagram, x1, y1) ;
+        one.addObserver(this) ;
+        zero.addObserver(this) ;
+        this.endpoints = [zero, one];
+    }
+
+    public function update(c:Component,?data:Dynamic) : Void {
+        notifyObservers( this ) ;
     }
 
     public function getLinkLength():Float{
-        return Math.sqrt(Math.pow(Math.abs(leftEndpoint.get_xPosition() - rightEndpoint.get_xPosition()),2) +
-                        Math.pow(Math.abs(leftEndpoint.get_yPosition() - rightEndpoint.get_yPosition()),2));
+        return Math.sqrt(Math.pow(Math.abs(endpoints[0].get_xPosition() - endpoints[1].get_xPosition()),2) +
+                        Math.pow(Math.abs(endpoints[0].get_yPosition() - endpoints[1].get_yPosition()),2));
     }
 	
 	public function getCircuitDiagram() : CircuitDiagramI {
 		return this.cd ;
 	}
-	
-    public function get_leftEndpoint():Endpoint {
-        return leftEndpoint;
+    
+    public function get_endpoint( i : Int ) : Endpoint {
+        return endpoints[i] ;
     }
-
-    public function set_leftEndpoint(value:Endpoint) {
-        return this.leftEndpoint = value;
+    public function get_leftEndpoint():Endpoint {
+        return endpoints[0];
     }
 
     public function get_rightEndpoint():Endpoint {
-        return rightEndpoint;
-    }
-
-    public function set_rightEndpoint(value:Endpoint) {
-        return this.rightEndpoint = value;
+        return endpoints[1];
     }
 
     override public function left() : Float {
-        return Math.min( this.rightEndpoint.get_xPosition(),
-                         this.leftEndpoint.get_xPosition() ) ; }
+        return Math.min( this.endpoints[1].get_xPosition(),
+                         this.endpoints[0].get_xPosition() ) ; }
 
     override public function right() : Float { 
-        return Math.max( this.rightEndpoint.get_xPosition(),
-                         this.leftEndpoint.get_xPosition() ) ; }
+        return Math.max( this.endpoints[1].get_xPosition(),
+                         this.endpoints[0].get_xPosition() ) ; }
 
     override public function top() : Float { 
-        return Math.min( this.rightEndpoint.get_yPosition(),
-                         this.leftEndpoint.get_yPosition() ) ; }
+        return Math.min( this.endpoints[1].get_yPosition(),
+                         this.endpoints[0].get_yPosition() ) ; }
 
     override public function bottom() : Float { 
-        return Math.max( this.rightEndpoint.get_yPosition(),
-                         this.leftEndpoint.get_yPosition() ) ; }
+        return Math.max( this.endpoints[1].get_yPosition(),
+                         this.endpoints[0].get_yPosition() ) ; }
 
     public function drawLink(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawLink(this, drawingAdapter);
@@ -94,14 +97,14 @@ class Link extends CircuitElement {
     }
 
     function pointOnEndpoint(coordinate:Coordinate):Endpoint{
-            if(pointsDistance(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
+            if(pointsDistance(endpoints[0].get_xPosition(), endpoints[0].get_yPosition(),
             coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
-                return leftEndpoint;
+                return endpoints[0];
             }
 
-            if(pointsDistance(rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
+            if(pointsDistance(endpoints[1].get_xPosition(), endpoints[1].get_yPosition(),
             coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
-                return rightEndpoint;
+                return endpoints[1];
             }
 
         return null;
@@ -115,8 +118,8 @@ class Link extends CircuitElement {
     **/
     function isOnLink(coordinate:Coordinate):Link{
 
-        if(pointToLine(leftEndpoint.get_xPosition(), leftEndpoint.get_yPosition(),
-        rightEndpoint.get_xPosition(), rightEndpoint.get_yPosition(),
+        if(pointToLine(endpoints[0].get_xPosition(), endpoints[0].get_yPosition(),
+        endpoints[1].get_xPosition(), endpoints[1].get_yPosition(),
         coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToLineDistance){
             //if the distance between the point to line less equal to 3, that means the line should be selected
             //only process the first link met
@@ -124,13 +127,13 @@ class Link extends CircuitElement {
             //the mouse location should be a little away from the endpoint
             //because in case of it confuse about select endpoint or link
             var theDistanaceToLeftEndpoint = Math.sqrt(
-                Math.pow(Math.abs(coordinate.get_xPosition() - leftEndpoint.get_xPosition()), 2) +
-                Math.pow(Math.abs(coordinate.get_yPosition() - leftEndpoint.get_yPosition()), 2)
+                Math.pow(Math.abs(coordinate.get_xPosition() - endpoints[0].get_xPosition()), 2) +
+                Math.pow(Math.abs(coordinate.get_yPosition() - endpoints[0].get_yPosition()), 2)
             );
 
             var theDistanceToRightEndpoint = Math.sqrt(
-                Math.pow(Math.abs(coordinate.get_xPosition() - rightEndpoint.get_xPosition()), 2) +
-                Math.pow(Math.abs(coordinate.get_yPosition() - rightEndpoint.get_yPosition()), 2)
+                Math.pow(Math.abs(coordinate.get_xPosition() - endpoints[1].get_xPosition()), 2) +
+                Math.pow(Math.abs(coordinate.get_yPosition() - endpoints[1].get_yPosition()), 2)
             );
             if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
                 if(theDistanceToRightEndpoint >= pointToEndpointDistance){
@@ -193,13 +196,5 @@ class Link extends CircuitElement {
         var lineLength:Float = 0;
         lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         return lineLength;
-    }
-
-    public function createJSon():String{
-        var jsonString:String = "{ \"leftEndpoint\": " + leftEndpoint.createJSon() + ",";
-        jsonString += "\"rightEndpoint\": " + rightEndpoint.createJSon();
-        jsonString += "}";
-
-        return jsonString;
     }
 }

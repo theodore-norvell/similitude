@@ -12,7 +12,7 @@ import model.enumeration.ORIENTATION;
 import type.Coordinate;
 import type.WorldPoint;
 
-class CircuitDiagram extends Observer implements CircuitDiagramI{ 
+class CircuitDiagram implements CircuitDiagramI implements Observer{  
     var observable:Observable;
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
@@ -26,7 +26,6 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
     static var margin:Float = 50;
 
     public function new( ) {
-        super();
         this.observable = new Observable() ;
         updateBoundingBox() ;
 
@@ -34,7 +33,13 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
 
     public function checkInvariant( ) : Void {
         for( comp in componentArray ) Assert.assert( comp.get_CircuitDiagram() == this ) ;
-        for( link in linkArray ) Assert.assert( link.get_CircuitDiagram() == this ) ;
+        for( link in linkArray ) {
+            Assert.assert( link.get_CircuitDiagram() == this ) ;
+            // TODO Check that any links that connect to ports connect to
+            // ports whose component is in the componentarray. 
+            // TODO Check that those port are in the same location 
+            // as the endpoints.
+        }
     }
 
     public function updateBoundingBox():Void {
@@ -61,6 +66,11 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
         xMax = xMax + margin / 2 ;
         yMax = yMax + margin / 2 ;
         centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
+        observable.notifyObservers(this) ;
+    }
+
+    public function update(c:Component,?data:Dynamic) : Void{
+        updateBoundingBox() ; // This will also notify observers.
     }
 
     public function get_centre():Coordinate{
@@ -101,30 +111,26 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
 
     public function addLink(link:Link):Void {
         linkArray.push(link);
+        link.addObserver(this);
+        updateBoundingBox() ;
     }
 
     public function addComponent(component:Component):Void {
         componentArray.push(component);
         component.addObserver(this);
-    }
-
-    public function removeLink(link:Link):Void {
-        linkArray.remove(link);
-    }
-
-    public function removeComponent(component:Component):Void {
-        componentArray.remove(component);
+        updateBoundingBox() ;
     }
 
     public function deleteLink(link:Link):Void{
         linkArray.remove(link);
+        updateBoundingBox() ;
     }
 
     public function deleteComponent(component:Component):Void{
         componentArray.remove(component);
         //delete port setted in the link
         for(i in component.get_inportIterator()){
-            for(j in 0...linkArray.length){
+            for(j in 0 ... linkArray.length){
                 if(i == linkArray[j].get_leftEndpoint().get_port()){
                     linkArray[j].get_leftEndpoint().set_port(null);
                 }
@@ -136,7 +142,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
         }
         //
         for(i in component.get_outportIterator()){
-            for(j in 0...linkArray.length){
+            for(j in 0 ... linkArray.length){
                 if(i == linkArray[j].get_leftEndpoint().get_port()){
                     linkArray[j].get_leftEndpoint().set_port(null);
                 }
@@ -144,9 +150,10 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
                 if(i == linkArray[j].get_rightEndpoint().get_port()){
                     linkArray[j].get_rightEndpoint().set_port(null);
                 }
-
             }
         }
+        
+        updateBoundingBox() ;
     }
 
     /**
@@ -161,7 +168,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
 
     public function componentSetName(component:Component, name:String):Void{
         // TODO.  It must be enforced that components of a circuit have unique names.
-        componentArray[componentArray.indexOf(component)].set_name(name);
+        component.set_name(name);
     }
 
     /**
@@ -226,13 +233,5 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
             worldPointArray.push(new WorldPoint(this, worldCoordinate));
         }
         return worldPointArray;
-    }
-
-    public function isEmpty():Bool{
-        if(componentArray.length == 0 && linkArray.length == 0){
-            return true;
-        }else{
-            return false;
-        }
     }
 }

@@ -36,16 +36,6 @@ interface CircuitDiagramI {
     public function addComponent(component:Component):Void;
 
     /**
-    * remove one link
-    **/
-    public function removeLink(link:Link):Void;
-
-    /**
-    * remove one component
-    **/
-    public function removeComponent(component:Component):Void;
-
-    /**
     * delete one link
     **/
     public function deleteLink(link:Link):Void;
@@ -132,8 +122,4 @@ interface CircuitDiagramI {
     **/
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 
-    /**
-    * is this circuitdiagram has nothing?
-    **/
-    public function isEmpty():Bool;
 }

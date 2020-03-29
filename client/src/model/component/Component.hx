@@ -131,7 +131,9 @@ class Component extends CircuitElement {
         Assert.assert(list.exists(s));
         if(list.exists(s)){
             if(list.get(s).canupdate(this,v)){
-                return list.get(s).update(this,v);
+                var success =  list.get(s).update(this,v);
+                if( success ) notifyObservers(this) ;
+                return success ;
             }
         }
         return false;
@@ -141,16 +143,18 @@ class Component extends CircuitElement {
         return xPosition;
     }
 
-    public function set_xPosition(value:Float) {
-        return this.xPosition = value;
+    public function set_xPosition(value:Float) : Void {
+        this.xPosition = value;
+        notifyObservers(this) ;
     }
 
     public function get_yPosition():Float {
         return yPosition;
     }
 
-    public function set_yPosition(value:Float) {
-        return this.yPosition = value;
+    public function set_yPosition(value:Float) : Void {
+        this.yPosition = value;
+        notifyObservers(this) ;
     }
 
     override public function left() : Float {
@@ -169,8 +173,8 @@ class Component extends CircuitElement {
         return list.get("orientation").getAttrValue().getvalue();
     }
 
-    public function set_orientation(value:ORIENTATION) {
-        list.get("orientation").update(this,new OrientationValue(value));
+    public function set_orientation(value:ORIENTATION) : Void {
+        update("orientation",new OrientationValue(value));
     }
 
     public function get_componentKind():ComponentKind {
@@ -183,6 +187,7 @@ class Component extends CircuitElement {
 
     public function set_boxType(value:BOX) {
         this.boxType = value;
+        notifyObservers(this) ;
     }
 
     public function get_inportIterator():Iterator<Port> {
@@ -205,7 +210,7 @@ class Component extends CircuitElement {
     }
 
     public function set_name(value:String) {
-        list.get("name").update(this,new StringValue(value));
+        update("name",new StringValue(value));
     }
 
     public function get_height():Float {
@@ -214,6 +219,7 @@ class Component extends CircuitElement {
 
     public function set_height(value:Float) {
         return this.height = value;
+        notifyObservers(this) ;
     }
 
     public function get_width():Float {
@@ -222,25 +228,27 @@ class Component extends CircuitElement {
 
     public function set_width(value:Float) {
         return this.width = value;
+        notifyObservers(this) ;
     }
 
     public function get_inportsNum():Int {
         return inportsNum;
     }
-    public function setNameOfTheComponentKind(name:String){
-        //this.nameOfTheComponentKind = name;
-    }
+
     public function getNameOfTheComponentKind():String{
         return this.componentKind.getname();
     }
 
-    public function removeInport(inport:Port):Bool {
-        return inportArray.remove(inport);
+    public function removeInport(inport:Port): Bool {
+        // Calling this function might violate an invariant of the kind.
+        var success = inportArray.remove(inport);
+        if( success ) notifyObservers(this) ;
+        return success ;
     }
-    public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{
+    function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float): Void{
         inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
         outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        return this;
+        notifyObservers(this) ;
     }
 
     public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ) {
@@ -261,6 +269,7 @@ class Component extends CircuitElement {
 
     public function set_sequence(n:Int) : Void {
         this.sequenceNumber = n ;
+        notifyObservers(this) ;
     }
 
     public function get_sequence() : Int {
