@@ -154,6 +154,7 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
         }
         
         updateBoundingBox() ;
+
     }
 
     /**

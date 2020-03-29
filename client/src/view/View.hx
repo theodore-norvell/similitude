@@ -105,7 +105,10 @@ class View
 	
 	public function updateCanvas() : Void {
 		Console.log('view.updateCanvas');
-		var drawingAdapter = new DrawingAdapter(Transform.identity(), this.activeTab.canvasElement.getContext2d());
+		var canvas = this.activeTab.canvasElement ;
+		var context = canvas.getContext2d() ;
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		var drawingAdapter = new DrawingAdapter(Transform.identity(), context);
 		this.activeTab.tabModel.draw(drawingAdapter);
 	}
 	
