@@ -113,7 +113,20 @@ interface CircuitDiagramI {
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>;
 
     /**
-    * find the world points
+    * Find all coordinates a point corresponds to.
+    * This can be used when there is a mouse click on a circuit. The view
+    * would transform the view coordinate to a world coordinate and then call
+    * this methods.
+    * 
+    * Normally this  method just returns a world point that consistst of this diagram
+    * and the input coordinate. However when a point is inside a (white box) compound component, the
+    * point also refers to a coordinate within that compound component.  So in that case
+    * there are two points (at least) that could have been intended by the mouse click.
+    * And there could be more beneath that.
+    * 
+    * When mode is POINT_MODE.ONE, only one world point is returned.
+    * 
+    * When mode is POINT_MODE.PATH, all the world points are returned. In no particular order.
     **/
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 

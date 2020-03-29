@@ -7,6 +7,7 @@ import model.drawingInterface.DrawingAdapterI;
 /**
 * draw and gate
 * @author wanhui
+  TODO Consoldate all this drawing code into one class
 **/
 class DrawAND implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;

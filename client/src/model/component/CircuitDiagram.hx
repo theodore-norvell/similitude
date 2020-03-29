@@ -211,7 +211,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
 
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
-
+        
         for(i in componentArray){
             var tempWorldPointArray:Array<WorldPoint> = i.findWorldPoint(worldCoordinate, mode);
             for(j in tempWorldPointArray){

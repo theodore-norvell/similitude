@@ -2,7 +2,8 @@ package type;
 import model.component.CircuitDiagram;
 
 /**
- *  A movable point in a diagram.
+ *  A World Point is a pair consisting of a world coordinate and 
+ *  a circuit diagram whose origin that that point is relative to.
  */
 class WorldPoint {
     var circuitDiagram:CircuitDiagram;
@@ -17,15 +18,7 @@ class WorldPoint {
         return circuitDiagram;
     }
 
-    public function set_circuitDiagram(value:CircuitDiagram) {
-        return this.circuitDiagram = value;
-    }
-
     public function get_coordinate():Coordinate {
         return coordinate;
-    }
-
-    public function set_coordinate(value:Coordinate) {
-        return this.coordinate = value;
     }
 }
