@@ -34,7 +34,7 @@ class CanvasController extends AbstractController implements CanvasListener
 		trace('AAAA', eventObject.component);
 		// create and execute a command here 
 		// Type.createEnum(ComponentType, eventObject.component)
-		var component = new Component(eventObject.draggedToX, eventObject.draggedToY, 70, 70, ORIENTATION.EAST, componentTypesSingleton.toComponentKind(eventObject.component), 0);
+		var component = new Component(eventObject.draggedToX, eventObject.draggedToY, 25, 25, ORIENTATION.EAST, componentTypesSingleton.toComponentKind(eventObject.component), 0);
 		var addComponentCommand = new AddComponentCommand(this.activeTab.getCircuitDiagram(), component);
 		this.commandManager.executeCommand(addComponentCommand);
 		this.viewUpdater.updateCanvas();

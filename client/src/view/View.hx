@@ -5,6 +5,7 @@ import controller.listenerInterfaces.SidebarListener;
 import js.Browser.document;
 import js.html.CanvasElement;
 import js.html.Console;
+import js.html.Window;
 import haxe.Json;
 import model.component.CircuitDiagram;
 import model.drawingInterface.DrawingAdapter;
@@ -121,9 +122,15 @@ class View
 		var innerCanvas = document.createCanvasElement();
 		// innerCanvas.id = "canvasToDraw"; // deal with this to get better and unique IDs, IF NEED BE
 		canvasDisplayScreen.appendChild(innerCanvas);
+		//innerCanvas.style.width = "100%";
+		//innerCanvas.style.height = "100%";
+		var cs = document.defaultView.getComputedStyle(canvasDisplayScreen);
+		
 		innerCanvas.style.width = "100%";
 		innerCanvas.style.height = "100%";
-		innerCanvas.style.border = "solid 1px";
+		innerCanvas.style.border = "solid 1px black";
+		innerCanvas.width = Std.parseInt(cs.getPropertyValue('width'));
+		innerCanvas.height = Std.parseInt(cs.getPropertyValue('height'));
 		
 		// needs this event by default for the drop target.
 		canvasDisplayScreen.addEventListener('dragover', function (event) {
@@ -149,8 +156,8 @@ class View
 			// in element co-ordinates
 			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
 			trace(eventPassed);
-			eventPassed.draggedToX = event.layerX;
-			eventPassed.draggedToY = event.layerY;
+			eventPassed.draggedToX = event.layerX-80;
+			eventPassed.draggedToY = event.layerY-50;
 			//eventPassed.draggedToX = event.pageX;
 			//eventPassed.draggedToY = event.pageY;
 			this.updateCanvasListener(eventPassed);
