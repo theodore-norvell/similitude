@@ -1,6 +1,6 @@
-package model.observe;
-import model.component.Component;
-import Array;
+package model.observe ;
+import assertions.Assert;
+
 class Observable {
 
     var observers:Array<Observer>= new Array<Observer>();
@@ -10,24 +10,20 @@ class Observable {
     }
 
 
-    public function addObserver(obs:Observer):Bool {
-        if(obs==null){
-            return false;
-        }
-        else {
-            observers.push(obs);
-            return true;
-        }
+    public function addObserver(obs:Observer) : Void {
+        Assert.assert( obs != null ) ;
+        if( observers.indexOf( obs ) == -1 ) observers.push(obs);
     }
 
 
-    public function removeObserver(obs:Observer):Bool {
-        return observers.remove(obs);
+    public function removeObserver(obs:Observer):Void {
+        Assert.assert( obs != null ) ;
+        observers.remove(obs);
     }
 
 
-    public function notifyObservers(c:Component,?data:Dynamic):Void {
-        for(n in observers){
+    public function notifyObservers(c:Any,?data:Dynamic):Void {
+        for(n in observers) {
             n.update(c,data);
         }
     }

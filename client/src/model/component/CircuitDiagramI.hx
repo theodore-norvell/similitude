@@ -20,31 +20,10 @@ interface CircuitDiagramI {
     public function get_componentIterator():Iterator<Component>;
 
     /**
-    * reverse iterator for componenent array
-    **/
-    public function get_componentReverseIterator():Iterator<Component>;
-
-    /**
-    * reverse iterator for link array
-    **/
-    public function get_linkReverseIterator():Iterator<Link>;
-
-    /**
     * @:getter link array from the circuit diagram
      * @return the iterator
     **/
     public function get_linkIterator():Iterator<Link>;
-
-    /**
-    * @:getter the name of the circuit diagram
-    * @return the name
-    **/
-    public function get_name():String;
-
-    /**
-    * @:setter the name of the circuit diagram
-    **/
-    public function set_name(value:String):Void;
 
     /**
     * add one link
@@ -67,11 +46,6 @@ interface CircuitDiagramI {
     public function removeComponent(component:Component):Void;
 
     /**
-    * set IntAttr orientation for one component
-    **/
-    public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void;
-
-    /**
     * delete one link
     **/
     public function deleteLink(link:Link):Void;
@@ -87,13 +61,13 @@ interface CircuitDiagramI {
     public function componentSetName(component:Component, name:String):Void;
 
     /**
-    * compute the size of this diagram
+    * update the size of this diagram
     * note: the size of this diagram changed only happens in two suitutions
     *       1. add a component
     *       2. move a component (significant slow down the performance)
     *            because there is no way to track the change for every component, so make this function public.
     **/
-    public function computeDiagramSize():Void;
+    public function updateBoundingBox():Void;
 
     /**
     * get the width of this diagram
@@ -125,7 +99,7 @@ interface CircuitDiagramI {
     **/
     public function get_yMax():Float;
 
-    public function getComponentAndLinkCenterCoordinate():Coordinate;
+    public function get_centre():Coordinate;
 
     /**
     * draw the circuit diagram itself

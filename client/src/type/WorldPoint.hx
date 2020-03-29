@@ -1,11 +1,9 @@
 package type;
-/**
-* typedef WorldPoint = {
-    var circuitDiagram:CircuitDiagram;
-    var coordinate:Coordinate;
-}
-**/
 import model.component.CircuitDiagram;
+
+/**
+ *  A movable point in a diagram.
+ */
 class WorldPoint {
     var circuitDiagram:CircuitDiagram;
     var coordinate:Coordinate;

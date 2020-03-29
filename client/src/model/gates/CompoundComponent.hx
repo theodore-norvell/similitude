@@ -174,7 +174,8 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
 
     function makeTransform():Transform{
         var transform:Transform = Transform.identity();
-        transform = transform.translate(-circuitDiagram.getComponentAndLinkCenterCoordinate().get_xPosition(), -circuitDiagram.getComponentAndLinkCenterCoordinate().get_yPosition())
+        var centre = circuitDiagram.get_centre() ;
+        transform = transform.translate(-centre.get_xPosition(), -centre.get_yPosition())
                     .scale(component.get_width()/circuitDiagram.get_diagramWidth(), component.get_height()/circuitDiagram.get_diagramHeight())
                     .translate(component.get_xPosition(), component.get_yPosition());
 

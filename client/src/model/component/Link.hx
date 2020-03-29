@@ -12,15 +12,15 @@ import type.Coordinate;
 import view.drawComponents.DrawComponent;
 import view.drawComponents.DrawLink;
 import model.drawingInterface.DrawingAdapterI;
-class Link{
+
+class Link extends CircuitElement {
     var leftEndpoint:Endpoint;
     var rightEndpoint:Endpoint;
-	var circuitDiagram: CircuitDiagramI;
 
-    public function new(leftEndpoint:Endpoint, rightEndpoint:Endpoint, ?circuitDiagram : CircuitDiagramI) {
+    public function new(circuitDiagram : CircuitDiagramI, leftEndpoint:Endpoint, rightEndpoint:Endpoint ) {
+        super(circuitDiagram) ;
         this.leftEndpoint = leftEndpoint;
         this.rightEndpoint = rightEndpoint;
-		this.circuitDiagram = circuitDiagram;
     }
 
     public function getLinkLength():Float{
@@ -29,11 +29,7 @@ class Link{
     }
 	
 	public function getCircuitDiagram() : CircuitDiagramI {
-		return this.circuitDiagram;
-	}
-
-	public function setCircuitDiagram(circuitDiagram: CircuitDiagramI) : Void {
-		this.circuitDiagram = circuitDiagram;
+		return this.cd ;
 	}
 	
     public function get_leftEndpoint():Endpoint {
@@ -51,6 +47,22 @@ class Link{
     public function set_rightEndpoint(value:Endpoint) {
         return this.rightEndpoint = value;
     }
+
+    override public function left() : Float {
+        return Math.min( this.rightEndpoint.get_xPosition(),
+                         this.leftEndpoint.get_xPosition() ) ; }
+
+    override public function right() : Float { 
+        return Math.max( this.rightEndpoint.get_xPosition(),
+                         this.leftEndpoint.get_xPosition() ) ; }
+
+    override public function top() : Float { 
+        return Math.min( this.rightEndpoint.get_yPosition(),
+                         this.leftEndpoint.get_yPosition() ) ; }
+
+    override public function bottom() : Float { 
+        return Math.max( this.rightEndpoint.get_yPosition(),
+                         this.leftEndpoint.get_yPosition() ) ; }
 
     public function drawLink(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawLink(this, drawingAdapter);

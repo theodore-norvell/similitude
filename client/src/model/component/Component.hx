@@ -3,8 +3,6 @@ package model.component;
 import model.selectionModel.SelectionModel;
 import model.attribute.Pair;
 import model.observe.Observable;
-//import js.html.CanvasRenderingContext2D;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import type.HitObject;
 import model.enumeration.BOX;
 import model.enumeration.POINT_MODE;
@@ -33,7 +31,7 @@ import model.attribute.OrientationValue;
  * @author wanhui
  *
  */
-class Component extends Observable{
+class Component extends CircuitElement {
     var xPosition:Float;//the x position of the component
     var yPosition:Float;//the y position of the component
     var height:Float;//height
@@ -46,7 +44,6 @@ class Component extends Observable{
     //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
     var boxType:BOX;
     var list:Map<String,Pair>=new Map<String,Pair>();
-    var cd:CircuitDiagram;
     /**
     *   create component
      *   @param xPosition: x position
@@ -57,8 +54,8 @@ class Component extends Observable{
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
-        super();
+    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
+        super(circuitDiagram);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.height = height;
@@ -134,10 +131,6 @@ class Component extends Observable{
         return false;
     }
 
-    public function get_CircuitDiagram():CircuitDiagram{
-        return cd;
-    }
-
     public function get_xPosition():Float {
         return xPosition;
     }
@@ -153,6 +146,18 @@ class Component extends Observable{
     public function set_yPosition(value:Float) {
         return this.yPosition = value;
     }
+
+    override public function left() : Float {
+        return this.xPosition - this.width/2.0 ; }
+
+    override public function right() : Float {
+        return this.xPosition - this.width/2.0 ; }
+
+    override public function top() : Float {
+        return this.yPosition - this.height/2.0 ; }
+
+    override public function bottom() : Float {
+        return this.yPosition + this.height/2.0 ; }
 
     public function get_orientation():ORIENTATION {
         return list.get("orientation").getAttrValue().getvalue();

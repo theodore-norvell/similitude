@@ -4,6 +4,7 @@ import model.component.Port;
 import model.component.Link;
 import model.component.Component;
 import model.component.CircuitDiagramI;
+
 class HitObject {
     var circuitDiagram:CircuitDiagramI;
     var component:Component;

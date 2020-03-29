@@ -1,9 +1,8 @@
 package model.component;
 
-import haxe.ds.GenericStack;
+import assertions.Assert;
 import model.observe.Observable;
 import model.observe.Observer;
-//import js.html.CanvasRenderingContext2D;
 import type.HitObject;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
@@ -13,175 +12,91 @@ import model.enumeration.ORIENTATION;
 import type.Coordinate;
 import type.WorldPoint;
 
-class CircuitDiagram extends Observer implements CircuitDiagramI{
-    var Obable:Observable;
+class CircuitDiagram extends Observer implements CircuitDiagramI{ 
+    var observable:Observable;
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
-    var name:String;//the name of this circuit diagram
-    var componentArrayReverseFlag:Bool = false;
-    var linkArrayReverseFlag:Bool = false;
 
-    //circuit diagram has its width height
-    var diagramWidth:Float;
-    var diagramHeight:Float;
-    //initial the margin
+    // The bounding box
     var xMin:Float;
     var yMin:Float;
     var xMax:Float;
     var yMax:Float;
-    var margin:Int;
-    var componentAndLinkCenter:Coordinate;
+    var centrePoint : Coordinate ;
+    static var margin:Float = 50;
 
-    public function new() {
+    public function new( ) {
         super();
-        componentAndLinkCenter = new Coordinate(0, 0);
-        this.margin = 50;
+        this.observable = new Observable() ;
+        updateBoundingBox() ;
+
     }
 
-    public function computeDiagramSize():Void{
-        xMin = 99999999 ;
-        yMin = 99999999 ;
-        xMax = 0 ;
-        yMax = 0 ;
+    public function checkInvariant( ) : Void {
+        for( comp in componentArray ) Assert.assert( comp.get_CircuitDiagram() == this ) ;
+        for( link in linkArray ) Assert.assert( link.get_CircuitDiagram() == this ) ;
+    }
+
+    public function updateBoundingBox():Void {
+        xMin = 0;
+        yMin = 0;
+        xMax = 0;
+        yMax = 0;
 
         for(i in componentArray){
-            if(i.get_xPosition() - i.get_width()/2 < xMin){
-                xMin = i.get_xPosition() - i.get_width()/2;
-            }
-
-            if(i.get_xPosition() + i.get_width()/2 > xMax){
-                xMax = i.get_xPosition() + i.get_width()/2;
-            }
-
-            if(i.get_yPosition() - i.get_height()/2 < yMin){
-                yMin = i.get_yPosition() - i.get_height()/2;
-            }
-
-            if(i.get_yPosition() + i.get_height()/2 > yMax){
-                yMax = i.get_yPosition() + i.get_height()/2;
-            }
+            xMin = Math.min( xMin, i.left() ) ;
+            xMax = Math.max( xMax, i.right() ) ;
+            yMin = Math.min( yMin, i.top() ) ;
+            yMax = Math.min( yMax, i.bottom() ) ;
         }
 
         for(i in linkArray){
-            //left endpoint
-            if(i.get_leftEndpoint().get_xPosition() < xMin){
-                xMin = i.get_leftEndpoint().get_xPosition();
-            }
-
-            if(i.get_leftEndpoint().get_xPosition() > xMax){
-                xMax = i.get_leftEndpoint().get_xPosition();
-            }
-
-            if(i.get_leftEndpoint().get_yPosition() < yMin){
-                yMin = i.get_leftEndpoint().get_yPosition();
-            }
-
-            if(i.get_leftEndpoint().get_yPosition() > yMax){
-                yMax = i.get_leftEndpoint().get_yPosition();
-            }
-            //right endpoint
-            if(i.get_rightEndpoint().get_xPosition() < xMin){
-                xMin = i.get_rightEndpoint().get_xPosition();
-            }
-
-            if(i.get_rightEndpoint().get_xPosition() > xMax){
-                xMax = i.get_rightEndpoint().get_xPosition();
-            }
-
-            if(i.get_rightEndpoint().get_yPosition() < yMin){
-                yMin = i.get_rightEndpoint().get_yPosition();
-            }
-
-            if(i.get_rightEndpoint().get_yPosition() > yMax){
-                yMax = i.get_rightEndpoint().get_yPosition();
-            }
+            xMin = Math.min( xMin, i.left() ) ;
+            xMax = Math.max( xMax, i.right() ) ;
+            yMin = Math.min( yMin, i.top() ) ;
+            yMax = Math.min( yMax, i.bottom() ) ;
         }
-
-        componentAndLinkCenter.set_xPosition((xMin + xMax)/2);
-        componentAndLinkCenter.set_yPosition((yMin + yMax)/2);
-
-        diagramWidth = xMax - xMin + margin;
-        diagramHeight = yMax - yMin + margin;
-
-        if(diagramHeight > diagramWidth){
-            diagramWidth = diagramHeight;
-        }else{
-            diagramHeight = diagramWidth;
-        }
+        xMin = xMin - margin / 2 ;
+        yMin = yMin - margin / 2 ;
+        xMax = xMax + margin / 2 ;
+        yMax = yMax + margin / 2 ;
+        centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
     }
 
-    public function getComponentAndLinkCenterCoordinate():Coordinate{
-        return componentAndLinkCenter;
+    public function get_centre():Coordinate{
+        return centrePoint ;
     }
 
     public function get_diagramWidth():Float {
-        return diagramWidth;
+        return xMax - xMin ;
     }
 
     public function get_diagramHeight():Float {
-        return diagramHeight;
+        return yMax - yMin ;
     }
 
     public function get_xMin():Float {
-        return xMin;
+        return xMin ;
     }
 
     public function get_yMin():Float {
-        return yMin;
+        return yMin ;
     }
 
     public function get_xMax():Float {
-        return xMax;
+        return xMax ;
     }
 
     public function get_yMax():Float {
-        return yMax;
+        return yMax ;
     }
 
-    public function get_componentIterator():Iterator<Component>{
-        if(componentArrayReverseFlag){
-            componentArrayReverse();
-        }
+    public function get_componentIterator():Iterator<Component> {
         return componentArray.iterator();
     }
 
-    public function get_componentReverseIterator():Iterator<Component>{
-        if( ! componentArrayReverseFlag){
-            componentArrayReverse();
-        }
-        return componentArray.iterator();
-    }
-
-    function componentArrayReverse(){
-        componentArrayReverseFlag = !componentArrayReverseFlag;
-        componentArray.reverse();
-    }
-
-    public function get_linkIterator():Iterator<Link>{
-        if(linkArrayReverseFlag){
-            linkArrayReverse();
-        }
+    public function get_linkIterator():Iterator<Link> {
         return linkArray.iterator();
-    }
-
-    public function get_linkReverseIterator():Iterator<Link>{
-        if( ! linkArrayReverseFlag ){
-            linkArrayReverse();
-        }
-        return linkArray.iterator();
-    }
-
-    function linkArrayReverse(){
-        linkArrayReverseFlag = !linkArrayReverseFlag;
-        linkArray.reverse();
-    }
-
-    public function get_name():String {
-        return name;
-    }
-
-    public function set_name(value:String):Void{
-        this.name = value;
     }
 
     public function addLink(link:Link):Void {
@@ -201,17 +116,6 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
         componentArray.remove(component);
     }
 
-    public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void{
-        for (i in 0...componentArray.length) {
-            if (component == componentArray[i]) {
-                componentArray[i].set_orientation(newOrientation);
-                componentArray[i].updateMoveComponentPortPosition(componentArray[i].get_xPosition(),componentArray[i].get_yPosition());
-                linkArraySelfUpdate();
-                break;
-            }
-        }
-    }
-
     public function deleteLink(link:Link):Void{
         linkArray.remove(link);
     }
@@ -228,7 +132,6 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
                 if(i == linkArray[j].get_rightEndpoint().get_port()){
                     linkArray[j].get_rightEndpoint().set_port(null);
                 }
-
             }
         }
         //
