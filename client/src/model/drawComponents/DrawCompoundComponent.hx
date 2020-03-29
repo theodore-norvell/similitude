@@ -1,4 +1,5 @@
-package view.drawComponents;
+package model.drawComponents;
+
 //import js.html.CanvasRenderingContext2D;
 import model.enumeration.BOX;
 import type.Coordinate;

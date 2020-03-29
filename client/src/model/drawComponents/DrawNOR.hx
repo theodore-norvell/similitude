@@ -1,13 +1,14 @@
-package view.drawComponents;
+package model.drawComponents;
+
 import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
 import global.Constant.*;
 /**
-* draw output gate
+* draw NOR gate
 * @author wanhui
 **/
-class DrawOutput implements DrawComponent{
+class DrawNOR implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
@@ -22,14 +23,15 @@ class DrawOutput implements DrawComponent{
         }
         drawingAdapter.setStrokeColor(strokeColor);
 
-        //set the radius equal to 7
-        drawingAdapter.setFillColor("black");
-        drawingAdapter.drawCricle(component.get_xPosition(), component.get_yPosition(), 7);
-        drawingAdapter.setTextColor("white");
-        //drawingAdapter.drawText("Output", component.get_yPosition, component.get_yPosition(), component.get_width() - 2);
-        //output gate shouldn't have output port
+        drawingAdapter.drawNOrShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
         //draw inport
         for (i in component.get_inportIterator()) {
+            var port:Port = i;
+            drawingAdapter.setFillColor("black");
+            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
+        }
+        //draw outport
+        for (i in component.get_outportIterator()) {
             var port:Port = i;
             drawingAdapter.setFillColor("black");
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);

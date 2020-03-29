@@ -1,13 +1,14 @@
-package view.drawComponents;
+package model.drawComponents;
+
 import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
 import global.Constant.*;
 /**
-* draw OR gate
+* draw input gate
 * @author wanhui
 **/
-class DrawOR implements DrawComponent{
+class DrawInput implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
@@ -22,13 +23,12 @@ class DrawOR implements DrawComponent{
         }
         drawingAdapter.setStrokeColor(strokeColor);
 
-        drawingAdapter.drawOrShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
-        //draw inport
-        for (i in component.get_inportIterator()) {
-            var port:Port = i;
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
-        }
+        //set the radius equal to 7
+        drawingAdapter.setFillColor("red");
+        drawingAdapter.drawCricle(component.get_xPosition(), component.get_yPosition(), 7);
+        drawingAdapter.setTextColor("black");
+        //drawingAdapter.drawText("Input", component.get_yPosition(), component.get_yPosition(), component.get_width() - 2);
+        //input gate shouldn't have inport
         //draw outport
         for (i in component.get_outportIterator()) {
             var port:Port = i;
@@ -39,4 +39,5 @@ class DrawOR implements DrawComponent{
         //reset drawing parameter
         drawingAdapter.resetDrawingParam();
     }
+
 }

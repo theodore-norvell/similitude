@@ -1,14 +1,15 @@
-package view.drawComponents;
+package model.drawComponents;
 
-import global.Constant.*;
 import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
+import global.Constant.*;
 /**
-* draw and gate
+* draw NAND gate
+* *
 * @author wanhui
 **/
-class DrawAND implements DrawComponent{
+class DrawNAND implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
@@ -22,7 +23,8 @@ class DrawAND implements DrawComponent{
             strokeColor = "black";
         }
         drawingAdapter.setStrokeColor(strokeColor);
-        drawingAdapter.drawAndShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
+
+        drawingAdapter.drawNAndShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
         //draw inport
         for (i in component.get_inportIterator()) {
             var port:Port = i;
@@ -39,5 +41,4 @@ class DrawAND implements DrawComponent{
         //reset drawing parameter
         drawingAdapter.resetDrawingParam();
     }
-
 }

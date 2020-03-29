@@ -1,13 +1,14 @@
-package view.drawComponents;
+package model.drawComponents;
+
 import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
 import global.Constant.*;
 /**
-* draw XOR gate
+* draw OR gate
 * @author wanhui
 **/
-class DrawXOR implements DrawComponent{
+class DrawOR implements DrawComponent{
     var drawingAdapter:DrawingAdapterI;
     var component:Component;
 
@@ -22,7 +23,7 @@ class DrawXOR implements DrawComponent{
         }
         drawingAdapter.setStrokeColor(strokeColor);
 
-        drawingAdapter.drawXorShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
+        drawingAdapter.drawOrShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
         //draw inport
         for (i in component.get_inportIterator()) {
             var port:Port = i;

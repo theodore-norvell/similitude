@@ -1,4 +1,4 @@
-package view.drawComponents;
+package model.drawComponents;
 
 import model.component.Link;
 import model.drawingInterface.DrawingAdapterI;

@@ -9,8 +9,8 @@ import type.HitObject;
 import global.Constant.*;
 import model.enumeration.MODE;
 import type.Coordinate;
-import view.drawComponents.DrawComponent;
-import view.drawComponents.DrawLink;
+import model.drawComponents.DrawComponent;
+import model.drawComponents.DrawLink;
 import model.drawingInterface.DrawingAdapterI;
 
 class Link extends CircuitElement {

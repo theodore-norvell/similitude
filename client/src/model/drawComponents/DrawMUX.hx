@@ -1,4 +1,5 @@
-package view.drawComponents;
+package model.drawComponents;
+
 import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
