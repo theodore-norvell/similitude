@@ -8,7 +8,6 @@ import model.attribute.StringAttr;
 import model.attribute.IntAttr;
 import model.attribute.Attribute;
 import model.observe.Observer;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import type.HitObject;
 import type.WorldPoint;
 import model.drawComponents.DrawComponent;

@@ -2,10 +2,9 @@ package model.gates;
 
 import model.attribute.StringAttr;
 import model.attribute.Attribute;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import vimodelew.drawComponents.DrawOutput;
+import model.drawComponents.DrawOutput;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -137,7 +136,7 @@ class Output implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawOutput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

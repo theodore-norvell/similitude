@@ -5,7 +5,6 @@ import model.attribute.OrientationAttr;
 import model.attribute.StringAttr;
 import model.attribute.IntAttr;
 import model.attribute.Attribute;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawFlipFlop;
 import model.drawComponents.DrawComponent;
@@ -256,7 +255,7 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawFlipFlop(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

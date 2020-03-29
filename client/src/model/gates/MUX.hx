@@ -4,7 +4,6 @@ import model.attribute.OrientationAttr;
 import model.attribute.StringAttr;
 import model.attribute.IntAttr;
 import model.attribute.Attribute;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawMUX;
@@ -183,7 +182,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawMUX(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

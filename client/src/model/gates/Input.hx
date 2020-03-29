@@ -2,7 +2,6 @@ package model.gates;
 
 import model.attribute.StringAttr;
 import model.attribute.Attribute;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawInput;
@@ -143,7 +142,7 @@ class Input implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
         var drawComponent:DrawComponent = new DrawInput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");
