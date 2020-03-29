@@ -4,9 +4,11 @@ import model.attribute.OrientationAttr;
 import model.attribute.StringAttr;
 import model.attribute.IntAttr;
 import model.attribute.Attribute;
-import model.drawComponents.DrawComponent;
+import type.LinkAndComponentAndEndpointAndPortArray;
+import view.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawMUX;
+import view.drawComponents.DrawMUX;
+import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -42,10 +44,6 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     public function new() {
         super() ;
         attributes.push(new IntAttr("delay"));
-    }
-
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
     }
 
     public function getname():String{
@@ -182,7 +180,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
         var drawComponent:DrawComponent = new DrawMUX(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

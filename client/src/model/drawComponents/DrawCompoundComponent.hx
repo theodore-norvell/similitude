@@ -71,7 +71,7 @@ class DrawCompoundComponent implements DrawComponent{
             if(component.get_boxType() == BOX.WHITE_BOX ){
                 for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
                     if(j.getNameOfTheComponentKind() == "Input"){
-                        if(i.get_sequence() == j.get_componentKind().get_sequence()){
+                        if(i.get_sequence() == j.get_sequence()){
                             for(k in j.get_inportIterator()){
                                 //draw a line
                                 var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
@@ -93,9 +93,9 @@ class DrawCompoundComponent implements DrawComponent{
             drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
 
             if(component.get_boxType() == BOX.WHITE_BOX){
-                for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
+                for(j in component.getInnerCircuitDiagram().get_componentIterator()){
                     if(j.getNameOfTheComponentKind() == "Output"){
-                        if(i.get_sequence() == j.get_componentKind().get_sequence()){
+                        if(i.get_sequence() == j.get_sequence()){
                             for(k in j.get_outportIterator()){
                                 //draw a line
                                 var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));

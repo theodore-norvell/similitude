@@ -2,7 +2,6 @@ package model.component;
 
 
 import model.enumeration.IOTYPE;
-import model.enumeration.VALUE_LOGIC;
 /**
  * Every gate should have port to access the logic value
  * @author wanhui
@@ -28,16 +27,6 @@ interface Port {
     *
     **/
     public function set_yPosition(yPosition:Float):Void;
-
-    /** get the logic value of this port
-    *
-    **/
-    public function get_value():VALUE_LOGIC;
-
-    /** set the logic value
-    *
-    **/
-    public function set_value(value:VALUE_LOGIC):Void;
 
     /** get the port description, Inport or outport
     *

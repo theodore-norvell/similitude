@@ -31,17 +31,23 @@ import model.attribute.OrientationValue;
  * @author wanhui
  *
  */
+
 class Component extends CircuitElement {
     var xPosition:Float;//the x position of the component
     var yPosition:Float;//the y position of the component
     var height:Float;//height
     var width:Float;//width
-    //var orientation:ORIENTATION;//the orientation of the component
+    // TODO: make sequenceNumber an attribute.
+    var sequenceNumber : Int ; // This should be -1 unless the component is an
+                            // input or an output. In that case, it represents
+                            // the component's position relative to other inputs
+                            // and outputs.
     var componentKind:ComponentKind;//the actual gate in this component
     var inportArray:Array<Port> = new Array<Port>();//the inports for the component
     var outportArray:Array<Port> = new Array<Port>();//the outports for the component
+    // TODO Make inportsNum an attribute for the kinds where it makes sense.
     var inportsNum:Int;//init
-    //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
+    // TODO Make boxType an attribute for the kinds where it makes sense.
     var boxType:BOX;
     var list:Map<String,Pair>=new Map<String,Pair>();
     /**
@@ -60,8 +66,8 @@ class Component extends CircuitElement {
         this.yPosition = yPosition;
         this.height = height;
         this.width = width;
+        this.sequenceNumber = -1 ;
         this.componentKind = componentKind;
-        this.componentKind.set_component(this);
         this.inportsNum = inportNum;
         this.boxType = BOX.WHITE_BOX;
 
@@ -171,10 +177,6 @@ class Component extends CircuitElement {
         return componentKind;
     }
 
-    public function set_componentKind(value:ComponentKind) {
-        return this.componentKind = value;
-    }
-
     public function get_boxType():BOX {
         return boxType;
     }
@@ -241,82 +243,27 @@ class Component extends CircuitElement {
         return this;
     }
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ){
-        // This whole IF statement looks like complete crap to me.  What does this have to do with drawing?
-        if(componentKind.checkInnerCircuitDiagramPortsChange()){
-            for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
-                var inputFlag:Bool = false;
-                var outputFlag:Bool = false;
-                for(j in inportArray){
-                    if(i.getNameOfTheComponentKind() == "Input"){
-                        if(i.get_componentKind().get_sequence() == j.get_sequence()){
-                            inputFlag = true;
-                        }
-                    }
-                }
-
-                for(j in outportArray){
-                    if(i.getNameOfTheComponentKind() == "Output"){
-                        if(i.get_componentKind().get_sequence() == j.get_sequence()){
-                            outputFlag = true;
-                        }
-                    }
-                }
-
-                if(!inputFlag && !outputFlag){
-                    if(i.getNameOfTheComponentKind() == "Input"){
-                        var port:Port = componentKind.addInPort();
-                        port.set_sequence(i.get_componentKind().get_sequence());
-                        inportArray.push(port);
-                    }else{
-                        var port:Port = componentKind.addOutPort();
-                        port.set_sequence(i.get_componentKind().get_sequence());
-                        outportArray.push(port);
-                    }
-                }
-            }
-
-            for(i in inportArray){
-                var flag_delete:Bool = true;
-                for(j in componentKind.getInnerCircuitDiagram().get_componentIterator()){
-                    if(i.get_sequence() == j.get_componentKind().get_sequence() && j.getNameOfTheComponentKind() == "Input"){
-                        flag_delete = false;
-                    }
-                }
-
-                if(flag_delete){
-                    inportArray.remove(i);
-                }
-            }
-
-            for(i in outportArray){
-                var flag_delete:Bool = true;
-                for(j in componentKind.getInnerCircuitDiagram().get_componentIterator()){
-                    if(i.get_sequence() == j.get_componentKind().get_sequence() && j.getNameOfTheComponentKind() == "Output"){
-                        flag_delete = false;
-                    }
-                }
-
-                if(flag_delete){
-                    outportArray.remove(i);
-                }
-            }
-
-            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        }
-        if(this.componentKind.getname()!= "CC"){
-            componentKind.drawComponent(drawingAdpater, highLight, selection );
-        }else{
-            componentKind.drawComponent(drawingAdpater, highLight, selection );
-        }
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ) {
+        componentKind.drawComponent(this, drawingAdpater, highLight, selection );
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
-        return componentKind.findHitList(coordinate, mode);
+        return componentKind.findHitList(this, coordinate, mode);
     }
 
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
-        return componentKind.findWorldPoint(coordinate, mode);
+        return componentKind.findWorldPoint(this, coordinate, mode);
+    }
+
+    public function getInnerCircuitDiagram() {
+        return this.componentKind.getInnerCircuitDiagram() ;
+    }
+
+    public function set_sequence(n:Int) : Void {
+        this.sequenceNumber = n ;
+    }
+
+    public function get_sequence() : Int {
+        return this.sequenceNumber ;
     }
 }

@@ -13,6 +13,7 @@ import type.WorldPoint;
 import model.drawComponents.DrawComponent;
 import model.drawComponents.DrawCompoundComponent;
 import model.component.CircuitDiagramI;
+import model.component.Component ;
 import model.enumeration.POINT_MODE;
 import model.enumeration.BOX;
 import model.enumeration.MODE;
@@ -33,10 +34,6 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     var circuitDiagram:CircuitDiagramI;
     var nameOfTheComponentKind:String="CC";
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
     }
@@ -49,26 +46,6 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{
         return circuitDiagram;
-    }
-
-    override public function checkInnerCircuitDiagramPortsChange():Bool{
-        var inputNumberTemp:Int = 0;
-        var outputNumberTemp:Int = 0;
-
-        for(i in circuitDiagram.get_componentIterator()){
-            if(i.getNameOfTheComponentKind() == "Input"){
-                inputNumberTemp++;
-            }
-            if(i.getNameOfTheComponentKind() == "Output"){
-                outputNumberTemp++;
-            }
-        }
-
-        if(inputNumberTemp == component.get_inportIteratorLength() && outputNumberTemp == component.get_outportIteratorLength()){
-            return false;
-        }else{
-            return true;
-        }
     }
 
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
@@ -89,16 +66,16 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
                         var inport_1:Port = new Inport(xPosition - width / 2,
-                                                       height / (inportCount+1) * (i.get_componentKind().get_sequence()+1)
+                                                       height / (inportCount+1) * (i.get_sequence()+1)
                                                        + (yPosition - height / 2));
-                        inport_1.set_sequence(i.get_componentKind().get_sequence());
+                        inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
                         var outport_:Port = new Outport(xPosition + width / 2,
-                                                        height / (outportCount+1) * (i.get_componentKind().get_sequence()+1)
+                                                        height / (outportCount+1) * (i.get_sequence()+1)
                                                         + (yPosition - height / 2));
-                        outport_.set_sequence(i.get_componentKind().get_sequence());
+                        outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);
                     }
                 }
@@ -107,13 +84,15 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (inportCount+1) * (i.get_componentKind().get_sequence()+1), height + height/2);
-                        inport_1.set_sequence(i.get_componentKind().get_sequence());
+                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
+                                                       height + height/2);
+                        inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outportCount+1) * (i.get_componentKind().get_sequence()+1), height - height/2);
-                        outport_.set_sequence(i.get_componentKind().get_sequence());
+                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
+                                                        height - height/2);
+                        outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);
                     }
                 }
@@ -122,13 +101,15 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (inportCount+1) * (i.get_componentKind().get_sequence()+1), height - height/2);
-                        inport_1.set_sequence(i.get_componentKind().get_sequence());
+                        var inport_1:Port = new Inport(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
+                                                       height - height/2);
+                        inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2 + width/ (outportCount+1) * (i.get_componentKind().get_sequence()+1), height + height/2);
-                        outport_.set_sequence(i.get_componentKind().get_sequence());
+                        var outport_:Port = new Outport( xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
+                                                         height + height/2);
+                        outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);
                     }
                 }
@@ -137,13 +118,15 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
                 for(i in circuitDiagram.get_componentIterator()){
                     if(i.getNameOfTheComponentKind() == "Input"){
                         //inport
-                        var inport_1:Port = new Inport(xPosition + width / 2, height / (inportCount+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
-                        inport_1.set_sequence(i.get_componentKind().get_sequence());
+                        var inport_1:Port = new Inport( xPosition + width / 2,
+                                                        height / (inportCount+1) * (i.get_sequence()+1) + (yPosition - height / 2));
+                        inport_1.set_sequence(i.get_sequence());
                         portArray.push(inport_1);
                     }else if(i.getNameOfTheComponentKind() == "Output"){
                         //outport
-                        var outport_:Port = new Outport(xPosition - width / 2,  height / (outportCount+1) * (i.get_componentKind().get_sequence()+1) + (yPosition - height / 2));
-                        outport_.set_sequence(i.get_componentKind().get_sequence());
+                        var outport_:Port = new Outport( xPosition - width / 2,
+                                                         height / (outportCount+1) * (i.get_sequence()+1) + (yPosition - height / 2));
+                        outport_.set_sequence(i.get_sequence());
                         portArray.push(outport_);
                     }
                 }
@@ -155,8 +138,8 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool,  selection : SelectionModel ):Void {
-        var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform());
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool,  selection : SelectionModel ):Void {
+        var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform(component));
         var drawComponent:DrawComponent = new DrawCompoundComponent(component, drawingAdapter, drawingAdapterTrans);
         if(hightLight){
             drawComponent.drawCorrespondingComponent("red");
@@ -165,13 +148,11 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         }
 
         if(component.get_boxType() == BOX.WHITE_BOX){
-            //compound component need to draw all the components in ComponentArray, which should make a IntAttr transfrom
-            drawingAdapterTrans = drawingAdapter.transform(makeTransform());
             circuitDiagram.draw(drawingAdapterTrans, selection);
         }
     }
 
-    function makeTransform():Transform{
+    function makeTransform(component : Component ):Transform{
         var transform:Transform = Transform.identity();
         var centre = circuitDiagram.get_centre() ;
         transform = transform.translate(-centre.get_xPosition(), -centre.get_yPosition())
@@ -181,14 +162,14 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         return transform;
     }
 
-    override public function findHitList(outerWorldCoordinates:Coordinate, mode:MODE):Array<HitObject>{
+    override public function findHitList(component : Component, outerWorldCoordinates:Coordinate, mode:MODE):Array<HitObject>{
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
-        var hitComponent:Component = isInComponent(outerWorldCoordinates);
+        var hitComponent:Component = isInComponent(component, outerWorldCoordinates);
         if(hitComponent == null){
             return hitObjectArray;
         }else if(component.get_boxType() == BOX.WHITE_BOX){
-            var transform:Transform = makeTransform();
+            var transform:Transform = makeTransform(component);
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
             var result:Array<HitObject> = circuitDiagram.findHitList(innerWorldCoordinates, mode);
 
@@ -206,13 +187,17 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         }
     }
 
-    override public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
-        var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
+    override public function findWorldPoint(component : Component,
+                                            worldCoordinate:Coordinate,
+                                            mode:POINT_MODE)
+        : Array<WorldPoint>
+    {
+        var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>() ;
 
-        if(isInComponent(worldCoordinate) == null){
+        if(isInComponent(component, worldCoordinate) == null){
             return worldPointArray;
         }else if(component.get_boxType() == BOX.WHITE_BOX){
-            var transform:Transform = makeTransform();
+            var transform:Transform = makeTransform(component);
             var wForDiagram:Coordinate = transform.pointInvert(worldCoordinate);
             return circuitDiagram.findWorldPoint(wForDiagram, mode);
         }else{

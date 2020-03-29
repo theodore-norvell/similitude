@@ -8,6 +8,7 @@ import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawOR;
 import model.selectionModel.SelectionModel ;
+import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -38,10 +39,6 @@ class OR implements ComponentKind extends AbstractComponentKind {
         attributes.push(new IntAttr("delay"));
     }
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function getname():String{
         return nameOfTheComponentKind;
     }
@@ -56,7 +53,8 @@ class OR implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+                    var inport:Port = new Inport(xPosition - width / 2,
+                                                 height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -115,7 +113,7 @@ class OR implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
         var drawComponent:DrawComponent = new DrawOR(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

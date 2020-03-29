@@ -8,6 +8,7 @@ import model.drawComponents.DrawAND;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.selectionModel.SelectionModel ;
+import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
@@ -44,10 +45,6 @@ class AND implements ComponentKind extends AbstractComponentKind {
         return nameOfTheComponentKind;
     }
 
-    public function setname(s:String):Void{
-        nameOfTheComponentKind=s;
-    }
-
     public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
         var portArray:Array<Port> = new Array<Port>();
         switch (orientation){
@@ -55,7 +52,8 @@ class AND implements ComponentKind extends AbstractComponentKind {
                 var counter:Int = 0;
                 //inport
                 while (counter < inportNum) {
-                    var inport:Port = new Inport(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+                    var inport:Port = new Inport(xPosition - width / 2,
+                                                 height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
                     inport.set_portDescription(IOTYPE.INPUT);
                     portArray.push(inport);
                     counter++;
@@ -114,7 +112,7 @@ class AND implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel ){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel ){
         var drawComponent:DrawComponent = new DrawAND(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");
