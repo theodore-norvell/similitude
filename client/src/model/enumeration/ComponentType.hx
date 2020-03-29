@@ -1,12 +1,17 @@
 package model.enumeration;
+import model.gates.FlipFlop;
 import model.component.CircuitDiagramI;
 import model.gates.ComponentKind;
 import model.gates.AND;
 import model.gates.CompoundComponent;
+import model.gates.FlipFlop ;
+import model.gates.Input ;
+import model.gates.MUX ;
 import model.gates.NAND;
 import model.gates.NOR;
 import model.gates.NOT;
 import model.gates.OR;
+import model.gates.Output;
 import model.gates.XOR;
 
 /**
@@ -27,11 +32,16 @@ enum ComponentType
 
 class ComponentTypes {
 	var andComponentKind = new AND();
+
+	var flipFlopKind = new FlipFlop() ;
+	var inputComponentKind = new Input() ;
+	var muxComponentKind = new MUX() ;
 	var nandComponentKind = new NAND();
-	var orComponentKind = new OR();
 	var norComponentKind = new NOR();
-	var xorComponentKind = new XOR();
 	var notComponentKind = new NOT();
+	var orComponentKind = new OR();
+	var outputComponentKind = new Output();
+	var xorComponentKind = new XOR();
 	var compoundComponentKind: CompoundComponent;
 	
 	public function new (circuitDiagram: CircuitDiagramI) {

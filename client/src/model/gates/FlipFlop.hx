@@ -5,15 +5,16 @@ import model.attribute.OrientationAttr;
 import model.attribute.StringAttr;
 import model.attribute.IntAttr;
 import model.attribute.Attribute;
-import view.drawComponents.DrawComponent;
+import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import view.drawComponents.DrawFlipFlop;
+import model.drawComponents.DrawFlipFlop;
 import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
 import model.enumeration.IOTYPE;
 import model.enumeration.ORIENTATION;
+import model.selectionModel.SelectionModel ;
 /**
  * Flip-Flop<br>
  * Truth Table
@@ -252,7 +253,7 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
         var drawComponent:DrawComponent = new DrawFlipFlop(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");

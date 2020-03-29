@@ -2,16 +2,16 @@ package model.gates;
 
 import model.attribute.StringAttr;
 import model.attribute.Attribute;
-import type.LinkAndComponentAndEndpointAndPortArray;
-import view.drawComponents.DrawComponent;
+import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import view.drawComponents.DrawOutput;
+import model.drawComponents.DrawOutput;
 import model.component.Component ;
 import model.component.Inport;
 import model.component.Outport;
 import model.component.Port;
 import model.enumeration.IOTYPE;
 import model.enumeration.ORIENTATION;
+import model.selectionModel.SelectionModel ;
 /**
  * output<br>
  * the output result is the same as input
@@ -134,7 +134,7 @@ class Output implements ComponentKind extends AbstractComponentKind {
         return portArray;
     }
 
-    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, ?linkAndComponentArray:LinkAndComponentAndEndpointAndPortArray){
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
         var drawComponent:DrawComponent = new DrawOutput(component, drawingAdapter);
         if(highLight){
             drawComponent.drawCorrespondingComponent("red");
