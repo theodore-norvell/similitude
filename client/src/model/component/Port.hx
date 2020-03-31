@@ -7,33 +7,14 @@ import model.enumeration.IOTYPE;
  * @author wanhui
  *
  */
-class Port {
+class Port extends Connectable {
 
-    var xPosition:Float;
-    var yPosition:Float;
     var sequence:Int = -1;
     var description : IOTYPE ;
 
-    public function new(xPosition:Float, yPosition:Float) {
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
+    public function new(cd : CircuitDiagram, x:Float, y:Float) {
+        super(cd, x, y) ;
         this.description = IOTYPE.OUTPUT ; 
-    }
-
-    public function get_xPosition():Float {
-        return xPosition;
-    }
-
-    public function get_yPosition():Float {
-        return yPosition;
-    }
-
-    public function set_xPosition(xPosition:Float):Void {
-        this.xPosition = xPosition;
-    }
-
-    public function set_yPosition(yPosition:Float):Void {
-        this.yPosition = yPosition;
     }
 
     public function get_sequence():Int {

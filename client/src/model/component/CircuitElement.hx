@@ -14,8 +14,8 @@ class CircuitElement extends Observable {
 
     public function new( cd : CircuitDiagramI ) {
         super() ;
-        
         this.cd = cast( cd, CircuitDiagram ) ;
+        this.addObserver( this.cd ) ;
     }
 
     public function left() : Float { Assert.assert(false) ; return 0 ;}

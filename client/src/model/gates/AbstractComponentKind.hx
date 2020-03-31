@@ -4,99 +4,41 @@ import assertions.Assert ;
 import model.attribute.Attribute ;
 import model.attribute.OrientationAttr ;
 import model.attribute.StringAttr ;
-import type.HitObject;
 import model.component.CircuitDiagramI;
-import model.enumeration.POINT_MODE;
 import model.component.Component;
+import model.component.Port ;
+import model.drawingInterface.DrawingAdapterI ;
+import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
+import model.selectionModel.SelectionModel ;
 import type.Coordinate;
+import type.HitObject;
 import type.WorldPoint;
-import model.component.Port;
-import model.enumeration.ORIENTATION;
-import global.Constant.*;
 /**
 * abstract class for gates
 * @author wanhui
 **/
-class AbstractComponentKind {
+class AbstractComponentKind  {
     
     private var attributes:Array<Attribute>=new Array<Attribute>();
 
     private function new() {
-
         attributes.push(new OrientationAttr());
         attributes.push(new StringAttr("name"));
     }
 
-    public function getAttr():Array<Attribute>{
-        return attributes; }
+    public function getAttr():Array<Attribute> {
+        return attributes ;
+    }
 
-    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
-        switch (orientation){
-            case ORIENTATION.EAST : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition - width / 2);
-                    portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-                }
-            };
-            case ORIENTATION.NORTH : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
-                    portArray[i].set_yPosition(yPosition + height / 2);
-                }
-            };
-            case ORIENTATION.SOUTH : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
-                    portArray[i].set_yPosition(yPosition - height / 2);
-                }
-            };
-            case ORIENTATION.WEST : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition + width / 2);
-                    portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-                }
-            };
-            default:{
-                //do nothing
-            }
-        }
-        return portArray;
+    public function createPorts( component : Component ) : Void {
+        //TODO
     }
-    
-    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
-        switch(orientation){
-            case ORIENTATION.EAST : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition + width / 2);
-                    portArray[i].set_yPosition(yPosition);
-                }
-            };
-            case ORIENTATION.NORTH : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition);
-                    portArray[i].set_yPosition(yPosition - height / 2);
-                }
-            };
-            case ORIENTATION.SOUTH : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition);
-                    portArray[i].set_yPosition(yPosition + height / 2);
-                }
-            };
-            case ORIENTATION.WEST : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition - width / 2);
-                    portArray[i].set_yPosition(yPosition);
-                }
-            };
-            default:{
-                //do nothing
-            }
-        }
-        return portArray;
+
+    public function updatePortPositions( component : Component  ) : Void {
+        //TODO
     }
-    
+
     public function findHitList(component : Component, coordinate:Coordinate, mode:MODE)
     :Array<HitObject> {
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
@@ -158,19 +100,10 @@ class AbstractComponentKind {
     function isOnPort(component : Component, cooridnate:Coordinate):Port{
         var port:Port;
 
-            for(j in component.get_inportIterator()){
-                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+            for(port in component.get_ports()){
+                if(isInCircle(cooridnate, port.get_xPosition(), port.get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
-                    port = j;
-                    return port;
-                }
-            }
-            for(j in component.get_outportIterator()){
-                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
-                    //the mouse on the port
-                    //verify is there any link link to this port
-                    port = j;
                     return port;
                 }
             }
@@ -187,12 +120,9 @@ class AbstractComponentKind {
      * @return if in the circle, return true; otherwise, return false;
     **/
     function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
-        //the radius is 3
-        if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius){
-            return true;
-        }else{
-            return false;
-        }
+        var portRadius = 3 ;
+        return Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius
+            && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius ;
     }
 
     /**

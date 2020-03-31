@@ -77,9 +77,7 @@ class SidebarUpdate extends AbstractUpdate
 		// use the optional component parameter for this.
 		switch (drawComponentString) {
 			case ComponentType.AND : drawingAdapter.drawAndShape(80,75, 70, 70, ORIENTATION.EAST);
-			case ComponentType.NAND : drawingAdapter.drawNAndShape(80,75, 70, 70, ORIENTATION.EAST);
 			case ComponentType.OR : drawingAdapter.drawOrShape(80,75, 70, 70, ORIENTATION.EAST);
-			case ComponentType.NOR : drawingAdapter.drawNOrShape(80,75, 70, 70, ORIENTATION.EAST);
 			case ComponentType.XOR : drawingAdapter.drawXorShape(80,75, 70, 70, ORIENTATION.EAST);
 			case ComponentType.NOT : drawingAdapter.drawNotShape(80,75, 70, 70, ORIENTATION.EAST);
 			case ComponentType.COMPOUND_COMPONENT : Console.log("CC");
@@ -93,7 +91,7 @@ class SidebarUpdate extends AbstractUpdate
 	 */ 
 	public function populateSidebar()  : Void {
 		// this handles cases for the default logic gates in general
-		var defaultSidebarItems = [ComponentType.AND, ComponentType.NAND, ComponentType.OR, ComponentType.NOR, ComponentType.XOR,ComponentType.NOT];
+		var defaultSidebarItems = [ComponentType.AND, ComponentType.OR, ComponentType.XOR,ComponentType.NOT];
 		
 		var sidebarTable = document.querySelector("#sidebarTable");
 		var tableBody = sidebarTable.childNodes[1];

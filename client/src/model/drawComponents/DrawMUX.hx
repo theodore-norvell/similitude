@@ -10,33 +10,27 @@ import global.Constant.*;
 * draw mux gate
 * @author wanhui
 **/
-class DrawMUX implements DrawComponent{
-    var drawingAdapter:DrawingAdapterI;
-    var component:Component;
+class DrawMUX extends DrawComponent {
 
-    public function new(component:Component, drawingAdapter:DrawingAdapterI) {
-        this.component = component;
-        this.drawingAdapter = drawingAdapter;
+    public function new(component:Component, drawingAdapter:DrawingAdapterI, highlight : Bool ) {
+        super( component, drawingAdapter, highlight ) ;
     }
 
-    public function drawCorrespondingComponent(strokeColor:String):Void {
-        if(strokeColor == null || strokeColor == ""){
-            strokeColor = "black";
-        }
-        drawingAdapter.setStrokeColor(strokeColor);
+    public function drawCorrespondingComponent() : Void {
+        this.setColor() ;
 
         drawingAdapter.drawRect(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height());
         drawingAdapter.setTextColor("black");
         drawingAdapter.drawText("MUX", component.get_xPosition(), component.get_yPosition(), component.get_width());
 
-        //draw inport
-        for (i in component.get_inportIterator()) {
-            var port:Port = i;
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
+        // Draw the ports.
+        this.drawPorts() ;
 
+
+        // TODO Put this all in one place.
+        drawingAdapter.setTextColor("black");
+        for (port in component.get_ports()) {
             //draw text
-            drawingAdapter.setTextColor("black");
             switch (component.get_orientation()){
                 case ORIENTATION.EAST : {
                     if (port.get_portDescription() == IOTYPE.S) {
@@ -71,14 +65,6 @@ class DrawMUX implements DrawComponent{
                 }
             }
 
-        }
-
-        //draw outport
-        for (i in component.get_outportIterator()) {
-            var port:Port = i;
-            //init set the radius is 2
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
         }
 
         //reset drawing parameter

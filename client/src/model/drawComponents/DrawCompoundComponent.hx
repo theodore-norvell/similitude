@@ -8,38 +8,16 @@ import model.drawingInterface.DrawingAdapterI;
 import model.component.Component;
 import global.Constant.*;
 
-class DrawCompoundComponent implements DrawComponent{
-    var drawingAdapter:DrawingAdapterI;
-    var component:Component;
-    var drawingAdapterTrans:DrawingAdapterI;
-    //var context:CanvasRenderingContext2D;
+class DrawCompoundComponent extends DrawComponent{
 
-    public function new(component:Component, drawingAdapter:DrawingAdapterI, drawingAdapterTrans:DrawingAdapterI) {
-        this.component = component;
-        this.drawingAdapter = drawingAdapter;
+    var drawingAdapterTrans : DrawingAdapterI ;
+    public function new(component:Component, drawingAdapter:DrawingAdapterI, higlight : Bool, drawingAdapterTrans:DrawingAdapterI) {
+        super( component, drawingAdapter, highlight ) ;
         this.drawingAdapterTrans = drawingAdapterTrans;
-       // this.context = context;
     }
 
-    public function drawCorrespondingComponent(strokeColor:String):Void {
-        if(strokeColor == null || strokeColor == ""){
-            strokeColor = "black";
-        }
-
-        for (i in component.get_inportIterator()) {
-            var port:Port = i;
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), global.Constant.portRadius);
-        }
-        for (i in component.get_outportIterator()) {
-            var port:Port = i;
-            //init set the radius is 2
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), global.Constant.portRadius);
-        }
-
-
-        drawingAdapter.setStrokeColor(strokeColor);
+    public function drawCorrespondingComponent() : Void {
+        this.setColor() ;
 
         if(component.get_boxType() == BOX.WHITE_BOX ){
             drawingAdapter.setFillColor("white");
@@ -55,53 +33,31 @@ class DrawCompoundComponent implements DrawComponent{
             drawingAdapter.drawText(component.get_name(), component.get_xPosition(), component.get_yPosition(), component.get_width());
         }
 
-        drawInportAndOutport();
+        drawPorts() ;
 
         //reset drawing parameter
         drawingAdapter.resetDrawingParam();
     }
 
-    function drawInportAndOutport(){
+    override function drawPorts() : Void {
         //draw inport
-        for (i in component.get_inportIterator()) {
-            var port:Port = i;
+        for (port in component.get_ports()) {
             drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
+            drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portRadius, portRadius);
 
+            // If in White box, mode, try to draw a line from the port of the compound port to
+            // the connector with the same sequence number in the inner drawing.
+            // TODO Clean this up.
+            // TODO: For black box mode, draw the name of the port instead,
             if(component.get_boxType() == BOX.WHITE_BOX ){
                 for(j in component.get_componentKind().getInnerCircuitDiagram().get_componentIterator()){
-                    if(j.getNameOfTheComponentKind() == "Input"){
-                        if(i.get_sequence() == j.get_sequence()){
-                            for(k in j.get_inportIterator()){
+                    if(j.getNameOfTheComponentKind() == "Connector" ){
+                        if(port.get_sequence() == j.get_sequence()){
+                            for(k in j.get_ports()){
                                 //draw a line
                                 var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
                                 coordinate = drawingAdapter.getTransform().pointInvert(coordinate);
-                                drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        //draw outport
-        for (i in component.get_outportIterator()) {
-            var port:Port = i;
-            //init set the radius is 2
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
-
-            if(component.get_boxType() == BOX.WHITE_BOX){
-                for(j in component.getInnerCircuitDiagram().get_componentIterator()){
-                    if(j.getNameOfTheComponentKind() == "Output"){
-                        if(i.get_sequence() == j.get_sequence()){
-                            for(k in j.get_outportIterator()){
-                                //draw a line
-                                var coordinate:Coordinate = drawingAdapterTrans.getTransform().pointConvert(new Coordinate(k.get_xPosition(), k.get_yPosition()));
-                                coordinate = drawingAdapter.getTransform().pointInvert(coordinate);
-                                drawingAdapter.drawLine(i.get_xPosition(), i.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
-
+                                drawingAdapter.drawLine(port.get_xPosition(), port.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition());
                             }
                         }
                     }

@@ -26,7 +26,7 @@ import model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class NOT implements ComponentKind extends AbstractComponentKind {
+class NOT implements ComponentKind extends AbstractGate {
 
     var nameOfTheComponentKind:String="NOT";
 
@@ -39,81 +39,77 @@ class NOT implements ComponentKind extends AbstractComponentKind {
         return nameOfTheComponentKind;
     }
 
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum):Array<Port> {
-        var portArray:Array<Port> = new Array<Port>();
-        if(true){//not gate not have one input
-            inportNum = 1;
-        }
-        switch (orientation){
-            case ORIENTATION.EAST : {
-                var counter:Int = 0;
-                //inport
-                while (counter < inportNum) {
-                    var inport:Port = new Port(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
-                    inport.set_portDescription(IOTYPE.INPUT);
-                    portArray.push(inport);
-                    counter++;
-                }
-                //outport
-                var outport_:Port = new Port(xPosition + width / 2, yPosition);
-                outport_.set_portDescription(IOTYPE.OUTPUT);
-                portArray.push(outport_);
-            };
-            case ORIENTATION.NORTH : {
-                var counter:Int = 0;
-                //inport
-                while (counter < inportNum) {
-                    var inport:Port = new Port(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition + height / 2);
-                    inport.set_portDescription(IOTYPE.INPUT);
-                    portArray.push(inport);
-                    counter++;
-                }
-                //outport
-                var outport_:Port = new Port(xPosition, yPosition - height / 2);
-                outport_.set_portDescription(IOTYPE.OUTPUT);
-                portArray.push(outport_);
-            };
-            case ORIENTATION.SOUTH : {
-                var counter:Int = 0;
-                //inport
-                while (counter < inportNum) {
-                    var inport:Port = new Port(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition - height / 2);
-                    inport.set_portDescription(IOTYPE.INPUT);
-                    portArray.push(inport);
-                    counter++;
-                }
-                //outport
-                var outport_:Port = new Port(xPosition, yPosition + height / 2);
-                outport_.set_portDescription(IOTYPE.OUTPUT);
-                portArray.push(outport_);
-            };
-            case ORIENTATION.WEST : {
-                var counter:Int = 0;
-                //inport
-                while (counter < inportNum) {
-                    var inport:Port = new Port(xPosition + width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
-                    inport.set_portDescription(IOTYPE.INPUT);
-                    portArray.push(inport);
-                    counter++;
-                }
-                //outport
-                var outport_:Port = new Port(xPosition - width / 2, yPosition);
-                outport_.set_portDescription(IOTYPE.OUTPUT);
-                portArray.push(outport_);
-            };
-            default : {
-                //do nothing
-            }
-        }
-        return portArray;
-    }
+    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum):Array<Port> {
+    //     var portArray:Array<Port> = new Array<Port>();
+    //     if(true){//not gate not have one input
+    //         inportNum = 1;
+    //     }
+    //     switch (orientation){
+    //         case ORIENTATION.EAST : {
+    //             var counter:Int = 0;
+    //             //inport
+    //             while (counter < inportNum) {
+    //                 var inport:Port = new Port(xPosition - width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+    //                 inport.set_portDescription(IOTYPE.INPUT);
+    //                 portArray.push(inport);
+    //                 counter++;
+    //             }
+    //             //outport
+    //             var outport_:Port = new Port(xPosition + width / 2, yPosition);
+    //             outport_.set_portDescription(IOTYPE.OUTPUT);
+    //             portArray.push(outport_);
+    //         };
+    //         case ORIENTATION.NORTH : {
+    //             var counter:Int = 0;
+    //             //inport
+    //             while (counter < inportNum) {
+    //                 var inport:Port = new Port(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition + height / 2);
+    //                 inport.set_portDescription(IOTYPE.INPUT);
+    //                 portArray.push(inport);
+    //                 counter++;
+    //             }
+    //             //outport
+    //             var outport_:Port = new Port(xPosition, yPosition - height / 2);
+    //             outport_.set_portDescription(IOTYPE.OUTPUT);
+    //             portArray.push(outport_);
+    //         };
+    //         case ORIENTATION.SOUTH : {
+    //             var counter:Int = 0;
+    //             //inport
+    //             while (counter < inportNum) {
+    //                 var inport:Port = new Port(xPosition - width / 2 + width / (inportNum + 1) * (counter + 1), yPosition - height / 2);
+    //                 inport.set_portDescription(IOTYPE.INPUT);
+    //                 portArray.push(inport);
+    //                 counter++;
+    //             }
+    //             //outport
+    //             var outport_:Port = new Port(xPosition, yPosition + height / 2);
+    //             outport_.set_portDescription(IOTYPE.OUTPUT);
+    //             portArray.push(outport_);
+    //         };
+    //         case ORIENTATION.WEST : {
+    //             var counter:Int = 0;
+    //             //inport
+    //             while (counter < inportNum) {
+    //                 var inport:Port = new Port(xPosition + width / 2, height / (inportNum + 1) * (counter + 1) + (yPosition - height / 2));
+    //                 inport.set_portDescription(IOTYPE.INPUT);
+    //                 portArray.push(inport);
+    //                 counter++;
+    //             }
+    //             //outport
+    //             var outport_:Port = new Port(xPosition - width / 2, yPosition);
+    //             outport_.set_portDescription(IOTYPE.OUTPUT);
+    //             portArray.push(outport_);
+    //         };
+    //         default : {
+    //             //do nothing
+    //         }
+    //     }
+    //     return portArray;
+    // }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        var drawComponent:DrawComponent = new DrawNOT(component, drawingAdapter);
-        if(highLight){
-            drawComponent.drawCorrespondingComponent("red");
-        }else{
-            drawComponent.drawCorrespondingComponent("black");
-        }
+        var drawComponent:DrawNOT = new DrawNOT(component, drawingAdapter, highLight);
+        drawComponent.drawCorrespondingComponent();
     }
 }

@@ -9,35 +9,16 @@ import model.drawingInterface.DrawingAdapterI;
 * @author wanhui
   TODO Consoldate all this drawing code into one class
 **/
-class DrawAND implements DrawComponent{
-    var drawingAdapter:DrawingAdapterI;
-    var component:Component;
+class DrawAND extends DrawComponent{
 
-    public function new(component:Component, drawingAdapter:DrawingAdapterI) {
-        this.component = component;
-        this.drawingAdapter = drawingAdapter;
+    public function new(component:Component, drawingAdapter:DrawingAdapterI, highlight : Bool ) {
+        super( component, drawingAdapter, highlight ) ;
     }
 
-    public function drawCorrespondingComponent(strokeColor:String):Void {
-        if(strokeColor == null || strokeColor == ""){
-            strokeColor = "black";
-        }
-        drawingAdapter.setStrokeColor(strokeColor);
+    public function drawCorrespondingComponent() : Void {
+        this.setColor() ;
         drawingAdapter.drawAndShape(component.get_xPosition(), component.get_yPosition(), component.get_width(), component.get_height(), component.get_orientation());
-        //draw inport
-        for (i in component.get_inportIterator()) {
-            var port:Port = i;
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
-        }
-        //draw outport
-        for (i in component.get_outportIterator()) {
-            var port:Port = i;
-            drawingAdapter.setFillColor("black");
-            drawingAdapter.drawCricle(port.get_xPosition(), port.get_yPosition(), portRadius);
-        }
-
-        //reset drawing parameter
+        this.drawPorts() ;
         drawingAdapter.resetDrawingParam();
     }
 

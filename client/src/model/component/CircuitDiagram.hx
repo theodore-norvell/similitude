@@ -127,44 +127,10 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
     }
 
     public function deleteComponent(component:Component):Void{
+        component.disconnectAllPorts() ;
         componentArray.remove(component);
-        //delete port setted in the link
-        for(i in component.get_inportIterator()){
-            for(j in 0 ... linkArray.length){
-                if(i == linkArray[j].get_leftEndpoint().get_port()){
-                    linkArray[j].get_leftEndpoint().set_port(null);
-                }
-
-                if(i == linkArray[j].get_rightEndpoint().get_port()){
-                    linkArray[j].get_rightEndpoint().set_port(null);
-                }
-            }
-        }
-        //
-        for(i in component.get_outportIterator()){
-            for(j in 0 ... linkArray.length){
-                if(i == linkArray[j].get_leftEndpoint().get_port()){
-                    linkArray[j].get_leftEndpoint().set_port(null);
-                }
-
-                if(i == linkArray[j].get_rightEndpoint().get_port()){
-                    linkArray[j].get_rightEndpoint().set_port(null);
-                }
-            }
-        }
-        
         updateBoundingBox() ;
 
-    }
-
-    /**
-    * because component may update the port position, so the link should update all of the port connect to the component port
-    **/
-    function linkArraySelfUpdate():Void{
-        for(i in 0...linkArray.length){
-            linkArray[i].get_leftEndpoint().updatePosition();
-            linkArray[i].get_rightEndpoint().updatePosition();
-        }
     }
 
     public function componentSetName(component:Component, name:String):Void{

@@ -33,36 +33,20 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port>;
+    public function createPorts( component : Component ) : Void ;
 
     /**
-    * update all of the position of ports in inportArray
-     * @param portArray
-     * @param xPosition : x position
-    *  @param yPosition : y position
-    *  @param height : height
-    *  @param width : width
-    *  @param orientation : direction
-    *  @return the array of the updated ports
-    **/
-    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
-
-    /**
-    * update all of the position of ports in in outportArray
-     * @param portArray
-     * @param xPosition : x position
-    *  @param yPosition : y position
-    *  @param height : height
-    *  @param width : width
-    *  @param orientation : direction
-    *  @return the array of the updated ports
-    **/
-    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
+     *  Update the positions of the ports of a component.
+     * @param component 
+     */
+    public function updatePortPositions( component : Component  ) : Void ;
 
     /**
     * draw this componentkind
      * @param component
      * @param drawingAdapter
+     * @param highlight Should this component be highlighted
+     * @param selection The set of things that should be highlighted
     **/
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
 

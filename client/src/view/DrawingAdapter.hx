@@ -331,7 +331,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.closePath();
     }
 
-    public function drawCricle(x:Float, y:Float, radius:Float):Void {
+    public function drawCircle(x:Float, y:Float, radius:Float):Void {
         var wnw:Coordinate = new Coordinate(x - radius, y);
         var wse:Coordinate = new Coordinate(x + radius, y);
 

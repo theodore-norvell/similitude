@@ -43,8 +43,8 @@ class Component extends CircuitElement {
                             // the component's position relative to other inputs
                             // and outputs.
     var componentKind:ComponentKind;//the actual gate in this component
-    var inportArray:Array<Port> = new Array<Port>();//the inports for the component
-    var outportArray:Array<Port> = new Array<Port>();//the outports for the component
+    // The ports that belong to this component.
+    var  ports : Array<Port> = new Array<Port>() ;
     // TODO Make inportsNum an attribute for the kinds where it makes sense.
     var inportsNum:Int;//init
     // TODO Make boxType an attribute for the kinds where it makes sense.
@@ -74,18 +74,9 @@ class Component extends CircuitElement {
         //this.delay = 0;//init is zero
 
         //initial ports
-        var portArray:Array<Port> = new Array<Port>();
-        portArray = this.componentKind.createPorts(xPosition, yPosition, width, height, orientation, inportNum);
-        for (o in 0...portArray.length) {
-            var port:Port = portArray[o];
-            if (port.get_portDescription() == IOTYPE.INPUT || port.get_portDescription() == IOTYPE.CLK || port.get_portDescription() == IOTYPE.D ||
-                port.get_portDescription() == IOTYPE.S) {
-                inportArray.push(port);
-            } else {
-                outportArray.push(port);
-            }
+        this.componentKind.createPorts( this ) ;
+        this.componentKind.updatePortPositions( this ) ;
 
-        }
         // TODO What is going on with this loop?  What about other attributes.
         for(n in componentKind.getAttr()){
             if(n.getName()=="delay"){
@@ -145,6 +136,7 @@ class Component extends CircuitElement {
 
     public function set_xPosition(value:Float) : Void {
         this.xPosition = value;
+        this.componentKind.updatePortPositions( this ) ;
         notifyObservers(this) ;
     }
 
@@ -154,6 +146,7 @@ class Component extends CircuitElement {
 
     public function set_yPosition(value:Float) : Void {
         this.yPosition = value;
+        this.componentKind.updatePortPositions( this ) ;
         notifyObservers(this) ;
     }
 
@@ -175,6 +168,7 @@ class Component extends CircuitElement {
 
     public function set_orientation(value:ORIENTATION) : Void {
         update("orientation",new OrientationValue(value));
+        this.componentKind.updatePortPositions( this ) ;
     }
 
     public function get_componentKind():ComponentKind {
@@ -190,19 +184,12 @@ class Component extends CircuitElement {
         notifyObservers(this) ;
     }
 
-    public function get_inportIterator():Iterator<Port> {
-        return inportArray.iterator();
-    }
-    public function get_inportIteratorLength():Int {
-        return inportArray.length;
+    public function get_ports():Iterator<Port> {
+        return ports.iterator();
     }
 
-    public function get_outportIteratorLength():Int {
-        return outportArray.length;
-    }
-
-    public function get_outportIterator():Iterator<Port> {
-        return outportArray.iterator();
+    public function get_portCount() : Int {
+        return ports.length ;
     }
 
     public function get_name():String {
@@ -239,16 +226,8 @@ class Component extends CircuitElement {
         return this.componentKind.getname();
     }
 
-    public function removeInport(inport:Port): Bool {
-        // Calling this function might violate an invariant of the kind.
-        var success = inportArray.remove(inport);
-        if( success ) notifyObservers(this) ;
-        return success ;
-    }
-    function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float): Void{
-        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        notifyObservers(this) ;
+    public function disconnectAllPorts() {
+        Assert.assert( false ) ; // TODO 
     }
 
     public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ) {

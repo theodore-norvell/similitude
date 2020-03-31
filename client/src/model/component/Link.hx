@@ -67,13 +67,9 @@ class Link extends CircuitElement implements Observer {
         return Math.max( this.endpoints[1].get_yPosition(),
                          this.endpoints[0].get_yPosition() ) ; }
 
-    public function drawLink(drawingAdapter:DrawingAdapterI, highLight:Bool){
-        var drawComponent:DrawComponent = new DrawLink(this, drawingAdapter);
-        if(highLight){
-            drawComponent.drawCorrespondingComponent("red");
-        }else{
-            drawComponent.drawCorrespondingComponent("black");
-        }
+    public function drawLink(drawingAdapter:DrawingAdapterI, highlight:Bool){
+        var drawComponent:DrawLink = new DrawLink(this, drawingAdapter, highlight );
+        drawComponent.drawCorrespondingComponent( ) ;
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
