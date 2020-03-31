@@ -69,35 +69,35 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
         observable.notifyObservers(this) ;
     }
 
-    public function update(c:Component,?data:Dynamic) : Void{
+    public function update(target: Any, ?data:Dynamic) : Void{
         updateBoundingBox() ; // This will also notify observers.
     }
 
-    public function get_centre():Coordinate{
+    public function get_centre() : Coordinate {
         return centrePoint ;
     }
 
-    public function get_diagramWidth():Float {
+    public function get_diagramWidth() : Float {
         return xMax - xMin ;
     }
 
-    public function get_diagramHeight():Float {
+    public function get_diagramHeight() : Float {
         return yMax - yMin ;
     }
 
-    public function get_xMin():Float {
+    public function get_xMin() : Float {
         return xMin ;
     }
 
-    public function get_yMin():Float {
+    public function get_yMin() : Float {
         return yMin ;
     }
 
-    public function get_xMax():Float {
+    public function get_xMax() : Float {
         return xMax ;
     }
 
-    public function get_yMax():Float {
+    public function get_yMax() : Float {
         return yMax ;
     }
 
@@ -122,6 +122,7 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
     }
 
     public function deleteLink(link:Link):Void{
+        link.disconnectEndpoints() ;
         linkArray.remove(link);
         updateBoundingBox() ;
     }

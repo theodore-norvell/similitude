@@ -1,11 +1,12 @@
 package model.component;
+import model.observe.Observer;
 import type.Coordinate ;
 
 /**
  *  A circuit element that can be connected to other circuit elements with
  * which it shares a common location.
  */
-class Connectable extends CircuitElement {
+class Connectable extends CircuitElement implements Observer {
 
 
     // Invariant. connection is never null and always contains
@@ -16,6 +17,13 @@ class Connectable extends CircuitElement {
         super(cd) ;
         var coordinate = new Coordinate( x, y ) ;
         this.connection = new Connection( cd, coordinate, this ) ;
+        this.connection.addObserver( this ) ;
+    }
+
+    public function isPort() { return false ; }
+    
+    public function update( target: Any,?data:Dynamic) : Void {
+        notifyObservers( this ) ;
     }
 
     // Call back: Should only be called from the connection.
@@ -25,7 +33,9 @@ class Connectable extends CircuitElement {
     }
 
     public function disconnect( ) : Void {
-        if( isConnected() ) this.connection.disconnect( this ) ;
+        if( isConnected() ) {
+            this.connection.disconnect( this ) ;
+            notifyObservers( this ) ; }
     }
 
     /**
@@ -35,6 +45,7 @@ class Connectable extends CircuitElement {
      */
     public function connectTo( other : Connectable ) : Void {
         other.connection.connect( this ) ;
+        notifyObservers( this ) ;
     }
 
     public function isConnected( ) : Bool {

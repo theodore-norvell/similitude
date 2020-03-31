@@ -97,9 +97,11 @@
   <dt>Bidirectional Port</dt>
   <dd>A Port used for both input and output. Bidirectional ports might be represented by small diamonds with black stroke and white fill.</dd>
   <dt>Links</dt>
-  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles (black input and black fill), unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
-  <dt>Connected</dt>
-  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is Connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
+  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  squares or circles, unless the endpoint is Directly Connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
+  <dt>Directly Connected</dt>
+  <dd>Two endpoints or an endpoint and a port may be Directly Connected. This is equivalence relation, i.e., it is transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a). If two endpoints or an endpoint and a link are Directly Connected, then they will have the same location. Usually the converse is also true too. Ports can not be Directly Connected to other Ports. (Although, there could be exceptions. E.g. when we move an endpoint that is connected to a port, we would first disconnect it from the port and so for a short time, they have the same location, but are not directly connected.)</dd>
+  <dt>Indirectly Connected</dt>
+  <dd>Two ports, two links, or a port and a link are Indirectly Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.  Also every Port and Link is Indirectly Connected to itself. This is equivalence relation, i.e., it is transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
   <dt>Net</dt>
   <dd>A maximal set of Ports and Links that are all connected to each other is called a Net.&nbsp; Note that each Port and Link is a member of exactly one Net. (Implementation note:&nbsp; There is no need to represent Nets explicitely. However, it will be useful for simulation if we can calculate the Net of a Port or Link.</dd>
   <dt>World coordinates</dt>
@@ -159,7 +161,7 @@
 </ol>
 <p>Notes:</p>
 <p></p>
-<font color="red"><h4>File upload</h4>
+<h4>File upload</h4>
 <p>Requirements: File upload as registed client</p>
 <p>Actors: The user and the client</p>
 <p>Precondition: After login</p>
@@ -169,8 +171,8 @@
   <li>User: diagrams can be uploaded by clicking upload button</li>
   <li>User: need to choose yes or no when diagrams already exit and needed to be covered</li>
 </ol>
-<p>Notes:</p></font>
-<font color="red"><h4>File download</h4>
+<p>Notes:</p>
+<h4>File download</h4>
 <p>Requirements: File download as registed client</p>
 <p>Actors: The user and the client</p>
 <p>Precondition: After login</p>
@@ -181,8 +183,8 @@
   <li>User: need to choose yes or no when diagrams already exit and if needed to be covered</li>
 </ol>
 <p>Notes:</p>
-<p></p></font>
-<font color="red"><h4>Add component by drag and drop</h4>
+<p></p>
+<h4>Add component by drag and drop</h4>
 <p>Requirements: Add components to a circuit diagram.</p>
 <p>Actors: The user and the client</p>
 <p>Precondition: The client is in editing mode.</p>
@@ -205,8 +207,8 @@
   <li>On a touch device, the drag may be done with touch event rather than mouse events.'</li>
   <li>In step 5, if the drop is on top of a compound compononent and the compound component&nbsp;is &quot;white-box&quot;, then the new component is added to the diagram associated with that compond component.</li>
 </ul>
-<p></p></font>
-<font color="red"><h4>Add a new link by dragging</h4>
+<p></p>
+<h4>Add a new link by dragging</h4>
 <p>Requirements: Add links</p>
 <p>Actors: The user and the client</p>
 <p>Precondition: The client is in editing mode.</p>
@@ -215,26 +217,56 @@
 <ol>
   <li>User: Depresses mouse button at a place <em>x</em> somewhere on the diagram such that it does not hit a&nbsp;selected component or link.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>If&nbsp;<em>x</em>, is on or sufficiently close to&nbsp;a component.
-    <ol>
-      <li>A  link is added starting from the position of closest port on the component&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
-    </ol>
-  </li>
-  <li>Otherwise
-    <ol>
-      <li>A link is added starting from place <em>x</em> (converted into world coordinates)&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
-    </ol>
+  <li>Client creates a link
+    <ul>
+      <li>If&nbsp;<em>x</em>, is on or sufficiently close to&nbsp;a port of a component.
+        <ul>
+          <li>A  link is added so that one endpoint is connected to the  port&nbsp;and the other is at  the mouse's current position (converted into world coordinates).</li>
+        </ul>
+      </li>
+      <li>Otherwise, if x is near an endpoint:
+        <ul>
+          <li>one endpoint of&nbsp; the new link should be connected to that endpoint and the other  is at  the mouse's current position (converted into world coordinates).</li>
+        </ul>
+      </li>
+      <li>Otherwise if x is on a link
+        <ul>
+          <li>that links is split and one endpoint of the new link is connected to the new connection.</li>
+        </ul>
+      </li>
+      <li>Otherwise, a link is added starting from place <em>x</em> (converted into world coordinates)&nbsp;and ending at the mouse's current position (converted into world coordinates). </li>
+    </ul>
   </li>
   <li>User continues to move the mouse.</li>
   <li>Client: As the mouse moves, the ending endpoint of the link is updated.</li>
-  <li>Client releases the mouse or the mouse moves to where it can no longer be converted to a suitable world coordinate.</li>
+  <li>User: releases the mouse or the mouse moves off the canvas</li>
+  <li>Client:
+    <ul>
+      <li>If the end that was being dragged falls on a port or and endpoint:
+        <ul>
+          <li>It should be connected to that port or endpoint.</li>
+        </ul>
+      </li>
+      <li>Otherwise, if the end that was being dragged falls on a link:
+        <ul>
+          <li>The link&nbsp;should be split and the the new endpoint connected to the new connection.</li>
+        </ul>
+      </li>
+      <li>Otherwise,
+        <ul>
+          <li>The new endpoint will not be connected to anything else.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
 </ol>
 <p>Notes:</p>
 <ul>
   <li>On a touch device, touch events can be used.</li>
   <li>If <em>x</em> hits a selected component or link, then the use case for moves applies.</li>
   <li>If the original point <em>x</em> is within a compound component <em>c</em>&nbsp;(not in the current selection) and the compound component is has a white-box view, then there is an ambiguity as to whether the link should be added to the outer circuit (the circuit that the component is a part of, or the inner circuit (the circuit the component contains). The best way to decide is probably based on whether <em>x</em> is close to the edge&nbsp;of <em>c</em>. </li>
-</ul></font>
+</ul>
+
 <h4>Add to the selection or clear the selection.</h4>
 <p>Requirements: None</p>
 <p>Actors: The user and the client</p>
@@ -243,18 +275,25 @@
 <p>Basic Flow</p>
 <ol>
   <li>User: Clicks on the canvas</li>
-  <li>If the click is on a component or link which is not in the current selection, that component or link is unioned to the set of selected objects.</li>
-  <li>If the click is on a component or link which is in the current selection, that component or link is removed from the current selection.</li>
-  <li>Otherwise the set of selected objects becomes empty.  </li>
+  <li>Client: 
+    <ul>
+      <li>If the click is on&nbsp;one or more links, let X be that set of links.</li>
+      <li>Otherwise, if the click is on a component, let X be the set of just that component.</li>
+      <li>Otherwise, let X be empty.</li>
+      <li>If any thing in X is not in the currect selection, then everything in X is added to the current selection.</li>
+      <li>Otherwise, if X is not empty, everything in X is removed from the current selection.</li>
+      <li>Otherwise, the current selection is cleared.</li>
+    </ul>
+  </li>
 </ol>
 <p>Notes:</p>
 <ul>
   <li>On a touch device, touch events can be used.</li>
   <li>Disambiguating a mouse down should be done as follows: Links, then components.</li>
-  <li>If the mouse hits a component inside a compound component (in whitebox view), the inner component is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
+  <li>If the mouse hits a component or link(s) inside a compound component (in whitebox view), the inner component or link(s) is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
 </ul>
 <p></p>
-<h4>Move components, <font color="red">[links, and endpoints by drag]?</font></h4>
+<h4>Move components, links, and endpoints.</h4>
 <p>Requirements:</p>
 <ul>
   <li>Move components around the circuit diagram.</li>
@@ -269,17 +308,32 @@
   <li>User: Moves mouse to another part of the diagram.</li>
   <li>If the <em>x</em>  is a link or component in the current selection:
     <ol>
-      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
-      <li>Note: When a component moves, all endpoints connected to its ports should also move. However when a link moves,&nbsp;ports and components connected to its endpoints only move if they are in the current selection.</li>
+      <li>Client: As the mouse moves,&nbsp;all selected  components also move. (This will automatically move all endpoints connected to ports of these components, regardless of whether the endpoint's link is selected or not.)&nbsp; All endpoints of selected links should also move unless they are directly connected to a port of a   component that is not selected.</li>
+      <li>The user releases the mouse.</li>
+      <li>Client: connects any endpoint&nbsp;that is now at the same location as a port to that port.</li>
     </ol>
   </li>
   <li>Otherwise, <em>x</em> is the endpoint of a currently selected link.
     <ol>
-      <li>Client: As the mouse moves, <em>x</em> moves.</li>
-      <li>Note: Only the endpoint moves.</li>
+      <li>Client:
+        <ol>
+          <li>Let X be the set of all endpoints x is directly connected to (including x itself) and which are endpoints of selected links.</li>
+          <li>Let Y be the set of all endpoints&nbsp;and ports directly connected to x that are not endpoints of selected links. (Y might be empty.)</li>
+          <li>All the endpoints in X are disconnected&nbsp;from anything else, but should remain connected together.</li>
+        </ol>
+      </li>
+      <li>User moves mouse.</li>
+      <li>Client: As the mouse moves amoves. </li>
+      <li>User releases mouse</li>
+      <li>Client
+        <ul>
+          <li>If&nbsp; the endpoints in X are now at the same location as a port&nbsp;or endpoint, they are all connected to that port or endpoint</li>
+          <li>Otherwise, if the endpoint lands on a link, that link should be split at that point and the endpoints in X should be connected to the new endpoints created.</li>
+          <li>Otherwise, the endpoint remains disconnected.</li>
+        </ul>
+      </li>
     </ol>
   </li>
-  <li>User: Releases the mouse.</li>
 </ol>
 <p>Notes:</p>
 <ul>
@@ -302,7 +356,7 @@
 </ol>
 <p>Notes:</p>
 <ul>
-  <li>As a component rotates, its ports move and any endpoints connected to those ports should also move.</li>
+  <li>As a component rotates, its ports move and any endpoints Directly Connected to those ports should also move.</li>
 </ul>
 <h4>Delete components and links</h4>
 <p>Requirements: </p>

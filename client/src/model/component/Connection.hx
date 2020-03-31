@@ -1,5 +1,6 @@
 package model.component;
 
+import controller.commandManager.CommandI;
 import assertions.Assert ;
 import type.Coordinate;
 
@@ -12,6 +13,7 @@ class Connection extends CircuitElement {
     // It is shared by everything connected by this connection.
     var coordinate : Coordinate ;
 
+    // Invariant. Items of connectedElements are unique. At most one is a Port.
     var connectedElements : Array<Connectable> = new Array<Connectable>() ;
 
     public function new(cd : CircuitDiagramI, coordinate : Coordinate, connectable : Connectable ) {
@@ -37,13 +39,19 @@ class Connection extends CircuitElement {
         notifyObservers( this ) ;
     }
 
-    public function connect( connectable : Connectable ) {
+    public function connect( connectable : Connectable ) : Void {
         Assert.assert( connectable.get_CircuitDiagram() == this.get_CircuitDiagram() ) ;
         if( connectedElements.indexOf( connectable ) == -1 ) {
-            if( connectable.isConnected() ) connectable.disconnect() ;
-            connectable.setConnection( this ) ;
-            connectedElements.push( connectable ) ;
-            notifyObservers( this ) ; }
+            if( !connectable.isPort() || ! aPortIsConnecte() ) {}
+                if( connectable.isConnected() ) connectable.disconnect() ;
+                connectable.setConnection( this ) ;
+                connectedElements.push( connectable ) ;
+                notifyObservers( this ) ; } }
+    }
+
+    public function aPortIsConnecte() {
+        for( c in connectedElements ) if( c.isPort() ) return true ;
+        return false ;
     }
     public function disconnect( connectable : Connectable ) {
         if( connectedElements.indexOf( connectable ) != -1 ) {

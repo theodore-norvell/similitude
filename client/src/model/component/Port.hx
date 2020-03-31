@@ -17,6 +17,8 @@ class Port extends Connectable {
         this.description = IOTYPE.OUTPUT ; 
     }
 
+    public function isPort() { return true ; }
+
     public function get_sequence():Int {
         return this.sequence;
     }

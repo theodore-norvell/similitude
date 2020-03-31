@@ -28,8 +28,13 @@ class Link extends CircuitElement implements Observer {
         this.endpoints = [zero, one];
     }
 
-    public function update(c:Component,?data:Dynamic) : Void {
+    public function update(target : Any,?data:Dynamic) : Void {
         notifyObservers( this ) ;
+    }
+
+    public function disconnectEndpoints() : Void {
+        this.endpoints[0].disconnect() ;
+        this.endpoints[1].disconnect() ;
     }
 
     public function getLinkLength():Float{
@@ -43,13 +48,6 @@ class Link extends CircuitElement implements Observer {
     
     public function get_endpoint( i : Int ) : Endpoint {
         return endpoints[i] ;
-    }
-    public function get_leftEndpoint():Endpoint {
-        return endpoints[0];
-    }
-
-    public function get_rightEndpoint():Endpoint {
-        return endpoints[1];
     }
 
     override public function left() : Float {

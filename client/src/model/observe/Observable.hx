@@ -22,9 +22,9 @@ class Observable {
     }
 
 
-    public function notifyObservers(c:Any,?data:Dynamic):Void {
+    public function notifyObservers(target:Any,?data:Dynamic):Void {
         for(n in observers) {
-            n.update(c,data);
+            n.update( target, data);
         }
     }
 

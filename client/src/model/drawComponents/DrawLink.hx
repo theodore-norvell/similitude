@@ -20,8 +20,8 @@ class DrawLink {
     public function drawCorrespondingComponent():Void {
         var color = if( highlight ) "red" else "black" ;
         drawingAdapter.setStrokeColor(color);
-        var zero = link.get_leftEndpoint() ;
-        var one = link.get_rightEndpoint() ;
+        var zero = link.get_endpoint(0) ;
+        var one = link.get_endpoint(1) ;
         drawingAdapter.drawLine( zero.get_xPosition(),
                                 zero.get_yPosition(),
                                 one.get_xPosition(),
