@@ -33,7 +33,7 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
-    public function createPorts( component : Component ) : Void ;
+    public function createPorts( component : Component, addPort : Port -> Void ) : Void ;
 
     /**
      *  Update the positions of the ports of a component.

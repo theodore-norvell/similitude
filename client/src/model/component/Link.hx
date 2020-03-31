@@ -7,7 +7,8 @@ package model.component;
  */
 import model.observe.Observer;
 import type.HitObject;
-import global.Constant.*;
+import global.Constant.portSize;
+import global.Constant.pointToLineDistance ;
 import model.enumeration.MODE;
 import type.Coordinate;
 import model.drawComponents.DrawComponent;
@@ -93,13 +94,15 @@ class Link extends CircuitElement implements Observer {
     }
 
     function pointOnEndpoint(coordinate:Coordinate):Endpoint{
-            if(pointsDistance(endpoints[0].get_xPosition(), endpoints[0].get_yPosition(),
-            coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
+            if(   pointsDistance(endpoints[0].get_xPosition(), endpoints[0].get_yPosition(),
+                              coordinate.get_xPosition(), coordinate.get_yPosition())
+               <= portSize ){
                 return endpoints[0];
             }
 
-            if(pointsDistance(endpoints[1].get_xPosition(), endpoints[1].get_yPosition(),
-            coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToEndpointDistance){
+            if(   pointsDistance(endpoints[1].get_xPosition(), endpoints[1].get_yPosition(),
+                              coordinate.get_xPosition(), coordinate.get_yPosition())
+               <= portSize){
                 return endpoints[1];
             }
 
@@ -132,11 +135,11 @@ class Link extends CircuitElement implements Observer {
                 Math.pow(Math.abs(coordinate.get_yPosition() - endpoints[1].get_yPosition()), 2)
             );
             if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
-                if(theDistanceToRightEndpoint >= pointToEndpointDistance){
+                if(theDistanceToRightEndpoint >= portSize ){
                     return this;
                 }
             }else{
-                if(theDistanaceToLeftEndpoint >= pointToEndpointDistance){
+                if(theDistanaceToLeftEndpoint >= portSize){
                     return this;
                 }
             }

@@ -1,8 +1,15 @@
 package model.component;
 import type.Coordinate ;
 
+/**
+ *  A circuit element that can be connected to other circuit elements with
+ * which it shares a common location.
+ */
 class Connectable extends CircuitElement {
 
+
+    // Invariant. connection is never null and always contains
+    // at least this connectable. 
     var connection : Connection ;
 
     public function new(cd : CircuitDiagramI, x:Float, y:Float) {

@@ -43,7 +43,7 @@ class DrawCompoundComponent extends DrawComponent{
         //draw inport
         for (port in component.get_ports()) {
             drawingAdapter.setFillColor("black");
-            drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portRadius, portRadius);
+            drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portSize, portSize);
 
             // If in White box, mode, try to draw a line from the port of the compound port to
             // the connector with the same sequence number in the inner drawing.

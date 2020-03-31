@@ -39,6 +39,8 @@ class NOT implements ComponentKind extends AbstractGate {
         return nameOfTheComponentKind;
     }
 
+    override function initialNumberOfInPorts() : Int { return 1 ; }
+
     // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum):Array<Port> {
     //     var portArray:Array<Port> = new Array<Port>();
     //     if(true){//not gate not have one input

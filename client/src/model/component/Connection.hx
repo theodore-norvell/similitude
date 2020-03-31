@@ -3,6 +3,10 @@ package model.component;
 import assertions.Assert ;
 import type.Coordinate;
 
+/**
+ * A Connection is a mutable collection of Connectable elements
+ * and a shared, mutable location that is shared by them all.
+ */
 class Connection extends CircuitElement {
     // This is the location of the connection.
     // It is shared by everything connected by this connection.

@@ -6,8 +6,8 @@ package type;
 *    }
 **/
 class Coordinate {
-    @:isVar var xPosition(get, set):Float;
-    @:isVar var yPosition(get, set):Float;
+    var xPosition:Float;
+    var yPosition:Float;
 
     public function new(xPosition:Float, yPosition:Float) {
         this.xPosition = xPosition;
@@ -18,15 +18,12 @@ class Coordinate {
         return xPosition;
     }
 
-    public function set_xPosition(value:Float) {
-        return this.xPosition = value;
-    }
-
     public function get_yPosition():Float {
         return yPosition;
     }
 
-    public function set_yPosition(value:Float) {
-        return this.yPosition = value;
+    public function plus( other : Coordinate ) {
+        return new Coordinate( this.xPosition + other.xPosition,
+                               this.yPosition + other.yPosition ) ;
     }
 }

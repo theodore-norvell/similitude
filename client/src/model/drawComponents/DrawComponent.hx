@@ -2,7 +2,7 @@ package model.drawComponents;
 
 import model.component.Component;
 import model.drawingInterface.DrawingAdapterI;
-import global.Constant.portRadius ;
+import global.Constant.portSize ;
 
 class DrawComponent {
 
@@ -19,17 +19,20 @@ class DrawComponent {
     private function setColor( ) : Void {
         if( highlight ) drawingAdapter.setStrokeColor( "red" ) ;
         else drawingAdapter.setStrokeColor( "black" ) ;
+        drawingAdapter.setFillColor("white");
     }
 
     private function drawPorts( ) : Void {
         // TODO. Draw the text associated with each input, if any.
         // TODO. Draw pigtails for ports.
         // TODO. Change color for selected ports
-        drawingAdapter.setStrokeColor( "black" ) ;
-        drawingAdapter.setFillColor("white");
+        drawingAdapter.setStrokeColor( "blue" ) ;
+        drawingAdapter.setFillColor("blue");
         for (port in component.get_ports()) {
-            if( port.isConnected() ) {
-                drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portRadius, portRadius); }
+            if( ! port.isConnected() ) {
+                drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portSize, portSize); }
+
+            trace( "drawing port" ) ;
         }
     }
 }

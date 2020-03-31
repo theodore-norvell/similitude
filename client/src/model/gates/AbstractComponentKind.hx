@@ -14,6 +14,7 @@ import model.selectionModel.SelectionModel ;
 import type.Coordinate;
 import type.HitObject;
 import type.WorldPoint;
+import global.Constant.portSize ;
 /**
 * abstract class for gates
 * @author wanhui
@@ -31,7 +32,7 @@ class AbstractComponentKind  {
         return attributes ;
     }
 
-    public function createPorts( component : Component ) : Void {
+    public function createPorts( component : Component, addPort : Port -> Void ) : Void {
         //TODO
     }
 
@@ -120,9 +121,8 @@ class AbstractComponentKind  {
      * @return if in the circle, return true; otherwise, return false;
     **/
     function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
-        var portRadius = 3 ;
-        return Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius
-            && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius ;
+        return Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portSize
+            && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portSize ;
     }
 
     /**

@@ -45,8 +45,6 @@ class Component extends CircuitElement {
     var componentKind:ComponentKind;//the actual gate in this component
     // The ports that belong to this component.
     var  ports : Array<Port> = new Array<Port>() ;
-    // TODO Make inportsNum an attribute for the kinds where it makes sense.
-    var inportsNum:Int;//init
     // TODO Make boxType an attribute for the kinds where it makes sense.
     var boxType:BOX;
     var list:Map<String,Pair>=new Map<String,Pair>();
@@ -68,13 +66,12 @@ class Component extends CircuitElement {
         this.width = width;
         this.sequenceNumber = -1 ;
         this.componentKind = componentKind;
-        this.inportsNum = inportNum;
         this.boxType = BOX.WHITE_BOX;
 
         //this.delay = 0;//init is zero
 
         //initial ports
-        this.componentKind.createPorts( this ) ;
+        this.componentKind.createPorts( this, function ( port : Port ) { ports.push( port ) ; } ) ;
         this.componentKind.updatePortPositions( this ) ;
 
         // TODO What is going on with this loop?  What about other attributes.
@@ -91,7 +88,7 @@ class Component extends CircuitElement {
         }
         list.get("orientation").update(this,new OrientationValue(orientation));
     }
-
+    
     public function getmap(){
         return list;
     }
@@ -154,7 +151,7 @@ class Component extends CircuitElement {
         return this.xPosition - this.width/2.0 ; }
 
     override public function right() : Float {
-        return this.xPosition - this.width/2.0 ; }
+        return this.xPosition + this.width/2.0 ; }
 
     override public function top() : Float {
         return this.yPosition - this.height/2.0 ; }
@@ -218,13 +215,11 @@ class Component extends CircuitElement {
         notifyObservers(this) ;
     }
 
-    public function get_inportsNum():Int {
-        return inportsNum;
-    }
-
-    public function getNameOfTheComponentKind():String{
+    public function getNameOfTheComponentKind() : String{
         return this.componentKind.getname();
     }
+
+    
 
     public function disconnectAllPorts() {
         for( port in ports ) {

@@ -3,7 +3,7 @@ package model.drawComponents;
 import model.component.Endpoint;
 import model.component.Link;
 import model.drawingInterface.DrawingAdapterI;
-import global.Constant.portRadius ;
+import global.Constant.portSize ;
 /**
 * draw link
 **/
@@ -34,7 +34,7 @@ class DrawLink {
         drawingAdapter.setStrokeColor( "black" ) ;
         drawingAdapter.setFillColor("white");
         if( endpoint.isConnected() ) {
-            drawingAdapter.drawRect(endpoint.get_xPosition(), endpoint.get_yPosition(), portRadius, portRadius); }
+            drawingAdapter.drawRect(endpoint.get_xPosition(), endpoint.get_yPosition(), portSize, portSize); }
     }
 
 }
