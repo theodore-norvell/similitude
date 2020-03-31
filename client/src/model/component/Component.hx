@@ -227,7 +227,9 @@ class Component extends CircuitElement {
     }
 
     public function disconnectAllPorts() {
-        Assert.assert( false ) ; // TODO 
+        for( port in ports ) {
+            port.disconnect() ;
+        }
     }
 
     public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ) {

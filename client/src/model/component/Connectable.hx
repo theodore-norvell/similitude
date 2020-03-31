@@ -17,6 +17,10 @@ class Connectable extends CircuitElement {
         this.connection = connection ;
     }
 
+    public function disconnect( ) : Void {
+        if( isConnected() ) this.connection.disconnect( this ) ;
+    }
+
     public function isConnected( ) : Bool {
         return this.connection.get_count() > 1 ;
     }
