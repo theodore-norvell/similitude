@@ -36,6 +36,7 @@ class Connection extends CircuitElement {
     public function connect( connectable : Connectable ) {
         Assert.assert( connectable.get_CircuitDiagram() == this.get_CircuitDiagram() ) ;
         if( connectedElements.indexOf( connectable ) == -1 ) {
+            if( connectable.isConnected() ) connectable.disconnect() ;
             connectable.setConnection( this ) ;
             connectedElements.push( connectable ) ;
             notifyObservers( this ) ; }

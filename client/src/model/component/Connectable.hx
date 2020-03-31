@@ -21,6 +21,15 @@ class Connectable extends CircuitElement {
         if( isConnected() ) this.connection.disconnect( this ) ;
     }
 
+    /**
+     * Connect this connectable to another connectable.
+     * This object will lose any of its present connections.
+     * @param other 
+     */
+    public function connectTo( other : Connectable ) : Void {
+        other.connection.connect( this ) ;
+    }
+
     public function isConnected( ) : Bool {
         return this.connection.get_count() > 1 ;
     }
