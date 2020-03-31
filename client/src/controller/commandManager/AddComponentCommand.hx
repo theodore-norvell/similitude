@@ -20,14 +20,14 @@ class AddComponentCommand extends AbstractCommand
 	
 	override public function execute() : Void {
 		this.circuitDiagram.addComponent(this.component);
-	};
+	}
 	
 	override public function redo() : Void {
 		this.execute();
-	};
+	}
 	
 	override public function undo() : Void {
 		this.circuitDiagram.removeComponent(this.component);
-	};	
+	}	
 	
 }

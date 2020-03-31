@@ -81,6 +81,19 @@
 		top: 465px;
 		left: 65px;
 	}
+	
+	#CanvasPanControl {
+		z-index: 2;
+		position: absolute;
+		margin-left: 705px;
+		margin-top: 305px;
+	}
+	
+	.panController{
+		border: solid 1px black;
+		width: 35px;
+		margin-top: 2px;
+	}
 	</style>
 </head>
 <body>
@@ -95,7 +108,15 @@
 		  </div>
 	  <div id="pallete">
 		  <div id="topNavbar"></div>
-		  <div id="displayScreen"></div>
+		  <div id="displayScreen">
+			<div id="CanvasPanControl">
+				<div id="Up" class="panController">Up</div>
+				<div id="Down" class="panController">Down</div>
+				<div id="Left" class="panController">Left</div>
+				<div id="Right" class="panController">Right</div>
+				<div id="Centre" class="panController">Centre</div>
+			</div>
+		  </div>
 	  </div>
 	  <div id="undo">UNDO</div>
 	  <div id="redo">REDO</div>

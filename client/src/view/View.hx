@@ -9,6 +9,7 @@ import js.html.Window;
 import haxe.Json;
 import model.component.CircuitDiagram;
 import model.drawingInterface.DrawingAdapter;
+import model.similitudeEvents.CanvasPanEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
@@ -49,6 +50,65 @@ class View
             // do something
 			Console.log("redo was clicked");
 			this.canvasListener.redoLastCanvasChange();
+        });
+		
+		document.querySelector("#Up").addEventListener('click', function (event) {
+            // do something
+			Console.log("Up was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveXNegative(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.yPan = -10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Down").addEventListener('click', function (event) {
+            // do something
+			Console.log("Down was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveYPositive(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.yPan = 10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Left").addEventListener('click', function (event) {
+            // do something
+			Console.log("Left was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveXNegative(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.xPan = -10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Right").addEventListener('click', function (event) {
+            // do something
+			Console.log("Right was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveXPositive(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.xPan = 10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Centre").addEventListener('click', function (event) {
+            // do something
+			Console.log("Centre was clicked");
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.xPan = this.activeTab.tabModel.canvasPan.centreX();
+			canvasPanEvent.yPan = this.activeTab.tabModel.canvasPan.centreY();
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
         });
 		
 		// for testing the flow of the click event

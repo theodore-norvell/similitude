@@ -1,6 +1,6 @@
 package model.tabModel;
 import model.drawingInterface.DrawingAdapterI;
-import js.html.CanvasElement;
+	import model.selectionModel.CanvasPan;
 //import js.html.CanvasRenderingContext2D;
 import model.component.CircuitDiagramI;
 import model.component.Component;
@@ -23,6 +23,7 @@ class TabModel
 {
 	var selectionModel: SelectionModel;
 	var circuitDiagram: CircuitDiagramI;
+	public var canvasPan: CanvasPan = new CanvasPan();
 	// create this field using  the JS document and then set it using the set functionality in this class.
 	
 	
@@ -30,49 +31,6 @@ class TabModel
 	{
 		this.circuitDiagram = circuitDiagram;
 		this.selectionModel = new SelectionModel(new Array<Link>(), new Array<Component>());
-		
-		// The following commented code corresponds to the code in the view using the function view.spawnNewCanvas()
-		// On a personal note I believe the Tab model should be capable of doing this on it's own.
-		// the comments can be removed later on.
-		
-		//var canvasDisplayScreen = document.querySelector("#displayScreen");
-		//
-		//var innerCanvas = document.createCanvasElement();
-		//innerCanvas.id = "canvasToDraw";
-		//canvasDisplayScreen.appendChild(innerCanvas);
-		//innerCanvas.style.width = "100%";
-		//innerCanvas.style.height = "100%";
-		//
-		//// needs this event by default for the drop target.
-		//canvasDisplayScreen.addEventListener('dragover', function (event) {
-			//event.preventDefault(); // called to avoid any other event from occuring when processing this one.
-			//event.dataTransfer.dropEffect = "move";
-			//// refer to MDN docs for more dropEffects
-			//
-		//});
-		//// needs this event by default for the drop target.
-		//canvasDisplayScreen.addEventListener('drop', function (event) {
-			//event.preventDefault();
-			//var data = event.dataTransfer.getData("text/plain");
-			//
-			//// use this for co-ordinates of the mouse pointers on the current ancestor element
-			//Console.log("co-ordinates ::", event.layerX, event.layerY);
-			//// here make a function to draw on the canvas
-			//// presumably move this entire block to the canvasUpdate
-			//// use a command through the command manager here
-			//var eventPassed = Json.parse(data);
-			//// in element co-ordinates
-			////eventPassed.posX = event.layerX;
-			////eventPassed.posY = event.layerY;
-			//eventPassed.posX = event.pageX;
-			//eventPassed.posY = event.pageY;
-			//this.view.updateCanvasListener(eventPassed);
-			////this.canvasListener.update(data);
-		//});
-		//
-		//this.canvasElement = innerCanvas;
-		
-		
 	}
 
 	public function draw( drawingAdaptor : DrawingAdapterI ) : Void {
