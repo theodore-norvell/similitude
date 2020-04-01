@@ -10,6 +10,7 @@ import haxe.Json;
 import model.component.CircuitDiagram;
 import view.DrawingAdapter;
 import model.similitudeEvents.SidebarDragAndDropEvent;
+import model.similitudeEvents.CanvasPanEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
 import view.viewModelRepresentatives.TabView;

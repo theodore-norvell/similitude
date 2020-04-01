@@ -46,7 +46,7 @@ class Connection extends CircuitElement {
                 if( connectable.isConnected() ) connectable.disconnect() ;
                 connectable.setConnection( this ) ;
                 connectedElements.push( connectable ) ;
-                notifyObservers( this ) ; } }
+                notifyObservers( this ) ; }
     }
 
     public function aPortIsConnecte() {
