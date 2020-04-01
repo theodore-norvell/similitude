@@ -1,8 +1,9 @@
-package model.drawingInterface;
+package view ;
 
-import model.drawingInterface.Box;
+import view.Box;
 import type.Coordinate;
 import model.drawingInterface.DrawingAdapterI;
+import model.drawingInterface.Transform;
 import model.enumeration.ORIENTATION;
 import js.html.CanvasRenderingContext2D;
 
@@ -217,16 +218,26 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
         // Line to point (b+c)/2
+        // TODO.  Change this point to 2 radii closer to the center.
         cxt.lineTo((r.get_xb() + r.get_xc()) / 2, (r.get_yb() + r.get_yc()) / 2) ;
         // Line to d
         cxt.lineTo(r.get_xd(), r.get_yd()) ;
         // Back to a
         cxt.closePath();
 
+        cxt.lineWidth = lineWidth;
+        cxt.fillStyle = fillColor;
+        cxt.strokeStyle = strokeColor;
+        cxt.fill();
+        cxt.stroke();
+
         var circleCentreX:Float = (r.get_xb() + r.get_xc()) / 2 ;
         var circleCentreY:Float = (r.get_yb() + r.get_yc()) / 2 ;
-        var radius:Float = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10 ;
+        // The radius is 1 / 10 the distance from b to c .
+        var radius:Float = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc())
+                                   + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10 ;
 
+        cxt.beginPath();
         //draw the circle
         switch (orientation){
             case ORIENTATION.NORTH : {
@@ -237,13 +248,8 @@ class DrawingAdapter implements DrawingAdapterI {
                 cxt.arc(circleCentreX, circleCentreY - radius / 2, radius, 0, 2 * Math.PI, false); }
             case ORIENTATION.WEST : {
                 cxt.arc(circleCentreX + radius / 2, circleCentreY, radius, 0, 2 * Math.PI, false); }
-            default : {
-                //noting. Orientation only have four values
-            }
+            default :// Unreachable 
         }
-        cxt.lineWidth = lineWidth;
-        cxt.fillStyle = fillColor;
-        cxt.strokeStyle = strokeColor;
         cxt.fill();
         cxt.stroke();
     }
@@ -330,7 +336,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.closePath();
     }
 
-    public function drawCricle(x:Float, y:Float, radius:Float):Void {
+    public function drawCircle(x:Float, y:Float, radius:Float):Void {
         var wnw:Coordinate = new Coordinate(x - radius, y);
         var wse:Coordinate = new Coordinate(x + radius, y);
 

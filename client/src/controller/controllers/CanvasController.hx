@@ -30,12 +30,14 @@ class CanvasController extends AbstractController implements CanvasListener
 		this.viewUpdater.updateView("The element that was added to the canvas div is :: " + a );
 	}
 	
-	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void {
+	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void 
+	{
 		trace('AAAA', eventObject.component);
 		// create and execute a command here 
 		// Type.createEnum(ComponentType, eventObject.component)
-		var component = new Component(eventObject.draggedToX, eventObject.draggedToY, 25, 25, ORIENTATION.EAST, componentTypesSingleton.toComponentKind(eventObject.component), 0);
-		var addComponentCommand = new AddComponentCommand(this.activeTab.getCircuitDiagram(), component);
+		var circuitDiagram = this.activeTab.getCircuitDiagram() ;
+		var component = new Component(circuitDiagram, eventObject.draggedToX, eventObject.draggedToY, 70, 70, ORIENTATION.EAST, componentTypesSingleton.toComponentKind(eventObject.component), 0);
+		var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
 		this.commandManager.executeCommand(addComponentCommand);
 		this.viewUpdater.updateCanvas();
 	}

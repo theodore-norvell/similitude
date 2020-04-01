@@ -157,7 +157,7 @@ interface DrawingAdapterI {
 	 * @param y   -- The distance from the top edge to the centre of the bounding box in world coordinates.
 	 * @param radius  -- The radius in world coordinates.
 	 */
-    public function drawCricle(x:Float, y:Float, radius:Float):Void;
+    public function drawCircle(x:Float, y:Float, radius:Float):Void;
 
     /** Draw a line between two points in world coordinates.
 	 *

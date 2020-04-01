@@ -20,31 +20,10 @@ interface CircuitDiagramI {
     public function get_componentIterator():Iterator<Component>;
 
     /**
-    * reverse iterator for componenent array
-    **/
-    public function get_componentReverseIterator():Iterator<Component>;
-
-    /**
-    * reverse iterator for link array
-    **/
-    public function get_linkReverseIterator():Iterator<Link>;
-
-    /**
     * @:getter link array from the circuit diagram
      * @return the iterator
     **/
     public function get_linkIterator():Iterator<Link>;
-
-    /**
-    * @:getter the name of the circuit diagram
-    * @return the name
-    **/
-    public function get_name():String;
-
-    /**
-    * @:setter the name of the circuit diagram
-    **/
-    public function set_name(value:String):Void;
 
     /**
     * add one link
@@ -55,21 +34,6 @@ interface CircuitDiagramI {
     * add one component
     **/
     public function addComponent(component:Component):Void;
-
-    /**
-    * remove one link
-    **/
-    public function removeLink(link:Link):Void;
-
-    /**
-    * remove one component
-    **/
-    public function removeComponent(component:Component):Void;
-
-    /**
-    * set IntAttr orientation for one component
-    **/
-    public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void;
 
     /**
     * delete one link
@@ -87,13 +51,13 @@ interface CircuitDiagramI {
     public function componentSetName(component:Component, name:String):Void;
 
     /**
-    * compute the size of this diagram
+    * update the size of this diagram
     * note: the size of this diagram changed only happens in two suitutions
     *       1. add a component
     *       2. move a component (significant slow down the performance)
     *            because there is no way to track the change for every component, so make this function public.
     **/
-    public function computeDiagramSize():Void;
+    public function updateBoundingBox():Void;
 
     /**
     * get the width of this diagram
@@ -125,7 +89,7 @@ interface CircuitDiagramI {
     **/
     public function get_yMax():Float;
 
-    public function getComponentAndLinkCenterCoordinate():Coordinate;
+    public function get_centre():Coordinate;
 
     /**
     * draw the circuit diagram itself
@@ -135,16 +99,27 @@ interface CircuitDiagramI {
 
     /**
     * find the hit list
+    * TODO replace this method with one that uses a SelectionModel.
+    * TODO Get rid of the HitObject class.
     **/
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>;
 
     /**
-    * find the world points
+    * Find all coordinates a point corresponds to.
+    * This can be used when there is a mouse click on a circuit. The view
+    * would transform the view coordinate to a world coordinate and then call
+    * this methods.
+    * 
+    * Normally this  method just returns a world point that consistst of this diagram
+    * and the input coordinate. However when a point is inside a (white box) compound component, the
+    * point also refers to a coordinate within that compound component.  So in that case
+    * there are two points (at least) that could have been intended by the mouse click.
+    * And there could be more beneath that.
+    * 
+    * When mode is POINT_MODE.ONE, only one world point is returned.
+    * 
+    * When mode is POINT_MODE.PATH, all the world points are returned. In no particular order.
     **/
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 
-    /**
-    * is this circuitdiagram has nothing?
-    **/
-    public function isEmpty():Bool;
 }

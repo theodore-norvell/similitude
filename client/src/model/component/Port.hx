@@ -2,62 +2,36 @@ package model.component;
 
 
 import model.enumeration.IOTYPE;
-import model.enumeration.VALUE_LOGIC;
 /**
  * Every gate should have port to access the logic value
  * @author wanhui
  *
  */
-interface Port {
-    /** get the x position of this port
-    *
-    **/
-    public function get_xPosition():Float;
+class Port extends Connectable {
 
-    /** get the y position of this port
-    *
-    **/
-    public function get_yPosition():Float;
+    var sequence:Int = -1;
+    var description : IOTYPE ;
 
-    /** set the x position of this port
-    *
-    **/
-    public function set_xPosition(xPosition:Float):Void;
+    public function new(cd : CircuitDiagram, x:Float, y:Float) {
+        super(cd, x, y) ;
+        this.description = IOTYPE.OUTPUT ; 
+    }
 
-    /** set the y position of this port
-    *
-    **/
-    public function set_yPosition(yPosition:Float):Void;
+    override public function isPort() { return true ; }
 
-    /** get the logic value of this port
-    *
-    **/
-    public function get_value():VALUE_LOGIC;
+    public function get_sequence():Int {
+        return this.sequence;
+    }
 
-    /** set the logic value
-    *
-    **/
-    public function set_value(value:VALUE_LOGIC):Void;
+    public function set_sequence(sequence:Int):Void {
+        this.sequence = sequence;
+    }
 
-    /** get the port description, Inport or outport
-    *
-    **/
-    public function get_portDescription():IOTYPE;
+    public function get_portDescription():IOTYPE {
+        return this.description ;
+    }
 
-    /** get the port description, Inport or outport
-    *
-    **/
-    public function set_portDescription(value:IOTYPE):Void;
-
-    /** get the sequence of this port
-    *
-    **/
-    public function get_sequence():Int;
-
-    /** set the sequence of this port
-    *
-    **/
-    public function set_sequence(sequence:Int):Void;
-
-    public function createJSon():String;
+    public function set_portDescription(description:IOTYPE):Void {
+        this.description = description;
+    }
 }

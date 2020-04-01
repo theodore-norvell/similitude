@@ -4,149 +4,54 @@ import assertions.Assert ;
 import model.attribute.Attribute ;
 import model.attribute.OrientationAttr ;
 import model.attribute.StringAttr ;
-import model.component.Outport;
-import type.HitObject;
 import model.component.CircuitDiagramI;
-import model.enumeration.POINT_MODE;
 import model.component.Component;
+import model.component.Port ;
+import model.drawingInterface.DrawingAdapterI ;
+import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
+import model.selectionModel.SelectionModel ;
 import type.Coordinate;
+import type.HitObject;
 import type.WorldPoint;
-import model.component.Inport;
-import model.component.Port;
-import model.enumeration.ORIENTATION;
-import global.Constant.*;
+import global.Constant.portSize ;
 /**
 * abstract class for gates
 * @author wanhui
 **/
-class AbstractComponentKind {
-    // TODO: Get rid of this.
-    private var sequence:Int;//use for input and output
-    // TODO: Get rid of this
-    private var component:Component;
+class AbstractComponentKind  {
+    
     private var attributes:Array<Attribute>=new Array<Attribute>();
 
     private function new() {
-
-        sequence = -1;
         attributes.push(new OrientationAttr());
         attributes.push(new StringAttr("name"));
     }
 
-    public function getAttr():Array<Attribute>{
-        return attributes;
+    public function getAttr():Array<Attribute> {
+        return attributes ;
     }
 
-    // TODO: Get rid of this
-    public function get_component():Component {
-        return component;
+    public function createPorts( component : Component, addPort : Port -> Void ) : Void {
+        //TODO
     }
 
-    // TODO: Get rid of this
-    public function set_component(value:Component):Void {
-        this.component = value;
+    public function updatePortPositions( component : Component  ) : Void {
+        //TODO
     }
 
-    // TODO: Get rid of this
-    public function addInPort():Port {
-        return new Inport();
-    }
-
-    // TODO: Get rid of this
-    public function addOutPort():Port {
-        return new Outport();
-    }
-
-    // TODO: Get rid of this
-    public function get_sequence():Int {
-        return sequence;
-    }
-
-    // TODO: Get rid of this
-    public function set_sequence(value:Int) {
-        return this.sequence = value;
-    }
-
-    // TODO This might make sense if it had a component to work on.
-    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
-        switch (orientation){
-            case ORIENTATION.EAST : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition - width / 2);
-                    portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-                }
-            };
-            case ORIENTATION.NORTH : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
-                    portArray[i].set_yPosition(yPosition + height / 2);
-                }
-            };
-            case ORIENTATION.SOUTH : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
-                    portArray[i].set_yPosition(yPosition - height / 2);
-                }
-            };
-            case ORIENTATION.WEST : {
-                for (i in 0...portArray.length) {
-                    portArray[i].set_xPosition(xPosition + width / 2);
-                    portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-                }
-            };
-            default:{
-                //do nothing
-            }
-        }
-        return portArray;
-    }
-    // TODO This might make sense if it had a component to work on. 
-    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
-        switch(orientation){
-            case ORIENTATION.EAST : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition + width / 2);
-                    portArray[i].set_yPosition(yPosition);
-                }
-            };
-            case ORIENTATION.NORTH : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition);
-                    portArray[i].set_yPosition(yPosition - height / 2);
-                }
-            };
-            case ORIENTATION.SOUTH : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition);
-                    portArray[i].set_yPosition(yPosition + height / 2);
-                }
-            };
-            case ORIENTATION.WEST : {
-                for(i in 0...portArray.length){
-                    portArray[i].set_xPosition(xPosition - width / 2);
-                    portArray[i].set_yPosition(yPosition);
-                }
-            };
-            default:{
-                //do nothing
-            }
-        }
-        return portArray;
-    }
-    
-    // TODO This might make sense if it had a component to work on.
-    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
+    public function findHitList(component : Component, coordinate:Coordinate, mode:MODE)
+    :Array<HitObject> {
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
-        var component:Component = isInComponent(coordinate);
+        var component:Component = isInComponent(component, coordinate);
         if(component != null){
             var hitObject:HitObject = new HitObject();
             hitObject.set_component(component);
             hitObjectArray.push(hitObject);
         }
 
-        var port:Port = isOnPort(coordinate);
+        var port:Port = isOnPort(component, coordinate);
         if(port != null){
             var hitObject:HitObject = new HitObject();
             hitObject.set_port(port);
@@ -162,8 +67,8 @@ class AbstractComponentKind {
     * @return if the coordinate in a component then return the component
     *           or  return null;
     **/
-    function isInComponent(coordinate:Coordinate):Component{
-        if(isInScope(component.get_xPosition(), component.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition(), component.get_height(), component.get_width()) == true){
+    function isInComponent(component : Component, coordinate:Coordinate):Component {
+        if(isInScope(component.get_xPosition(), component.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition(), component.get_height(), component.get_width())){
             return component;
         }
         return null;
@@ -193,22 +98,13 @@ class AbstractComponentKind {
     * @return if the coordinate on the port then return the port
     *           or  return null;
     **/
-    function isOnPort(cooridnate:Coordinate):Port{
+    function isOnPort(component : Component, cooridnate:Coordinate):Port{
         var port:Port;
 
-            for(j in component.get_inportIterator()){
-                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
+            for(port in component.get_ports()){
+                if(isInCircle(cooridnate, port.get_xPosition(), port.get_yPosition())){
                     //the mouse on the port
                     //verify is there any link link to this port
-                    port = j;
-                    return port;
-                }
-            }
-            for(j in component.get_outportIterator()){
-                if(isInCircle(cooridnate, j.get_xPosition(), j.get_yPosition())){
-                    //the mouse on the port
-                    //verify is there any link link to this port
-                    port = j;
                     return port;
                 }
             }
@@ -218,37 +114,26 @@ class AbstractComponentKind {
 
 
     /**
-    * verify a point is in a circuit or not
+    * verify a point is in a circle or not
      * @param coordinate     the point need to be verified
      * @param orignalXPosition   the circuit x position
      * @param orignalYPosition   the circuit y position
      * @return if in the circle, return true; otherwise, return false;
     **/
     function isInCircle(coordinate:Coordinate, orignalXPosition:Float, orignalYPosition:Float):Bool{
-        //the radius is 3
-        if(Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portRadius && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portRadius){
-            return true;
-        }else{
-            return false;
-        }
+        return Math.abs(coordinate.get_xPosition() - orignalXPosition) <= portSize
+            && Math.abs(coordinate.get_yPosition() - orignalYPosition) <= portSize ;
     }
 
     /**
     * for all component kinds except compound component, find world point always return a empty list
     **/
-    public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
+    public function findWorldPoint(component : Component, worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         return new Array<WorldPoint>();
     }
 
     public function getInnerCircuitDiagram():CircuitDiagramI{
         Assert.assert(false) ;
         return null;//for most of the componentkind it has no circuit diagram inside, except compound component
-    }
-
-    /**
-    * for all component kinds except compound component, this function always return false; False means their is no change
-    **/
-    public function checkInnerCircuitDiagramPortsChange():Bool{
-        return false;
     }
 }

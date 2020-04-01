@@ -27,7 +27,7 @@ class AddComponentCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		this.circuitDiagram.removeComponent(this.component);
-	}	
+		this.circuitDiagram.deleteComponent(this.component);
+	};	
 	
 }

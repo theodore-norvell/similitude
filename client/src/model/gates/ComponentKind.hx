@@ -33,93 +33,36 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
-    // TODO. This function must go.
-    public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port>;
-
-    public function checkInnerCircuitDiagramPortsChange():Bool;
+    public function createPorts( component : Component, addPort : Port -> Void ) : Void ;
 
     /**
-    * add an inport
-     * @return the created ports
-    **/
-    // TODO. This function must go.
-    public function addInPort():Port;
-
-    // TODO. This function must go.
-    public function addOutPort():Port;
-
-    /**
-    * update all of the position of ports in inportArray
-     * @param portArray
-     * @param xPosition : x position
-    *  @param yPosition : y position
-    *  @param height : height
-    *  @param width : width
-    *  @param orientation : direction
-    *  @return the array of the updated ports
-    **/
-    // TODO. This function must go.
-    public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
-
-    /**
-    * update all of the position of ports in in outportArray
-     * @param portArray
-     * @param xPosition : x position
-    *  @param yPosition : y position
-    *  @param height : height
-    *  @param width : width
-    *  @param orientation : direction
-    *  @return the array of the updated ports
-    **/
-    // TODO. This function must go.
-    public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>;
+     *  Update the positions of the ports of a component.
+     * @param component 
+     */
+    public function updatePortPositions( component : Component  ) : Void ;
 
     /**
     * draw this componentkind
      * @param component
      * @param drawingAdapter
+     * @param highlight Should this component be highlighted
+     * @param selection The set of things that should be highlighted
     **/
-    public function drawComponent(drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
-
-    /**
-    * get component sequence
-    * TODO Get rid of this.
-    **/
-    public function get_sequence():Int;
-
-    /**
-    * set component sequence
-    * TODO Get rid of this.
-    **/
-    public function set_sequence(value:Int):Int;
-
-    /**
-    * get the component which belongs to this kind.
-    * TODO Get rid of this.
-    **/
-    public function get_component():Component;
-
-    /**
-    * set the componentKind belongs to which component
-    * TODO Get rid of this.
-    **/
-    public function set_component(value:Component):Void;
+    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
 
     /**
     * find the hit list
     **/
-    public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>;
+    public function findHitList(component : Component, coordinate:Coordinate, mode:MODE):Array<HitObject>;
 
     /**
     * find world point
     **/
-    public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
+    public function findWorldPoint(component : Component, worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 
     /**
     * this function just use for compound component
     * TODO Get rid of this.
     **/
     public function getInnerCircuitDiagram():CircuitDiagramI;
-
-    public function setname(s:String):Void;
 }

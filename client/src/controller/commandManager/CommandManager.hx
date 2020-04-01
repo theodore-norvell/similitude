@@ -15,17 +15,20 @@ class CommandManager
 	public function executeCommand(command: CommandI) : Void {
 		command.execute();
 		undoStack.add(command);
+		while( ! redoStack.isEmpty() ) redoStack.pop() ;
 	}
 	
 	public function undoCommand() : Void {
-		var undoCommand = undoStack.pop();
-		undoCommand.undo();
-		redoStack.add(undoCommand);
+		if( ! undoStack.isEmpty() ) { 
+			var undoCommand = undoStack.pop();
+			undoCommand.undo();
+			redoStack.add(undoCommand); }
 	}
 	
 	public function redoCommand() : Void {
-		var redoCommand = redoStack.pop();
-		redoCommand.redo();
-		undoStack.add(redoCommand);
+		if( ! redoStack.isEmpty() ) {
+			var redoCommand = redoStack.pop();
+			redoCommand.redo();
+			undoStack.add(redoCommand); }
 	}
 }

@@ -1,9 +1,8 @@
 package model.component;
 
-import haxe.ds.GenericStack;
+import assertions.Assert;
 import model.observe.Observable;
 import model.observe.Observer;
-//import js.html.CanvasRenderingContext2D;
 import type.HitObject;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
@@ -13,252 +12,131 @@ import model.enumeration.ORIENTATION;
 import type.Coordinate;
 import type.WorldPoint;
 
-class CircuitDiagram extends Observer implements CircuitDiagramI{
-    var Obable:Observable;
+class CircuitDiagram implements CircuitDiagramI implements Observer{  
+    var observable:Observable;
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
-    var name:String;//the name of this circuit diagram
-    var componentArrayReverseFlag:Bool = false;
-    var linkArrayReverseFlag:Bool = false;
 
-    //circuit diagram has its width height
-    var diagramWidth:Float;
-    var diagramHeight:Float;
-    //initial the margin
+    // The bounding box
     var xMin:Float;
     var yMin:Float;
     var xMax:Float;
     var yMax:Float;
-    var margin:Int;
-    var componentAndLinkCenter:Coordinate;
+    var centrePoint : Coordinate ;
+    static var margin:Float = 50;
 
-    public function new() {
-        super();
-        componentAndLinkCenter = new Coordinate(0, 0);
-        this.margin = 50;
+    public function new( ) {
+        this.observable = new Observable() ;
+        updateBoundingBox() ;
+
     }
 
-    public function computeDiagramSize():Void{
-        xMin = 99999999 ;
-        yMin = 99999999 ;
-        xMax = 0 ;
-        yMax = 0 ;
+    public function checkInvariant( ) : Void {
+        for( comp in componentArray ) Assert.assert( comp.get_CircuitDiagram() == this ) ;
+        for( link in linkArray ) {
+            Assert.assert( link.get_CircuitDiagram() == this ) ;
+            // TODO Check that any links that connect to ports connect to
+            // ports whose component is in the componentarray. 
+            // TODO Check that those port are in the same location 
+            // as the endpoints.
+        }
+    }
+
+    public function updateBoundingBox():Void {
+        xMin = 0;
+        yMin = 0;
+        xMax = 0;
+        yMax = 0;
 
         for(i in componentArray){
-            if(i.get_xPosition() - i.get_width()/2 < xMin){
-                xMin = i.get_xPosition() - i.get_width()/2;
-            }
-
-            if(i.get_xPosition() + i.get_width()/2 > xMax){
-                xMax = i.get_xPosition() + i.get_width()/2;
-            }
-
-            if(i.get_yPosition() - i.get_height()/2 < yMin){
-                yMin = i.get_yPosition() - i.get_height()/2;
-            }
-
-            if(i.get_yPosition() + i.get_height()/2 > yMax){
-                yMax = i.get_yPosition() + i.get_height()/2;
-            }
+            xMin = Math.min( xMin, i.left() ) ;
+            xMax = Math.max( xMax, i.right() ) ;
+            yMin = Math.min( yMin, i.top() ) ;
+            yMax = Math.min( yMax, i.bottom() ) ;
         }
 
         for(i in linkArray){
-            //left endpoint
-            if(i.get_leftEndpoint().get_xPosition() < xMin){
-                xMin = i.get_leftEndpoint().get_xPosition();
-            }
-
-            if(i.get_leftEndpoint().get_xPosition() > xMax){
-                xMax = i.get_leftEndpoint().get_xPosition();
-            }
-
-            if(i.get_leftEndpoint().get_yPosition() < yMin){
-                yMin = i.get_leftEndpoint().get_yPosition();
-            }
-
-            if(i.get_leftEndpoint().get_yPosition() > yMax){
-                yMax = i.get_leftEndpoint().get_yPosition();
-            }
-            //right endpoint
-            if(i.get_rightEndpoint().get_xPosition() < xMin){
-                xMin = i.get_rightEndpoint().get_xPosition();
-            }
-
-            if(i.get_rightEndpoint().get_xPosition() > xMax){
-                xMax = i.get_rightEndpoint().get_xPosition();
-            }
-
-            if(i.get_rightEndpoint().get_yPosition() < yMin){
-                yMin = i.get_rightEndpoint().get_yPosition();
-            }
-
-            if(i.get_rightEndpoint().get_yPosition() > yMax){
-                yMax = i.get_rightEndpoint().get_yPosition();
-            }
+            xMin = Math.min( xMin, i.left() ) ;
+            xMax = Math.max( xMax, i.right() ) ;
+            yMin = Math.min( yMin, i.top() ) ;
+            yMax = Math.min( yMax, i.bottom() ) ;
         }
-
-        componentAndLinkCenter.set_xPosition((xMin + xMax)/2);
-        componentAndLinkCenter.set_yPosition((yMin + yMax)/2);
-
-        diagramWidth = xMax - xMin + margin;
-        diagramHeight = yMax - yMin + margin;
-
-        if(diagramHeight > diagramWidth){
-            diagramWidth = diagramHeight;
-        }else{
-            diagramHeight = diagramWidth;
-        }
+        xMin = xMin - margin / 2 ;
+        yMin = yMin - margin / 2 ;
+        xMax = xMax + margin / 2 ;
+        yMax = yMax + margin / 2 ;
+        centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
+        observable.notifyObservers(this) ;
     }
 
-    public function getComponentAndLinkCenterCoordinate():Coordinate{
-        return componentAndLinkCenter;
+    public function update(target: Any, ?data:Dynamic) : Void{
+        updateBoundingBox() ; // This will also notify observers.
     }
 
-    public function get_diagramWidth():Float {
-        return diagramWidth;
+    public function get_centre() : Coordinate {
+        return centrePoint ;
     }
 
-    public function get_diagramHeight():Float {
-        return diagramHeight;
+    public function get_diagramWidth() : Float {
+        return xMax - xMin ;
     }
 
-    public function get_xMin():Float {
-        return xMin;
+    public function get_diagramHeight() : Float {
+        return yMax - yMin ;
     }
 
-    public function get_yMin():Float {
-        return yMin;
+    public function get_xMin() : Float {
+        return xMin ;
     }
 
-    public function get_xMax():Float {
-        return xMax;
+    public function get_yMin() : Float {
+        return yMin ;
     }
 
-    public function get_yMax():Float {
-        return yMax;
+    public function get_xMax() : Float {
+        return xMax ;
     }
 
-    public function get_componentIterator():Iterator<Component>{
-        if(componentArrayReverseFlag){
-            componentArrayReverse();
-        }
+    public function get_yMax() : Float {
+        return yMax ;
+    }
+
+    public function get_componentIterator():Iterator<Component> {
         return componentArray.iterator();
     }
 
-    public function get_componentReverseIterator():Iterator<Component>{
-        if( ! componentArrayReverseFlag){
-            componentArrayReverse();
-        }
-        return componentArray.iterator();
-    }
-
-    function componentArrayReverse(){
-        componentArrayReverseFlag = !componentArrayReverseFlag;
-        componentArray.reverse();
-    }
-
-    public function get_linkIterator():Iterator<Link>{
-        if(linkArrayReverseFlag){
-            linkArrayReverse();
-        }
+    public function get_linkIterator():Iterator<Link> {
         return linkArray.iterator();
-    }
-
-    public function get_linkReverseIterator():Iterator<Link>{
-        if( ! linkArrayReverseFlag ){
-            linkArrayReverse();
-        }
-        return linkArray.iterator();
-    }
-
-    function linkArrayReverse(){
-        linkArrayReverseFlag = !linkArrayReverseFlag;
-        linkArray.reverse();
-    }
-
-    public function get_name():String {
-        return name;
-    }
-
-    public function set_name(value:String):Void{
-        this.name = value;
     }
 
     public function addLink(link:Link):Void {
         linkArray.push(link);
+        link.addObserver(this);
+        updateBoundingBox() ;
     }
 
     public function addComponent(component:Component):Void {
         componentArray.push(component);
         component.addObserver(this);
-    }
-
-    public function removeLink(link:Link):Void {
-        linkArray.remove(link);
-    }
-
-    public function removeComponent(component:Component):Void {
-        componentArray.remove(component);
-    }
-
-    public function setNewOirentation(component:Component, newOrientation:ORIENTATION):Void{
-        for (i in 0...componentArray.length) {
-            if (component == componentArray[i]) {
-                componentArray[i].set_orientation(newOrientation);
-                componentArray[i].updateMoveComponentPortPosition(componentArray[i].get_xPosition(),componentArray[i].get_yPosition());
-                linkArraySelfUpdate();
-                break;
-            }
-        }
+        updateBoundingBox() ;
     }
 
     public function deleteLink(link:Link):Void{
+        link.disconnectEndpoints() ;
         linkArray.remove(link);
+        updateBoundingBox() ;
     }
 
     public function deleteComponent(component:Component):Void{
+        component.disconnectAllPorts() ;
         componentArray.remove(component);
-        //delete port setted in the link
-        for(i in component.get_inportIterator()){
-            for(j in 0...linkArray.length){
-                if(i == linkArray[j].get_leftEndpoint().get_port()){
-                    linkArray[j].get_leftEndpoint().set_port(null);
-                }
+        updateBoundingBox() ;
 
-                if(i == linkArray[j].get_rightEndpoint().get_port()){
-                    linkArray[j].get_rightEndpoint().set_port(null);
-                }
-
-            }
-        }
-        //
-        for(i in component.get_outportIterator()){
-            for(j in 0...linkArray.length){
-                if(i == linkArray[j].get_leftEndpoint().get_port()){
-                    linkArray[j].get_leftEndpoint().set_port(null);
-                }
-
-                if(i == linkArray[j].get_rightEndpoint().get_port()){
-                    linkArray[j].get_rightEndpoint().set_port(null);
-                }
-
-            }
-        }
-    }
-
-    /**
-    * because component may update the port position, so the link should update all of the port connect to the component port
-    **/
-    function linkArraySelfUpdate():Void{
-        for(i in 0...linkArray.length){
-            linkArray[i].get_leftEndpoint().updatePosition();
-            linkArray[i].get_rightEndpoint().updatePosition();
-        }
     }
 
     public function componentSetName(component:Component, name:String):Void{
         // TODO.  It must be enforced that components of a circuit have unique names.
-        componentArray[componentArray.indexOf(component)].set_name(name);
+        component.set_name(name);
     }
 
     /**
@@ -308,7 +186,7 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
 
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
         var worldPointArray:Array<WorldPoint> = new Array<WorldPoint>();
-
+        
         for(i in componentArray){
             var tempWorldPointArray:Array<WorldPoint> = i.findWorldPoint(worldCoordinate, mode);
             for(j in tempWorldPointArray){
@@ -323,13 +201,5 @@ class CircuitDiagram extends Observer implements CircuitDiagramI{
             worldPointArray.push(new WorldPoint(this, worldCoordinate));
         }
         return worldPointArray;
-    }
-
-    public function isEmpty():Bool{
-        if(componentArray.length == 0 && linkArray.length == 0){
-            return true;
-        }else{
-            return false;
-        }
     }
 }

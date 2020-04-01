@@ -8,9 +8,9 @@ import js.html.Console;
 import js.html.Window;
 import haxe.Json;
 import model.component.CircuitDiagram;
-import model.drawingInterface.DrawingAdapter;
-import model.similitudeEvents.CanvasPanEvent;
+import view.DrawingAdapter;
 import model.similitudeEvents.SidebarDragAndDropEvent;
+import model.similitudeEvents.CanvasPanEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
 import view.viewModelRepresentatives.TabView;
@@ -166,7 +166,10 @@ class View
 	
 	public function updateCanvas() : Void {
 		Console.log('view.updateCanvas');
-		var drawingAdapter = new DrawingAdapter(Transform.identity(), this.activeTab.canvasElement.getContext2d());
+		var canvas = this.activeTab.canvasElement ;
+		var context = canvas.getContext2d() ;
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		var drawingAdapter = new DrawingAdapter(Transform.identity(), context);
 		this.activeTab.tabModel.draw(drawingAdapter);
 	}
 	

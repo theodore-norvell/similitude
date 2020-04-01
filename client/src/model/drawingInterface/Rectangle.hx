@@ -1,7 +1,8 @@
-package model.drawingInterface;
+package model.drawingInterface ;
+
 import type.Coordinate;
 
-class Rectangle implements RectangleI{
+class Rectangle {
     // Inv minCoordinate.xPosition < maxCoordinate.xPosition
     // Inv minCoordinate.yPosition < maxCoordinate.yPosition
     var minCoordinate:Coordinate;

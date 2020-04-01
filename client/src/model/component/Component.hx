@@ -3,8 +3,6 @@ package model.component;
 import model.selectionModel.SelectionModel;
 import model.attribute.Pair;
 import model.observe.Observable;
-//import js.html.CanvasRenderingContext2D;
-import type.LinkAndComponentAndEndpointAndPortArray;
 import type.HitObject;
 import model.enumeration.BOX;
 import model.enumeration.POINT_MODE;
@@ -33,20 +31,23 @@ import model.attribute.OrientationValue;
  * @author wanhui
  *
  */
-class Component extends Observable{
+
+class Component extends CircuitElement {
     var xPosition:Float;//the x position of the component
     var yPosition:Float;//the y position of the component
     var height:Float;//height
     var width:Float;//width
-    //var orientation:ORIENTATION;//the orientation of the component
+    // TODO: make sequenceNumber an attribute.
+    var sequenceNumber : Int ; // This should be -1 unless the component is an
+                            // input or an output. In that case, it represents
+                            // the component's position relative to other inputs
+                            // and outputs.
     var componentKind:ComponentKind;//the actual gate in this component
-    var inportArray:Array<Port> = new Array<Port>();//the inports for the component
-    var outportArray:Array<Port> = new Array<Port>();//the outports for the component
-    var inportsNum:Int;//init
-    //var nameOfTheComponentKind:String;//the actually name of this componentkind, like "AND", "OR"      if the component is a compound component, this value would be "CC"
+    // The ports that belong to this component.
+    var  ports : Array<Port> = new Array<Port>() ;
+    // TODO Make boxType an attribute for the kinds where it makes sense.
     var boxType:BOX;
     var list:Map<String,Pair>=new Map<String,Pair>();
-    var cd:CircuitDiagram;
     /**
     *   create component
      *   @param xPosition: x position
@@ -57,32 +58,22 @@ class Component extends Observable{
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
-        super();
+    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
+        super(circuitDiagram);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.height = height;
         this.width = width;
+        this.sequenceNumber = -1 ;
         this.componentKind = componentKind;
-        this.componentKind.set_component(this);
-        this.inportsNum = inportNum;
         this.boxType = BOX.WHITE_BOX;
 
         //this.delay = 0;//init is zero
 
         //initial ports
-        var portArray:Array<Port> = new Array<Port>();
-        portArray = this.componentKind.createPorts(xPosition, yPosition, width, height, orientation, inportNum);
-        for (o in 0...portArray.length) {
-            var port:Port = portArray[o];
-            if (port.get_portDescription() == IOTYPE.INPUT || port.get_portDescription() == IOTYPE.CLK || port.get_portDescription() == IOTYPE.D ||
-                port.get_portDescription() == IOTYPE.S) {
-                inportArray.push(port);
-            } else {
-                outportArray.push(port);
-            }
+        this.componentKind.createPorts( this, function ( port : Port ) { ports.push( port ) ; } ) ;
+        this.componentKind.updatePortPositions( this ) ;
 
-        }
         // TODO What is going on with this loop?  What about other attributes.
         for(n in componentKind.getAttr()){
             if(n.getName()=="delay"){
@@ -97,7 +88,7 @@ class Component extends Observable{
         }
         list.get("orientation").update(this,new OrientationValue(orientation));
     }
-
+    
     public function getmap(){
         return list;
     }
@@ -128,46 +119,57 @@ class Component extends Observable{
         Assert.assert(list.exists(s));
         if(list.exists(s)){
             if(list.get(s).canupdate(this,v)){
-                return list.get(s).update(this,v);
+                var success =  list.get(s).update(this,v);
+                if( success ) notifyObservers(this) ;
+                return success ;
             }
         }
         return false;
-    }
-
-    public function get_CircuitDiagram():CircuitDiagram{
-        return cd;
     }
 
     public function get_xPosition():Float {
         return xPosition;
     }
 
-    public function set_xPosition(value:Float) {
-        return this.xPosition = value;
+    public function set_xPosition(value:Float) : Void {
+        this.xPosition = value;
+        this.componentKind.updatePortPositions( this ) ;
+        notifyObservers(this) ;
     }
 
     public function get_yPosition():Float {
         return yPosition;
     }
 
-    public function set_yPosition(value:Float) {
-        return this.yPosition = value;
+    public function set_yPosition(value:Float) : Void {
+        this.yPosition = value;
+        this.componentKind.updatePortPositions( this ) ;
+        notifyObservers(this) ;
     }
+
+    override public function left() : Float {
+        return this.xPosition - this.width/2.0 ; }
+
+    override public function right() : Float {
+        return this.xPosition + this.width/2.0 ; }
+
+    override public function top() : Float {
+        return this.yPosition - this.height/2.0 ; }
+
+    override public function bottom() : Float {
+        return this.yPosition + this.height/2.0 ; }
 
     public function get_orientation():ORIENTATION {
         return list.get("orientation").getAttrValue().getvalue();
     }
 
-    public function set_orientation(value:ORIENTATION) {
-        list.get("orientation").update(this,new OrientationValue(value));
+    public function set_orientation(value:ORIENTATION) : Void {
+        update("orientation",new OrientationValue(value));
+        this.componentKind.updatePortPositions( this ) ;
     }
 
     public function get_componentKind():ComponentKind {
         return componentKind;
-    }
-
-    public function set_componentKind(value:ComponentKind) {
-        return this.componentKind = value;
     }
 
     public function get_boxType():BOX {
@@ -176,21 +178,15 @@ class Component extends Observable{
 
     public function set_boxType(value:BOX) {
         this.boxType = value;
+        notifyObservers(this) ;
     }
 
-    public function get_inportIterator():Iterator<Port> {
-        return inportArray.iterator();
-    }
-    public function get_inportIteratorLength():Int {
-        return inportArray.length;
+    public function get_ports():Iterator<Port> {
+        return ports.iterator();
     }
 
-    public function get_outportIteratorLength():Int {
-        return outportArray.length;
-    }
-
-    public function get_outportIterator():Iterator<Port> {
-        return outportArray.iterator();
+    public function get_portCount() : Int {
+        return ports.length ;
     }
 
     public function get_name():String {
@@ -198,7 +194,7 @@ class Component extends Observable{
     }
 
     public function set_name(value:String) {
-        list.get("name").update(this,new StringValue(value));
+        update("name",new StringValue(value));
     }
 
     public function get_height():Float {
@@ -207,6 +203,7 @@ class Component extends Observable{
 
     public function set_height(value:Float) {
         return this.height = value;
+        notifyObservers(this) ;
     }
 
     public function get_width():Float {
@@ -215,103 +212,43 @@ class Component extends Observable{
 
     public function set_width(value:Float) {
         return this.width = value;
+        notifyObservers(this) ;
     }
 
-    public function get_inportsNum():Int {
-        return inportsNum;
-    }
-    public function setNameOfTheComponentKind(name:String){
-        //this.nameOfTheComponentKind = name;
-    }
-    public function getNameOfTheComponentKind():String{
+    public function getNameOfTheComponentKind() : String{
         return this.componentKind.getname();
     }
 
-    public function removeInport(inport:Inport):Bool {
-        return inportArray.remove(inport);
-    }
-    public function updateMoveComponentPortPosition(xPosition:Float, yPosition:Float):Component{
-        inportArray = componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        outportArray = componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-        return this;
-    }
+    
 
-    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ){
-        // This whole IF statement looks like complete crap to me.  What does this have to do with drawing?
-        if(componentKind.checkInnerCircuitDiagramPortsChange()){
-            for(i in componentKind.getInnerCircuitDiagram().get_componentIterator()){
-                var inputFlag:Bool = false;
-                var outputFlag:Bool = false;
-                for(j in inportArray){
-                    if(i.getNameOfTheComponentKind() == "Input"){
-                        if(i.get_componentKind().get_sequence() == j.get_sequence()){
-                            inputFlag = true;
-                        }
-                    }
-                }
-
-                for(j in outportArray){
-                    if(i.getNameOfTheComponentKind() == "Output"){
-                        if(i.get_componentKind().get_sequence() == j.get_sequence()){
-                            outputFlag = true;
-                        }
-                    }
-                }
-
-                if(!inputFlag && !outputFlag){
-                    if(i.getNameOfTheComponentKind() == "Input"){
-                        var port:Port = componentKind.addInPort();
-                        port.set_sequence(i.get_componentKind().get_sequence());
-                        inportArray.push(port);
-                    }else{
-                        var port:Port = componentKind.addOutPort();
-                        port.set_sequence(i.get_componentKind().get_sequence());
-                        outportArray.push(port);
-                    }
-                }
-            }
-
-            for(i in inportArray){
-                var flag_delete:Bool = true;
-                for(j in componentKind.getInnerCircuitDiagram().get_componentIterator()){
-                    if(i.get_sequence() == j.get_componentKind().get_sequence() && j.getNameOfTheComponentKind() == "Input"){
-                        flag_delete = false;
-                    }
-                }
-
-                if(flag_delete){
-                    inportArray.remove(i);
-                }
-            }
-
-            for(i in outportArray){
-                var flag_delete:Bool = true;
-                for(j in componentKind.getInnerCircuitDiagram().get_componentIterator()){
-                    if(i.get_sequence() == j.get_componentKind().get_sequence() && j.getNameOfTheComponentKind() == "Output"){
-                        flag_delete = false;
-                    }
-                }
-
-                if(flag_delete){
-                    outportArray.remove(i);
-                }
-            }
-
-            componentKind.updateInPortPosition(inportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
-            componentKind.updateOutPortPosition(outportArray, xPosition, yPosition, height, width, list.get("orientation").getAttrValue().getvalue());
+    public function disconnectAllPorts() {
+        for( port in ports ) {
+            port.disconnect() ;
         }
-        if(this.componentKind.getname()!= "CC"){
-            componentKind.drawComponent(drawingAdpater, highLight, selection );
-        }else{
-            componentKind.drawComponent(drawingAdpater, highLight, selection );
-        }
+    }
+
+    public function drawComponent(drawingAdpater:DrawingAdapterI, highLight:Bool, selection : SelectionModel ) {
+        componentKind.drawComponent(this, drawingAdpater, highLight, selection );
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
-        return componentKind.findHitList(coordinate, mode);
+        return componentKind.findHitList(this, coordinate, mode);
     }
 
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
-        return componentKind.findWorldPoint(coordinate, mode);
+        return componentKind.findWorldPoint(this, coordinate, mode);
+    }
+
+    public function getInnerCircuitDiagram() {
+        return this.componentKind.getInnerCircuitDiagram() ;
+    }
+
+    public function set_sequence(n:Int) : Void {
+        this.sequenceNumber = n ;
+        notifyObservers(this) ;
+    }
+
+    public function get_sequence() : Int {
+        return this.sequenceNumber ;
     }
 }
