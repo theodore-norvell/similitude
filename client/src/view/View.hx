@@ -5,6 +5,7 @@ import controller.listenerInterfaces.SidebarListener;
 import js.Browser.document;
 import js.html.CanvasElement;
 import js.html.Console;
+import js.html.Window;
 import haxe.Json;
 import model.component.CircuitDiagram;
 import view.DrawingAdapter;
@@ -48,6 +49,65 @@ class View
             // do something
 			Console.log("redo was clicked");
 			this.canvasListener.redoLastCanvasChange();
+        });
+		
+		document.querySelector("#Up").addEventListener('click', function (event) {
+            // do something
+			Console.log("Up was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveXNegative(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.yPan = -10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Down").addEventListener('click', function (event) {
+            // do something
+			Console.log("Down was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveYPositive(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.yPan = 10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Left").addEventListener('click', function (event) {
+            // do something
+			Console.log("Left was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveXNegative(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.xPan = -10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Right").addEventListener('click', function (event) {
+            // do something
+			Console.log("Right was clicked");
+			// change the pan in the tabModel
+			this.activeTab.tabModel.canvasPan.moveXPositive(10);
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.xPan = 10;
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
+        });
+		
+		document.querySelector("#Centre").addEventListener('click', function (event) {
+            // do something
+			Console.log("Centre was clicked");
+			// create a new canvas event
+			var canvasPanEvent = new CanvasPanEvent();
+			canvasPanEvent.xPan = this.activeTab.tabModel.canvasPan.centreX();
+			canvasPanEvent.yPan = this.activeTab.tabModel.canvasPan.centreY();
+			// update the canvas through the controller
+			this.canvasListener.panCanvas(canvasPanEvent);
         });
 		
 		// for testing the flow of the click event
@@ -124,9 +184,15 @@ class View
 		var innerCanvas = document.createCanvasElement();
 		// innerCanvas.id = "canvasToDraw"; // deal with this to get better and unique IDs, IF NEED BE
 		canvasDisplayScreen.appendChild(innerCanvas);
+		//innerCanvas.style.width = "100%";
+		//innerCanvas.style.height = "100%";
+		var cs = document.defaultView.getComputedStyle(canvasDisplayScreen);
+		
 		innerCanvas.style.width = "100%";
 		innerCanvas.style.height = "100%";
-		innerCanvas.style.border = "solid 1px";
+		innerCanvas.style.border = "solid 1px black";
+		innerCanvas.width = Std.parseInt(cs.getPropertyValue('width'));
+		innerCanvas.height = Std.parseInt(cs.getPropertyValue('height'));
 		
 		// needs this event by default for the drop target.
 		canvasDisplayScreen.addEventListener('dragover', function (event) {
@@ -152,8 +218,8 @@ class View
 			// in element co-ordinates
 			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
 			trace(eventPassed);
-			eventPassed.draggedToX = event.layerX;
-			eventPassed.draggedToY = event.layerY;
+			eventPassed.draggedToX = event.layerX-80;
+			eventPassed.draggedToY = event.layerY-50;
 			//eventPassed.draggedToX = event.pageX;
 			//eventPassed.draggedToY = event.pageY;
 			this.updateCanvasListener(eventPassed);

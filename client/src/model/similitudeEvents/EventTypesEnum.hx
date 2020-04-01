@@ -8,4 +8,5 @@ package model.similitudeEvents;
 enum EventTypesEnum 
 {
 	SIDEBAR_DRAG_N_DROP;
+	CANVAS_PAN;
 }
