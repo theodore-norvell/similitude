@@ -1,4 +1,4 @@
-package model.selectionModel;
+package model.tabModel;
 
 /**
  * This object is supposed to be passed in TabModel so that it can be linked to a respective canvas.

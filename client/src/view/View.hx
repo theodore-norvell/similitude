@@ -10,7 +10,6 @@ import haxe.Json;
 import model.component.CircuitDiagram;
 import view.DrawingAdapter;
 import model.similitudeEvents.SidebarDragAndDropEvent;
-import model.similitudeEvents.CanvasPanEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
 import view.viewModelRepresentatives.TabView;
@@ -55,60 +54,31 @@ class View
 		document.querySelector("#Up").addEventListener('click', function (event) {
             // do something
 			Console.log("Up was clicked");
-			// change the pan in the tabModel
-			this.activeTab.tabModel.canvasPan.moveXNegative(10);
-			// create a new canvas event
-			var canvasPanEvent = new CanvasPanEvent();
-			canvasPanEvent.yPan = -10;
-			// update the canvas through the controller
-			this.canvasListener.panCanvas(canvasPanEvent);
+			this.activeTab.panCanvasUp();
         });
 		
 		document.querySelector("#Down").addEventListener('click', function (event) {
             // do something
 			Console.log("Down was clicked");
-			// change the pan in the tabModel
-			this.activeTab.tabModel.canvasPan.moveYPositive(10);
-			// create a new canvas event
-			var canvasPanEvent = new CanvasPanEvent();
-			canvasPanEvent.yPan = 10;
-			// update the canvas through the controller
-			this.canvasListener.panCanvas(canvasPanEvent);
+			this.activeTab.panCanvasDown();
         });
 		
 		document.querySelector("#Left").addEventListener('click', function (event) {
             // do something
 			Console.log("Left was clicked");
-			// change the pan in the tabModel
-			this.activeTab.tabModel.canvasPan.moveXNegative(10);
-			// create a new canvas event
-			var canvasPanEvent = new CanvasPanEvent();
-			canvasPanEvent.xPan = -10;
-			// update the canvas through the controller
-			this.canvasListener.panCanvas(canvasPanEvent);
+			this.activeTab.panCanvasLeft();
         });
 		
 		document.querySelector("#Right").addEventListener('click', function (event) {
             // do something
 			Console.log("Right was clicked");
-			// change the pan in the tabModel
-			this.activeTab.tabModel.canvasPan.moveXPositive(10);
-			// create a new canvas event
-			var canvasPanEvent = new CanvasPanEvent();
-			canvasPanEvent.xPan = 10;
-			// update the canvas through the controller
-			this.canvasListener.panCanvas(canvasPanEvent);
+			this.activeTab.panCanvasRight();
         });
 		
 		document.querySelector("#Centre").addEventListener('click', function (event) {
             // do something
 			Console.log("Centre was clicked");
-			// create a new canvas event
-			var canvasPanEvent = new CanvasPanEvent();
-			canvasPanEvent.xPan = this.activeTab.tabModel.canvasPan.centreX();
-			canvasPanEvent.yPan = this.activeTab.tabModel.canvasPan.centreY();
-			// update the canvas through the controller
-			this.canvasListener.panCanvas(canvasPanEvent);
+			this.activeTab.panCanvasCentre();
         });
 		
 		// for testing the flow of the click event
@@ -150,11 +120,7 @@ class View
 		var updateThis= document.querySelector("#updateThis");
 		updateThis.innerText = updateString;
 	}
-	
-	public function updateSidebarOptions(){
-		Console.log("updateSidebarOptions has been called");
-	}
-	
+
 	/**
 	 * A common function that accepts JSON / Dynamic objects to update the Canvas
 	 * @param	eventObject
@@ -164,13 +130,12 @@ class View
 		this.canvasListener.addComponentToCanvas(eventObject);
 	}
 	
+	/**
+	 * This serves a function for the controller to hit as they cannot reach out top the tabView directly
+	 */
 	public function updateCanvas() : Void {
 		Console.log('view.updateCanvas');
-		var canvas = this.activeTab.canvasElement ;
-		var context = canvas.getContext2d() ;
-		context.clearRect(0, 0, canvas.width, canvas.height);
-		var drawingAdapter = new DrawingAdapter(Transform.identity(), context);
-		this.activeTab.tabModel.draw(drawingAdapter);
+		this.activeTab.update();
 	}
 	
 	public function setActiveTab(){
@@ -185,8 +150,6 @@ class View
 		var innerCanvas = document.createCanvasElement();
 		// innerCanvas.id = "canvasToDraw"; // deal with this to get better and unique IDs, IF NEED BE
 		canvasDisplayScreen.appendChild(innerCanvas);
-		//innerCanvas.style.width = "100%";
-		//innerCanvas.style.height = "100%";
 		var cs = document.defaultView.getComputedStyle(canvasDisplayScreen);
 		
 		innerCanvas.style.width = "100%";
@@ -206,17 +169,6 @@ class View
 		canvasDisplayScreen.addEventListener('drop', function (event) {
 			event.preventDefault();
 			var data = event.dataTransfer.getData("text/plain");
-			
-			// use this for co-ordinates of the mouse pointers on the current ancestor element
-			//Console.log("co-ordinates ::", event.layerX, event.layerY);
-			// here make a function to draw on the canvas
-			// presumably move this entire block to the canvasUpdate
-			// use a command through the command manager here
-			//Console.log(event);
-			//trace(event);
-			//Console.log(Unserializer.run(data));
-			//var eventPassed = Json.parse(data);
-			// in element co-ordinates
 			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
 			trace(eventPassed);
 			eventPassed.draggedToX = event.layerX-80;
@@ -224,7 +176,6 @@ class View
 			//eventPassed.draggedToX = event.pageX;
 			//eventPassed.draggedToY = event.pageY;
 			this.updateCanvasListener(eventPassed);
-			//this.canvasListener.update(data);
 		});
 		
 		return innerCanvas;

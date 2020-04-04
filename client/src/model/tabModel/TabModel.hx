@@ -1,6 +1,5 @@
 package model.tabModel;
 import model.drawingInterface.DrawingAdapterI;
-	import model.selectionModel.CanvasPan;
 //import js.html.CanvasRenderingContext2D;
 import model.component.CircuitDiagramI;
 import model.component.Component;
@@ -23,7 +22,6 @@ class TabModel
 {
 	var selectionModel: SelectionModel;
 	var circuitDiagram: CircuitDiagramI;
-	public var canvasPan: CanvasPan = new CanvasPan();
 	// create this field using  the JS document and then set it using the set functionality in this class.
 	
 	

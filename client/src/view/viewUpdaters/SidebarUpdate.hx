@@ -47,8 +47,6 @@ class SidebarUpdate extends AbstractUpdate
 		sidebarItem.draggable = true; // need to set true for dragging.
 		sidebarItem.addEventListener('drag', function (event) {
             // do something
-			//Console.log("A sidebar item is being dragged");
-			//Console.log(event);
         });
 		
 		// also set the dragStart event to send data through the drag and drop
@@ -58,8 +56,6 @@ class SidebarUpdate extends AbstractUpdate
 			dndEvent.eventTypes = EventTypesEnum.SIDEBAR_DRAG_N_DROP;
 			dndEvent.component = drawComponentString;
 			var draggedItemEvent = dndEvent;
-			//var draggedItemEvent = {eventType:"sidebarDrag" , from: "sidebar" , to: "canvas", component: Std.string(drawComponentString)};
-			//var stringEvent = Json.stringify(draggedItemEvent);
 			var stringEvent = Serializer.run(draggedItemEvent);
 			trace(stringEvent);
 			event.dataTransfer.setData("text/plain", stringEvent);
@@ -102,8 +98,6 @@ class SidebarUpdate extends AbstractUpdate
 			td.appendChild(this.createSidebarItemElement(defaultItem));
 			tableBody.appendChild(tr);
 		}
-		
-		this.viewToUpdate.updateSidebarOptions();
 	}
 	
 	public override function updateView(string: String){

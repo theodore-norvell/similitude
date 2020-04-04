@@ -1,5 +1,4 @@
 package controller.listenerInterfaces;
-import model.similitudeEvents.CanvasPanEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 
 /**
@@ -15,5 +14,4 @@ interface CanvasListener extends ViewListener
 	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void;
 	public function undoLastCanvasChange() : Void;
 	public function redoLastCanvasChange() : Void;
-	public function panCanvas(canvasPanEvent: CanvasPanEvent) : Void;
 }
