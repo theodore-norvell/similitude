@@ -156,6 +156,15 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
     public function draw( drawingAdapter:DrawingAdapterI,
                           selection :SelectionModel)
     : Void{
+
+        // The following is just for debugging.
+        var centre = get_centre() ;
+        var width = get_diagramWidth() - margin ;
+        var height = get_diagramHeight() - margin ;
+        drawingAdapter.setStrokeColor( "lightgray" ) ;
+        drawingAdapter.setFillColor( "white" ) ;
+        drawingAdapter.drawRect( centre.get_xPosition(), centre.get_yPosition(), width, height ) ;
+
         //update component array
         for(i in componentArray){
             var highlight = selection.containsComponent( i ) ;
@@ -167,11 +176,6 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
             i.drawLink(drawingAdapter, highlight);
         }
 
-        // The following is just for debugging.
-        drawingAdapter.setStrokeColor( "red" ) ;
-        drawingAdapter.drawLine(get_xMin()+margin/2, get_yMin()+margin/2, get_xMax()-margin/2, get_yMax()-margin/2 ) ;
-        drawingAdapter.setStrokeColor( "blue" ) ;
-        drawingAdapter.drawLine(get_xMin()+margin/2, get_yMax()-margin/2, get_xMax()-margin/2, get_yMin()+margin/2 ) ;
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
