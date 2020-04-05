@@ -6,9 +6,16 @@ import type.Coordinate;
 /**
 * Represent an affine transformation between two coordinate systems
 *  and its inverse transformation.
+* Generally the forward transform (convert) tranforms a world point to a view point,
+* while the inverse transform (invert) transforms a view point to a world point.
 **/
 class Transform {
-    /* The two arrays are each 9 long and represent inverse matrices */
+    /** The two arrays are each 9 long and represent inverse matrices
+    * Each matrix is represented by a 1 d array thus
+    *    [ 0 1 2 ]        [m(0,0), m(0,1), m(0,2), m(1,0), m(1,1), m(1,2), m(1,0), m(2,1), m(1,2)]
+    *    [ 3 4 5 ]
+    *    [ 6 7 8 ]
+    */
     var convertMatrix:Array<Float> ;
     var invertMatrix: Array<Float> ;
 
@@ -31,7 +38,6 @@ class Transform {
         [0 0 1]   [1  ]
     **/
     public function pointConvert ( c : Coordinate ) : Coordinate {
-
         return new Coordinate(convertMatrix[0]*c.get_xPosition() + convertMatrix[1]*c.get_yPosition() + convertMatrix[2],
                                 convertMatrix[3]*c.get_xPosition() + convertMatrix[4]*c.get_yPosition() + convertMatrix[5]);
     }
@@ -116,7 +122,7 @@ class Transform {
     * only support (n*n matrix) * (n*n matrix)
     **/
     public function multiply(matrix1 : Array<Float>, matrix2:Array<Float>):Array<Float>{
-        var n:Int = cast Math.sqrt(matrix1.length);
+        var n:Int = 3 ;
         var tempArray:Array<Float> = new Array<Float>();
         //initialize the matrix
         for(i in 0...n){

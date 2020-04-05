@@ -43,28 +43,38 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
     }
 
     public function updateBoundingBox():Void {
-        xMin = 0;
-        yMin = 0;
-        xMax = 0;
-        yMax = 0;
+        xMin = Math.POSITIVE_INFINITY ;
+        yMin =  Math.POSITIVE_INFINITY ;
+        xMax = Math.NEGATIVE_INFINITY ;
+        yMax = Math.NEGATIVE_INFINITY ;
 
         for(i in componentArray){
             xMin = Math.min( xMin, i.left() ) ;
             xMax = Math.max( xMax, i.right() ) ;
             yMin = Math.min( yMin, i.top() ) ;
-            yMax = Math.min( yMax, i.bottom() ) ;
+            yMax = Math.max( yMax, i.bottom() ) ;
         }
 
         for(i in linkArray){
             xMin = Math.min( xMin, i.left() ) ;
             xMax = Math.max( xMax, i.right() ) ;
             yMin = Math.min( yMin, i.top() ) ;
-            yMax = Math.min( yMax, i.bottom() ) ;
+            yMax = Math.max( yMax, i.bottom() ) ;
         }
+
+        if( xMin == Math.POSITIVE_INFINITY ) xMin = 0 ;
+        if( yMin == Math.POSITIVE_INFINITY ) yMin = 0 ;
+        if( yMax == Math.NEGATIVE_INFINITY ) yMax = 0 ;
+        if( yMax == Math.NEGATIVE_INFINITY ) yMax = 0 ;
+        
+        if( xMin >= xMax ) xMax = xMin + 1 ;
+        if( yMin >= yMax ) yMax = yMin + 1 ;
+
         xMin = xMin - margin / 2 ;
         yMin = yMin - margin / 2 ;
         xMax = xMax + margin / 2 ;
         yMax = yMax + margin / 2 ;
+
         centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
         observable.notifyObservers(this) ;
     }
@@ -146,6 +156,15 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
     public function draw( drawingAdapter:DrawingAdapterI,
                           selection :SelectionModel)
     : Void{
+
+        // The following is just for debugging.
+        var centre = get_centre() ;
+        var width = get_diagramWidth() - margin ;
+        var height = get_diagramHeight() - margin ;
+        drawingAdapter.setStrokeColor( "lightgray" ) ;
+        drawingAdapter.setFillColor( "white" ) ;
+        drawingAdapter.drawRect( centre.get_xPosition(), centre.get_yPosition(), width, height ) ;
+
         //update component array
         for(i in componentArray){
             var highlight = selection.containsComponent( i ) ;
@@ -156,6 +175,7 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
             var highlight = selection.containsLink( i ) ;
             i.drawLink(drawingAdapter, highlight);
         }
+
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{

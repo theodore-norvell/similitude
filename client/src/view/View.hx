@@ -1,5 +1,6 @@
 package view;
 
+import type.Coordinate;
 import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
 import js.Browser.document;
@@ -145,6 +146,7 @@ class View
 	}
 	
 	public function spawnNewCanvas() : CanvasElement {
+		// TODO.  It seems to me (TSN) that this routine should be moved to the TabView class.
 		var canvasDisplayScreen = document.querySelector("#displayScreen");
 		
 		var innerCanvas = document.createCanvasElement();
@@ -170,9 +172,12 @@ class View
 			event.preventDefault();
 			var data = event.dataTransfer.getData("text/plain");
 			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
+			var viewCoord = new Coordinate( event.layerX-80, event.layerY-50) ;
+			// TODO: Where does this magic numbers of 80 and 50 come from?
+			var worldCoords = activeTab.viewToWorld( viewCoord ) ;
+			eventPassed.draggedToX = worldCoords.get_xPosition() ;
+			eventPassed.draggedToY = worldCoords.get_yPosition() ;
 			trace(eventPassed);
-			eventPassed.draggedToX = event.layerX-80;
-			eventPassed.draggedToY = event.layerY-50;
 			//eventPassed.draggedToX = event.pageX;
 			//eventPassed.draggedToY = event.pageY;
 			this.updateCanvasListener(eventPassed);

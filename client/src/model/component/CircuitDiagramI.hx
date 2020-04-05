@@ -13,6 +13,7 @@ import model.enumeration.ORIENTATION;
 * interface for CicuitDiagram
 **/
 interface CircuitDiagramI {
+
     /**
     * @:getter component array from the circuit diagram
      * @return the iterator
