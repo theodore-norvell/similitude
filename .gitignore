@@ -13,3 +13,6 @@ server/.idea
 .idea
 test.js
 *.code-workspace
+similitudeClient.js
+ClassDiagram.vux
+*.orig

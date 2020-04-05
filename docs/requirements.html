@@ -97,9 +97,13 @@
   <dt>Bidirectional Port</dt>
   <dd>A Port used for both input and output. Bidirectional ports might be represented by small diamonds with black stroke and white fill.</dd>
   <dt>Links</dt>
-  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  circles (black input and black fill), unless the endpoint is connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
-  <dt>Connected</dt>
-  <dd>A Link is directly Connected to a&nbsp;port if one of its end points&nbsp;has the same World Coordiates as the port.&nbsp; Two different Links are directly Connected to each other if they they have end points at the same World Coordinates if one has an end point that is on the line formed by the other.&nbsp; Two ports, two links, or a port and a link are Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.&nbsp; Also every Port and Link is Connected to itself. The&nbsp;relation of being connected is thus transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
+  <dd>A link&nbsp;is a wire with two endpoints. The endpoints should be shown as small  squares or circles, unless the endpoint is Directly Connected to a port. The Link itself is shown as a straight  line.&nbsp; The colour of the Link and its endpoints is by default black. If there is an active Simulation the colour may be determined by the state of the Simulation. Also when the mouse hovers over an endpoint, it might be good to show it in a different colour.</dd>
+  <dt>Directly Connected</dt>
+  <dd>Two endpoints or an endpoint and a port may be Directly Connected. (Two ports may not be directly connected.) This is equivalence relation, i.e., it is transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a). If two endpoints or an endpoint and a link are Directly Connected, then they will have the same location. Usually the converse is also true too. Ports can not be Directly Connected to other Ports. (Although, there could be exceptions. E.g. when we move an endpoint that is connected to a port, we would first disconnect it from the port and so for a short time, they have the same location, but are not directly connected.)</dd>
+  <dt>Connection</dt>
+  <dd>A&nbsp;Connection is an equivalence class of endpoints and ports that are Directly Connected. Each Connection has at least&nbsp;one port or endpoitn in it. No connection has more than one port in it. Each connection has a location. So moving one thing in the Connection will move everything in the Connection.</dd>
+  <dt>Indirectly Connected</dt>
+  <dd>Two ports, two links, or a port and a link are Indirectly Connected to each other if they are either Directly Connected or connected by 1 or more intermediary links.  Also every Port and Link is Indirectly Connected to itself. This is equivalence relation, i.e., it is transitive (if a~b and b~c then a~c), symmetric (if a~b then b~a), and reflexive (a~a).</dd>
   <dt>Net</dt>
   <dd>A maximal set of Ports and Links that are all connected to each other is called a Net.&nbsp; Note that each Port and Link is a member of exactly one Net. (Implementation note:&nbsp; There is no need to represent Nets explicitely. However, it will be useful for simulation if we can calculate the Net of a Port or Link.</dd>
   <dt>World coordinates</dt>
@@ -132,7 +136,121 @@
 <p>During simulation, the bottom part of the main screen contains the simulation panel.</p>
 <h3>Selection model</h3>
 <p>At each point in time a set of components and links on each  diagram are considered selected. Selected components are displayed in a distinctive colour. Selected components may belong to diagrams that are inside of compound components, so it is possible that not all selected components and links belong to the same diagram.</p>
+<h3>Normalization</h3>
+<p>Normallization&nbsp;is a process of tidying up a cicuit diagram so that the way it is matches the way it looks. Generally normalization is done at the end of each user interaction that might change the diagram. A diagram might become denormailzed in the middle of an interaction, but at the end, it should be normal again. A normal diagram has the following properties.</p>
+<ul>
+  <li>Any two distinct connections that are close to each other, both contain a port.</li>
+  <li>Any two disctinct connections that are close to each other (and therefor both contain ports) must be connected by a link.</li>
+  <li>No connection is  close to a link unless it includes an endpoint of that link.</li>
+  <li>No link has two endpoints that are directly connected to each other.</li>
+  <li>No two links connect the same pair of connections.</li>
+</ul>
+<p>A normalization process changes the diagram until it is normal. Here is a possible normalization process:</p>
+<ol>
+  <li>For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
+    <ol>
+      <li>if and both&nbsp;contain a port,
+        <ol>
+          <li>create a link to connect them</li>
+        </ol>
+      </li>
+      <li>else one or both don't contain a port
+        <ol>
+          <li>if c0 contains a port, swap c0 and c1</li>
+          <li>move everything in c0 to c1</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>For all connections c and for all links x not connected to c
+    <ol>
+      <li>If c is not close to either endpoint of x, but is close to x
+        <ol>
+          <li>Split x into two links each with an endpoint added to c</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>For all links x
+    <ol>
+      <li>If both endpoints are in the same connection, 
+        <ol>
+          <li>Mark x for deletion</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>Delete all marked links</li>
+  <li>For all remaining links x
+    <ol>
+      <li>If x is not marked for deletion
+        <ol>
+          <li>For all links y connected to x.endpoint(0) other than x
+            <ol>
+              <li>If the other end of y connects to x.endpoint(0)
+                <ol>
+                  <li>Mark y for deletion</li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </li>
+  <li>Delete all marked links</li>
+</ol>
+<p>Prenormalization: As a visual aid, when some elements of the diagram are in motion, we could highlight any connections that will be affected by normalization.&nbsp; That is any connection that is</p>
+<ul>
+  <li>near a link it is not connected to or</li>
+  <li>near another connection when either
+    <ul>
+      <li>both connections contain&nbsp;a port, but there is no link between the connections,</li>
+      <li>or one of the connections does not contain a port.</li>
+    </ul>
+  </li>
+</ul>
+<p>Examples:</p>
+<ul>
+  <li>We move a component so that one of its ports is sufficiently close to the endpoint of a link. If the diagram is then normalized, the port and the link become connected.  </li>
+  <blockquote>
+    <p>Before:&nbsp; &nbsp;{x0}-------x-------{x1}{p}</p>
+    <p>After:&nbsp; &nbsp; &nbsp;{x0}-------x---------{x1, p}</p>
+  </blockquote>
+  <li>We move a component so that one of its ports is sufficiently close to the port of another component.&nbsp;If the diagram is then normalized, a link should appear connecting those ports (if they were not already connected.  </li>
+</ul>
+<ul>
+  <blockquote>
+    <p>Before: {p}&nbsp; &nbsp; {q}</p>
+    <p>After:&nbsp; &nbsp;{p,x0}--x--{x1,q}</p>
+  </blockquote>
+  <li>Suppose link x has endpoints x0 and x1,  link y has endpoints y0 and y1,  that x1 and y0 are directly connected to each other (only) and that y1 is directly connected to a port p (only). Suppose the {x1, y0} connection is moved  close to {y1, p} connection. On normalization the two connections should be merged, to create a connection {x1,y0,y1,p}. Then the y edge should be deleted.  </li>
+</ul>
+<ul>
+  <blockquote>
+    <p>Before {x0}-------x--------{x1,y0}---y---{y1,p}</p>
+    <p>After:&nbsp; {x0}-------x------------------------{x1,p}</p>
+  </blockquote>
+  <li>Suppose that p is a port and link&nbsp;y has endpoints y0 and y1.&nbsp; p is moved to be on the line between y0 and y1 (but not close to either endpoint). Then upon normalization the following could happen: First a new link z is created: z0 is connected to p, z0 is connected to y1. Second y1 is moved to connect to p. </li>
+</ul>
+<ul>
+  <blockquote>
+    <p>Before:&nbsp; {y0, a, b, c} ----------------y------------{y1, d, e, f}</p>
+    <p>After:&nbsp;&nbsp;&nbsp; {y0, a, b, c}-----y----{y1,p,z0}----z----{z1, d, e, f} </p>
+  </blockquote>
+</ul>
+<ul>
+  <li>Suppose that link x has&nbsp;endpoints x0 and x1 and link&nbsp;y has endpoints y0 and y1.&nbsp; x1 is moved to be on the line between y0 and y1 (but not close to either endpoint). Then upon normalization the following could happen: First a new link z is created: z0 is connected to x1, z0 is connected to y1. Second y1 is moved to connect to x1.
+  </li>
+</ul>
+<ul>
+  <blockquote>
+    <p>Before:&nbsp; {y0, a, b, c} ----------------y------------{y1, d, e, f}</p>
+    <p>After:&nbsp;&nbsp;&nbsp; {y0, a, b, c}-----y----{y1,x1,z0}----z----{z1, d, e, f}  </p>
+  </blockquote>
+</ul>
 <h3>Use cases for editing</h3>
+<h4>&nbsp;</h4>
 <h4>Login by clicking login button</h4>
 <p>Requirements: Login in as client</p>
 <p>Actors: The user and the client</p>
@@ -195,7 +313,7 @@
   <li>Client: As long as the mouse is over the palette or drawing canvas, as preview of the component is shown.</li>
   <li>User: Releases the mouse over the drawing canvas.</li>
   <li>Optionally,&nbsp;the user is asked to fill in values of any properties that are required by the kind, but that don't have default values. In particular, if the circuit is a compound circuit, the user must choose the Circuit Diagram associated with the component.</li>
-  <li>Client: Adds the component to the diagram.</li>
+  <li>Client: Adds the component to the diagram&nbsp;and then normalizes the diagram.</li>
   <li>Client: The newly added component becomes the selected component.</li>
 </ol>
 <p>Notes:</p>
@@ -215,19 +333,15 @@
 <ol>
   <li>User: Depresses mouse button at a place <em>x</em> somewhere on the diagram such that it does not hit a&nbsp;selected component or link.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>If&nbsp;<em>x</em>, is on or sufficiently close to&nbsp;a component.
-    <ol>
-      <li>A  link is added starting from the position of closest port on the component&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
-    </ol>
-  </li>
-  <li>Otherwise
-    <ol>
-      <li>A link is added starting from place <em>x</em> (converted into world coordinates)&nbsp;and ending at the mouse's current position (converted into world coordinates).</li>
-    </ol>
+  <li>Client 
+    <ul>
+      <li>Creates a link&nbsp; ywith disconnected endpoints y0 and y1, with y0 and place x (converted into world coordinates)&nbsp;and y1 at the mouse's new position (converted into world coordinates). </li>
+    </ul>
   </li>
   <li>User continues to move the mouse.</li>
-  <li>Client: As the mouse moves, the ending endpoint of the link is updated.</li>
-  <li>Client releases the mouse or the mouse moves to where it can no longer be converted to a suitable world coordinate.</li>
+  <li>Client: As the mouse moves, the position of y1 continues to be updated.</li>
+  <li>User: releases the mouse or the mouse moves off the canvas</li>
+  <li>Client: Normalizes the diagram.</li>
 </ol>
 <p>Notes:</p>
 <ul>
@@ -235,6 +349,7 @@
   <li>If <em>x</em> hits a selected component or link, then the use case for moves applies.</li>
   <li>If the original point <em>x</em> is within a compound component <em>c</em>&nbsp;(not in the current selection) and the compound component is has a white-box view, then there is an ambiguity as to whether the link should be added to the outer circuit (the circuit that the component is a part of, or the inner circuit (the circuit the component contains). The best way to decide is probably based on whether <em>x</em> is close to the edge&nbsp;of <em>c</em>. </li>
 </ul>
+
 <h4>Add to the selection or clear the selection.</h4>
 <p>Requirements: None</p>
 <p>Actors: The user and the client</p>
@@ -243,18 +358,25 @@
 <p>Basic Flow</p>
 <ol>
   <li>User: Clicks on the canvas</li>
-  <li>If the click is on a component or link which is not in the current selection, that component or link is unioned to the set of selected objects.</li>
-  <li>If the click is on a component or link which is in the current selection, that component or link is removed from the current selection.</li>
-  <li>Otherwise the set of selected objects becomes empty.  </li>
+  <li>Client: 
+    <ul>
+      <li>If the click is on&nbsp;one or more links, let X be that set of links.</li>
+      <li>Otherwise, if the click is on a component, let X be the set of just that component.</li>
+      <li>Otherwise, let X be empty.</li>
+      <li>If any thing in X is not in the currect selection, then everything in X is added to the current selection.</li>
+      <li>Otherwise, if X is not empty, everything in X is removed from the current selection.</li>
+      <li>Otherwise, the current selection is cleared.</li>
+    </ul>
+  </li>
 </ol>
 <p>Notes:</p>
 <ul>
   <li>On a touch device, touch events can be used.</li>
   <li>Disambiguating a mouse down should be done as follows: Links, then components.</li>
-  <li>If the mouse hits a component inside a compound component (in whitebox view), the inner component is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
+  <li>If the mouse hits a component or link(s) inside a compound component (in whitebox view), the inner component or link(s) is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
 </ul>
 <p></p>
-<h4>Move components, links, and endpoints by drag</h4>
+<h4>Move components, links, and endpoints.</h4>
 <p>Requirements:</p>
 <ul>
   <li>Move components around the circuit diagram.</li>
@@ -269,17 +391,27 @@
   <li>User: Moves mouse to another part of the diagram.</li>
   <li>If the <em>x</em>  is a link or component in the current selection:
     <ol>
-      <li>Client: As the mouse moves,&nbsp;all selected links and components also move.</li>
-      <li>Note: When a component moves, all endpoints connected to its ports should also move. However when a link moves,&nbsp;ports and components connected to its endpoints only move if they are in the current selection.</li>
+      <li>Client: As the mouse moves,&nbsp;all selected  components also move. (This will automatically move all endpoints connected to ports of these components, regardless of whether the endpoint's link is selected or not.)&nbsp; All endpoints of selected links should also move unless they are directly connected to a port of a   component that is not selected.</li>
+      <li>The user releases the mouse.</li>
+      <li>Client: Normalizes the diagram.</li>
     </ol>
   </li>
   <li>Otherwise, <em>x</em> is the endpoint of a currently selected link.
     <ol>
-      <li>Client: As the mouse moves, <em>x</em> moves.</li>
-      <li>Note: Only the endpoint moves.</li>
+      <li>Client:
+        <ol>
+          <li>Let X be the set of all endpoints x is directly connected to (including x itself) and which are endpoints of selected links.</li>
+          <li>Let Y be the set of all endpoints&nbsp;and ports directly connected to x that are not endpoints of selected links. (Y might be empty.)</li>
+          <li>All the endpoints in X are disconnected&nbsp;from anything else, but should remain connected together.</li>
+        </ol>
+      </li>
+      <li>User moves mouse.</li>
+      <li>Client: As the mouse moves, a endpoints in X move. </li>
+      <li>User releases mouse</li>
+      <li>Client: Normalizes the diagram.
+      </li>
     </ol>
   </li>
-  <li>User: Releases the mouse.</li>
 </ol>
 <p>Notes:</p>
 <ul>
@@ -293,16 +425,16 @@
 <h4>Rotate components</h4>
 <p>Requirements: Rotate components.</p>
 <p>Actors: The user and the client</p>
-<p>Precondition: The client is in editing mode&nbsp;and at least one component is selected</p>
+<p>Precondition: The client is in editing mode&nbsp;and at least one component is selected.</p>
 <p>Postcondition: The client is in editing mode.</p>
 <p>Basic Flow</p>
 <ol>
   <li>User: Clicks on the rotate-clockwise or rotate-counter-clockwise button.</li>
-  <li>Client: Rotates all selected components in the appropriate direction.  </li>
+  <li>Client: Rotates all selected components in the appropriate direction&nbsp;and then normalizes the diagram.</li>
 </ol>
 <p>Notes:</p>
 <ul>
-  <li>As a component rotates, its ports move and any endpoints connected to those ports should also move.</li>
+  <li>As a component rotates, its ports move and any endpoints Directly Connected to those ports should also move.</li>
 </ul>
 <h4>Delete components and links</h4>
 <p>Requirements: </p>
@@ -316,7 +448,7 @@
 <p>Basic Flow</p>
 <ol>
   <li>User: Clicks on the Cut button.</li>
-  <li>Client: Deletes all selected components and links.</li>
+  <li>Client: Deletes all selected components and links&nbsp;and then normalizes the diagram.</li>
 </ol>
 <p>Notes:</p>
 <ul>
@@ -324,22 +456,8 @@
 </ul>
 <h4>Create a new circuit</h4>
 <p>Requirements: </p>
-<ul>
-  <li>Delete components from a circuit diagram.</li>
-  <li>Delete links</li>
-</ul>
 <p>Actors: The user and the client</p>
-<p>Precondition: The client is in editing mode&nbsp;and at least one component or link is selected</p>
-<p>Postcondition: The client is in editing mode. The selection is empty.</p>
-<p>Basic Flow</p>
-<ol>
-  <li>User: Clicks on the Cut button.</li>
-  <li>Client: Deletes all selected components and links.</li>
-</ol>
-<p>Notes:</p>
-<ul>
-  <li>None.</li>
-</ul>
+<p>Precondition: &nbsp;...</p>
 <p></p>
 <p>&nbsp;</p>
 <h2>Discussion</h2>

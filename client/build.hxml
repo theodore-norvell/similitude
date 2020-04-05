@@ -1,0 +1,4 @@
+-cp src
+-main Main
+-js bin/similitudeClient.js
+-D dce=no
