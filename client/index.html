@@ -1,132 +1,211 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>similitude_proto</title>
-	<style>
-	.container {
-		content: "";
-		// display: table;
-		clear: both;
-		width: 830px;
-		height: 560px;
-		position:relative;
-	}
-	
-	html, body {
-		height: 100%;
-		width: 100%;
-	}
-	
-	#sidebar {
-		background-color : #c5dbdb;
-		float: left;
-		width: 10%;
-		height: 80%;
-		overflow-y: scroll;
-		scrollbar-width: none; // mozilla
-		-ms-overflow-style: none; // IE10
-	}
-	
-	#sidebar::-webkit-scrollbar {
-		width: 0;
-		height: 0;
-	}
-	
-	#pallete {
-		float: left;
-		width: 90%;
-		height: 443px;
-	}
-	
-	#displayScreen {
-		float: left;
-		width: 100%;
-		height: 90%;
-	}
-	
-	#topNavbar {
-		float: left;
-		width: 100%;
-		height: 10%;
-		border: solid 1px;
-	}
-	
-	.sidebarItem{
-		width: 100%;
-		height: 50px;
-		border: solid 1px black;
-	}
-	
-	#updateThis {
-		position: absolute;
-		width: 50%;
-		height: 50px;
-		border: solid 1px black;
-		top: 500px;
-	}
-	
-	#undo {
-		position: absolute;
-		width: 50px;
-		height: 20px;
-		border: solid 1px black;
-		top: 465px;
-	}
-	
-	#redo {
-		position: absolute;
-		width: 50px;
-		height: 20px;
-		border: solid 1px black;
-		top: 465px;
-		left: 65px;
-	}
-	
-	#CanvasPanControl {
-		z-index: 2;
-		position: absolute;
-		margin-left: 705px;
-		margin-top: 305px;
-	}
-	
-	.panController{
-		border: solid 1px black;
-		width: 35px;
-		margin-top: 2px;
-	}
-	</style>
+    <title>Circuit Diagram</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入 Bootstrap -->
+    <link rel="stylesheet" href="src/css/bootstrap.css">
+    <link rel="stylesheet" href="src/css/bootstrap-theme.css">
+
+    <!-- HTML5 Shim 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
 </head>
 <body>
-  <!-- container div needed for example code -->
-  <div class="container">
-	  <div id="sidebar">
-		  <table id="sidebarTable">
-			  <tr><td><div id="clickMe" class="sidebarItem">clickable</div></td></tr>
-			  <tr><td><div id="dragMe" class="sidebarItem">draggable</div></td></tr>
-			  <!--<tr><td><p></p></td></tr>-->
-		  </table>
-		  </div>
-	  <div id="pallete">
-		  <div id="topNavbar"></div>
-		  <div id="displayScreen">
-			<div id="CanvasPanControl">
-				<div id="Up" class="panController">Up</div>
-				<div id="Down" class="panController">Down</div>
-				<div id="Left" class="panController">Left</div>
-				<div id="Right" class="panController">Right</div>
-				<div id="Centre" class="panController">Centre</div>
-			</div>
-		  </div>
-	  </div>
-	  <div id="undo">UNDO</div>
-	  <div id="redo">REDO</div>
-	  <div id="updateThis"></div>
-  </div>
 
-  <!-- from jQuery's CDN (http://jquery.com/download/#using-jquery-with-a-cdn) -->
-  <!-- <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script> -->
+<div class="container-fluid" style="height: 100%">
+    <div class="row-fluid">
+        <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="col-sm-1 col-md-1 col-lg-1">
+                    <button id="file" type="button" class="btn btn-default" disabled="disabled">File</button>
+                </div>
+                <div class="col-sm-1 col-md-1 col-lg-1">
 
-  <!-- Your Haxe compiled script -->
-  <script src="bin/similitudeClient.js"></script>
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-3 btn-group" role="group" aria-label="...">
+                    <button id="undo" type="button" class="btn btn-default" disabled="disabled">undo</button>
+                    <button id="redo" type="button" class="btn btn-default" disabled="disabled">redo</button>
+                    <button id="copy" type="button" class="btn btn-default" disabled="disabled">copy</button>
+                    <button id="paste" type="button" class="btn btn-default" disabled="disabled">paste</button>
+                </div>
+                <div class="col-sm-2 col-md-2 col-lg-2">
+                    <div class="input-group col-md-12">
+                        <input type="text" class="form-control" placeholder="Search CircuitDiagram" id="search_circuitdiagram"/>
+                    </div>
+                    <div>
+                        <ul id="circuitDiagramHintList" style="display: none;">
+                            <!-- search hint list -->
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-sm-4 col-md-4 col-lg-4">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-group has-feedback col-sm-11 col-md-11 col-lg-11 input-group" id="nameofcddiv">
+                            <span class="input-group-addon" id="basic-addon1">Circuit Diagram Name:</span>
+                            <input type="text" class="form-control" id="nameofcd" aria-describedby="inputStatus">
+                            <span id="inputStatus" class="sr-only"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1 col-md-1 col-lg-1">
+                    <button id="download" type="button" class="btn btn-default" >download</button>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="col-sm-2 col-md-2 col-lg-2" id="leftDIV">
+                    <div class="col-sm-12 col-md-12 col-lg-12 tab-content" id="leftdivsidebartabcontent">
+                        <!--sidebar generated by js-->
+                    </div>
+                </div>
+                <!-- canvas -->
+                <div class="tabbable col-sm-10 col-md-10 col-lg-10" id="rightDIV">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="col-sm-11 col-md-11 col-lg-11">
+                            <ul class="nav nav-tabs" id="circuitdiagramul">
+                                <!--nav bar generated by js-->
+                            </ul>
+                        </div>
+                        <div class="col-sm-1 col-md-1 col-lg-1">
+                            <ul  class="nav nav-tabs close" id="">
+                                <li role="presentation"><a href="#"  id="createNewCircuitDiagram" data-toggle="tab">+</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                <button id="zoom_in" type="button" class="btn btn-default" style="width: 100%">
+                                    <span class="glyphicon glyphicon-zoom-in"></span>
+                                </button>
+                            </div>
+                            <div class="col-sm-10 col-md-10 col-lg-10">
+                                <button id="up" type="button" class="btn btn-default" style="width: 100%">
+                                    <span class="glyphicon glyphicon-chevron-up"></span>
+                                </button>
+                            </div>
+                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                <button id="zoom_out" type="button" class="btn btn-default" style="width: 100%">
+                                    <span class="glyphicon glyphicon-zoom-out"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                <button id="left" type="button" class="btn btn-default" style="width: 100%">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                </button>
+                            </div>
+                            <div class="col-sm-10 col-md-10 col-lg-10">
+                                <div class="tab-content col-sm-12 col-md-12 col-lg-12" id="circuitdiagramcanvas">
+                                    <!--canvas generated by js-->
+                                </div>
+                            </div>
+                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                <button id="right" type="button" class="btn btn-default" style="width: 100%">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                <button id="o" type="button" class="btn btn-default" style="width: 100%">o</button>
+                            </div>
+                            <div class="col-sm-10 col-md-10 col-lg-10">
+                                <button id="down" type="button" class="btn btn-default" style="width: 100%">
+                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                </button>
+                            </div>
+                            <div class="col-sm-1 col-md-1 col-lg-1">
+                                <button id="f" type="button" class="btn btn-default" style="width: 100%">F</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- tool bar start -->
+            <div class="col-sm-12 col-md-12 col-lg-12" >
+                <div class="col-sm-2 col-md-2 col-lg-2">
+
+                </div>
+                <div class="col-sm-7 col-md-7 col-lg-7" style="border: 1px solid; visibility: hidden" id="toolbar_div">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="col-sm-12 col-md-12 col-lg-12" id="component_name_div">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="component_name">name</span>
+                                <input type="text" class="form-control" placeholder="Component Name" aria-describedby="basic-addon1" id="name_input">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12" id="component_delay_div">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="component_delay">delay</span>
+                                <input type="text" class="form-control" placeholder="Component Delay" aria-describedby="basic-addon1" id="delay_input">
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="col-sm-8 col-md-8 col-lg-8" id="orientation_div">
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <!-- Button and dropdown menu -->
+                                        <div class="btn-group dropup">
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Orientation <span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#" id="north">NORTH</a></li>
+                                                <li><a href="#" id="south">SOUTH</a></li>
+                                                <li><a href="#" id="west">WEST</a></li>
+                                                <li><a href="#" id="east">EAST</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <input type="text" class="form-control" aria-label="..." disabled="disabled" id="orientation">
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-4 col-lg-4">
+                                <button id="delete" type="button" class="btn btn-default">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-3">
+                    <div class="col-sm-12 col-md-12 col-lg-12 pre-scrollable" id="compoundComponentBoxSelection">
+                        <!--generated by js-->
+                    </div>
+                </div>
+            </div>
+            <!-- tool bar end -->
+            <!--useless now-->
+            <div class="col-sm-1 col-md-1 col-lg-1">
+                <input type="file" id="selectFiles" accept="application/json" value="Import" style="display: none"/>
+                <button id="import" type="button" class="btn btn-default" style="display: none">import</button>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
+                <button id="previouseCD" type="button" class="btn btn-default" style="display: none">Previouse CircuitDiagram</button>
+            </div>
+            <div class="col-sm-2 col-md-2 col-lg-2">
+                <button id="nextCD" type="button" class="btn btn-default" style="display: none">Next CircuitDiagram</button>
+            </div>
+            <!--useless now-->
+        </div>
+
+    </div>
+</div>
+
+<div id="haxe:trace"></div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="application/javascript" src="src/test.js"></script>
+<!-- 包括所有已编译的插件 -->
+<script type="text/javascript" src="src/js/bootstrap.js"></script>
 </body>
 </html>
+
+
