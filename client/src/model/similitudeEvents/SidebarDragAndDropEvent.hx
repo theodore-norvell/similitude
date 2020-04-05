@@ -8,8 +8,8 @@ import model.enumeration.ComponentType;
 class SidebarDragAndDropEvent extends AbstractSimilitudeEvent
 {
 	public var component: ComponentType;
-	public var draggedToX: Int = 0;
-	public var draggedToY: Int = 0;
+	public var draggedToX: Float = 0;
+	public var draggedToY: Float = 0;
 
 	public function new() 
 	{

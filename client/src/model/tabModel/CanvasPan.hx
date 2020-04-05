@@ -16,23 +16,13 @@ class CanvasPan
 
 	}
 	
-	public function moveXPositive(diff: Float) : Float {
+	public function moveX(diff: Float) : Float {
 		this.totalXPan = this.totalXPan + diff;
 		return this.totalXPan;
 	}
 	
-	public function moveYPositive(diff: Float) : Float {
+	public function moveY(diff: Float) : Float {
 		this.totalYPan = this.totalYPan + diff;
-		return this.totalYPan;
-	}
-	
-	public function moveXNegative(diff: Float) : Float {
-		this.totalXPan = this.totalXPan - diff;
-		return this.totalXPan;
-	}
-	
-	public function moveYNegative(diff: Float) : Float {
-		this.totalYPan = this.totalYPan - diff;
 		return this.totalYPan;
 	}
 	
