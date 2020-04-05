@@ -117,8 +117,8 @@ class View
 	}
 	
 	public function updateThisBox(updateString: String){
-		var updateThis= document.querySelector("#updateThis");
-		updateThis.innerText = updateString;
+		//var updateThis= document.querySelector("#updateThis");
+		//updateThis.innerText = updateString;
 	}
 
 	/**

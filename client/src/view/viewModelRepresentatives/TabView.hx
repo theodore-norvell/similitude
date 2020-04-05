@@ -4,7 +4,6 @@ import type.Coordinate;
 import js.html.CanvasElement;
 import model.component.CircuitDiagramI;
 import model.drawingInterface.Transform;
-import model.tabModel.CanvasPan;
 import model.tabModel.TabModel;
 import view.View;
 import haxe.Unserializer;
@@ -20,7 +19,6 @@ class TabView
 	public var transform: Transform = Transform.identity();
 	public var view: View;
 	public var tabModel: TabModel;
-	public var canvasPan: CanvasPan = new CanvasPan();
 	
 	public function new(circuitDiagram: CircuitDiagramI, view: View, tranform: Transform) 
 	{
@@ -42,25 +40,21 @@ class TabView
 	}
 	
 	public function panCanvasUp() {
-		this.canvasPan.moveY(-70);
 		this.transform = this.transform.translate(0, -70);
 		this.update();
 	}
 	
 	public function panCanvasDown() {
-		this.canvasPan.moveY(70);
 		this.transform = this.transform.translate(0, 70);
 		this.update();
 	}
 	
 	public function panCanvasRight() {
-		this.canvasPan.moveX(70);
 		this.transform = this.transform.translate(70, 0);
 		this.update();
 	}
 	
 	public function panCanvasLeft() {
-		this.canvasPan.moveX(-70);
 		this.transform = this.transform.translate(-70, 0);
 		this.update();
 	}
