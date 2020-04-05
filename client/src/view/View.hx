@@ -14,7 +14,6 @@ import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
 import view.viewModelRepresentatives.TabView;
-import haxe.Unserializer;
 
 class View 
 {
@@ -144,46 +143,4 @@ class View
 		//after that push it to the canvas controller
 		this.canvasListener.setActiveTab(this.activeTab.tabModel);
 	}
-	
-	public function spawnNewCanvas() : CanvasElement {
-		// TODO.  It seems to me (TSN) that this routine should be moved to the TabView class.
-		var canvasDisplayScreen = document.querySelector("#displayScreen");
-		
-		var innerCanvas = document.createCanvasElement();
-		// innerCanvas.id = "canvasToDraw"; // deal with this to get better and unique IDs, IF NEED BE
-		canvasDisplayScreen.appendChild(innerCanvas);
-		var cs = document.defaultView.getComputedStyle(canvasDisplayScreen);
-		
-		innerCanvas.style.width = "100%";
-		innerCanvas.style.height = "100%";
-		innerCanvas.style.border = "solid 1px black";
-		innerCanvas.width = Std.parseInt(cs.getPropertyValue('width'));
-		innerCanvas.height = Std.parseInt(cs.getPropertyValue('height'));
-		
-		// needs this event by default for the drop target.
-		canvasDisplayScreen.addEventListener('dragover', function (event) {
-			event.preventDefault(); // called to avoid any other event from occuring when processing this one.
-			event.dataTransfer.dropEffect = "move";
-			// refer to MDN docs for more dropEffects
-			
-		});
-		// needs this event by default for the drop target.
-		canvasDisplayScreen.addEventListener('drop', function (event) {
-			event.preventDefault();
-			var data = event.dataTransfer.getData("text/plain");
-			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
-			var viewCoord = new Coordinate( event.layerX-80, event.layerY-50) ;
-			// TODO: Where does this magic numbers of 80 and 50 come from?
-			var worldCoords = activeTab.viewToWorld( viewCoord ) ;
-			eventPassed.draggedToX = worldCoords.get_xPosition() ;
-			eventPassed.draggedToY = worldCoords.get_yPosition() ;
-			trace(eventPassed);
-			//eventPassed.draggedToX = event.pageX;
-			//eventPassed.draggedToY = event.pageY;
-			this.updateCanvasListener(eventPassed);
-		});
-		
-		return innerCanvas;
-	}
-	
 }
