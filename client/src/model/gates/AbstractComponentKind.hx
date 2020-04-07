@@ -1,9 +1,7 @@
 package model.gates;
 
 import assertions.Assert ;
-import model.attribute.Attribute ;
-import model.attribute.OrientationAttr ;
-import model.attribute.StringAttr ;
+import model.attribute.* ;
 import model.component.CircuitDiagramI;
 import model.component.Component;
 import model.component.Port ;
@@ -20,16 +18,24 @@ import global.Constant.portSize ;
 * @author wanhui
 **/
 class AbstractComponentKind  {
-    
-    private var attributes:Array<Attribute>=new Array<Attribute>();
+
+    var attributes = new Array<Attribute<AttributeValue> >() ;
 
     private function new() {
-        attributes.push(new OrientationAttr());
-        attributes.push(new StringAttr("name"));
+        // TODO add attributes
     }
 
-    public function getAttr():Array<Attribute> {
-        return attributes ;
+    public function getAttributes() : Iterator< Attribute<AttributeValue> > {
+        return attributes.iterator() ;
+    }
+
+    public function canUpdate<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Bool {
+        // TODO
+        return true ;
+    }
+
+    public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
+        // TODO
     }
 
     public function createPorts( component : Component, addPort : Port -> Void ) : Void {

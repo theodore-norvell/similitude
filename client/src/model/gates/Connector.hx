@@ -1,7 +1,5 @@
 package model.gates;
 
-import model.attribute.StringAttr;
-import model.attribute.Attribute;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawConnector;

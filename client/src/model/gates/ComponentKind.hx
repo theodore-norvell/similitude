@@ -1,7 +1,7 @@
 package model.gates;
 
-import model.attribute.Attribute;
 import type.HitObject;
+import model.attribute.* ;
 import model.component.CircuitDiagramI;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
@@ -20,9 +20,6 @@ interface ComponentKind {
 
     public function getname():String;
 
-    // TODO: I don't like that this returns an array.  Is there a better interface?
-    public function getAttr():Array<Attribute>;
-
     /** create ports for each gate.
     *  Because box can identify the 4 corner of the component, so we can use a,b,c,d to identify the position of the component
     *  @param xPosition : x position
@@ -33,6 +30,12 @@ interface ComponentKind {
     *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
     *  @return the array of the created ports
     **/
+
+    public function getAttributes() : Iterator< Attribute<AttributeValue> > ;
+
+    public function canUpdate<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Bool ;
+
+    public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void ;
     public function createPorts( component : Component, addPort : Port -> Void ) : Void ;
 
     /**
@@ -48,7 +51,7 @@ interface ComponentKind {
      * @param highlight Should this component be highlighted
      * @param selection The set of things that should be highlighted
     **/
-    public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
+    public function drawComponent( component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
 
     /**
     * find the hit list

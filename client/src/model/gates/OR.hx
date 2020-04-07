@@ -1,9 +1,5 @@
 package model.gates;
 
-import model.attribute.OrientationAttr;
-import model.attribute.StringAttr;
-import model.attribute.IntAttr;
-import model.attribute.Attribute;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawOR;
@@ -34,7 +30,6 @@ class OR implements ComponentKind extends AbstractGate {
 
     public function new() {
         super() ;
-        attributes.push(new IntAttr("delay"));
     }
 
     public function getname():String{

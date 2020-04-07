@@ -1,9 +1,5 @@
 package model.gates;
 
-import model.attribute.OrientationAttr;
-import model.attribute.StringAttr;
-import model.attribute.IntAttr;
-import model.attribute.Attribute;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawMUX;
@@ -41,7 +37,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
 
     public function new() {
         super() ;
-        attributes.push(new IntAttr("delay"));
+        // TODO add attributes
     }
 
     public function getname():String{

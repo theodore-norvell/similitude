@@ -1,10 +1,6 @@
 package model.gates;
 
 import type.Coordinate;
-import model.attribute.Attribute;
-import model.attribute.OrientationAttr;
-import model.attribute.StringAttr;
-import model.attribute.IntAttr;
 import model.drawComponents.DrawAND;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
@@ -21,7 +17,7 @@ class AbstractGate extends AbstractComponentKind {
 
     public function new() {
         super() ;
-        attributes.push(new IntAttr("delay"));
+        // TODO Add attributes
     }
 
     function initialNumberOfInPorts() : Int { return 2 ; }

@@ -1,9 +1,14 @@
 package model.attribute;
-import model.enumeration.AttrType;
-interface Attribute {
-    public function getdefaultvalue():AttrValue;
-    public function getAttrType():AttrType;
-    public function getName():String;
 
+class Attribute< ValueType : AttributeValue > {
+    public var defaultValue( default, null ) : ValueType ;
+    public var type( default, null )  : AttributeType ;
 
+    var name : String ;
+
+    public function new( name : String, type : AttributeType, defaultValue : ValueType ) {
+        this.name = name ;
+        this.type = type ;
+        this.defaultValue = defaultValue ;
+    }
 }

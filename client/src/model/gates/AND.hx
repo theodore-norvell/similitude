@@ -1,9 +1,5 @@
 package model.gates;
 
-import model.attribute.Attribute;
-import model.attribute.OrientationAttr;
-import model.attribute.StringAttr;
-import model.attribute.IntAttr;
 import model.drawComponents.DrawAND;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
@@ -35,7 +31,6 @@ class AND implements ComponentKind extends AbstractGate implements ComponentKind
 
     public function new() {
         super() ;
-        attributes.push(new IntAttr("delay"));
     }
 
 

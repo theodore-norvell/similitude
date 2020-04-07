@@ -1,10 +1,6 @@
 package model.gates;
 
 import assertions.Assert ;
-import model.attribute.OrientationAttr;
-import model.attribute.StringAttr;
-import model.attribute.IntAttr;
-import model.attribute.Attribute;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawFlipFlop;
@@ -35,9 +31,7 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind {
 
     public function new() {
         super();
-        attributes.push(new IntAttr("delay"));
-        attributes.push(new IntAttr("hold"));
-        attributes.push(new IntAttr("setup"));
+        // TODO Add attributes.
     }
 
     public function getname():String {
