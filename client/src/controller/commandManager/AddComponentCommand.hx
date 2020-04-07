@@ -2,7 +2,7 @@ package controller.commandManager;
 import model.component.CircuitDiagramI;
 import model.component.Component;
 import model.gates.ComponentKind;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 
 /**
  * ...

@@ -1,10 +1,10 @@
 package model.attribute;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 
-class OrientationAttributeValue implements AttributeValue<OrientationAttributeType> {
+class OrientationAttributeValue implements AttributeValue {
     var orientation:ORIENTATION;
-    public function new(or:Orientation) {
-        orientation=or;
+    public function new( orientation: Orientation ) {
+        this.orientation = orientation;
     }
 
     public function getOrientation() : Orientation{

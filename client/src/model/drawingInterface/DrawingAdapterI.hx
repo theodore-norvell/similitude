@@ -2,7 +2,7 @@ package model.drawingInterface;
 
 import js.html.CanvasRenderingContext2D;
 import model.drawingInterface.Transform;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 /**  A drawing adaptor represents a tool for outputting
  *   drawings to a part of a screen or page or similar
  *   device.

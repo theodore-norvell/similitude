@@ -8,7 +8,7 @@ import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
 import model.drawingInterface.DrawingAdapterI;
 import model.selectionModel.SelectionModel ;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import type.Coordinate;
 import type.WorldPoint;
 

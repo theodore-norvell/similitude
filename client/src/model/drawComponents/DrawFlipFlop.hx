@@ -4,7 +4,7 @@ import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import global.Constant.*;
 /**
 * draw flip flop

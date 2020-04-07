@@ -1,6 +1,6 @@
 package model.enumeration;
 
-enum ORIENTATION {
+enum Orientation {
     NORTH;
     SOUTH;
     WEST;

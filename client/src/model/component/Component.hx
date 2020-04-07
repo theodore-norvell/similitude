@@ -11,7 +11,7 @@ import type.Coordinate;
 import type.WorldPoint;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.gates.ComponentKind;
 import assertions.Assert;
 

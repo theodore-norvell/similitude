@@ -8,7 +8,7 @@ import type.WorldPoint;
 import model.enumeration.MODE;
 import model.selectionModel.SelectionModel ;
 import model.drawingInterface.DrawingAdapterI;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 /**
 * interface for CicuitDiagram
 **/

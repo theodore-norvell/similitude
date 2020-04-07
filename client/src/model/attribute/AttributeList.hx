@@ -28,7 +28,6 @@ class AttributeList {
         var pt : AttributeValuePair<ValueType> = cast( p ) ;
         pt.value = newValue ;
     }
-    
     public function has<ValueType : AttributeValue>( attribute : Attribute<ValueType> ) : Bool {
         var a : Attribute<AttributeValue> = cast( attribute ) ;
         return pairMap.exists( a ) ;
