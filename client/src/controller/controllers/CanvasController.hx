@@ -6,7 +6,7 @@ import controller.listenerInterfaces.CanvasListener;
 import model.component.CircuitDiagram;
 import model.component.Component;
 import model.enumeration.ComponentType;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 // import js.html.Console;
 
@@ -34,7 +34,7 @@ class CanvasController extends AbstractController implements CanvasListener
 		// create and execute a command here 
 		// Type.createEnum(ComponentType, eventObject.component)
 		var circuitDiagram = this.activeTab.getCircuitDiagram() ;
-		var component = new Component(circuitDiagram, eventObject.draggedToX, eventObject.draggedToY, 70, 70, ORIENTATION.EAST, componentTypesSingleton.toComponentKind(eventObject.component), 0);
+		var component = new Component(circuitDiagram, eventObject.draggedToX, eventObject.draggedToY, 70, 70, Orientation.EAST, componentTypesSingleton.toComponentKind(eventObject.component), 0);
 		var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
 		this.commandManager.executeCommand(addComponentCommand);
 		this.viewUpdater.updateCanvas();

@@ -38,7 +38,8 @@ class Component extends CircuitElement {
     // TODO Make boxType an attribute for the kinds where it makes sense.
     var boxType:BOX;
 
-    var attributeList : AttributeList ;
+    @:allow( model.gates )
+    var attributeList : AttributeValueList ;
     
     /**
     *   create component
@@ -50,7 +51,7 @@ class Component extends CircuitElement {
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
+    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, componentKind:ComponentKind, inportNum:Int) {
         super(circuitDiagram);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -67,14 +68,14 @@ class Component extends CircuitElement {
         this.componentKind.updatePortPositions( this ) ;
 
         // TODO What is going on with this loop?  What about other attributes.
-        this.attributeList = new AttributeList( this.componentKind.getAttributes() ) ;
+        this.attributeList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
     
     public function hasAttr<T : AttributeValue>( attribute : Attribute<T> ) : Bool {
         return attributeList.has( attribute ) ;
     }
 
-    public function getAttr<T : AttributeValue>( attribute : Attribute<T> ) : T {
+    public function get<T : AttributeValue>( attribute : Attribute<T> ) : T {
         return attributeList.get( attribute ) ;
     }
 
@@ -118,13 +119,14 @@ class Component extends CircuitElement {
     override public function bottom() : Float {
         return this.yPosition + this.height/2.0 ; }
 
-    public function get_orientation():ORIENTATION {
-        return ORIENTATION.EAST ;
+    public function get_orientation():Orientation {
+        var attrVal = get( StandardAttributes.orientation ) ;
+        return attrVal.getOrientation() ;
     }
 
-    public function set_orientation(value:ORIENTATION) : Void {
-        // TODO
-    }
+    public function set_orientation(value:Orientation) : Void {
+        update( StandardAttributes.orientation, new OrientationAttributeValue( value ) ) ;
+    } 
 
     public function get_componentKind():ComponentKind {
         return componentKind;

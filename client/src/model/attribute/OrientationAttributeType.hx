@@ -1,4 +1,4 @@
-package model.enumeration;
+package model.attribute;
 
 class OrientationAttributeType implements AttributeType  {
     static public var singleton (default, null) : OrientationAttributeType =

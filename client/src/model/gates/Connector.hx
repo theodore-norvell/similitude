@@ -6,7 +6,7 @@ import model.drawComponents.DrawConnector;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.selectionModel.SelectionModel ;
 /**
  * Connector components connect to the world outside the circuit.
@@ -26,13 +26,13 @@ class Connector implements ComponentKind extends AbstractComponentKind {
         return nameOfTheComponentKind;
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
+    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
     //     var portArray:Array<Port> = new Array<Port>();
     //     if(true){//input should only have one input
     //         inportNum = 1;
     //     }
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             //inport
     //             var inport:Port = new Port(xPosition - width / 2, yPosition);
     //             inport.set_portDescription(IOTYPE.INPUT);
@@ -42,7 +42,7 @@ class Connector implements ComponentKind extends AbstractComponentKind {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             //inport
     //             var inport:Port = new Port(xPosition, yPosition + height / 2);
     //             inport.set_portDescription(IOTYPE.INPUT);
@@ -52,7 +52,7 @@ class Connector implements ComponentKind extends AbstractComponentKind {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             var inport:Port = new Port(xPosition, yPosition - height / 2);
     //             inport.set_portDescription(IOTYPE.INPUT);
     //             portArray.push(inport);
@@ -61,7 +61,7 @@ class Connector implements ComponentKind extends AbstractComponentKind {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             var inport:Port = new Port(xPosition + width / 2, yPosition);
     //             inport.set_portDescription(IOTYPE.INPUT);
     //             portArray.push(inport);
@@ -79,21 +79,21 @@ class Connector implements ComponentKind extends AbstractComponentKind {
     // /**
     // * different from others, this function used in move command when the componenet has been re-located
     // **/
-    // override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
+    // override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             portArray[0].set_xPosition(xPosition - width / 2);
     //             portArray[0].set_yPosition(yPosition);
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             portArray[0].set_xPosition(xPosition);
     //             portArray[0].set_yPosition(yPosition + height / 2);
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             portArray[0].set_xPosition(xPosition);
     //             portArray[0].set_yPosition(yPosition - height / 2);
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             portArray[0].set_xPosition(xPosition + width / 2);
     //             portArray[0].set_yPosition(yPosition);
     //         };
@@ -106,21 +106,21 @@ class Connector implements ComponentKind extends AbstractComponentKind {
     // /**
     // * different from others, this function used in move command when the componenet has been re-located
     // **/
-    // override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port>{
+    // override public function updateOutPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port>{
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             portArray[0].set_xPosition(xPosition + width / 2);
     //             portArray[0].set_yPosition(yPosition);
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             portArray[0].set_xPosition(xPosition);
     //             portArray[0].set_yPosition(yPosition - height / 2);
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             portArray[0].set_xPosition(xPosition);
     //             portArray[0].set_yPosition(yPosition + height / 2);
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             portArray[0].set_xPosition(xPosition - width / 2);
     //             portArray[0].set_yPosition(yPosition);
     //         };

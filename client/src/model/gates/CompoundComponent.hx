@@ -17,7 +17,7 @@ import type.Coordinate;
 import model.drawingInterface.Transform;
 import model.drawingInterface.DrawingAdapterI;
 import model.component.Component;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.component.Port;
 /**
 * compound Component
@@ -42,7 +42,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         return circuitDiagram;
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
+    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
     //     var inportCount = 0 ;
     //     var outportCount = 0 ;
     //     for(i in circuitDiagram.get_componentIterator()){
@@ -55,7 +55,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     //     var portArray:Array<Port> = new Array<Port>();
     //     //find how many inputs gate in the sub-circuit diagram
     //     switch(orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             for(i in circuitDiagram.get_componentIterator()){
     //                 if(i.getNameOfTheComponentKind() == "Input"){
     //                     //inport
@@ -74,7 +74,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     //                 }
     //             }
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             for(i in circuitDiagram.get_componentIterator()){
     //                 if(i.getNameOfTheComponentKind() == "Input"){
     //                     //inport
@@ -91,7 +91,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     //                 }
     //             }
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             for(i in circuitDiagram.get_componentIterator()){
     //                 if(i.getNameOfTheComponentKind() == "Input"){
     //                     //inport
@@ -108,7 +108,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     //                 }
     //             }
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             for(i in circuitDiagram.get_componentIterator()){
     //                 if(i.getNameOfTheComponentKind() == "Input"){
     //                     //inport

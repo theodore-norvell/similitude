@@ -1,12 +1,12 @@
 package model.component;
 
-import js.lib.Object;
 import model.attribute.* ;
+import model.enumeration.Orientation ;
 
 class StandardAttributes {
-    public var orientation(default, null)
+    static public var orientation(default, null) : Attribute<OrientationAttributeValue>
         = new Attribute<OrientationAttributeValue>(
-            orientation,
+            "orientation",
             OrientationAttributeType.singleton,
             new OrientationAttributeValue( Orientation.EAST )) ;
 }

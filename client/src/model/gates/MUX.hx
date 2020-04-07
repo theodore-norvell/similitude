@@ -6,7 +6,7 @@ import model.drawComponents.DrawMUX;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.selectionModel.SelectionModel ;
 /**
  * 2-1 MUX<br>
@@ -44,11 +44,11 @@ class MUX implements ComponentKind extends AbstractComponentKind {
         return nameOfTheComponentKind;
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
+    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
     //     var portArray:Array<Port> = new Array<Port>();
     //     //mux have one select inport and two input inports
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             //inport
     //             var inport_S:Port = new Port(xPosition, yPosition - height / 2);
     //             inport_S.set_portDescription(IOTYPE.S);
@@ -64,7 +64,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             //inport
     //             var inport_S:Port = new Port(xPosition, yPosition - height / 2);
     //             inport_S.set_portDescription(IOTYPE.S);
@@ -80,7 +80,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             //inport
     //             var inport_S:Port = new Port(xPosition - width / 2, yPosition);
     //             inport_S.set_portDescription(IOTYPE.S);
@@ -96,7 +96,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             //inport
     //             var inport_S:Port = new Port(xPosition + width / 2, yPosition);
     //             inport_S.set_portDescription(IOTYPE.S);
@@ -121,9 +121,9 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     // /**
     // * different from others, this function used in move command when the componenet has been re-located
     // **/
-    // override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION):Array<Port> {
+    // override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             for (i in 0...portArray.length) {
     //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
     //                     portArray[i].set_xPosition(xPosition - width / 2);
@@ -134,7 +134,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     //                 }
     //             }
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             for (i in 0...portArray.length) {
     //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
     //                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
@@ -145,7 +145,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     //                 }
     //             }
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             for (i in 0...portArray.length) {
     //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
     //                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
@@ -156,7 +156,7 @@ class MUX implements ComponentKind extends AbstractComponentKind {
     //                 }
     //             }
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             for (i in 0...portArray.length) {
     //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
     //                     portArray[i].set_xPosition(xPosition + width / 2);

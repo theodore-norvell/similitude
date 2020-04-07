@@ -6,7 +6,7 @@ import model.component.Component;
 import view.DrawingAdapter;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import view.viewUpdaters.AbstractUpdate;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.enumeration.ComponentType;
 import model.drawingInterface.Transform;
 import js.Browser.document;
@@ -72,10 +72,10 @@ class SidebarUpdate extends AbstractUpdate
 		// add more defaults when needed
 		// use the optional component parameter for this.
 		switch (drawComponentString) {
-			case ComponentType.AND : drawingAdapter.drawAndShape(80,75, 70, 70, ORIENTATION.EAST);
-			case ComponentType.OR : drawingAdapter.drawOrShape(80,75, 70, 70, ORIENTATION.EAST);
-			case ComponentType.XOR : drawingAdapter.drawXorShape(80,75, 70, 70, ORIENTATION.EAST);
-			case ComponentType.NOT : drawingAdapter.drawNotShape(80,75, 70, 70, ORIENTATION.EAST);
+			case ComponentType.AND : drawingAdapter.drawAndShape(80,75, 70, 70, Orientation.EAST);
+			case ComponentType.OR : drawingAdapter.drawOrShape(80,75, 70, 70, Orientation.EAST);
+			case ComponentType.XOR : drawingAdapter.drawXorShape(80,75, 70, 70, Orientation.EAST);
+			case ComponentType.NOT : drawingAdapter.drawNotShape(80,75, 70, 70, Orientation.EAST);
 			case ComponentType.COMPOUND_COMPONENT : Console.log("CC");
 		}
 		

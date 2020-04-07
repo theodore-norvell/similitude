@@ -8,7 +8,7 @@ import model.selectionModel.SelectionModel ;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 /**
  * XOR gate<br>
  * Truth Table
@@ -37,13 +37,13 @@ class XOR implements ComponentKind extends AbstractGate {
         return nameOfTheComponentKind;
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
+    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
     //     var portArray:Array<Port> = new Array<Port>();
     //     if(inportNum == null || inportNum <2){
     //         inportNum = 2;
     //     }
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {
@@ -57,7 +57,7 @@ class XOR implements ComponentKind extends AbstractGate {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {
@@ -71,7 +71,7 @@ class XOR implements ComponentKind extends AbstractGate {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {
@@ -85,7 +85,7 @@ class XOR implements ComponentKind extends AbstractGate {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {

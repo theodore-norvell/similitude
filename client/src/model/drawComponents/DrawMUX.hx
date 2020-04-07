@@ -4,7 +4,7 @@ import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import global.Constant.*;
 /**
 * draw mux gate
@@ -32,28 +32,28 @@ class DrawMUX extends DrawComponent {
         for (port in component.get_ports()) {
             //draw text
             switch (component.get_orientation()){
-                case ORIENTATION.EAST : {
+                case Orientation.EAST : {
                     if (port.get_portDescription() == IOTYPE.S) {
                         drawingAdapter.drawText("S", port.get_xPosition() - 2, port.get_yPosition() + 10, component.get_width() - 4);
                     } else {
                         drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition() + 3, port.get_yPosition() + 2, component.get_width() - 4);
                     }
                 };
-                case ORIENTATION.WEST : {
+                case Orientation.WEST : {
                     if (port.get_portDescription() == IOTYPE.S) {
                         drawingAdapter.drawText("S", port.get_xPosition() - 2, port.get_yPosition() + 10, component.get_width() - 4);
                     } else {
                         drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition() - 8, port.get_yPosition(), component.get_width() - 4);
                     }
                 };
-                case ORIENTATION.SOUTH : {
+                case Orientation.SOUTH : {
                     if (port.get_portDescription() == IOTYPE.S) {
                         drawingAdapter.drawText("S", port.get_xPosition() + 3, port.get_yPosition(), component.get_width() - 4);
                     } else {
                         drawingAdapter.drawText(port.get_sequence() + "", port.get_xPosition(), port.get_yPosition() + 10, component.get_width() - 4);
                     }
                 };
-                case ORIENTATION.NORTH : {
+                case Orientation.NORTH : {
                     if (port.get_portDescription() == IOTYPE.S) {
                         drawingAdapter.drawText("S", port.get_xPosition() - 7, port.get_yPosition() + 2, component.get_width() - 4);
                     } else {

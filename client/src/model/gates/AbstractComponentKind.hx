@@ -5,6 +5,7 @@ import model.attribute.* ;
 import model.component.CircuitDiagramI;
 import model.component.Component;
 import model.component.Port ;
+import model.component.StandardAttributes ;
 import model.drawingInterface.DrawingAdapterI ;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
@@ -19,10 +20,10 @@ import global.Constant.portSize ;
 **/
 class AbstractComponentKind  {
 
-    var attributes = new Array<Attribute<AttributeValue> >() ;
+    var attributes = new AttributeList() ;
 
     private function new() {
-        // TODO add attributes
+        attributes.add( StandardAttributes.orientation ) ;
     }
 
     public function getAttributes() : Iterator< Attribute<AttributeValue> > {
@@ -30,12 +31,13 @@ class AbstractComponentKind  {
     }
 
     public function canUpdate<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Bool {
-        // TODO
-        return true ;
+        return component.attributeList.has( attribute ) ;
     }
 
     public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
-        // TODO
+        if( attribute.is( StandardAttributes.orientation ) ) updatePortPositions( component ) ;
+        component.attributeList.set( attribute, value ) ;
+        component.notifyObservers(component) ;
     }
 
     public function createPorts( component : Component, addPort : Port -> Void ) : Void {

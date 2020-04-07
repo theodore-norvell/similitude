@@ -2,7 +2,7 @@ package model.attribute;
 import model.enumeration.Orientation;
 
 class OrientationAttributeValue implements AttributeValue {
-    var orientation:ORIENTATION;
+    var orientation:Orientation;
     public function new( orientation: Orientation ) {
         this.orientation = orientation;
     }
@@ -11,7 +11,7 @@ class OrientationAttributeValue implements AttributeValue {
         return orientation ;
     }
 
-    public function getType() : AttrType {
-        return attrType ;
+    public function getType() : AttributeType {
+        return OrientationAttributeType.singleton ;
     }
 }

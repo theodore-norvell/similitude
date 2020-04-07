@@ -4,7 +4,7 @@ import view.Box;
 import type.Coordinate;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawingInterface.Transform;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import js.html.CanvasRenderingContext2D;
 
 /** This class used for drawing the base components
@@ -68,7 +68,7 @@ class DrawingAdapter implements DrawingAdapterI {
         //  Delete this method if not needed.
     }
 
-    public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
 
         var vCenterCoordinate:Coordinate = trans.pointConvert(new Coordinate(x, y));
@@ -85,13 +85,13 @@ class DrawingAdapter implements DrawingAdapterI {
         //creat a circle for the AND gate
         //draw the ellipse
         switch (orientation){
-            case ORIENTATION.NORTH : {
+            case Orientation.NORTH : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 180 * Math.PI / 180, 0, 1 * Math.PI);}
-            case ORIENTATION.EAST : {
+            case Orientation.EAST : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 270 * Math.PI / 180, 0, 1 * Math.PI);}
-            case ORIENTATION.SOUTH : {
+            case Orientation.SOUTH : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 0 * Math.PI / 180, 0, 1 * Math.PI);}
-            case ORIENTATION.WEST : {
+            case Orientation.WEST : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2, 90 * Math.PI / 180, 0, 1 * Math.PI);}
             default : {
                 //noting. Orientation only have four values
@@ -106,7 +106,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawNAndShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
         var vCenterCoordinate:Coordinate = trans.pointConvert(new Coordinate(x, y));
         // Make a rectangle from a to (a+b)/2 to (c+d)/2 to d and back to a.
@@ -127,13 +127,13 @@ class DrawingAdapter implements DrawingAdapterI {
         //creat a circle for the AND gate
         //draw the ellipse
         switch (orientation){
-            case ORIENTATION.NORTH : {
+            case Orientation.NORTH : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 180 * Math.PI / 180, 0, 1 * Math.PI);}
-            case ORIENTATION.EAST : {
+            case Orientation.EAST : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 270 * Math.PI / 180, 0, 1 * Math.PI);}
-            case ORIENTATION.SOUTH : {
+            case Orientation.SOUTH : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 0 * Math.PI / 180, 0, 1 * Math.PI);}
-            case ORIENTATION.WEST : {
+            case Orientation.WEST : {
                 cxt.ellipse(vCenterCoordinate.get_xPosition(), vCenterCoordinate.get_yPosition(), (cxmax - cxmin) / 2, (cymax - cymin) / 2 - 2 * radius, 90 * Math.PI / 180, 0, 1 * Math.PI);}
             default : {
                 //noting. Orientation only have four values
@@ -153,7 +153,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawOrShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
         cxt.beginPath();
         cxt.moveTo(r.get_xa(), r.get_ya());
@@ -173,7 +173,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawNOrShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
         var radius:Float = Math.sqrt((r.get_xb() - r.get_xc()) * (r.get_xb() - r.get_xc()) + (r.get_yb() - r.get_yc()) * (r.get_yb() - r.get_yc())) / 10 ;
         cxt.beginPath();
@@ -194,7 +194,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawBufferShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
         cxt.beginPath();
         // Start at point a
@@ -212,7 +212,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawNotShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
         // Start at point a
         cxt.beginPath();
@@ -240,13 +240,13 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.beginPath();
         //draw the circle
         switch (orientation){
-            case ORIENTATION.NORTH : {
+            case Orientation.NORTH : {
                 cxt.arc(circleCentreX, circleCentreY + radius / 2, radius, 0, 2 * Math.PI, false); }
-            case ORIENTATION.EAST : {
+            case Orientation.EAST : {
                 cxt.arc(circleCentreX - radius / 2, circleCentreY, radius, 0, 2 * Math.PI, false); }
-            case ORIENTATION.SOUTH : {
+            case Orientation.SOUTH : {
                 cxt.arc(circleCentreX, circleCentreY - radius / 2, radius, 0, 2 * Math.PI, false); }
-            case ORIENTATION.WEST : {
+            case Orientation.WEST : {
                 cxt.arc(circleCentreX + radius / 2, circleCentreY, radius, 0, 2 * Math.PI, false); }
             default :// Unreachable 
         }
@@ -254,7 +254,7 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.stroke();
     }
 
-    public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:ORIENTATION):Void {
+    public function drawXorShape(x:Float, y:Float, width:Float, height:Float, orientation:Orientation):Void {
         var r:Box = new Box(x, y, width, height, orientation,trans);
         var vCenterCoordinate:Coordinate = trans.pointConvert(new Coordinate(x, y));
         cxt.beginPath();
@@ -273,19 +273,19 @@ class DrawingAdapter implements DrawingAdapterI {
         cxt.fill();
         // Curve from (a+d)/8 to (a+d)/8 * 7
         switch (orientation){
-            case ORIENTATION.NORTH : {
+            case Orientation.NORTH : {
                 cxt.moveTo(r.get_xa() + (r.get_xb() - r.get_xa()) / 8, r.get_ya());
                 cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition()  + (r.get_yc() - r.get_yb())/7, r.get_xa() + (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
             };
-            case ORIENTATION.SOUTH : {
+            case Orientation.SOUTH : {
                 cxt.moveTo(r.get_xa() - (r.get_xb() - r.get_xa()) / 8, r.get_ya());
                 cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition(),vCenterCoordinate.get_yPosition()  - (r.get_yc() - r.get_yb())/7, r.get_xa() - (r.get_xb() - r.get_xa()) / 8 * 7, r.get_ya());
             };
-            case ORIENTATION.WEST : {
+            case Orientation.WEST : {
                 cxt.moveTo(r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8);
                 cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() + (r.get_xb() - r.get_xa())/7,vCenterCoordinate.get_yPosition(), r.get_xa(), r.get_ya() - (r.get_xb() - r.get_xa()) / 8 * 7);
             };
-            case ORIENTATION.EAST : {
+            case Orientation.EAST : {
                 cxt.moveTo(r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8);
                 cxt.quadraticCurveTo(vCenterCoordinate.get_xPosition() - (r.get_xb() - r.get_xa())/7,vCenterCoordinate.get_yPosition(), r.get_xa(), r.get_ya() + (r.get_xb() - r.get_xa()) / 8 * 7);
             };

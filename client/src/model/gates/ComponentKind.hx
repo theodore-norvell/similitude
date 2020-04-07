@@ -20,17 +20,6 @@ interface ComponentKind {
 
     public function getname():String;
 
-    /** create ports for each gate.
-    *  Because box can identify the 4 corner of the component, so we can use a,b,c,d to identify the position of the component
-    *  @param xPosition : x position
-    *  @param yPosition : y position
-    *  @param height : height
-    *  @param width : width
-    *  @param orientation : direction
-    *  @param [Optional] inportNum : the number of inports in this gates, initial value is 2
-    *  @return the array of the created ports
-    **/
-
     public function getAttributes() : Iterator< Attribute<AttributeValue> > ;
 
     public function canUpdate<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Bool ;

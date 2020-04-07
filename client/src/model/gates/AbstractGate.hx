@@ -8,7 +8,7 @@ import model.selectionModel.SelectionModel ;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
  /**
   * A parent class for gates and gate-like things.
   * 

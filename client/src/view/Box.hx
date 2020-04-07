@@ -1,7 +1,7 @@
 package view ;
 
 import type.Coordinate;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.drawingInterface.Transform;
 
 class Box {
@@ -14,7 +14,7 @@ class Box {
     var xd:Float;
     var yd:Float;
 
-    public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:ORIENTATION, transform:Transform) {
+    public function new(x_position:Float, y_position:Float, width:Float, height:Float, orientation:Orientation, transform:Transform) {
 
         var wnw:Coordinate = new Coordinate(x_position - width/2, y_position - height/2);
         var wse:Coordinate = new Coordinate(x_position + width/2, y_position + height/2);
@@ -27,25 +27,25 @@ class Box {
         var x1:Float = vse.get_xPosition();
         var y1:Float = vse.get_yPosition();
         switch (orientation){
-            case ORIENTATION.EAST : {
+            case Orientation.EAST : {
                 xa = x0; ya = y0;
                 xb = x1; yb = y0;
                 xc = x1; yc = y1;
                 xd = x0; yd = y1;
             }
-            case ORIENTATION.SOUTH : {
+            case Orientation.SOUTH : {
                 xd = x0; yd = y0;
                 xa = x1; ya = y0;
                 xb = x1; yb = y1;
                 xc = x0; yc = y1;
             }
-            case ORIENTATION.WEST : {
+            case Orientation.WEST : {
                 xc = x0; yc = y0;
                 xd = x1; yd = y0;
                 xa = x1; ya = y1;
                 xb = x0; yb = y1;
             }
-            case ORIENTATION.NORTH : {
+            case Orientation.NORTH : {
                 xb = x0; yb = y0;
                 xc = x1; yc = y0;
                 xd = x1; yd = y1;
