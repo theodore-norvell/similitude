@@ -1,5 +1,8 @@
 package model.tabModel;
 import model.drawingInterface.DrawingAdapterI;
+import model.observe.Observable;
+import model.observe.Observer;
+import view.viewModelRepresentatives.TabView;
 //import js.html.CanvasRenderingContext2D;
 import model.component.CircuitDiagramI;
 import model.component.Component;
@@ -17,7 +20,7 @@ import model.selectionModel.SelectionModel;
  * 
  * @author AdvaitTrivedi
  */
-class TabModel 
+class TabModel implements Observer extends Observable
 // This should be Observable. TSN
 {
 	var selectionModel: SelectionModel;
@@ -25,8 +28,9 @@ class TabModel
 	// create this field using  the JS document and then set it using the set functionality in this class.
 	
 	
-	public function new(circuitDiagram: CircuitDiagramI) 
+	public function new(circuitDiagram: CircuitDiagramI, tabView: TabView) 
 	{
+		this.addObserver(tabView);
 		this.circuitDiagram = circuitDiagram;
 		this.selectionModel = new SelectionModel(new Array<Link>(), new Array<Component>());
 	}
@@ -65,5 +69,9 @@ class TabModel
 		for (component in components) {
 			this.selectionModel.removeComponentFromSelection(component);
 		}
+	}
+	
+	public function update(target: Any, ?data:Dynamic) : Void {
+		this.notifyObservers(target, data);
 	}
 }

@@ -5,9 +5,9 @@ class Observable {
 
     var observers:Array<Observer>= new Array<Observer>();
 
-    public function new() {
-
-    }
+    //public function new() {
+//
+    //}
 
 
     public function addObserver(obs:Observer) : Void {

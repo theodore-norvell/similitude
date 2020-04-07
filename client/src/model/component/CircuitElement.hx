@@ -13,7 +13,7 @@ class CircuitElement extends Observable {
     var cd : CircuitDiagram ;
 
     public function new( cd : CircuitDiagramI ) {
-        super() ;
+        //super() ;
         this.cd = cast( cd, CircuitDiagram ) ;
         this.addObserver( this.cd ) ;
     }

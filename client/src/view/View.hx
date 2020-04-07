@@ -1,5 +1,6 @@
 package view;
 
+import model.observe.Observer;
 import type.Coordinate;
 import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
@@ -15,7 +16,7 @@ import model.tabModel.TabModel;
 import model.drawingInterface.Transform;
 import view.viewModelRepresentatives.TabView;
 
-class View 
+class View implements Observer
 {
 	var sidebarListener: SidebarListener;
 	var canvasListener: CanvasListener;
@@ -135,12 +136,21 @@ class View
 	 */
 	public function updateCanvas() : Void {
 		Console.log('view.updateCanvas');
-		this.activeTab.update();
+		this.activeTab.updateTabView();
 	}
 	
 	public function setActiveTab(){
 		// do something for the active tab field
 		//after that push it to the canvas controller
 		this.canvasListener.setActiveTab(this.activeTab.tabModel);
+	}
+	
+	/**
+	 * for the observer interface
+	 * @param	target
+	 * @param	data
+	 */
+	public function update(target: Any, ?data:Dynamic) : Void {
+		this.updateCanvas();
 	}
 }
