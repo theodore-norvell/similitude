@@ -61,8 +61,6 @@ class Component extends CircuitElement {
         this.componentKind = componentKind;
         this.boxType = BOX.WHITE_BOX;
 
-        //this.delay = 0;//init is zero
-
         //initial ports
         this.componentKind.createPorts( this, function ( port : Port ) { ports.push( port ) ; } ) ;
         this.componentKind.updatePortPositions( this ) ;
@@ -71,7 +69,7 @@ class Component extends CircuitElement {
         this.attributeList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
     
-    public function hasAttr<T : AttributeValue>( attribute : Attribute<T> ) : Bool {
+    public function hasAttr( attribute : Attribute<Dynamic> ) : Bool {
         return attributeList.has( attribute ) ;
     }
 
@@ -79,11 +77,21 @@ class Component extends CircuitElement {
         return attributeList.get( attribute ) ;
     }
 
-    public function canUpdate<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Bool {
+    public function getUntyped( attribute : Attribute<Dynamic>) : AttributeValue {
+        return attributeList.getUntyped( attribute ) ;
+    }
+
+    public function canUpdate<T : AttributeValue>( attribute : Attribute<Dynamic>, value : T ) : Bool {
+        if( value.getType() != attribute.getType() ) return false ;
         return this.componentKind.canUpdate( this, attribute, value) ;
     }
 
     public function update<T : AttributeValue>( attribute : Attribute<T>, value : T ) {
+        this.componentKind.update( this, attribute, value) ;
+    }
+
+    public function updateUntyped<T : AttributeValue>( attribute : Attribute<Dynamic>, value : T ) {
+        Assert.assert( value.getType() == attribute.getType() ) ;
         this.componentKind.update( this, attribute, value) ;
     }
 

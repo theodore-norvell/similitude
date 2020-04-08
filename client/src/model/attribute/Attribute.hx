@@ -1,8 +1,8 @@
 package model.attribute;
 
 class Attribute< ValueType : AttributeValue >  {
-    public var defaultValue( default, null ) : ValueType ;
-    public var type( default, null )  : AttributeType ;
+    var defaultValue : ValueType ;
+    var type : AttributeType ;
 
     var name : String ;
 
@@ -10,6 +10,14 @@ class Attribute< ValueType : AttributeValue >  {
         this.name = name ;
         this.type = type ;
         this.defaultValue = defaultValue ;
+    }
+
+    public function getDefaultValue() : ValueType {
+        return defaultValue ;
+    }
+
+    public function getType() : AttributeType {
+        return type ;
     }
 
     /**Equality for attributes**/ 
