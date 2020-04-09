@@ -39,7 +39,7 @@ class Component extends CircuitElement {
     var boxType:BOX;
 
     @:allow( model.gates )
-    var attributeList : AttributeValueList ;
+    var attributeValueList : AttributeValueList ;
     
     /**
     *   create component
@@ -66,23 +66,23 @@ class Component extends CircuitElement {
         this.componentKind.updatePortPositions( this ) ;
 
         // TODO What is going on with this loop?  What about other attributes.
-        this.attributeList = new AttributeValueList( this.componentKind.getAttributes() ) ;
+        this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
 
     public function getAttributes( ) : Iterator< AttributeUntyped > {
-        return attributeList.getAttributes() ;
+        return attributeValueList.getAttributes() ;
     }
     
     public function hasAttr( attribute : AttributeUntyped ) : Bool {
-        return attributeList.has( attribute ) ;
+        return attributeValueList.has( attribute ) ;
     }
 
     public function get<T : AttributeValue>( attribute : Attribute<T> ) : T {
-        return attributeList.get( attribute ) ;
+        return attributeValueList.get( attribute ) ;
     }
 
     public function getUntyped( attribute : AttributeUntyped) : AttributeValue {
-        return attributeList.getUntyped( attribute ) ;
+        return attributeValueList.getUntyped( attribute ) ;
     }
 
     public function canUpdate<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Bool {

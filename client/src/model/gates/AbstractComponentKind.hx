@@ -36,7 +36,7 @@ class AbstractComponentKind  {
 
     public function canUpdateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Bool {
         Assert.assert( attribute.getType() == value.getType() ) ;
-        return component.attributeList.has( attribute ) ;
+        return component.attributeValueList.has( attribute ) ;
     }
 
     public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
@@ -45,7 +45,7 @@ class AbstractComponentKind  {
 
     public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
         Assert.assert( canUpdateUntyped( component, attribute, value ) ) ;
-        component.attributeList.setUntyped( attribute, value ) ;
+        component.attributeValueList.setUntyped( attribute, value ) ;
         updateHelper( component, attribute, value ) ;
         component.notifyObservers(component) ;
     }
