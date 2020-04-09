@@ -26,18 +26,36 @@ class AbstractComponentKind  {
         attributes.add( StandardAttributes.orientation ) ;
     }
 
-    public function getAttributes() : Iterator< Attribute<AttributeValue> > {
+    public function getAttributes() : Iterator< AttributeUntyped > {
         return attributes.iterator() ;
     }
 
     public function canUpdate<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Bool {
+        return canUpdateUntyped( component, attribute, value ) ;
+    }
+
+    public function canUpdateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Bool {
+        Assert.assert( attribute.getType() == value.getType() ) ;
         return component.attributeList.has( attribute ) ;
     }
 
     public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
-        if( attribute.is( StandardAttributes.orientation ) ) updatePortPositions( component ) ;
-        component.attributeList.set( attribute, value ) ;
+        updateUntyped( component, attribute, value ) ;
+    }
+
+    public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        Assert.assert( canUpdateUntyped( component, attribute, value ) ) ;
+        component.attributeList.setUntyped( attribute, value ) ;
+        updateHelper( component, attribute, value ) ;
         component.notifyObservers(component) ;
+    }
+    
+    
+    /* The job of the update helper is to ensure that any kind specific invariants
+    * of the component are restored prior to notifying the observers of the component.
+    */
+    private function updateHelper( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        if( attribute == StandardAttributes.orientation ) updatePortPositions( component ) ;
     }
 
     public function createPorts( component : Component, addPort : Port -> Void ) : Void {

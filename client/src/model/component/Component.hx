@@ -69,7 +69,7 @@ class Component extends CircuitElement {
         this.attributeList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
     
-    public function hasAttr( attribute : Attribute<Dynamic> ) : Bool {
+    public function hasAttr( attribute : AttributeUntyped ) : Bool {
         return attributeList.has( attribute ) ;
     }
 
@@ -77,22 +77,24 @@ class Component extends CircuitElement {
         return attributeList.get( attribute ) ;
     }
 
-    public function getUntyped( attribute : Attribute<Dynamic>) : AttributeValue {
+    public function getUntyped( attribute : AttributeUntyped) : AttributeValue {
         return attributeList.getUntyped( attribute ) ;
     }
 
-    public function canUpdate<T : AttributeValue>( attribute : Attribute<Dynamic>, value : T ) : Bool {
-        if( value.getType() != attribute.getType() ) return false ;
+    public function canUpdate<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Bool {
         return this.componentKind.canUpdate( this, attribute, value) ;
     }
 
-    public function update<T : AttributeValue>( attribute : Attribute<T>, value : T ) {
+    public function canUpdateUntyped( attribute : AttributeUntyped, value : AttributeValue ) : Bool {
+        return this.componentKind.canUpdateUntyped( this, attribute, value) ;
+    }
+
+    public function update<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Void {
         this.componentKind.update( this, attribute, value) ;
     }
 
-    public function updateUntyped<T : AttributeValue>( attribute : Attribute<Dynamic>, value : T ) {
-        Assert.assert( value.getType() == attribute.getType() ) ;
-        this.componentKind.update( this, attribute, value) ;
+    public function updateUntyped( attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        this.componentKind.updateUntyped( this, attribute, value) ;
     }
 
     public function get_xPosition():Float {

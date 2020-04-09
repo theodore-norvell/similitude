@@ -3,18 +3,17 @@ package model.attribute;
 import assertions.Assert ;
 
 class AttributeList {
-    var list = new Array< Attribute<AttributeValue> >() ;
+    var list = new Array< AttributeUntyped >() ;
 
     public function new() {
     }
 
-    public function add<T : AttributeValue>( attr : Attribute<T> ) : Void {
-        var attrErased : Attribute<AttributeValue> = cast( attr ) ;
-        Assert.assert( list.indexOf( attrErased ) == -1 ) ;
-        list.push( attrErased ) ; 
+    public function add( attr : AttributeUntyped ) : Void {
+        Assert.assert( list.indexOf( attr ) == -1 ) ;
+        list.push( attr ) ; 
     }
 
-    public function iterator() : Iterator< Attribute<AttributeValue> > {
+    public function iterator() : Iterator< AttributeUntyped > {
         return list.iterator() ;
     }
 }
