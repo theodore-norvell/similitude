@@ -5,5 +5,4 @@ class OrientationAttributeType implements AttributeType  {
         new OrientationAttributeType() ;
 
     private function new() { } 
-
 }

@@ -2,6 +2,9 @@ package model.attribute;
 
 import assertions.Assert ;
 
+/**
+ *  An assocciation list mapping attributes to attribute values.
+ */
 class AttributeList {
     var list = new Array< AttributeUntyped >() ;
 

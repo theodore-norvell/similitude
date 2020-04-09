@@ -68,6 +68,10 @@ class Component extends CircuitElement {
         // TODO What is going on with this loop?  What about other attributes.
         this.attributeList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
+
+    public function getAttributes( ) : Iterator< AttributeUntyped > {
+        return attributeList.getAttributes() ;
+    }
     
     public function hasAttr( attribute : AttributeUntyped ) : Bool {
         return attributeList.has( attribute ) ;

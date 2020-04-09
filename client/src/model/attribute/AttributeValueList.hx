@@ -12,7 +12,9 @@ private class AttributeValuePair {
         this.value = attribute.getDefaultValue() ;
     }
 }
-
+/**
+ *  An map from Attributes to AttributeValues.
+ */
 class AttributeValueList {
 
     // Invariant: forall a : AttributeUntyped | pairMap.get( a ) != null .
@@ -27,6 +29,9 @@ class AttributeValueList {
             var p = new AttributeValuePair( attr ) ;
             pairMap.set( attr, p ) ;
         }
+    }
+    public function getAttributes( ) : Iterator< AttributeUntyped > {
+        return pairMap.keys() ;
     }
     public function get<T : AttributeValue>( attribute : Attribute<T> ) : T {
         return cast( getUntyped( attribute ) ) ;
