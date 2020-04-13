@@ -1,4 +1,6 @@
 package view.viewModelRepresentatives;
+import model.observe.Observable;
+import model.observe.Observer;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import type.Coordinate;
 import js.html.CanvasElement;
@@ -13,7 +15,7 @@ import js.Browser.document;
  * ...
  * @author AdvaitTrivedi
  */
-class TabView 
+class TabView implements Observer extends Observable
 {
 	public var canvasElement : CanvasElement;
 	public var transform: Transform = Transform.identity();
@@ -23,7 +25,8 @@ class TabView
 	public function new(circuitDiagram: CircuitDiagramI, view: View, tranform: Transform) 
 	{
 		this.view = view;
-		this.tabModel = new TabModel(circuitDiagram);
+		this.addObserver(view);
+		this.tabModel = new TabModel(circuitDiagram, this);
 		this.canvasElement = this.spawnNewCanvas();
 	}
 
@@ -31,7 +34,11 @@ class TabView
 		return transform.pointInvert( viewCoord ) ;
 	}
 	
-	public function update() {
+	public function update(target: Any, ?data:Dynamic) : Void {
+		this.notifyObservers(target, data);
+	}
+	
+	public function updateTabView() {
 		var canvas = this.canvasElement ;
 		var context = canvas.getContext2d() ;
 		context.clearRect(0, 0, canvas.width, canvas.height);
@@ -41,22 +48,22 @@ class TabView
 	
 	public function panCanvasUp() {
 		this.transform = this.transform.translate(0, -70);
-		this.update();
+		this.updateTabView();
 	}
 	
 	public function panCanvasDown() {
 		this.transform = this.transform.translate(0, 70);
-		this.update();
+		this.updateTabView();
 	}
 	
 	public function panCanvasRight() {
 		this.transform = this.transform.translate(70, 0);
-		this.update();
+		this.updateTabView();
 	}
 	
 	public function panCanvasLeft() {
 		this.transform = this.transform.translate(-70, 0);
-		this.update();
+		this.updateTabView();
 	}
 	
 	public function panCanvasCentre() {
@@ -79,7 +86,7 @@ class TabView
 		this.transform = this.transform.translate( -circuitCentreX, -circuitCentreY ) ;
 		this.transform = this.transform.scale( scale, scale ) ;
 		this.transform = this.transform.translate( canvWidth/2, canvHeight/2 ) ;
-		this.update();
+		this.updateTabView();
 	}
 	
 	public function spawnNewCanvas() : CanvasElement {
