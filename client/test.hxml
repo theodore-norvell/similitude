@@ -1,0 +1,5 @@
+-cp src
+-cp testSrc
+-x TestMain
+-D dce=no
+-lib buddy

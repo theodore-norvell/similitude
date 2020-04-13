@@ -25,7 +25,7 @@ import model.enumeration.Orientation;
  * @author wanhui
  *
  */
-class XOR implements ComponentKind extends AbstractGate {
+class XOR implements ComponentKind extends AbstractGate implements ComponentKind {
 
     var nameOfTheComponentKind:String="XOR";
 

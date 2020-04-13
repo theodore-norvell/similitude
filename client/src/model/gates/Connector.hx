@@ -14,7 +14,7 @@ import model.selectionModel.SelectionModel ;
  * @author wanhui
  *
  */
-class Connector implements ComponentKind extends AbstractComponentKind {
+class Connector implements ComponentKind extends AbstractComponentKind implements ComponentKind {
 
     var nameOfTheComponentKind:String="Connector";
 

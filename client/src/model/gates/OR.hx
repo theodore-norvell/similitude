@@ -24,7 +24,7 @@ import model.enumeration.Orientation;
  * @author wanhui
  *
  */
-class OR implements ComponentKind extends AbstractGate {
+class OR implements ComponentKind extends AbstractGate implements ComponentKind {
 
     var nameOfTheComponentKind:String="OR";
 

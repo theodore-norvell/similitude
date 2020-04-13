@@ -9,11 +9,13 @@ import model.enumeration.MODE;
 import model.selectionModel.SelectionModel ;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.Orientation;
+import model.observe.ObservableI ;
 /**
 * interface for CicuitDiagram
 **/
-interface CircuitDiagramI {
+interface CircuitDiagramI extends ObservableI {
 
+    public function checkInvariant(): Void ;
     /**
     * @:getter component array from the circuit diagram
      * @return the iterator
@@ -50,15 +52,6 @@ interface CircuitDiagramI {
     * set name for component
     **/
     public function componentSetName(component:Component, name:String):Void;
-
-    /**
-    * update the size of this diagram
-    * note: the size of this diagram changed only happens in two suitutions
-    *       1. add a component
-    *       2. move a component (significant slow down the performance)
-    *            because there is no way to track the change for every component, so make this function public.
-    **/
-    public function updateBoundingBox():Void;
 
     /**
     * get the width of this diagram

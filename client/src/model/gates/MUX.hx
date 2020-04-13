@@ -31,7 +31,7 @@ import model.selectionModel.SelectionModel ;
  * @author wanhui
  *
  */
-class MUX implements ComponentKind extends AbstractComponentKind {
+class MUX implements ComponentKind extends AbstractComponentKind implements ComponentKind {
 
     var nameOfTheComponentKind:String="MUX";
 

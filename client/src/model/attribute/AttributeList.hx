@@ -3,7 +3,7 @@ package model.attribute;
 import assertions.Assert ;
 
 /**
- *  An assocciation list mapping attributes to attribute values.
+ *  A list of attributes.
  */
 class AttributeList {
     var list = new Array< AttributeUntyped >() ;

@@ -1,8 +1,7 @@
 package model.component;
 
 import assertions.Assert;
-import model.observe.Observable;
-import model.observe.Observer;
+import model.observe.*;
 import type.HitObject;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
@@ -12,8 +11,7 @@ import model.enumeration.Orientation;
 import type.Coordinate;
 import type.WorldPoint;
 
-class CircuitDiagram implements CircuitDiagramI implements Observer{  
-    var observable:Observable;
+class CircuitDiagram extends Observable implements CircuitDiagramI implements Observer{  
     var componentArray:Array<Component> = new Array<Component>();
     var linkArray:Array<Link> = new Array<Link>();
 
@@ -26,9 +24,8 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
     static var margin:Float = 50;
 
     public function new( ) {
-        this.observable = new Observable() ;
+        super() ;
         updateBoundingBox() ;
-
     }
 
     public function checkInvariant( ) : Void {
@@ -76,10 +73,10 @@ class CircuitDiagram implements CircuitDiagramI implements Observer{
         yMax = yMax + margin / 2 ;
 
         centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
-        observable.notifyObservers(this) ;
+        notifyObservers(this) ;
     }
 
-    public function update(target: Any, ?data:Dynamic) : Void{
+    public function update(target: ObservableI, ?data:Dynamic) : Void{
         updateBoundingBox() ; // This will also notify observers.
     }
 

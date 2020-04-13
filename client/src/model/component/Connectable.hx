@@ -1,5 +1,5 @@
 package model.component;
-import model.observe.Observer;
+import model.observe.*;
 import type.Coordinate ;
 
 /**
@@ -22,7 +22,7 @@ class Connectable extends CircuitElement implements Observer {
 
     public function isPort() { return false ; }
     
-    public function update( target: Any,?data:Dynamic) : Void {
+    public function update( target: ObservableI,?data:Dynamic) : Void {
         notifyObservers( this ) ;
     }
 

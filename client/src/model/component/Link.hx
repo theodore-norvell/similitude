@@ -5,7 +5,7 @@ package model.component;
  * @author wanhui
  *
  */
-import model.observe.Observer;
+import model.observe.*;
 import type.HitObject;
 import global.Constant.portSize;
 import global.Constant.pointToLineDistance ;
@@ -28,7 +28,7 @@ class Link extends CircuitElement implements Observer {
         this.endpoints = [zero, one];
     }
 
-    public function update(target : Any,?data:Dynamic) : Void {
+    public function update(target : ObservableI,?data:Dynamic) : Void {
         notifyObservers( this ) ;
     }
 

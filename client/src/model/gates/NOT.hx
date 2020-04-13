@@ -23,7 +23,7 @@ import model.enumeration.Orientation;
  * @author wanhui
  *
  */
-class NOT implements ComponentKind extends AbstractGate {
+class NOT implements ComponentKind extends AbstractGate implements ComponentKind {
 
     var nameOfTheComponentKind:String="NOT";
 
