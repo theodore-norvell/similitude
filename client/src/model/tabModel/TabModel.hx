@@ -1,7 +1,6 @@
 package model.tabModel;
 import model.drawingInterface.DrawingAdapterI;
-import model.observe.Observable;
-import model.observe.Observer;
+import model.observe.*;
 import view.viewModelRepresentatives.TabView;
 //import js.html.CanvasRenderingContext2D;
 import model.component.CircuitDiagramI;
@@ -71,7 +70,7 @@ class TabModel implements Observer extends Observable
 		}
 	}
 	
-	public function update(target: Any, ?data:Dynamic) : Void {
+	public function update(target: ObservableI, ?data: Any) : Void {
 		this.notifyObservers(target, data);
 	}
 }

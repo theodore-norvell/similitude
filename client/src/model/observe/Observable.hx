@@ -5,11 +5,6 @@ class Observable implements ObservableI {
 
     var observers:Array<Observer>= new Array<Observer>();
 
-    //public function new() {
-//
-    //}
-
-
     public function addObserver(obs:Observer) : Void {
         Assert.assert( obs != null ) ;
         if( observers.indexOf( obs ) == -1 ) observers.push(obs);

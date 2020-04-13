@@ -1,6 +1,6 @@
 package view;
 
-import model.observe.Observer;
+import model.observe.*;
 import type.Coordinate;
 import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
@@ -150,7 +150,7 @@ class View implements Observer
 	 * @param	target
 	 * @param	data
 	 */
-	public function update(target: Any, ?data:Dynamic) : Void {
+	public function update(target: ObservableI, ?data: Any) : Void {
 		this.updateCanvas();
 	}
 }

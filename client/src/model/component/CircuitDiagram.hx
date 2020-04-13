@@ -24,7 +24,6 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
     static var margin:Float = 50;
 
     public function new( ) {
-        super() ;
         updateBoundingBox() ;
     }
 
@@ -76,7 +75,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         notifyObservers(this) ;
     }
 
-    public function update(target: ObservableI, ?data:Dynamic) : Void{
+    public function update(target: ObservableI, ?data:Any) : Void{
         updateBoundingBox() ; // This will also notify observers.
     }
 

@@ -1,6 +1,5 @@
 package view.viewModelRepresentatives;
-import model.observe.Observable;
-import model.observe.Observer;
+import model.observe.* ;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import type.Coordinate;
 import js.html.CanvasElement;
@@ -34,7 +33,7 @@ class TabView implements Observer extends Observable
 		return transform.pointInvert( viewCoord ) ;
 	}
 	
-	public function update(target: Any, ?data:Dynamic) : Void {
+	public function update(target: ObservableI, ?data:Dynamic) : Void {
 		this.notifyObservers(target, data);
 	}
 	

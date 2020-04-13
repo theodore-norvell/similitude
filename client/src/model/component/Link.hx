@@ -28,7 +28,7 @@ class Link extends CircuitElement implements Observer {
         this.endpoints = [zero, one];
     }
 
-    public function update(target : ObservableI,?data:Dynamic) : Void {
+    public function update(target : ObservableI,?data: Any) : Void {
         notifyObservers( this ) ;
     }
 

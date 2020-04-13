@@ -22,7 +22,7 @@ class Connectable extends CircuitElement implements Observer {
 
     public function isPort() { return false ; }
     
-    public function update( target: ObservableI,?data:Dynamic) : Void {
+    public function update( target: ObservableI,?data: Any) : Void {
         notifyObservers( this ) ;
     }
 
