@@ -1,7 +1,7 @@
 package model.component;
 
+import model.attribute.* ;
 import model.selectionModel.SelectionModel;
-import model.attribute.Pair;
 import model.observe.Observable;
 import type.HitObject;
 import model.enumeration.BOX;
@@ -11,19 +11,9 @@ import type.Coordinate;
 import type.WorldPoint;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import model.gates.ComponentKind;
 import assertions.Assert;
-import model.attribute.StringAttr;
-import model.attribute.NamePair;
-import model.attribute.OrientationAttr;
-import model.attribute.OrientationPair;
-import model.attribute.IntAttr;
-import model.attribute.DelayPair;
-import model.attribute.AttrValue;
-import model.attribute.StringValue;
-import model.attribute.IntValue;
-import model.attribute.OrientationValue;
 
 /**
  * Component composite by gates and ports, in this class
@@ -47,7 +37,10 @@ class Component extends CircuitElement {
     var  ports : Array<Port> = new Array<Port>() ;
     // TODO Make boxType an attribute for the kinds where it makes sense.
     var boxType:BOX;
-    var list:Map<String,Pair>=new Map<String,Pair>();
+
+    @:allow( model.gates )
+    var attributeValueList : AttributeValueList ;
+    
     /**
     *   create component
      *   @param xPosition: x position
@@ -58,7 +51,7 @@ class Component extends CircuitElement {
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, componentKind:ComponentKind, inportNum:Int) {
+    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, componentKind:ComponentKind) {
         super(circuitDiagram);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -68,63 +61,44 @@ class Component extends CircuitElement {
         this.componentKind = componentKind;
         this.boxType = BOX.WHITE_BOX;
 
-        //this.delay = 0;//init is zero
-
         //initial ports
         this.componentKind.createPorts( this, function ( port : Port ) { ports.push( port ) ; } ) ;
         this.componentKind.updatePortPositions( this ) ;
 
         // TODO What is going on with this loop?  What about other attributes.
-        for(n in componentKind.getAttr()){
-            if(n.getName()=="delay"){
-                list.set(n.getName(),new DelayPair(cast(n,IntAttr),cast(n,IntAttr).getdefaultvalue()));
-            }
-            else if(n.getName()=="name"){
-                list.set(n.getName(),new NamePair(cast(n,StringAttr),cast(n,StringAttr).getdefaultvalue()));
-            }
-            else if(n.getName()=="orientation"){
-                list.set(n.getName(),new OrientationPair(cast(n,OrientationAttr),cast(n,OrientationAttr).getdefaultvalue()));
-            }
-        }
-        list.get("orientation").update(this,new OrientationValue(orientation));
+        this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
+    }
+
+    public function getAttributes( ) : Iterator< AttributeUntyped > {
+        return attributeValueList.getAttributes() ;
     }
     
-    public function getmap(){
-        return list;
+    public function hasAttr( attribute : AttributeUntyped ) : Bool {
+        return attributeValueList.has( attribute ) ;
     }
 
-    public function hasAttr(s:String):Bool{
-        return list.exists(s);
+    public function get<T : AttributeValue>( attribute : Attribute<T> ) : T {
+        return attributeValueList.get( attribute ) ;
     }
 
-    public function getAttr(s:String):AttrValue{
-        Assert.assert(list.exists(s));
-        return list.get(s).getAttrValue();
+    public function getUntyped( attribute : AttributeUntyped) : AttributeValue {
+        return attributeValueList.getUntyped( attribute ) ;
     }
 
-    public function getAttrInt(s:String):Int{
-        Assert.assert(list.exists(s));
-        return list.get(s).getAttrValue().getvalue();
+    public function canUpdate<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Bool {
+        return this.componentKind.canUpdate( this, attribute, value) ;
     }
 
-    public function canupdate(s:String,v:AttrValue):Bool{
-        Assert.assert(list.exists(s));
-        if(list.exists(s)){
-            return list.get(s).canupdate(this,v);
-        }
-        return false;
+    public function canUpdateUntyped( attribute : AttributeUntyped, value : AttributeValue ) : Bool {
+        return this.componentKind.canUpdateUntyped( this, attribute, value) ;
     }
 
-    public function update(s:String, v:AttrValue):Bool{
-        Assert.assert(list.exists(s));
-        if(list.exists(s)){
-            if(list.get(s).canupdate(this,v)){
-                var success =  list.get(s).update(this,v);
-                if( success ) notifyObservers(this) ;
-                return success ;
-            }
-        }
-        return false;
+    public function update<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Void {
+        this.componentKind.update( this, attribute, value) ;
+    }
+
+    public function updateUntyped( attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        this.componentKind.updateUntyped( this, attribute, value) ;
     }
 
     public function get_xPosition():Float {
@@ -159,14 +133,14 @@ class Component extends CircuitElement {
     override public function bottom() : Float {
         return this.yPosition + this.height/2.0 ; }
 
-    public function get_orientation():ORIENTATION {
-        return list.get("orientation").getAttrValue().getvalue();
+    public function get_orientation():Orientation {
+        var attrVal = get( StandardAttributes.orientation ) ;
+        return attrVal.getOrientation() ;
     }
 
-    public function set_orientation(value:ORIENTATION) : Void {
-        update("orientation",new OrientationValue(value));
-        this.componentKind.updatePortPositions( this ) ;
-    }
+    public function set_orientation(value:Orientation) : Void {
+        update( StandardAttributes.orientation, new OrientationAttributeValue( value ) ) ;
+    } 
 
     public function get_componentKind():ComponentKind {
         return componentKind;
@@ -190,11 +164,12 @@ class Component extends CircuitElement {
     }
 
     public function get_name():String {
-        return list.get("name").getAttrValue().getvalue();
+        // TODO
+        return "foo" ; 
     }
 
-    public function set_name(value:String) {
-        update("name",new StringValue(value));
+    public function set_name(value:String) : Void {
+        // TODO
     }
 
     public function get_height():Float {

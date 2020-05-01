@@ -1,9 +1,5 @@
 package model.gates;
 
-import model.attribute.OrientationAttr;
-import model.attribute.StringAttr;
-import model.attribute.IntAttr;
-import model.attribute.Attribute;
 import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawComponents.DrawOR;
@@ -11,7 +7,7 @@ import model.selectionModel.SelectionModel ;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 /**
  * OR gate<br>
  * Truth Table
@@ -28,26 +24,25 @@ import model.enumeration.ORIENTATION;
  * @author wanhui
  *
  */
-class OR implements ComponentKind extends AbstractGate {
+class OR implements ComponentKind extends AbstractGate implements ComponentKind {
 
     var nameOfTheComponentKind:String="OR";
 
     public function new() {
         super() ;
-        attributes.push(new IntAttr("delay"));
     }
 
     public function getname():String{
         return nameOfTheComponentKind;
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:ORIENTATION, ?inportNum:Int):Array<Port> {
+    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
     //     var portArray:Array<Port> = new Array<Port>();
     //     if(inportNum == null || inportNum < 3){
     //         inportNum = 2;
     //     }
     //     switch (orientation){
-    //         case ORIENTATION.EAST : {
+    //         case Orientation.EAST : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {
@@ -62,7 +57,7 @@ class OR implements ComponentKind extends AbstractGate {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.NORTH : {
+    //         case Orientation.NORTH : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {
@@ -76,7 +71,7 @@ class OR implements ComponentKind extends AbstractGate {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.SOUTH : {
+    //         case Orientation.SOUTH : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {
@@ -90,7 +85,7 @@ class OR implements ComponentKind extends AbstractGate {
     //             outport_.set_portDescription(IOTYPE.OUTPUT);
     //             portArray.push(outport_);
     //         };
-    //         case ORIENTATION.WEST : {
+    //         case Orientation.WEST : {
     //             var counter:Int = 0;
     //             //inport
     //             while (counter < inportNum) {

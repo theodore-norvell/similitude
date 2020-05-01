@@ -4,7 +4,7 @@ import model.component.Component;
 import model.component.Port;
 import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.IOTYPE;
-import model.enumeration.ORIENTATION;
+import model.enumeration.Orientation;
 import global.Constant.*;
 /**
 * draw flip flop
@@ -27,7 +27,7 @@ class DrawFlipFlop extends DrawComponent{
         drawingAdapter.setTextColor("black") ;
         for (port in component.get_ports()) {
             switch(component.get_orientation()){
-                case ORIENTATION.NORTH : {
+                case Orientation.NORTH : {
                     if (port.get_portDescription() == IOTYPE.D) {
                         drawingAdapter.drawText("D", port.get_xPosition() - 2, port.get_yPosition() - 5, component.get_width() - 2);
                     } else if (port.get_portDescription() == IOTYPE.CLK) {
@@ -38,7 +38,7 @@ class DrawFlipFlop extends DrawComponent{
                         drawingAdapter.drawText("QN", port.get_xPosition() - 6, port.get_yPosition() + 10, component.get_width() - 2);
                     }
                 };
-                case ORIENTATION.SOUTH : {
+                case Orientation.SOUTH : {
                     if (port.get_portDescription() == IOTYPE.D) {
                         drawingAdapter.drawText("D", port.get_xPosition() - 3, port.get_yPosition() + 10, component.get_width() - 2);
                     } else if (port.get_portDescription() == IOTYPE.CLK) {
@@ -49,7 +49,7 @@ class DrawFlipFlop extends DrawComponent{
                         drawingAdapter.drawText("QN", port.get_xPosition() - 3, port.get_yPosition() - 7, component.get_width() - 2);
                     }
                 };
-                case ORIENTATION.WEST : {
+                case Orientation.WEST : {
                     if (port.get_portDescription() == IOTYPE.D) {
                         drawingAdapter.drawText("D", port.get_xPosition() - 10, port.get_yPosition() + 2, component.get_width() - 2);
                     } else if (port.get_portDescription() == IOTYPE.CLK) {
@@ -60,7 +60,7 @@ class DrawFlipFlop extends DrawComponent{
                         drawingAdapter.drawText("QN", port.get_xPosition() + 3, port.get_yPosition() + 2, component.get_width() - 2);
                     }
                 };
-                case ORIENTATION.EAST : {
+                case Orientation.EAST : {
                     if (port.get_portDescription() == IOTYPE.D) {
                         drawingAdapter.drawText("D", port.get_xPosition() + 3, port.get_yPosition() + 3, component.get_width() - 2);
                     } else if (port.get_portDescription() == IOTYPE.CLK) {

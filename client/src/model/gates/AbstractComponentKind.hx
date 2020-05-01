@@ -1,12 +1,11 @@
 package model.gates;
 
 import assertions.Assert ;
-import model.attribute.Attribute ;
-import model.attribute.OrientationAttr ;
-import model.attribute.StringAttr ;
+import model.attribute.* ;
 import model.component.CircuitDiagramI;
 import model.component.Component;
 import model.component.Port ;
+import model.component.StandardAttributes ;
 import model.drawingInterface.DrawingAdapterI ;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
@@ -20,16 +19,43 @@ import global.Constant.portSize ;
 * @author wanhui
 **/
 class AbstractComponentKind  {
-    
-    private var attributes:Array<Attribute>=new Array<Attribute>();
+
+    var attributes = new AttributeList() ;
 
     private function new() {
-        attributes.push(new OrientationAttr());
-        attributes.push(new StringAttr("name"));
+        attributes.add( StandardAttributes.orientation ) ;
     }
 
-    public function getAttr():Array<Attribute> {
-        return attributes ;
+    public function getAttributes() : Iterator< AttributeUntyped > {
+        return attributes.iterator() ;
+    }
+
+    public function canUpdate<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Bool {
+        return canUpdateUntyped( component, attribute, value ) ;
+    }
+
+    public function canUpdateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Bool {
+        Assert.assert( attribute.getType() == value.getType() ) ;
+        return component.attributeValueList.has( attribute ) ;
+    }
+
+    public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
+        updateUntyped( component, attribute, value ) ;
+    }
+
+    public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        Assert.assert( canUpdateUntyped( component, attribute, value ) ) ;
+        component.attributeValueList.setUntyped( attribute, value ) ;
+        updateHelper( component, attribute, value ) ;
+        component.notifyObservers(component) ;
+    }
+    
+    
+    /* The job of the update helper is to ensure that any kind specific invariants
+    * of the component are restored prior to notifying the observers of the component.
+    */
+    private function updateHelper( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        if( attribute == StandardAttributes.orientation ) updatePortPositions( component ) ;
     }
 
     public function createPorts( component : Component, addPort : Port -> Void ) : Void {

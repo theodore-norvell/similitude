@@ -1,14 +1,9 @@
 package model.observe ;
 import assertions.Assert;
 
-class Observable {
+class Observable implements ObservableI {
 
     var observers:Array<Observer>= new Array<Observer>();
-
-    //public function new() {
-//
-    //}
-
 
     public function addObserver(obs:Observer) : Void {
         Assert.assert( obs != null ) ;
@@ -22,7 +17,7 @@ class Observable {
     }
 
 
-    public function notifyObservers(target:Any,?data:Dynamic):Void {
+    public function notifyObservers(target:ObservableI,?data:Dynamic):Void {
         for(n in observers) {
             n.update( target, data);
         }

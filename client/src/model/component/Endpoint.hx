@@ -1,8 +1,5 @@
 package model.component;
 
-import js.html.svg.CircleElement;
-
-
 /**
  * Every link should have two endpoints
  * @author wanhui
