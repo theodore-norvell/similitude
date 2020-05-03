@@ -128,7 +128,13 @@ class View implements Observer
 	 */
 	public function updateCanvasListener(eventObject: SidebarDragAndDropEvent) {
 		// add more cases to handle more stuff
-		this.canvasListener.addComponentToCanvas(eventObject);
+		if (Std.string(eventObject.component) == "LINK") {
+			// there is no component type called LINK, as Link is a CircuitElement
+			trace('here');
+			this.canvasListener.addLinkToCanvas(eventObject);
+		} else {
+			this.canvasListener.addComponentToCanvas(eventObject);
+		}
 	}
 	
 	/**

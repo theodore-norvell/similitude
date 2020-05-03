@@ -31,7 +31,7 @@ class SidebarUpdate extends AbstractUpdate
 	 * The optional parameter component is given with the view that the function might be reused further.
 	 * @return
 	 */
-	public function createSidebarItemElement(drawComponentString: ComponentType, ?component: Component) : DivElement {
+	private function createSidebarItemElement(drawComponentString: Dynamic, ?component: Component) : DivElement {
 		// the idea is to have constant width and height for each element
 		var height = 50;
 		var width = 50;
@@ -69,14 +69,21 @@ class SidebarUpdate extends AbstractUpdate
 		
 		var drawingAdapter = new DrawingAdapter(Transform.identity(), sidebarItemCanvas.getContext2d());
 		
-		// add more defaults when needed
-		// use the optional component parameter for this.
-		switch (drawComponentString) {
-			case ComponentType.AND : drawingAdapter.drawAndShape(80,75, 70, 70, Orientation.EAST);
-			case ComponentType.OR : drawingAdapter.drawOrShape(80,75, 70, 70, Orientation.EAST);
-			case ComponentType.XOR : drawingAdapter.drawXorShape(80,75, 70, 70, Orientation.EAST);
-			case ComponentType.NOT : drawingAdapter.drawNotShape(80,75, 70, 70, Orientation.EAST);
-			case ComponentType.COMPOUND_COMPONENT : Console.log("CC");
+		// links need to be handled separately, as there is no component kind for them
+		if (!Std.is(drawComponentString, ComponentType)) {
+			if (Std.is(drawComponentString, String) && drawComponentString == "LINK") {
+				drawingAdapter.drawLine(80, 75, 220, 75) ;
+			}
+		} else {
+			// add more defaults when needed
+			// use the optional component parameter for this.
+			switch (drawComponentString) {
+				case ComponentType.AND : drawingAdapter.drawAndShape(80,75, 70, 70, Orientation.EAST);
+				case ComponentType.OR : drawingAdapter.drawOrShape(80,75, 70, 70, Orientation.EAST);
+				case ComponentType.XOR : drawingAdapter.drawXorShape(80,75, 70, 70, Orientation.EAST);
+				case ComponentType.NOT : drawingAdapter.drawNotShape(80,75, 70, 70, Orientation.EAST);
+				case ComponentType.COMPOUND_COMPONENT : Console.log("CC");
+			}
 		}
 		
 		return sidebarItem;
@@ -87,7 +94,13 @@ class SidebarUpdate extends AbstractUpdate
 	 */ 
 	public function populateSidebar()  : Void {
 		// this handles cases for the default logic gates in general
-		var defaultSidebarItems = [ComponentType.AND, ComponentType.OR, ComponentType.XOR,ComponentType.NOT];
+		var defaultSidebarItems : Array<Dynamic> = [
+			ComponentType.AND, 
+			ComponentType.OR, 
+			ComponentType.XOR,
+			ComponentType.NOT, 
+			"LINK" // cases that are not components are to be included too
+		];
 		
 		var sidebarTable = document.querySelector("#sidebarTable");
 		var tableBody = sidebarTable.childNodes[1];

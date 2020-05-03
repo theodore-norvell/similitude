@@ -22,10 +22,13 @@ enum ComponentType
 	OR;
 	XOR;
 	NOT;
+	// LINK; // The link has no ComponentKind class attached but will be needed in different cases
 	COMPOUND_COMPONENT;
 }
 
 class ComponentTypes {
+	// The link does not have a singleton object associated to it givn that it has no ComponentKind class
+	
 	var andComponentKind = new AND();
 
 	var flipFlopKind = new FlipFlop() ;

@@ -12,6 +12,7 @@ interface CanvasListener extends ViewListener
 	 * @param	componentToAdd
 	 */
 	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void;
+	public function addLinkToCanvas(eventObject: SidebarDragAndDropEvent) : Void;
 	public function undoLastCanvasChange() : Void;
 	public function redoLastCanvasChange() : Void;
 }
