@@ -207,7 +207,7 @@ class Component extends CircuitElement {
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
-        return componentKind.findHitList(this, coordinate, mode);
+        return componentKind.findHitList(this, coordinate, mode, true);
     }
 
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
