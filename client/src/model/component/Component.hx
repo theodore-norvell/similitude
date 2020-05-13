@@ -69,6 +69,13 @@ class Component extends CircuitElement {
         this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
 
+    public function toString() : String {
+        return "Component( kind: " + componentKind
+                         + " x:" + xPosition
+                         + " y:" + yPosition
+                         + ")" ;
+    }
+
     public function getAttributes( ) : Iterator< AttributeUntyped > {
         return attributeValueList.getAttributes() ;
     }

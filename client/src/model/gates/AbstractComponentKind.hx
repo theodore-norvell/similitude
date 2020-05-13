@@ -70,7 +70,7 @@ class AbstractComponentKind  {
     :Array<HitObject> {
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
-        if( includeSelf && isInComponent(component, coordinate) ){
+        if( includeSelf && isInComponent(component, coordinate) ) {
             var hitObject:HitObject = new HitObject();
             hitObject.set_component(component);
             hitObjectArray.push(hitObject);
