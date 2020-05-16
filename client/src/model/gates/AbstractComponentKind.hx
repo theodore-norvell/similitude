@@ -66,12 +66,11 @@ class AbstractComponentKind  {
         //TODO
     }
 
-    public function findHitList(component : Component, coordinate:Coordinate, mode:MODE)
+    public function findHitList(component : Component, coordinate:Coordinate, mode:MODE, includeSelf : Bool )
     :Array<HitObject> {
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
 
-        var component:Component = isInComponent(component, coordinate);
-        if(component != null){
+        if( includeSelf && isInComponent(component, coordinate) ) {
             var hitObject:HitObject = new HitObject();
             hitObject.set_component(component);
             hitObjectArray.push(hitObject);
@@ -93,11 +92,10 @@ class AbstractComponentKind  {
     * @return if the coordinate in a component then return the component
     *           or  return null;
     **/
-    function isInComponent(component : Component, coordinate:Coordinate):Component {
-        if(isInScope(component.get_xPosition(), component.get_yPosition(), coordinate.get_xPosition(), coordinate.get_yPosition(), component.get_height(), component.get_width())){
-            return component;
-        }
-        return null;
+    function isInComponent(component : Component, coordinate:Coordinate) : Bool {
+        return isInScope(component.get_xPosition(), component.get_yPosition(),
+                         coordinate.get_xPosition(), coordinate.get_yPosition(),
+                         component.get_height(), component.get_width()) ;
     }
 
     /**
@@ -111,11 +109,10 @@ class AbstractComponentKind  {
      * @reutrn if in the scope, return true; otherwise, return false;
     **/
     function isInScope(orignalXposition:Float, orignalYposition:Float, mouseXPosition:Float, mouseYposition:Float, heigh:Float, width:Float):Bool{
-        if((mouseXPosition >= orignalXposition - width/2 && mouseXPosition <= orignalXposition + width/2)&&(mouseYposition >= orignalYposition - heigh/2 && mouseYposition <= orignalYposition + heigh/2)){
-            return true;
-        }else{
-            return false;
-        }
+        return  mouseXPosition >= orignalXposition - width/2 
+             && mouseXPosition <= orignalXposition + width/2
+             && mouseYposition >= orignalYposition - heigh/2
+             && mouseYposition <= orignalYposition + heigh/2 ;
     }
 
     /**

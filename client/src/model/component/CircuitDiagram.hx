@@ -176,20 +176,17 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
         var hitObjectArray:Array<HitObject> = new Array<HitObject>();
-        var hitLinkArray:Array<HitObject> = new Array<HitObject>();
-        for(i in linkArray){
-            hitLinkArray = i.findHitList(coordinate, mode);
-            for(j in hitLinkArray){
+        
+        for(link in linkArray){
+            var result = link.findHitList(coordinate, mode);
+            for(j in result){
                 j.set_circuitDiagram(this);
-
                 hitObjectArray.push(j);
             }
         }
 
-        var result:Array<HitObject> = new Array<HitObject>();
-        for(i in componentArray){
-            result = i.findHitList(coordinate, mode) ;
-
+        for(comp in componentArray) {
+            var result = comp.findHitList(coordinate, mode) ;
             for(j in result){
                 if(j.get_circuitDiagram() == null){
                     j.set_circuitDiagram(this);
