@@ -12,10 +12,11 @@ class AddComponentCommand extends AbstractCommand
 {
 	var component: Component;
 	
-	public function new(circuitDiagram: CircuitDiagramI, component: Component) 
+	public function new(circuitDiagram: CircuitDiagramI, component: Component, commandUID: String) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.component = component;
+		this.commandUID = commandUID;
 	}
 	
 	override public function execute() : Void {

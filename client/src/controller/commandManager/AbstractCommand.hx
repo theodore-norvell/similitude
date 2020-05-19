@@ -7,6 +7,7 @@ import model.component.CircuitDiagramI;
  */
 class AbstractCommand implements CommandI
 {
+	var commandUID: String;
 	var circuitDiagram: CircuitDiagramI;
 	
 	public function setCircuitDiagram(circuitDiagram: CircuitDiagramI) {
@@ -15,6 +16,14 @@ class AbstractCommand implements CommandI
 	
 	public function getCircuitDiagram() {
 		return this.circuitDiagram;
+	}
+	
+	public function getCommandUID() : String {
+		return this.commandUID;
+	}
+	
+	public function setCommandUID(uid: String) : Void {
+		this.commandUID = uid;
 	}
 	
 	public function execute() : Void {};

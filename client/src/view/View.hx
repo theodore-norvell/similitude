@@ -1,6 +1,9 @@
 package view;
 
 import model.observe.*;
+import model.similitudeEvents.CanvasMouseInteractionEvent;
+import model.similitudeEvents.LinkAddEvent;
+import model.similitudeEvents.LinkEditEvent;
 import type.Coordinate;
 import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
@@ -94,10 +97,9 @@ class View implements Observer
 		draggableBox.addEventListener('drag', function (event) {
             // do something
 			Console.log("draggable is being dragged");
-			//Console.log(event);
-			
-			
+			//Console.log(event);			
         });
+		
 		// also set the dragStart event to send data through the drag and drop
 		draggableBox.addEventListener('dragstart', function(event) {
 			// do not forget to set data before the transfer
@@ -116,25 +118,22 @@ class View implements Observer
 	public function setCanvasListener(listener: CanvasListener){
 		this.canvasListener = listener;
 	}
-	
-	public function updateThisBox(updateString: String){
-		//var updateThis= document.querySelector("#updateThis");
-		//updateThis.innerText = updateString;
-	}
 
-	/**
-	 * A common function that accepts JSON / Dynamic objects to update the Canvas
-	 * @param	eventObject
-	 */
 	public function updateCanvasListener(eventObject: SidebarDragAndDropEvent) {
 		// add more cases to handle more stuff
-		if (Std.string(eventObject.component) == "LINK") {
-			// there is no component type called LINK, as Link is a CircuitElement
-			trace('here');
-			this.canvasListener.addLinkToCanvas(eventObject);
-		} else {
-			this.canvasListener.addComponentToCanvas(eventObject);
-		}
+		this.canvasListener.addComponentToCanvas(eventObject);
+	}
+	
+	public function addLinkToCanvas(eventObject: LinkAddEvent) {
+		this.canvasListener.addLinkToCanvas(eventObject);
+	}
+	
+	public function editLinkOnCanvas(eventObject: LinkEditEvent) {
+		this.canvasListener.editLinkOnCanvas(eventObject);
+	}
+	
+	public function handleCanvasMouseInteractions(eventObject: CanvasMouseInteractionEvent) {
+		this.canvasListener.handleCanvasMouseInteractions(eventObject);
 	}
 	
 	/**

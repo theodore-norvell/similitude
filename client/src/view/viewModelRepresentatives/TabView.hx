@@ -1,5 +1,10 @@
 package view.viewModelRepresentatives;
 import model.observe.* ;
+import model.similitudeEvents.CanvasMouseDownEvent;
+import model.similitudeEvents.CanvasMouseMoveEvent;
+import model.similitudeEvents.CanvasMouseUpEvent;
+import model.similitudeEvents.LinkAddEvent;
+import model.similitudeEvents.LinkEditEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import type.Coordinate;
 import js.html.CanvasElement;
@@ -9,6 +14,7 @@ import model.tabModel.TabModel;
 import view.View;
 import haxe.Unserializer;
 import js.Browser.document;
+import model.enumeration.MODE;
 
 /**
  * ...
@@ -16,10 +22,11 @@ import js.Browser.document;
  */
 class TabView implements Observer extends Observable
 {
-	public var canvasElement : CanvasElement;
-	public var transform: Transform = Transform.identity();
-	public var view: View;
+	private var canvasElement : CanvasElement;
+	private var transform: Transform = Transform.identity();
+	private var view: View;
 	public var tabModel: TabModel;
+	private var mouseClicked: Bool = false;
 	
 	public function new(circuitDiagram: CircuitDiagramI, view: View, tranform: Transform) 
 	{
@@ -110,13 +117,14 @@ class TabView implements Observer extends Observable
 			// refer to MDN docs for more dropEffects
 			
 		});
+		
 		// needs this event by default for the drop target.
 		canvasDisplayScreen.addEventListener('drop', function (event) {
 			event.preventDefault();
 			var data = event.dataTransfer.getData("text/plain");
 			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
-			var viewCoord = new Coordinate( event.layerX-80, event.layerY-50) ;
-			// TODO: Where does this magic numbers of 80 and 50 come from?
+			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
+			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46) ;
 			var worldCoords = viewToWorld( viewCoord ) ;
 			eventPassed.draggedToX = worldCoords.get_xPosition() ;
 			eventPassed.draggedToY = worldCoords.get_yPosition() ;
@@ -125,6 +133,45 @@ class TabView implements Observer extends Observable
 			//eventPassed.draggedToY = event.pageY;
 			this.view.updateCanvasListener(eventPassed);
 		});
+		
+		innerCanvas.onmousedown = function (event) {
+			var circuitDiagram = this.tabModel.getCircuitDiagram();
+			
+			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
+			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46);
+			var worldCoords = viewToWorld( viewCoord );
+			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
+			var eventPassed = new CanvasMouseDownEvent(objectsHit);
+			eventPassed.xPosition = worldCoords.get_xPosition();
+			eventPassed.yPosition = worldCoords.get_yPosition();
+			this.view.handleCanvasMouseInteractions(eventPassed);
+		}
+		
+		innerCanvas.onmousemove = function (event) {
+			var circuitDiagram = this.tabModel.getCircuitDiagram();
+			
+			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
+			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46);
+			var worldCoords = viewToWorld( viewCoord );
+			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
+			var eventPassed = new CanvasMouseMoveEvent(objectsHit);
+			eventPassed.xPosition = worldCoords.get_xPosition();
+			eventPassed.yPosition = worldCoords.get_yPosition();
+			this.view.handleCanvasMouseInteractions(eventPassed);
+		}
+		
+		innerCanvas.onmouseup = function (event) {
+			var circuitDiagram = this.tabModel.getCircuitDiagram();
+			
+			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
+			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46);
+			var worldCoords = viewToWorld( viewCoord );
+			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
+			var eventPassed = new CanvasMouseUpEvent(objectsHit);
+			eventPassed.xPosition = worldCoords.get_xPosition();
+			eventPassed.yPosition = worldCoords.get_yPosition();
+			this.view.handleCanvasMouseInteractions(eventPassed);
+		}
 		
 		return innerCanvas;
 	}
