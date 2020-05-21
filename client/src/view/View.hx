@@ -33,6 +33,7 @@ class View implements Observer
 		// letting this stay here for now
 		// check out the matrix once to understand how it works.
 		this.activeTab = new TabView(new CircuitDiagram(), this, Transform.identity());
+		this.activeTab.addObserver(this);
 		// this.setActiveTab();
 		allTabs.push(activeTab);
 		

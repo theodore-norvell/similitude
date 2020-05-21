@@ -1,10 +1,9 @@
 package controller.commandManager;
 
-import model.component.Component;
-import model.component.Link;
-import model.component.Port;
-import model.component.Endpoint;
+import model.component.CircuitDiagramI;
 import model.selectionModel.SelectionModel;
+import haxe.Serializer;
+import haxe.Unserializer;
 
 /**
  * ...
@@ -12,22 +11,18 @@ import model.selectionModel.SelectionModel;
  */
 class ClearSelectionCommand extends AbstractCommand
 {
-	var selectedComponents = new Array<Component>();
-	var selectedLinks = new Array<Link>();
-	var selectedPorts = new Array<Port>();
-	var selectedEndpoints = new Array<Endpoint>();
 	var selectionModel: SelectionModel;
-	var copySelectionModel: SelectionModel;
+	var copySelectionModel: String;
 	
 	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
-		this.copySelectionModel = Reflect.
+		this.copySelectionModel = Serializer.run(selectionModel);
 	}
 	
 	override public function execute() : Void {
-		this.selectionModel.addCircuitElement(this.circuitElement);
+		this.selectionModel.clearSelection();
 	}
 	
 	override public function redo() : Void {
@@ -35,6 +30,8 @@ class ClearSelectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		this.selectionModel.removeCircuitElement(this.circuitElement);
+		var selection = Unserializer.run(this.copySelectionModel);
+		trace("Selection :: ", selection);
+		this.selectionModel = cast(selection, SelectionModel);
 	};
 }

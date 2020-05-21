@@ -47,22 +47,34 @@ class SelectionModel
 	
 	/**
 	 * Allows a user to remove a CircuitElement to the selection.
+	 * Element will be removed only if the selection contains it.
 	 * Compatible Types : Component, Link, Port, Endpoint.
 	 * Will throw a String exception if it is not a compatible type.
 	 * @param	element
 	 */
 	public function removeCircuitElement(element : CircuitElement) {
 		if (Std.is(element, Component)) {
-			this.removeComponent(Std.downcast(element, Component));
+			if(this.containsComponent(Std.downcast(element, Component))) { this.removeComponent(Std.downcast(element, Component)); }
 		} else if (Std.is(element, Link)) {
-			this.removeLink(Std.downcast(element, Link));
+			if(this.containsLink(Std.downcast(element, Link))) { this.removeLink(Std.downcast(element, Link)); }
 		} else if (Std.is(element, Port)) {
-			this.removePort(Std.downcast(element, Port));
+			if (this.containsPort(Std.downcast(element, Port))) { this.removePort(Std.downcast(element, Port)); }
 		} else if (Std.is(element, Endpoint)) {
-			this.removeEndpoint(Std.downcast(element, Endpoint));
+			if (this.containsEndpoint(Std.downcast(element, Endpoint))) { this.removeEndpoint(Std.downcast(element, Endpoint)); }
 		} else {
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
+	}
+	
+	/**
+	 * Will clear the selection completely.
+	 * WARNING : only use this function if you know what you are doing.
+	 */
+	public function clearSelection() {
+		this.selectedComponents = new Array<Component>();
+		this.selectedEndpoints = new Array<Endpoint>();
+		this.selectedLinks = new Array<Link>();
+		this.selectedPorts = new Array<Port>();
 	}
 	
 	/**
@@ -71,7 +83,7 @@ class SelectionModel
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	componentArray
 	 */
-	public function setSelectedComponentsArray(componentArray: Array<Component>) : Void {
+	public function setSelectedComponents(componentArray: Array<Component>) : Void {
 		this.selectedComponents = componentArray;
 	}
 	
@@ -81,7 +93,7 @@ class SelectionModel
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	linkArray
 	 */
-	public function setSelectedLinksArray(linkArray: Array<Link>) : Void {
+	public function setSelectedLinks(linkArray: Array<Link>) : Void {
 		this.selectedLinks = linkArray;
 	}
 	
@@ -91,7 +103,7 @@ class SelectionModel
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	portArray
 	 */
-	public function setSelectedPortsArray(portArray: Array<Port>) : Void {
+	public function setSelectedPorts(portArray: Array<Port>) : Void {
 		this.selectedPorts = portArray;
 	}
 	
@@ -101,7 +113,7 @@ class SelectionModel
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	endpointArray
 	 */
-	public function setSelectedEndpointsArray(endpointArray: Array<Endpoint>) : Void {
+	public function setSelectedEndpoints(endpointArray: Array<Endpoint>) : Void {
 		this.selectedEndpoints = endpointArray;
 	}
 	

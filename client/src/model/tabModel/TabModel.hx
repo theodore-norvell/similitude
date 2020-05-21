@@ -29,9 +29,9 @@ class TabModel implements Observer extends Observable
 	
 	public function new(circuitDiagram: CircuitDiagramI, tabView: TabView) 
 	{
-		this.addObserver(tabView);
 		this.circuitDiagram = circuitDiagram;
 		this.selectionModel = new SelectionModel();
+		this.circuitDiagram.addObserver(this);
 	}
 
 	public function draw( drawingAdaptor : DrawingAdapterI ) : Void {

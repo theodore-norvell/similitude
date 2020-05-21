@@ -26,13 +26,12 @@ class TabView implements Observer extends Observable
 	private var transform: Transform = Transform.identity();
 	private var view: View;
 	public var tabModel: TabModel;
-	private var mouseClicked: Bool = false;
 	
 	public function new(circuitDiagram: CircuitDiagramI, view: View, tranform: Transform) 
 	{
 		this.view = view;
-		this.addObserver(view);
 		this.tabModel = new TabModel(circuitDiagram, this);
+		this.tabModel.addObserver(this);
 		this.canvasElement = this.spawnNewCanvas();
 	}
 

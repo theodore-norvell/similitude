@@ -21,6 +21,7 @@ class AddToSelectionCommand extends AbstractCommand
 	
 	override public function execute() : Void {
 		this.selectionModel.addCircuitElement(this.circuitElement);
+		trace("Adding to selection model ::", this.selectionModel);
 	}
 	
 	override public function redo() : Void {
