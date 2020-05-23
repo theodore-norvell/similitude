@@ -4,6 +4,7 @@ import model.component.Component;
 import model.component.Link;
 import model.component.Port;
 import model.component.Endpoint;
+import type.Coordinate;
 
 /**
  * This class represents a user selection.
@@ -75,6 +76,32 @@ class SelectionModel
 		this.selectedEndpoints = new Array<Endpoint>();
 		this.selectedLinks = new Array<Link>();
 		this.selectedPorts = new Array<Port>();
+	}
+	
+	/**
+	 * will move only components and links, as the endpoints and ports in the selection mostly belong to them.
+	 * If needed then implementing a new method with ports and endpoints would be helpful.
+	 * @param	differenceX
+	 * @param	differenceY
+	 */
+	public function moveComponentsAndLinks(differenceX: Float, differenceY: Float) {
+		for(component in this.selectedComponents) {
+			component.set_xPosition(component.get_xPosition() + differenceX);
+			component.set_yPosition(component.get_yPosition() + differenceY);
+		}
+		
+		for (link in this.selectedLinks)  {
+			var endpoint0 = link.get_endpoint(0);
+			var endpoint1 = link.get_endpoint(1);
+			endpoint0.moveTo(new Coordinate(endpoint0.get_xPosition() + differenceX, endpoint0.get_yPosition() + differenceY));
+			endpoint1.moveTo(new Coordinate(endpoint1.get_xPosition() + differenceX, endpoint1.get_yPosition() + differenceY));
+		}
+		
+		// Ports and components in the selection belong to either a component or a link which are handled already.
+		// not sure what to do with them, so for now, it is better to leave them untouched. Implement in a new method.
+		//for ()  {}
+		//
+		//for ()  {}
 	}
 	
 	/**

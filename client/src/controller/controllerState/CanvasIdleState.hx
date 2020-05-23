@@ -78,7 +78,7 @@ class CanvasIdleState implements ControllerStateI
 					clickedObjects.push(link);
 				}
 				
-				canvasListener.setState(new AddToSelectionState(clickedObjects));
+				canvasListener.setState(new AddToSelectionState(clickedObjects, canvasMouseDownEvent.xPosition, canvasMouseDownEvent.yPosition));
 			}
 		} else {
 			// do something
