@@ -12,6 +12,7 @@ import model.component.Component;
 import model.component.Link;
 import model.enumeration.ComponentType;
 import model.enumeration.Orientation;
+import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.similitudeEvents.LinkAddEvent;
 import model.similitudeEvents.LinkEditEvent;
@@ -42,6 +43,10 @@ class CanvasController extends AbstractController implements CanvasListener
 		this.viewUpdater.updateView("The element that was added to the canvas div is :: " + a );
 	}
 	
+	public function getComponentTypesSingleton() : ComponentTypes {
+		return this.componentTypesSingleton;
+	}
+	
 	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void 
 	{
 		var commandUID = RandomStrings.randomAsciiAlphaNumeric(8);
@@ -50,7 +55,7 @@ class CanvasController extends AbstractController implements CanvasListener
 		// Type.createEnum(ComponentType, eventObject.component)
 		var circuitDiagram = this.activeTab.getCircuitDiagram() ;
 		var component = new Component(circuitDiagram, eventObject.draggedToX, eventObject.draggedToY, 70, 70, Orientation.EAST, componentTypesSingleton.toComponentKind(eventObject.getComponent()) );
-		var addComponentCommand = new AddComponentCommand(circuitDiagram, component, commandUID);
+		var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
 		this.commandManager.executeCommand(addComponentCommand);
 		this.viewUpdater.updateCanvas();
 	}
@@ -72,7 +77,7 @@ class CanvasController extends AbstractController implements CanvasListener
 		this.viewUpdater.updateCanvas();
 	}
 	
-	public function handleCanvasMouseInteractions(eventObject: CanvasMouseInteractionEvent) : Void {
+	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) : Void {
 		this.state.operate(this, eventObject);
 	}
 	

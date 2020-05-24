@@ -8,9 +8,10 @@ import controller.controllerState.ControllerStateI;
 import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.similitudeEvents.CanvasMouseMoveEvent;
 import model.similitudeEvents.EventTypesEnum;
+import hx.strings.RandomStrings;
 
 /**
- * ...
+ * Is hit when the canvas is clicked upon and the area is totally empty
  * @author AdvaitTrivedi
  */
 class DownOnEmptyState implements ControllerStateI 
@@ -38,7 +39,8 @@ class DownOnEmptyState implements ControllerStateI
 			// initate link adding sequence
 			trace('adding Link : ', canvasMouseMoveEvent);
 			var link = new Link(circuitDiagram, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition - 10);
-			var addLinkCommand = new AddLinkCommand(circuitDiagram, link);
+			//var commandUID = RandomStrings.randomAsciiAlphaNumeric(12);
+			var addLinkCommand = new AddLinkCommand(circuitDiagram, link/*, commandUID*/ );
 			canvasListener.getCommandManager().executeCommand(addLinkCommand, true);
 			canvasListener.updateCanvas();
 			// shift to the link edit state

@@ -1,6 +1,7 @@
 package view;
 
 import model.observe.*;
+import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.similitudeEvents.LinkAddEvent;
 import model.similitudeEvents.LinkEditEvent;
@@ -133,7 +134,7 @@ class View implements Observer
 		this.canvasListener.editLinkOnCanvas(eventObject);
 	}
 	
-	public function handleCanvasMouseInteractions(eventObject: CanvasMouseInteractionEvent) {
+	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) {
 		this.canvasListener.handleCanvasMouseInteractions(eventObject);
 	}
 	

@@ -1,5 +1,6 @@
 package controller.commandManager;
 import model.component.CircuitDiagramI;
+import hx.strings.RandomStrings;
 
 /**
  * ...
@@ -7,7 +8,7 @@ import model.component.CircuitDiagramI;
  */
 class AbstractCommand implements CommandI
 {
-	var commandUID: String;
+	var commandUID: String = RandomStrings.randomAsciiAlphaNumeric(12);
 	var circuitDiagram: CircuitDiagramI;
 	
 	public function setCircuitDiagram(circuitDiagram: CircuitDiagramI) {

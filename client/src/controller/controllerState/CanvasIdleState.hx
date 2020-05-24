@@ -1,4 +1,5 @@
 package controller.controllerState;
+import controller.commandManager.AddComponentCommand;
 import controller.commandManager.AddLinkCommand;
 import controller.listenerInterfaces.CanvasListener;
 import model.similitudeEvents.AbstractSimilitudeEvent;
@@ -9,7 +10,10 @@ import model.component.Port;
 import model.component.Endpoint;
 import model.similitudeEvents.EventTypesEnum;
 import model.similitudeEvents.CanvasMouseDownEvent;
+import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.component.CircuitElement;
+import hx.strings.RandomStrings;
+import model.enumeration.Orientation;
 
 /**
  * ...
@@ -24,6 +28,20 @@ class CanvasIdleState implements ControllerStateI
 	}
 	
 	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) : Void {
+		if (event.getEventType() == EventTypesEnum.SIDEBAR_DRAG_N_DROP) {
+			var dragNDropEvent = Std.downcast(event, SidebarDragAndDropEvent);
+			//var commandUID = RandomStrings.randomAsciiAlphaNumeric(12);
+			trace('adding Component : ', dragNDropEvent.getComponent());
+			// create and execute a command here 
+			// Type.createEnum(ComponentType, eventObject.component)
+			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
+			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
+			var addComponentCommand = new AddComponentCommand(circuitDiagram, component/*, commandUID*/);
+			canvasListener.getCommandManager().executeCommand(addComponentCommand);
+			canvasListener.updateCanvas();
+			canvasListener.setState(this);
+		}
+		
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_DOWN) {
 			var canvasMouseDownEvent = Std.downcast(event, CanvasMouseDownEvent);
 			if (!canvasMouseDownEvent.didObjectsGetHit()) {

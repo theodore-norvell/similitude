@@ -130,7 +130,8 @@ class TabView implements Observer extends Observable
 			trace(eventPassed);
 			//eventPassed.draggedToX = event.pageX;
 			//eventPassed.draggedToY = event.pageY;
-			this.view.updateCanvasListener(eventPassed);
+			//this.view.updateCanvasListener(eventPassed);
+			this.view.handleCanvasMouseInteractions(eventPassed);
 		});
 		
 		innerCanvas.onmousedown = function (event) {
