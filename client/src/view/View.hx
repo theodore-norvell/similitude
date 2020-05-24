@@ -37,11 +37,8 @@ class View implements Observer
 		this.activeTab.addObserver(this);
 		// this.setActiveTab();
 		allTabs.push(activeTab);
-		
-		trace("DOM example");
 
 		document.addEventListener("DOMContentLoaded", function(event) {
-		trace("DOM ready");
 		
 		// for undo button
 		document.querySelector("#undo").addEventListener('click', function (event) {
@@ -86,29 +83,6 @@ class View implements Observer
 			Console.log("Centre was clicked");
 			this.activeTab.panCanvasCentre();
         });
-		
-		// for testing the flow of the click event
-		document.querySelector("#clickMe").addEventListener('click', function (event) {
-            // do something
-			Console.log("clickable was clicked");
-			this.sidebarListener.update("clickMe");
-        });
-		
-		var draggableBox = document.querySelector("#dragMe");
-		draggableBox.draggable = true; // need to set true for dragging.
-		draggableBox.addEventListener('drag', function (event) {
-            // do something
-			Console.log("draggable is being dragged");
-			//Console.log(event);			
-        });
-		
-		// also set the dragStart event to send data through the drag and drop
-		draggableBox.addEventListener('dragstart', function(event) {
-			// do not forget to set data before the transfer
-			event.dataTransfer.setData("text/plain", event.target.id);
-			Console.log(event.dataTransfer.items);
-			event.dataTransfer.dropEffect = "move";
-		});
     });
 	
 	}
@@ -121,19 +95,6 @@ class View implements Observer
 		this.canvasListener = listener;
 	}
 
-	public function updateCanvasListener(eventObject: SidebarDragAndDropEvent) {
-		// add more cases to handle more stuff
-		this.canvasListener.addComponentToCanvas(eventObject);
-	}
-	
-	public function addLinkToCanvas(eventObject: LinkAddEvent) {
-		this.canvasListener.addLinkToCanvas(eventObject);
-	}
-	
-	public function editLinkOnCanvas(eventObject: LinkEditEvent) {
-		this.canvasListener.editLinkOnCanvas(eventObject);
-	}
-	
 	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) {
 		this.canvasListener.handleCanvasMouseInteractions(eventObject);
 	}

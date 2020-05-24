@@ -12,12 +12,11 @@ class AddToSelectionCommand extends AbstractCommand
 	var circuitElement: CircuitElement;
 	var selectionModel: SelectionModel;
 	
-	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, circuitElement: CircuitElement, ?commandUID: String) 
+	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, circuitElement: CircuitElement) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
 		this.circuitElement = circuitElement;
-		this.commandUID = commandUID;
 	}
 	
 	override public function execute() : Void {

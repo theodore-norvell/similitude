@@ -47,36 +47,6 @@ class CanvasController extends AbstractController implements CanvasListener
 		return this.componentTypesSingleton;
 	}
 	
-	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void 
-	{
-		var commandUID = RandomStrings.randomAsciiAlphaNumeric(8);
-		trace('adding Component : ', eventObject.getComponent());
-		// create and execute a command here 
-		// Type.createEnum(ComponentType, eventObject.component)
-		var circuitDiagram = this.activeTab.getCircuitDiagram() ;
-		var component = new Component(circuitDiagram, eventObject.draggedToX, eventObject.draggedToY, 70, 70, Orientation.EAST, componentTypesSingleton.toComponentKind(eventObject.getComponent()) );
-		var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
-		this.commandManager.executeCommand(addComponentCommand);
-		this.viewUpdater.updateCanvas();
-	}
-	
-	public function addLinkToCanvas(eventObject: LinkAddEvent) : Void {
-		trace('adding Link : ', eventObject);
-		var circuitDiagram = this.activeTab.getCircuitDiagram() ;
-		var link = new Link(circuitDiagram, eventObject.addedAtX, eventObject.addedAtY, eventObject.addedAtX , eventObject.addedAtY - 10);
-		var addLinkCommand = new AddLinkCommand(circuitDiagram, link);
-		this.commandManager.executeCommand(addLinkCommand, true);
-		this.viewUpdater.updateCanvas();
-	}
-	
-	public function editLinkOnCanvas(eventObject: LinkEditEvent) : Void {
-		trace('editing a link : ', eventObject);
-		var circuitDiagram = this.activeTab.getCircuitDiagram() ;
-		var editLinkCommand = new EditLinkCommand(circuitDiagram, eventObject.endpoint, eventObject.worldCoordinates);
-		this.commandManager.executeCommand(editLinkCommand, true);
-		this.viewUpdater.updateCanvas();
-	}
-	
 	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) : Void {
 		this.state.operate(this, eventObject);
 	}

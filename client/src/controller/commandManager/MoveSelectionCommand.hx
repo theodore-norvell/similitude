@@ -14,7 +14,7 @@ class MoveSelectionCommand extends AbstractCommand
 	var newX: Float;
 	var newY: Float;
 	
-	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, oldX: Float, oldY: Float, newX: Float, newY: Float, ?commandUID: String) 
+	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, oldX: Float, oldY: Float, newX: Float, newY: Float) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
@@ -22,7 +22,6 @@ class MoveSelectionCommand extends AbstractCommand
 		this.oldY = oldY;
 		this.newX = newX;
 		this.newY = newY;
-		this.commandUID = commandUID;
 	}
 	
 	override public function execute() : Void {

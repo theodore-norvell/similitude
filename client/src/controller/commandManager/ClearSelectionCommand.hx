@@ -14,12 +14,11 @@ class ClearSelectionCommand extends AbstractCommand
 	var selectionModel: SelectionModel;
 	var copySelectionModel: String;
 	
-	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, ?commandUID: String) 
+	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
 		this.copySelectionModel = Serializer.run(selectionModel);
-		this.commandUID = commandUID;
 	}
 	
 	override public function execute() : Void {
@@ -31,7 +30,7 @@ class ClearSelectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		var selection = Unserializer.run(this.copySelectionModel);
+		var selection: SelectionModel = Unserializer.run(this.copySelectionModel);
 		trace("Selection :: ", selection);
 		this.selectionModel = cast(selection, SelectionModel);
 	};

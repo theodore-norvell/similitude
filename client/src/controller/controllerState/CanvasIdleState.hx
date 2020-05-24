@@ -30,13 +30,10 @@ class CanvasIdleState implements ControllerStateI
 	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) : Void {
 		if (event.getEventType() == EventTypesEnum.SIDEBAR_DRAG_N_DROP) {
 			var dragNDropEvent = Std.downcast(event, SidebarDragAndDropEvent);
-			//var commandUID = RandomStrings.randomAsciiAlphaNumeric(12);
 			trace('adding Component : ', dragNDropEvent.getComponent());
-			// create and execute a command here 
-			// Type.createEnum(ComponentType, eventObject.component)
 			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
-			var addComponentCommand = new AddComponentCommand(circuitDiagram, component/*, commandUID*/);
+			var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
 			canvasListener.getCommandManager().executeCommand(addComponentCommand);
 			canvasListener.updateCanvas();
 			canvasListener.setState(this);
