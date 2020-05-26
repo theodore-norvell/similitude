@@ -153,29 +153,20 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         return transform;
     }
 
-    override public function findHitList(component : Component, outerWorldCoordinates:Coordinate, mode:MODE):Array<HitObject>{
-        var hitObjectArray:Array<HitObject> = new Array<HitObject>();
+    override public function findHitList(component : Component, outerWorldCoordinates:Coordinate, mode:MODE, includeSelf : Bool ):Array<HitObject>{
+        var hitObjectArray:Array<HitObject> = super.findHitList(component, outerWorldCoordinates, mode, mode==MODE.INCLUDE_PARENTS) ;
 
-        var hitComponent:Component = isInComponent(component, outerWorldCoordinates);
-        if(hitComponent == null){
-            return hitObjectArray;
-        }else if(component.get_boxType() == BOX.WHITE_BOX){
+        if( isInComponent(component, outerWorldCoordinates) && 
+            component.get_boxType() == BOX.WHITE_BOX )
+        {
             var transform:Transform = makeTransform(component);
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
             var result:Array<HitObject> = circuitDiagram.findHitList(innerWorldCoordinates, mode);
-
-            if(result.length == 0 || mode == MODE.INCLUDE_PARENTS){
-                var hitObject:HitObject = new HitObject();
-                hitObject.set_component(component);
-                result.push(hitObject);
+            for( hitOject in result ) {
+                hitObjectArray.push( hitOject ) ;
             }
-            return result;
-        }else{
-            var hitObject:HitObject = new HitObject();
-            hitObject.set_component(component);
-            hitObjectArray.push(hitObject);
-            return hitObjectArray;
         }
+        return hitObjectArray ;
     }
 
     override public function findWorldPoint(component : Component,

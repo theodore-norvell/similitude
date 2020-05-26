@@ -69,6 +69,13 @@ class Component extends CircuitElement {
         this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
     }
 
+    public function toString() : String {
+        return "Component( kind: " + componentKind
+                         + " x:" + xPosition
+                         + " y:" + yPosition
+                         + ")" ;
+    }
+
     public function getAttributes( ) : Iterator< AttributeUntyped > {
         return attributeValueList.getAttributes() ;
     }
@@ -207,7 +214,7 @@ class Component extends CircuitElement {
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{
-        return componentKind.findHitList(this, coordinate, mode);
+        return componentKind.findHitList(this, coordinate, mode, true);
     }
 
     public function findWorldPoint(coordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{

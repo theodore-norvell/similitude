@@ -48,9 +48,17 @@ interface ComponentKind {
     public function drawComponent( component : Component, drawingAdapter:DrawingAdapterI, hightLight:Bool, selection : SelectionModel ):Void;
 
     /**
-    * find the hit list
+    * Find the hit list
+    * @param component A component.
+    * @param coordinate A point
+    * @param mode If this is include parent, then white box compound components will be included
+    * @param includeSelf Should the component itself be included, or only its children.
+    *   (This should be set to true. The false value is only used internally.)
+    * @return An array of all things hit. This may include the component itself and its ports.
+    * If the component is a white box compound component, the array may also include components, ports,
+    * links, and endpoints that are within the component.
     **/
-    public function findHitList(component : Component, coordinate:Coordinate, mode:MODE):Array<HitObject>;
+    public function findHitList(component : Component, coordinate:Coordinate, mode:MODE, includeSelf : Bool ):Array<HitObject>;
 
     /**
     * find world point

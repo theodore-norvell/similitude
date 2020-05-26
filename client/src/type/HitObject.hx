@@ -16,6 +16,15 @@ class HitObject {
 
     }
 
+    public function toString() : String {
+        return "Hit object( "
+        + (if(component != null)  " "+component else "" )
+        + (if(link != null)  " "+link else "" )
+        + (if(port != null)  " "+port else "")
+        + (if(endpoint != null)  " "+endpoint else "")
+        + ")" ;
+    }
+
     public function hitNothing():Bool{
         if(component == null && link == null && port == null && endpoint == null){
             return true;

@@ -5,7 +5,8 @@ using buddy.Should;
 
 class TestMain implements Buddy< [
     TestThatBuddyWorks,
-    TestCircuitDiagram
+    TestCircuitDiagram,
+    TestFindHits
 ] > { }
 
 class TestThatBuddyWorks extends SingleSuite {
