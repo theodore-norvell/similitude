@@ -15,6 +15,7 @@ class DrawLink {
     public function new(link:Link, drawingAdapter:DrawingAdapterI, highlight : Bool) {
         this.link = link;
         this.drawingAdapter = drawingAdapter;
+        this.highlight = highlight ;
     }
 
     public function drawCorrespondingComponent():Void {
