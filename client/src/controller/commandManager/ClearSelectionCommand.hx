@@ -12,7 +12,7 @@ import model.selectionModel.SelectionModel;
 class ClearSelectionCommand extends AbstractCommand
 {
 	var selectionModel: SelectionModel;
-	var copySelectionModel: String;
+	// var copySelectionModel: String;
 	
 	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) 
 	{
@@ -21,9 +21,9 @@ class ClearSelectionCommand extends AbstractCommand
 		// The serialization is causing an infinite recursion.
 		// Note that serialization is not a great way to do this
 		// anyway.  See my comments in undo below. TSN
-		trace( "Starting serialization. ") ;
+		// trace( "Starting serialization. ") ;
 		// this.copySelectionModel = Serializer.run(selectionModel);
-		trace( "Done serialization. ") ;
+		// trace( "Done serialization. ") ;
 	}
 	
 	override public function execute() : Void {
@@ -39,7 +39,7 @@ class ClearSelectionCommand extends AbstractCommand
 		// trace("Selection :: ", selection);
 		// This isn't going to work because it doesn't add
 		// things back into the selection model object, it simply
-		// changes the valus of the field to a new object.  TSN
+		// changes the value of the field to a new object.  TSN
 		// this.selectionModel = cast(selection, SelectionModel);
 	};
 }
