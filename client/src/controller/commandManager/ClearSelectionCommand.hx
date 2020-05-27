@@ -2,8 +2,8 @@ package controller.commandManager;
 
 import model.component.CircuitDiagramI;
 import model.selectionModel.SelectionModel;
-import haxe.Serializer;
-import haxe.Unserializer;
+// import haxe.Serializer;
+// import haxe.Unserializer;
 
 /**
  * ...
@@ -22,7 +22,7 @@ class ClearSelectionCommand extends AbstractCommand
 		// Note that serialization is not a great way to do this
 		// anyway.  See my comments in undo below. TSN
 		trace( "Starting serialization. ") ;
-		this.copySelectionModel = Serializer.run(selectionModel);
+		// this.copySelectionModel = Serializer.run(selectionModel);
 		trace( "Done serialization. ") ;
 	}
 	
@@ -35,11 +35,11 @@ class ClearSelectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		var selection: SelectionModel = Unserializer.run(this.copySelectionModel);
-		trace("Selection :: ", selection);
+		//var selection: SelectionModel = Unserializer.run(this.copySelectionModel);
+		// trace("Selection :: ", selection);
 		// This isn't going to work because it doesn't add
 		// things back into the selection model object, it simply
 		// changes the valus of the field to a new object.  TSN
-		this.selectionModel = cast(selection, SelectionModel);
+		// this.selectionModel = cast(selection, SelectionModel);
 	};
 }
