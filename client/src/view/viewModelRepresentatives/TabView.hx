@@ -8,6 +8,9 @@ import model.similitudeEvents.LinkEditEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import type.Coordinate;
 import js.html.CanvasElement;
+import js.html.DragEvent ;
+import js.html.Event ;
+import js.html.MouseEvent ;
 import model.component.CircuitDiagramI;
 import model.drawingInterface.Transform;
 import model.tabModel.TabModel;
@@ -94,7 +97,7 @@ class TabView implements Observer extends Observable
 		this.updateTabView();
 	}
 	
-	public function spawnNewCanvas() : CanvasElement {
+	private function spawnNewCanvas() : CanvasElement {
 		// TODO.  It seems to me (TSN) that this routine should be moved to the TabView class.
 		var canvasDisplayScreen = document.querySelector("#displayScreen");
 		
@@ -110,7 +113,7 @@ class TabView implements Observer extends Observable
 		innerCanvas.height = Std.parseInt(cs.getPropertyValue('height'));
 		
 		// needs this event by default for the drop target.
-		canvasDisplayScreen.addEventListener('dragover', function (event) {
+		canvasDisplayScreen.addEventListener('dragover', function (event : DragEvent ) {
 			event.preventDefault(); // called to avoid any other event from occuring when processing this one.
 			event.dataTransfer.dropEffect = "move";
 			// refer to MDN docs for more dropEffects
@@ -118,12 +121,11 @@ class TabView implements Observer extends Observable
 		});
 		
 		// needs this event by default for the drop target.
-		canvasDisplayScreen.addEventListener('drop', function (event) {
+		canvasDisplayScreen.addEventListener('drop', function ( event : DragEvent ) {
 			event.preventDefault();
 			var data = event.dataTransfer.getData("text/plain");
 			var eventPassed :SidebarDragAndDropEvent = Unserializer.run(data);
-			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
-			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46) ;
+			var viewCoord = getCoordsRelativeToCanvasXY( event.clientX, event.clientY ) ;
 			var worldCoords = viewToWorld( viewCoord ) ;
 			eventPassed.draggedToX = worldCoords.get_xPosition() ;
 			eventPassed.draggedToY = worldCoords.get_yPosition() ;
@@ -134,11 +136,10 @@ class TabView implements Observer extends Observable
 			this.view.handleCanvasMouseInteractions(eventPassed);
 		});
 		
-		innerCanvas.onmousedown = function (event) {
+		innerCanvas.onmousedown = function (event : MouseEvent ) {
 			var circuitDiagram = this.tabModel.getCircuitDiagram();
 			
-			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
-			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46);
+			var viewCoord = getCoordsRelativeToCanvas( event ) ;
 			var worldCoords = viewToWorld( viewCoord );
 			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
 			var eventPassed = new CanvasMouseDownEvent(objectsHit);
@@ -147,11 +148,11 @@ class TabView implements Observer extends Observable
 			this.view.handleCanvasMouseInteractions(eventPassed);
 		}
 		
-		innerCanvas.onmousemove = function (event) {
+		innerCanvas.onmousemove = function (event : MouseEvent) {
 			var circuitDiagram = this.tabModel.getCircuitDiagram();
 			
 			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
-			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46);
+			var viewCoord = getCoordsRelativeToCanvas( event ) ;
 			var worldCoords = viewToWorld( viewCoord );
 			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
 			var eventPassed = new CanvasMouseMoveEvent(objectsHit);
@@ -160,12 +161,11 @@ class TabView implements Observer extends Observable
 			this.view.handleCanvasMouseInteractions(eventPassed);
 		}
 		
-		innerCanvas.onmouseup = function (event) {
+		innerCanvas.onmouseup = function (event : MouseEvent) {
 			var circuitDiagram = this.tabModel.getCircuitDiagram();
 			
-			// the magic numbers are canvas offsets to stabilize the position of the element placed on the canvas
-			var viewCoord = new Coordinate( event.layerX-83, event.layerY-46);
-			var worldCoords = viewToWorld( viewCoord );
+			var viewCoord = getCoordsRelativeToCanvas( event ) ;
+			var worldCoords = getCoordsRelativeToCanvas( event ) ;
 			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
 			var eventPassed = new CanvasMouseUpEvent(objectsHit);
 			eventPassed.xPosition = worldCoords.get_xPosition();
@@ -174,5 +174,18 @@ class TabView implements Observer extends Observable
 		}
 		
 		return innerCanvas;
+	}
+
+	private function getCoordsRelativeToCanvasXY( clientX : Float, clientY : Float ) : Coordinate {
+		// See https://stackoverflow.com/questions/17130395/real-mouse-position-in-canvas
+		// especially answer by Rafel S.
+		var rect = canvasElement.getBoundingClientRect();
+		var x = (clientX - rect.left) / (rect.right - rect.left) * canvasElement.width ;
+		var y = (clientY - rect.top) / (rect.bottom - rect.top) * canvasElement.height ;
+		return new Coordinate( x,  y) ;
+	}
+
+	private function getCoordsRelativeToCanvas( evt : MouseEvent ) : Coordinate {
+		return getCoordsRelativeToCanvasXY( evt.clientX, evt.clientY ) ;
 	}
 }
