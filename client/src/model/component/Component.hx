@@ -73,6 +73,7 @@ class Component extends CircuitElement {
         return "Component( kind: " + componentKind
                          + " x:" + xPosition
                          + " y:" + yPosition
+                         + "ports: " + ports
                          + ")" ;
     }
 

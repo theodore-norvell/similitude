@@ -26,16 +26,10 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
     var Ob:Observer;
     var Obable:Observable;
     var circuitDiagram:CircuitDiagramI;
-    var nameOfTheComponentKind:String="CC";
 
     public function new(circuitDiagram:CircuitDiagramI) {
-        super() ;
+        super("Compound") ;
         this.circuitDiagram = circuitDiagram;
-    }
-
-
-    public function getname():String{
-        return nameOfTheComponentKind;
     }
 
     override public function getInnerCircuitDiagram():CircuitDiagramI{
