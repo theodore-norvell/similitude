@@ -2,8 +2,10 @@ package controller.commandManager;
 
 import model.component.CircuitDiagramI;
 import model.selectionModel.SelectionModel;
-import haxe.Serializer;
-import haxe.Unserializer;
+import model.component.Component;
+import model.component.Link;
+import model.component.Port;
+import model.component.Endpoint;
 
 /**
  * ...
@@ -12,13 +14,20 @@ import haxe.Unserializer;
 class ClearSelectionCommand extends AbstractCommand
 {
 	var selectionModel: SelectionModel;
+	var selectedComponents = new Array<Component>();
+	var selectedLinks = new Array<Link>();
+	var selectedPorts = new Array<Port>();
+	var selectedEndpoints = new Array<Endpoint>();
 	var copySelectionModel: String;
 	
 	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
-		this.copySelectionModel = Serializer.run(selectionModel);
+		this.selectedComponents = selectionModel.getComponents();
+		this.selectedLinks = selectionModel.getLinks();
+		this.selectedPorts = selectionModel.getPorts();
+		this.selectedEndpoints = selectionModel.getEndpoint();
 	}
 	
 	override public function execute() : Void {
@@ -30,8 +39,9 @@ class ClearSelectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		var selection: SelectionModel = Unserializer.run(this.copySelectionModel);
-		trace("Selection :: ", selection);
-		this.selectionModel = cast(selection, SelectionModel);
+		this.selectionModel.setSelectedComponents(this.selectedComponents);
+		this.selectionModel.setSelectedEndpoints(this.selectedEndpoints);
+		this.selectionModel.setSelectedLinks(this.selectedLinks);
+		this.selectionModel.setSelectedPorts(this.selectedPorts);
 	};
 }

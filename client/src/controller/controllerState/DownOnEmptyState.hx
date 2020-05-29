@@ -7,6 +7,7 @@ import controller.listenerInterfaces.CanvasListener;
 import controller.controllerState.ControllerStateI;
 import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.similitudeEvents.CanvasMouseMoveEvent;
+import model.similitudeEvents.CanvasMouseUpEvent;
 import model.similitudeEvents.EventTypesEnum;
 import hx.strings.RandomStrings;
 
@@ -27,12 +28,7 @@ class DownOnEmptyState implements ControllerStateI
 	
 	public function operate(canvasListener:CanvasListener, event: AbstractSimilitudeEvent) : Void 
 	{
-		trace("Clearing Canvas...");
 		var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
-		var clearSelectionCommand = new ClearSelectionCommand(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
-		canvasListener.getCommandManager().executeCommand(clearSelectionCommand);
-		canvasListener.updateCanvas();
-		trace("Cleared Canvas...");
 		
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
@@ -46,8 +42,13 @@ class DownOnEmptyState implements ControllerStateI
 			canvasListener.setState(new EditLinkState(link.get_endpoint(1)));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
 			// clear selection
-			var clearSelectionCommand = new ClearSelectionCommand(canvasListener.getActiveTab().getCircuitDiagram(), canvasListener.getActiveTab().getSelectionModel());
+			//var canvasMouseUpEvent = Std.downcast(event, CanvasMouseUpEvent);
+			var clearSelectionCommand = new ClearSelectionCommand(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
 			canvasListener.getCommandManager().executeCommand(clearSelectionCommand);
+			canvasListener.updateCanvas();
+	
+			//var clearSelectionCommand = new ClearSelectionCommand(canvasListener.getActiveTab().getCircuitDiagram(), canvasListener.getActiveTab().getSelectionModel());
+			//canvasListener.getCommandManager().executeCommand(clearSelectionCommand);
 			canvasListener.setState(new CanvasIdleState());
 		} else {
 			trace("Unknown transition");

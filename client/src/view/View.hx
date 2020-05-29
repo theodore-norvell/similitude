@@ -43,44 +43,37 @@ class View implements Observer
 		// for undo button
 		document.querySelector("#undo").addEventListener('click', function (event) {
             // do something
-			Console.log("undo was clicked");
 			this.canvasListener.undoLastCanvasChange();
         });
 		
 		// for redo button
 		document.querySelector("#redo").addEventListener('click', function (event) {
             // do something
-			Console.log("redo was clicked");
 			this.canvasListener.redoLastCanvasChange();
         });
 		
 		document.querySelector("#Up").addEventListener('click', function (event) {
             // do something
-			Console.log("Up was clicked");
 			this.activeTab.panCanvasUp();
         });
 		
 		document.querySelector("#Down").addEventListener('click', function (event) {
             // do something
-			Console.log("Down was clicked");
 			this.activeTab.panCanvasDown();
         });
 		
 		document.querySelector("#Left").addEventListener('click', function (event) {
             // do something
-			Console.log("Left was clicked");
 			this.activeTab.panCanvasLeft();
         });
 		
 		document.querySelector("#Right").addEventListener('click', function (event) {
             // do something
-			Console.log("Right was clicked");
 			this.activeTab.panCanvasRight();
         });
 		
 		document.querySelector("#Centre").addEventListener('click', function (event) {
             // do something
-			Console.log("Centre was clicked");
 			this.activeTab.panCanvasCentre();
         });
     });
@@ -103,7 +96,6 @@ class View implements Observer
 	 * This serves a function for the controller to hit as they cannot reach out top the tabView directly
 	 */
 	public function updateCanvas() : Void {
-		Console.log('view.updateCanvas');
 		this.activeTab.updateTabView();
 	}
 	

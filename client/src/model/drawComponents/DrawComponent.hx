@@ -31,8 +31,6 @@ class DrawComponent {
         for (port in component.get_ports()) {
             if( ! port.isConnected() ) {
                 drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portSize, portSize); }
-
-            trace( "drawing port" ) ;
         }
     }
 }

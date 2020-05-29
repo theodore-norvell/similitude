@@ -31,12 +31,14 @@ class AddToSelectionState implements ControllerStateI
 			var moveSelectionCommand = new MoveSelectionCommand(activeTab.getCircuitDiagram(), activeTab.getSelectionModel(), this.xPosition, this.yPosition, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
 			canvasListener.getCommandManager().executeCommand(moveSelectionCommand, true);
 			canvasListener.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
+			canvasListener.updateCanvas();
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
 			var activeTab = canvasListener.getActiveTab();
 			for (object in this.clickedObjects) {
 				canvasListener.getCommandManager().executeCommand(new AddToSelectionCommand(activeTab.getCircuitDiagram(), activeTab.getSelectionModel(), object));
 			};
 			canvasListener.setState(new CanvasIdleState());
+			canvasListener.updateCanvas();
 		} else {
 			trace("Unknown transition");
 		}
