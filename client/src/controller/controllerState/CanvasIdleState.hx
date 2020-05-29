@@ -1,6 +1,7 @@
 package controller.controllerState;
 import controller.commandManager.AddComponentCommand;
 import controller.commandManager.AddLinkCommand;
+import controller.commandManager.ClearSelectionCommand;
 import controller.listenerInterfaces.CanvasListener;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.similitudeEvents.CanvasMouseInteractionEvent;
@@ -35,13 +36,16 @@ class CanvasIdleState implements ControllerStateI
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
 			var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
 			canvasListener.getCommandManager().executeCommand(addComponentCommand);
-			canvasListener.updateCanvas();
 			canvasListener.setState(this);
+			return;
 		}
 		
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_DOWN) {
 			var canvasMouseDownEvent = Std.downcast(event, CanvasMouseDownEvent);
 			if (!canvasMouseDownEvent.didObjectsGetHit()) {
+				var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
+				var clearSelectionCommand = new ClearSelectionCommand(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
+				canvasListener.getCommandManager().executeCommand(clearSelectionCommand);
 				canvasListener.setState(new DownOnEmptyState());
 				return; // maybe return the link/endpoint to the controller?
 			}
@@ -94,6 +98,7 @@ class CanvasIdleState implements ControllerStateI
 				}
 				
 				canvasListener.setState(new AddToSelectionState(clickedObjects, canvasMouseDownEvent.xPosition, canvasMouseDownEvent.yPosition));
+				return;
 			}
 		} else {
 			// do something

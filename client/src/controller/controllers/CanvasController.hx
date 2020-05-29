@@ -65,8 +65,4 @@ class CanvasController extends AbstractController implements CanvasListener
 		this.commandManager.redoCommand();
 		this.viewUpdater.updateCanvas();
 	}
-	
-	public function updateCanvas() {
-		this.viewUpdater.updateCanvas();
-	}
 }

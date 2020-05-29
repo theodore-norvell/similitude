@@ -27,7 +27,6 @@ class EditLinkState implements ControllerStateI
 			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
 			var editLinkCommand = new EditLinkCommand(circuitDiagram, this.linkEndpoint, new Coordinate( canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 			canvasListener.getCommandManager().executeCommand(editLinkCommand, true);
-			canvasListener.updateCanvas();
 			canvasListener.setState(this);
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
 			canvasListener.setState(new CanvasIdleState());

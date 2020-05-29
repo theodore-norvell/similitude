@@ -19,5 +19,4 @@ interface CanvasListener extends ViewListener
 	public function getComponentTypesSingleton() : ComponentTypes;
 	public function undoLastCanvasChange() : Void;
 	public function redoLastCanvasChange() : Void;
-	public function updateCanvas() : Void;
 }

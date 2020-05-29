@@ -23,7 +23,6 @@ class CanvasUpdate extends AbstractUpdate
 	}
 	
 	public override function updateCanvas() : Void {
-		Console.log('view.viewUpdaters.updateCanvas');
 		this.viewToUpdate.updateCanvas();
 	}
 	

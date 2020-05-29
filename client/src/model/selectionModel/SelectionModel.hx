@@ -4,6 +4,9 @@ import model.component.Component;
 import model.component.Link;
 import model.component.Port;
 import model.component.Endpoint;
+import model.observe.Observable;
+import model.observe.ObservableI;
+import model.observe.Observer;
 import type.Coordinate;
 
 /**
@@ -12,7 +15,7 @@ import type.Coordinate;
  * 
  * @author AdvaitTrivedi
  */
-class SelectionModel 
+class SelectionModel implements Observer extends Observable
 {
 	var selectedComponents = new Array<Component>();
 	var selectedLinks = new Array<Link>();
@@ -20,6 +23,10 @@ class SelectionModel
 	var selectedEndpoints = new Array<Endpoint>();
 
 	public function new() {}
+	
+	public function update(target: ObservableI, ?data:Dynamic) : Void {
+		this.notifyObservers(target, data);
+	}
 	
 	/**
 	 * Allows a user to add a CircuitElement to the selection.
@@ -44,6 +51,7 @@ class SelectionModel
 		} else {
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
+		this.update(this);
 	}
 	
 	/**
@@ -65,6 +73,7 @@ class SelectionModel
 		} else {
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
+		this.update(this);
 	}
 	
 	/**
@@ -76,6 +85,7 @@ class SelectionModel
 		this.selectedEndpoints = new Array<Endpoint>();
 		this.selectedLinks = new Array<Link>();
 		this.selectedPorts = new Array<Port>();
+		this.update(this);
 	}
 	
 	/**
@@ -102,6 +112,7 @@ class SelectionModel
 		//for ()  {}
 		//
 		//for ()  {}
+		this.update(this);
 	}
 	
 	/**
@@ -112,6 +123,7 @@ class SelectionModel
 	 */
 	public function setSelectedComponents(componentArray: Array<Component>) : Void {
 		this.selectedComponents = componentArray;
+		this.update(this);
 	}
 	
 	/**
@@ -122,6 +134,7 @@ class SelectionModel
 	 */
 	public function setSelectedLinks(linkArray: Array<Link>) : Void {
 		this.selectedLinks = linkArray;
+		this.update(this);
 	}
 	
 	/**
@@ -132,6 +145,7 @@ class SelectionModel
 	 */
 	public function setSelectedPorts(portArray: Array<Port>) : Void {
 		this.selectedPorts = portArray;
+		this.update(this);
 	}
 	
 	/**
@@ -142,6 +156,7 @@ class SelectionModel
 	 */
 	public function setSelectedEndpoints(endpointArray: Array<Endpoint>) : Void {
 		this.selectedEndpoints = endpointArray;
+		this.update(this);
 	}
 	
 	public function getComponents() : Array<Component> {
