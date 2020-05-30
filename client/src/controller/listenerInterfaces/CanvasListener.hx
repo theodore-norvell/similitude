@@ -1,4 +1,11 @@
 package controller.listenerInterfaces;
+import controller.commandManager.CommandManager;
+import controller.controllerState.ControllerStateI;
+import model.enumeration.ComponentType.ComponentTypes;
+import model.similitudeEvents.AbstractSimilitudeEvent;
+import model.similitudeEvents.CanvasMouseInteractionEvent;
+import model.similitudeEvents.LinkAddEvent;
+import model.similitudeEvents.LinkEditEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 
 /**
@@ -6,13 +13,10 @@ import model.similitudeEvents.SidebarDragAndDropEvent;
  */
 interface CanvasListener extends ViewListener
 {
-	/**
-	 * Performs an add operation through the command manager to add a component onto the canvas
-	 * 
-	 * @param	componentToAdd
-	 */
-	public function addComponentToCanvas(eventObject: SidebarDragAndDropEvent) : Void;
-	public function addLinkToCanvas(eventObject: SidebarDragAndDropEvent) : Void;
+	public function getCommandManager() : CommandManager;
+	public function setState(newState: ControllerStateI) : Void;
+	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) : Void;
+	public function getComponentTypesSingleton() : ComponentTypes;
 	public function undoLastCanvasChange() : Void;
 	public function redoLastCanvasChange() : Void;
 }

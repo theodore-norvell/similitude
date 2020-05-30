@@ -1,6 +1,10 @@
 package view;
 
 import model.observe.*;
+import model.similitudeEvents.AbstractSimilitudeEvent;
+import model.similitudeEvents.CanvasMouseInteractionEvent;
+import model.similitudeEvents.LinkAddEvent;
+import model.similitudeEvents.LinkEditEvent;
 import type.Coordinate;
 import controller.listenerInterfaces.CanvasListener;
 import controller.listenerInterfaces.SidebarListener;
@@ -30,81 +34,48 @@ class View implements Observer
 		// letting this stay here for now
 		// check out the matrix once to understand how it works.
 		this.activeTab = new TabView(new CircuitDiagram(), this, Transform.identity());
+		this.activeTab.addObserver(this);
 		// this.setActiveTab();
 		allTabs.push(activeTab);
-		
-		trace("DOM example");
 
 		document.addEventListener("DOMContentLoaded", function(event) {
-		trace("DOM ready");
 		
 		// for undo button
 		document.querySelector("#undo").addEventListener('click', function (event) {
             // do something
-			Console.log("undo was clicked");
 			this.canvasListener.undoLastCanvasChange();
         });
 		
 		// for redo button
 		document.querySelector("#redo").addEventListener('click', function (event) {
             // do something
-			Console.log("redo was clicked");
 			this.canvasListener.redoLastCanvasChange();
         });
 		
 		document.querySelector("#Up").addEventListener('click', function (event) {
             // do something
-			Console.log("Up was clicked");
 			this.activeTab.panCanvasUp();
         });
 		
 		document.querySelector("#Down").addEventListener('click', function (event) {
             // do something
-			Console.log("Down was clicked");
 			this.activeTab.panCanvasDown();
         });
 		
 		document.querySelector("#Left").addEventListener('click', function (event) {
             // do something
-			Console.log("Left was clicked");
 			this.activeTab.panCanvasLeft();
         });
 		
 		document.querySelector("#Right").addEventListener('click', function (event) {
             // do something
-			Console.log("Right was clicked");
 			this.activeTab.panCanvasRight();
         });
 		
 		document.querySelector("#Centre").addEventListener('click', function (event) {
             // do something
-			Console.log("Centre was clicked");
 			this.activeTab.panCanvasCentre();
         });
-		
-		// for testing the flow of the click event
-		document.querySelector("#clickMe").addEventListener('click', function (event) {
-            // do something
-			Console.log("clickable was clicked");
-			this.sidebarListener.update("clickMe");
-        });
-		
-		var draggableBox = document.querySelector("#dragMe");
-		draggableBox.draggable = true; // need to set true for dragging.
-		draggableBox.addEventListener('drag', function (event) {
-            // do something
-			Console.log("draggable is being dragged");
-			//Console.log(event);
-			
-			
-        });
-		// also set the dragStart event to send data through the drag and drop
-		draggableBox.addEventListener('dragstart', function(event) {
-			// do not forget to set data before the transfer
-			event.dataTransfer.setData("text/plain", event.target.id);
-			Console.log(event.dataTransfer.items);
-			event.dataTransfer.dropEffect = "move";
-		});
     });
 	
 	}
@@ -116,32 +87,15 @@ class View implements Observer
 	public function setCanvasListener(listener: CanvasListener){
 		this.canvasListener = listener;
 	}
-	
-	public function updateThisBox(updateString: String){
-		//var updateThis= document.querySelector("#updateThis");
-		//updateThis.innerText = updateString;
-	}
 
-	/**
-	 * A common function that accepts JSON / Dynamic objects to update the Canvas
-	 * @param	eventObject
-	 */
-	public function updateCanvasListener(eventObject: SidebarDragAndDropEvent) {
-		// add more cases to handle more stuff
-		if (Std.string(eventObject.component) == "LINK") {
-			// there is no component type called LINK, as Link is a CircuitElement
-			trace('here');
-			this.canvasListener.addLinkToCanvas(eventObject);
-		} else {
-			this.canvasListener.addComponentToCanvas(eventObject);
-		}
+	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) {
+		this.canvasListener.handleCanvasMouseInteractions(eventObject);
 	}
 	
 	/**
 	 * This serves a function for the controller to hit as they cannot reach out top the tabView directly
 	 */
 	public function updateCanvas() : Void {
-		Console.log('view.updateCanvas');
 		this.activeTab.updateTabView();
 	}
 	

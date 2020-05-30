@@ -52,9 +52,7 @@ class SidebarUpdate extends AbstractUpdate
 		// also set the dragStart event to send data through the drag and drop
 		sidebarItem.addEventListener('dragstart', function(event) {
 			// do not forget to set data before the transfer
-			var dndEvent = new SidebarDragAndDropEvent();
-			dndEvent.eventTypes = EventTypesEnum.SIDEBAR_DRAG_N_DROP;
-			dndEvent.component = drawComponentString;
+			var dndEvent = new SidebarDragAndDropEvent(drawComponentString);
 			var draggedItemEvent = dndEvent;
 			var stringEvent = Serializer.run(draggedItemEvent);
 			trace(stringEvent);
@@ -114,7 +112,7 @@ class SidebarUpdate extends AbstractUpdate
 	}
 	
 	public override function updateView(string: String){
-		this.viewToUpdate.updateThisBox(string);
+		//this.viewToUpdate.updateThisBox(string);
 	}
 	
 }

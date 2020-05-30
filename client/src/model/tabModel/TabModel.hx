@@ -29,9 +29,10 @@ class TabModel implements Observer extends Observable
 	
 	public function new(circuitDiagram: CircuitDiagramI, tabView: TabView) 
 	{
-		this.addObserver(tabView);
 		this.circuitDiagram = circuitDiagram;
-		this.selectionModel = new SelectionModel(new Array<Link>(), new Array<Component>());
+		this.selectionModel = new SelectionModel();
+		this.circuitDiagram.addObserver(this);
+		this.selectionModel.addObserver(this);
 	}
 
 	public function draw( drawingAdaptor : DrawingAdapterI ) : Void {
@@ -46,28 +47,6 @@ class TabModel implements Observer extends Observable
 	public function getSelectionModel() : SelectionModel {
 		// Could we do without this method?
 		return this.selectionModel;
-	}
-	
-	public function addLinksToSelection(links : Array<Link>) : Void {
-		// This violates the abstraction. TSN
-		this.selectionModel.getSelectedLinks().concat(links);
-	}
-	
-	public function addComponentsToSelection(components: Array<Component>) : Void {
-		// This violates the abstraction. TSN
-		this.selectionModel.getSelectedComponents().concat(components);
-	}
-	
-	public function removeLinksFromSelection(links: Array<Link>) : Void {
-		for (link in links) {
-			this.selectionModel.removeLinkFromSelection(link);
-		}
-	}
-	
-	public function removeComponentsFromSelection(components: Array<Component>) : Void {
-		for (component in components) {
-			this.selectionModel.removeComponentFromSelection(component);
-		}
 	}
 	
 	public function update(target: ObservableI, ?data: Any) : Void {

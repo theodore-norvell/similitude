@@ -7,12 +7,17 @@ import model.enumeration.ComponentType;
  */
 class SidebarDragAndDropEvent extends AbstractSimilitudeEvent
 {
-	public var component: ComponentType;
+	var component: ComponentType;
 	public var draggedToX: Float = 0;
 	public var draggedToY: Float = 0;
 
-	public function new() 
+	public function new(component: ComponentType) 
 	{
-		
+		this.component = component;
+		this.eventTypes = EventTypesEnum.SIDEBAR_DRAG_N_DROP;
+	}
+	
+	public function getComponent(): ComponentType {
+		return this.component;
 	}
 }

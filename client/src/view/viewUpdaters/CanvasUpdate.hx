@@ -16,14 +16,13 @@ class CanvasUpdate extends AbstractUpdate
 	}
 	
 	public override function updateView(string: String): Void{
-		this.viewToUpdate.updateThisBox(string);
+		//this.viewToUpdate.updateThisBox(string);
 		// for now this updates the same box as the sidebar.
 		// for testing.
 		// we can and should change this later.
 	}
 	
 	public override function updateCanvas() : Void {
-		Console.log('view.viewUpdaters.updateCanvas');
 		this.viewToUpdate.updateCanvas();
 	}
 	

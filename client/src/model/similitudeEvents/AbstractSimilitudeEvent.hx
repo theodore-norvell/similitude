@@ -7,5 +7,9 @@ package model.similitudeEvents;
  */
 class AbstractSimilitudeEvent
 {
-	public var eventTypes: EventTypesEnum;
+	var eventTypes: EventTypesEnum;
+	
+	public function getEventType(): EventTypesEnum {
+		return this.eventTypes;
+	}
 }
