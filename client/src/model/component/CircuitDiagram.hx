@@ -215,4 +215,100 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         }
         return worldPointArray;
     }
+	
+	public function normalise() : Void {
+		// For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
+		// if and both contain a port,
+			// create a link to connect them
+		// else one or both don't contain a port
+			// if c0 contains a port, swap c0 and c1
+			// move everything in c0 to c1
+		var connectionArray = new Array<Connection>();
+		for (link in this.linkArray) {
+			connectionArray.push(link.get_endpoint(0).getConnection());
+			connectionArray.push(link.get_endpoint(1).getConnection());
+		}
+		
+		for (component in this.componentArray) {
+			var ports = component.get_ports();
+			for (port in ports) {
+				connectionArray.push(port.getConnection());
+			}
+		}
+		
+		var markedConnections = new Array<Connection>();
+		for (connection in connectionArray) {
+			var otherConnections = connectionArray;
+			otherConnections.remove(connection);
+			for (otherConnection in otherConnections) {
+				var connectionDistance = Math.sqrt(Math.pow(Math.abs(connection.get_xPosition() - otherConnection.get_xPosition()),2) +
+                        Math.pow(Math.abs(connection.get_yPosition() - otherConnection.get_yPosition()),2));
+				if (connectionDistance <= 15) {
+					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
+						linkArray.push(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
+					} else {
+						if (connection.aPortIsConnecte()) {
+							for (element in connection.get_connectedElements()) {
+								otherConnection.connect(Std.downcast(element, Connectable));
+							}
+							markedConnections.push(connection);
+						}
+					}
+					
+					
+				} 
+			}
+		}
+		
+		// removing marked connections. Unclear is swapping connections in use cases is actually what it is supposed to be.
+		// removing such unused connections makes more sense.
+		for (connection in markedConnections) {
+			connectionArray.remove(connection);
+		}
+		
+		
+		// For all connections c and for all links x not connected to c
+		// 		If c is not close to either endpoint of x, but is close to x
+        // 			Split x into two links each with an endpoint added to c
+		// VERIFY :: Can cause Short circuit!!
+		
+		var markedLinks = new Array<Link>();
+		
+		// case : both endpoints of a link are in the same connection then the link is marked
+		for (link in this.linkArray) {
+			if (link.get_endpoint(0).getConnection() == link.get_endpoint(1).getConnection()) {
+				markedLinks.push(link);
+			}
+		}
+		
+		// delete all marked links
+		for (link in markedLinks) {
+			this.linkArray.remove(link);
+		}
+		markedLinks = new Array<Link>();
+		
+		// For all remaining links x
+		// 		If x is not marked for deletion
+		// 			For all links y connected to x.endpoint(0) other than x
+		// 				If the other end of y connects to x.endpoint(0)
+		// 					Mark y for deletion
+		for (link in this.linkArray) {
+			var otherLinks = this.linkArray;
+			otherLinks.remove(link);
+			
+			for (otherLink in otherLinks) {
+				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection()) {
+					markedLinks.push(otherLink);
+				}
+			}
+		}
+		
+		// delete all marked links
+		for (link in markedLinks) {
+			this.linkArray.remove(link);
+		}
+		markedLinks = new Array<Link>();
+		
+		
+	}
 }
