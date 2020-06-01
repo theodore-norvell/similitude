@@ -1,0 +1,10 @@
+This document contains a context free grammar for the state pattern created for the Use cases.
+Reading this, one can form a map of how the states progress among ech other.
+
+=====================================================================================================
+
+CanvasIdleState --> CanvasIdleState | DownOnEmptyState | EditLinkState | AddToSelectionState
+DownOnEmptyState --> CanvasIdleState | EditLinkState
+EditLinkState --> CanvasIdleState | EditLinkState
+AddToSelectionState --> CanvasIdleState | MoveSelectionState
+MoveSelectionState --> CanvasIdleState | MoveSelectionState
