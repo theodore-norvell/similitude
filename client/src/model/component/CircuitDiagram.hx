@@ -241,11 +241,11 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 			var otherConnections = connectionArray;
 			otherConnections.remove(connection);
 			for (otherConnection in otherConnections) {
-				var connectionDistance = Math.sqrt(Math.pow(Math.abs(connection.get_xPosition() - otherConnection.get_xPosition()),2) +
-                        Math.pow(Math.abs(connection.get_yPosition() - otherConnection.get_yPosition()),2));
+				var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
 				if (connectionDistance <= 15) {
+					// here 15 is what is being considered as "close" to each other
 					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
-						linkArray.push(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
+						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
 					} else {
 						if (connection.aPortIsConnecte()) {
 							for (element in connection.get_connectedElements()) {
@@ -261,16 +261,36 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		}
 		
 		// removing marked connections. Unclear is swapping connections in use cases is actually what it is supposed to be.
-		// removing such unused connections makes more sense.
+		// removing such unused connections makes more sense. CHECK ?
 		for (connection in markedConnections) {
 			connectionArray.remove(connection);
 		}
-		
 		
 		// For all connections c and for all links x not connected to c
 		// 		If c is not close to either endpoint of x, but is close to x
         // 			Split x into two links each with an endpoint added to c
 		// VERIFY :: Can cause Short circuit!!
+		// this carries on with the remaining links
+		var removeLinks = new Array<Link>();
+		for (connection in connectionArray) {
+			for (link in this.linkArray) {
+				if ((link.get_endpoint(0).getConnection() != connection) && (link.get_endpoint(1).getConnection() != connection)) {
+					if (Link.pointToLine(connection.get_xPosition(), connection.get_yPosition(), link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), link.get_endpoint(1).get_xPosition(), link.get_endpoint(1).get_yPosition()) <= 15) {
+						var link1 = new Link(this, link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), connection.get_xPosition(), connection.get_yPosition());
+						this.addLink(link1);
+						connection.connect(link1.get_endpoint(1));
+						var link2 = new Link(this, connection.get_xPosition(), connection.get_yPosition(), link.get_endpoint(1).get_xPosition(), link.get_endpoint(1).get_yPosition());
+						this.addLink(link2);
+						connection.connect(link2.get_endpoint(0));
+						removeLinks.push(link);
+					}
+				}
+			}
+		}
+		
+		for (link in removeLinks) {
+			this.deleteLink(link);
+		}
 		
 		var markedLinks = new Array<Link>();
 		
@@ -283,7 +303,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		
 		// delete all marked links
 		for (link in markedLinks) {
-			this.linkArray.remove(link);
+			this.deleteLink(link);
 		}
 		markedLinks = new Array<Link>();
 		
@@ -300,12 +320,16 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection()) {
 					markedLinks.push(otherLink);
 				}
+				
+				if (link.get_endpoint(1).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(1).getConnection()) {
+					markedLinks.push(otherLink);
+				}
 			}
 		}
 		
 		// delete all marked links
 		for (link in markedLinks) {
-			this.linkArray.remove(link);
+			this.deleteLink(link);
 		}
 		markedLinks = new Array<Link>();
 		

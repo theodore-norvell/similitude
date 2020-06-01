@@ -147,7 +147,7 @@ class Link extends CircuitElement implements Observer {
     }
 
     //the distance of point (x0,y0) to line [(x1,y1),(x2,y2)]
-    function pointToLine(x1:Float, y1:Float, x2:Float, y2:Float, x0:Float, y0:Float):Float{
+    public static function pointToLine(x1:Float, y1:Float, x2:Float, y2:Float, x0:Float, y0:Float):Float{
         var space:Float = 0;
         var a,b,c:Float;
 
@@ -189,7 +189,7 @@ class Link extends CircuitElement implements Observer {
     }
 
     //calculate the distance between two points
-    function pointsDistance(x1:Float, y1:Float, x2:Float, y2:Float):Float{
+    public static function pointsDistance(x1:Float, y1:Float, x2:Float, y2:Float):Float{
         var lineLength:Float = 0;
         lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         return lineLength;
