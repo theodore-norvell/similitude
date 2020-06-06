@@ -10,6 +10,7 @@ import model.selectionModel.SelectionModel ;
 import model.enumeration.Orientation;
 import type.Coordinate;
 import type.WorldPoint;
+import type.Set;
 
 class CircuitDiagram extends Observable implements CircuitDiagramI implements Observer{  
     var componentArray:Array<Component> = new Array<Component>();
@@ -117,12 +118,14 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 
     public function addLink(link:Link):Void {
         linkArray.push(link);
+		this.normalise();
         link.addObserver(this);
         updateBoundingBox() ;
     }
 
     public function addComponent(component:Component):Void {
         componentArray.push(component);
+		this.normalise();
         component.addObserver(this);
         updateBoundingBox() ;
     }
@@ -130,12 +133,14 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
     public function deleteLink(link:Link):Void{
         link.disconnectEndpoints() ;
         linkArray.remove(link);
+		this.normalise();
         updateBoundingBox() ;
     }
 
     public function deleteComponent(component:Component):Void{
         component.disconnectAllPorts() ;
         componentArray.remove(component);
+		this.normalise();
         updateBoundingBox() ;
 
     }
@@ -223,26 +228,25 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// else one or both don't contain a port
 			// if c0 contains a port, swap c0 and c1
 			// move everything in c0 to c1
-		var connectionArray = new Array<Connection>();
+		var connectionSet = new Set<Connection>();
 		for (link in this.linkArray) {
-			connectionArray.push(link.get_endpoint(0).getConnection());
-			connectionArray.push(link.get_endpoint(1).getConnection());
+			connectionSet.push(link.get_endpoint(0).getConnection());
+			connectionSet.push(link.get_endpoint(1).getConnection());
 		}
 		
 		for (component in this.componentArray) {
 			var ports = component.get_ports();
 			for (port in ports) {
-				connectionArray.push(port.getConnection());
+				connectionSet.push(port.getConnection());
 			}
 		}
 		
-		var markedConnections = new Array<Connection>();
-		for (connection in connectionArray) {
-			var otherConnections = connectionArray;
-			otherConnections.remove(connection);
-			for (otherConnection in otherConnections) {
+		var markedConnections = new Set<Connection>();
+		for (connection in connectionSet.iterator()) {
+			for (otherConnection in connectionSet.iterator()) {
+				if (otherConnection == connection) { continue ; }
 				var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
-				if (connectionDistance <= 15) {
+				if (connectionDistance <= 5) {
 					// here 15 is what is being considered as "close" to each other
 					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
 						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
@@ -263,7 +267,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// removing marked connections. Unclear is swapping connections in use cases is actually what it is supposed to be.
 		// removing such unused connections makes more sense. CHECK ?
 		for (connection in markedConnections) {
-			connectionArray.remove(connection);
+			connectionSet.remove(connection);
 		}
 		
 		// For all connections c and for all links x not connected to c
@@ -272,10 +276,10 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// VERIFY :: Can cause Short circuit!!
 		// this carries on with the remaining links
 		var removeLinks = new Array<Link>();
-		for (connection in connectionArray) {
+		for (connection in connectionSet.iterator()) {
 			for (link in this.linkArray) {
 				if ((link.get_endpoint(0).getConnection() != connection) && (link.get_endpoint(1).getConnection() != connection)) {
-					if (Link.pointToLine(connection.get_xPosition(), connection.get_yPosition(), link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), link.get_endpoint(1).get_xPosition(), link.get_endpoint(1).get_yPosition()) <= 15) {
+					if (Link.pointToLine(connection.get_xPosition(), connection.get_yPosition(), link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), link.get_endpoint(1).get_xPosition(), link.get_endpoint(1).get_yPosition()) <= 5) {
 						var link1 = new Link(this, link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), connection.get_xPosition(), connection.get_yPosition());
 						this.addLink(link1);
 						connection.connect(link1.get_endpoint(1));
@@ -313,10 +317,9 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// 				If the other end of y connects to x.endpoint(0)
 		// 					Mark y for deletion
 		for (link in this.linkArray) {
-			var otherLinks = this.linkArray;
-			otherLinks.remove(link);
-			
-			for (otherLink in otherLinks) {
+			for (otherLink in this.linkArray) {
+				if (link == otherLink) { continue ; }
+				
 				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection()) {
 					markedLinks.push(otherLink);
 				}
