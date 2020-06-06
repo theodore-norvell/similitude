@@ -252,10 +252,13 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
 					} else {
 						if (connection.aPortIsConnecte()) {
+							var temp = connection ; 
+							connection = otherConnection; 
+							otherConnection = temp;
 							for (element in connection.get_connectedElements()) {
 								otherConnection.connect(Std.downcast(element, Connectable));
 							}
-							markedConnections.push(connection);
+							//markedConnections.push(connection);
 						}
 					}
 					

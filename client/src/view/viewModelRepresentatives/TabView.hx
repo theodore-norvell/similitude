@@ -30,7 +30,7 @@ class TabView implements Observer extends Observable
 	public function new(circuitDiagram: CircuitDiagramI, view: View, tranform: Transform) 
 	{
 		this.view = view;
-		this.tabModel = new TabModel(circuitDiagram, this);
+		this.tabModel = new TabModel(circuitDiagram);
 		this.tabModel.addObserver(this);
 		this.canvasElement = this.spawnNewCanvas();
 	}
