@@ -3,8 +3,81 @@ Reading this, one can form a map of how the states progress among ech other.
 
 =====================================================================================================
 
-CanvasIdleState --> CanvasIdleState | DownOnEmptyState | EditLinkState | AddToSelectionState
-DownOnEmptyState --> CanvasIdleState | EditLinkState
-EditLinkState --> CanvasIdleState | EditLinkState
-AddToSelectionState --> CanvasIdleState | MoveSelectionState
-MoveSelectionState --> CanvasIdleState | MoveSelectionState
+CanvasIdleState -->
+	event( SidebarDragAndDropEvent )
+	test( drag a component from the sidebar and drop it on the canvas )
+	reaction( will add a new component to the circuit diagram and the canvas )
+	CanvasIdleState
+	
+CanvasIdleState -->
+	event( CanvasMouseDownEvent )
+	test( Click anywhere on the canvas with the mouse )
+	DownOnEmptyState
+
+CanvasIdleState -->
+	event( CanvasMouseDownEvent + an endpoint is hit )
+	test( click on an endpoint of an existing link )
+	EditLinkState
+	
+CanvasIdleState -->
+	event( CanvasMouseDownEvent + a component/link is hit )
+	test( click on a component/link pre-existing on the canvas )
+	reaction( Will *prepare* the clicked component/link for the selection )
+	AddToSelectionState
+
+DownOnEmptyState --> 
+	event( CanvasMouseUpEvent )
+	test( click in an empty place on the canvas 
+		  -> then unpress the mouse )
+	reaction( nothing will happen )
+	CanvasIdleState
+
+DownOnEmptyState --> 
+	event( CanvasMouseMoveEvent )
+	test( click on an empty space in the canvas 
+		  -> move your mouse with the left mouse button depressed )
+	reaction( Will add a new link to the circuit diagram and the canvas and pass one of it's endpoint to the EditLinkState)
+	EditLinkState
+
+EditLinkState --> 
+	event( CanvasMouseUpEvent )
+	test( press down in an empty state in the canvas 
+		  -> move your mouse with the left button depressed 
+		  -> lift your mouse button up )
+	reaction( extends the added link using the passed endpoint to the desired point )
+	CanvasIdleState
+
+EditLinkState --> 
+	event( CanvasMouseMoveEvent )
+	test( press down in an empty state in the canvas 
+		  -> move your mouse with the left button depressed )
+	reaction( continously extend the earlier added link )
+	EditLinkState
+
+AddToSelectionState --> 
+	event( CanvasMouseUpEvent )
+	test( click down on a cluster of components/links on the canvas 
+		  -> lift your finger from the left mouse button )
+	reaction( adds the prepared components/links to the selection )
+	CanvasIdleState
+
+AddToSelectionState --> 
+	event( CanvasMouseMoveEvent )
+	test( click down on a cluster of components/links on the canvas 
+		  -> move your mouse with the left button depressed )
+	reaction( moves the current selection around with the mouse )
+	MoveSelectionState
+
+MoveSelectionState --> 
+	event( CanvasMouseUpEvent )
+	test( click down on a cluster of components/links on the canvas 
+		  -> move your mouse with the left button depressed 
+		  -> lift your mouse button up )
+	CanvasIdleState
+
+MoveSelectionState --> 
+	event( CanvasMouseMoveEvent )
+	test( click down on a cluster of components/links on the canvas 
+		  -> move your mouse with the left button depressed )
+	reaction( moves the selection around continously until the mouse moves )
+	MoveSelectionState
