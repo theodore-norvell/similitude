@@ -298,7 +298,9 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		
 		var markedLinks = new Array<Link>();
 		
-		// case : both endpoints of a link are in the same connection then the link is marked
+		// For all links x:
+		//     If both endpoints are in the same connection:
+		//         mark x for deletion
 		for (link in this.linkArray) {
 			if (link.get_endpoint(0).getConnection() == link.get_endpoint(1).getConnection()) {
 				markedLinks.push(link);
@@ -314,17 +316,17 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// For all remaining links x
 		// 		If x is not marked for deletion
 		// 			For all links y connected to x.endpoint(0) other than x
-		// 				If the other end of y connects to x.endpoint(0)
+		// 				If the other end of y connects to x.endpoint(1)
 		// 					Mark y for deletion
 		for (link in this.linkArray) {
 			for (otherLink in this.linkArray) {
 				if (link == otherLink) { continue ; }
 				
-				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection()) {
+				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(1).getConnection()) {
 					markedLinks.push(otherLink);
 				}
 				
-				if (link.get_endpoint(1).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(1).getConnection()) {
+				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(0).getConnection()) {
 					markedLinks.push(otherLink);
 				}
 			}

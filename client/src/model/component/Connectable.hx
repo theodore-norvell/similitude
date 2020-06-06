@@ -20,7 +20,7 @@ class Connectable extends CircuitElement implements Observer {
         this.connection.addObserver( this ) ;
     }
 
-    public function isPort() { return Std.is(this, Port) ; }
+    public function isPort() { return false ; }
     
     public function update( target: ObservableI,?data: Any) : Void {
         notifyObservers( this ) ;
