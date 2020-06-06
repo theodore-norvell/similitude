@@ -9,13 +9,8 @@ class Set<T>
 {
 	var set: Array<T> = new Array<T>();
 
-	public function new(?iterable : Iterable<T>) 
-	{
-		for (element in iterable) {
-			this.push(element);
-		}
-	}
-	
+	public function new () {}
+
 	public function size() : Int {
 		return this.set.length;
 	}
