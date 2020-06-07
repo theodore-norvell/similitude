@@ -235,38 +235,32 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 			for (port in ports) {
 				connectionSet.push(port.getConnection());
 			}
-		}
-		
-		var markedConnections = new Set<Connection>();
+        }
+        
+		var alreadyProcessed = new Set<Connection>();
 		for (connection in connectionSet.iterator()) {
+            alreadyProcessed.push( connection ) ;
 			for (otherConnection in connectionSet.iterator()) {
-				if (otherConnection == connection) { continue ; }
-				var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
+				if ( alreadyProcessed.has( otherConnection ) ) { continue ; }
+                var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
 				if (connectionDistance <= 5) {
-					// here 5 is what is being considered as "close" to each other
+                    // The connections are close. Either we link them or we
+                    // merge them.
+                    trace( "Found two a pair of close connections:" + connection + " and " + otherConnection ) ;
 					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
 						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
 					} else {
+                        //
 						if (connection.aPortIsConnecte()) {
 							var temp = connection ; 
 							connection = otherConnection; 
-							otherConnection = temp;
-							for (element in connection.get_connectedElements()) {
-								otherConnection.connect(Std.downcast(element, Connectable));
-							}
-							//markedConnections.push(connection);
+							otherConnection = temp; }
+						for (element in connection.get_connectedElements()) {
+							otherConnection.connect(element);
 						}
 					}
-					
-					
-				} 
+				}
 			}
-		}
-		
-		// removing marked connections. Unclear is swapping connections in use cases is actually what it is supposed to be.
-		// removing such unused connections makes more sense. CHECK ?
-		for (connection in markedConnections) {
-			connectionSet.remove(connection);
 		}
 		
 		// For all connections c and for all links x not connected to c

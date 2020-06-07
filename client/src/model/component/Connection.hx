@@ -64,7 +64,7 @@ class Connection extends CircuitElement {
         return connectedElements.length ;
     }
     
-    public function get_connectedElements() : Iterator<CircuitElement> {
+    public function get_connectedElements() : Iterator<Connectable> {
         return connectedElements.iterator()  ;
     }
 }
