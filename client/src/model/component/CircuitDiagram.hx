@@ -251,11 +251,12 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 				if (connectionDistance <= 5) {
                     // The connections are close. Either we link them or we
                     // merge them.
-                    trace( "Found two a pair of close connections:" + connection + " and " + otherConnection ) ;
+                    trace( "Found a pair of close connections:" + connection + " and " + otherConnection ) ;
 					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
+                        trace( "Linking them" ) ;
 						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
 					} else {
-                        //
+                        trace( "Merging them" ) ;
 						if (connection.aPortIsConnecte()) {
 							var temp = connection ; 
 							connection = otherConnection; 
@@ -271,30 +272,40 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// For all connections c and for all links x not connected to c
 		// 		If c is not close to either endpoint of x, but is close to x
         // 			Split x into two links each with an endpoint added to c
-		// VERIFY :: Can cause Short circuit!!
-		// this carries on with the remaining links
-		var removeLinks = new Array<Link>();
+        trace( "Step 2" ) ;
 		for (connection in connectionSet.iterator()) {
-			for (link in this.linkArray) {
-				if ((link.get_endpoint(0).getConnection() != connection) && (link.get_endpoint(1).getConnection() != connection)) {
-					if (Link.pointToLine(connection.get_xPosition(), connection.get_yPosition(), link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), link.get_endpoint(1).get_xPosition(), link.get_endpoint(1).get_yPosition()) <= 5) {
-						var link1 = new Link(this, link.get_endpoint(0).get_xPosition(), link.get_endpoint(0).get_yPosition(), connection.get_xPosition(), connection.get_yPosition());
-						this.addLink(link1);
+            trace( "Considering connection " +connection ) ;
+            var removeLinks = new Array<Link>();
+            var linkArrayCopy = this.linkArray.copy() ;
+			for (link in linkArrayCopy ) {
+                trace( "Considering link " +link ) ;
+                var c0 = link.get_endpoint(0).getConnection() ;
+                var c1 = link.get_endpoint(1).getConnection() ;
+                if( c0 != connection
+                &&  c1 != connection ) {
+					if ( link.isOnLink( connection.location() ) != null ) {
+                        trace( "Connection " +connection+ " will split link " +link ) ;
+                        var link1 = new Link(this, c0.get_xPosition(), c0.get_yPosition(),
+                                                   connection.get_xPosition(), connection.get_yPosition());
+                        this.addLink(link1);
+                        c0.connect( link1.get_endpoint(0) ) ;
 						connection.connect(link1.get_endpoint(1));
-						var link2 = new Link(this, connection.get_xPosition(), connection.get_yPosition(), link.get_endpoint(1).get_xPosition(), link.get_endpoint(1).get_yPosition());
+                        var link2 = new Link(this, connection.get_xPosition(), connection.get_yPosition(),
+                                                   c1.get_xPosition(), c1.get_yPosition());
 						this.addLink(link2);
-						connection.connect(link2.get_endpoint(0));
+                        connection.connect(link2.get_endpoint(0));
+                        c1.connect( link2.get_endpoint(1) ) ;
 						removeLinks.push(link);
 					}
 				}
-			}
+            }
+            // Remove all links split by this connection.
+            for (link in removeLinks) {
+                this.deleteLink(link);
+            }
 		}
 		
-		for (link in removeLinks) {
-			this.deleteLink(link);
-		}
-		
-		var markedLinks = new Array<Link>();
+		var markedLinks = new Set<Link>();
 		
 		// For all links x:
 		//     If both endpoints are in the same connection:
@@ -308,17 +319,19 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// delete all marked links
 		for (link in markedLinks) {
 			this.deleteLink(link);
-		}
-		markedLinks = new Array<Link>();
+        }
 		
 		// For all remaining links x
 		// 		If x is not marked for deletion
 		// 			For all links y connected to x.endpoint(0) other than x
 		// 				If the other end of y connects to x.endpoint(1)
 		// 					Mark y for deletion
+        trace( "Step 3" ) ;
+		markedLinks = new Set<Link>();
 		for (link in this.linkArray) {
+            if( markedLinks.has( link ) ) continue ;
 			for (otherLink in this.linkArray) {
-				if (link == otherLink) { continue ; }
+				if (link == otherLink) continue ;
 				
 				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(1).getConnection()) {
 					markedLinks.push(otherLink);
@@ -332,10 +345,8 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		
 		// delete all marked links
 		for (link in markedLinks) {
+            trace( "Deleting link " +link ) ;
 			this.deleteLink(link);
-		}
-		markedLinks = new Array<Link>();
-		
-		
+        }
 	}
 }
