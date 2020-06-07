@@ -118,14 +118,12 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 
     public function addLink(link:Link):Void {
         linkArray.push(link);
-		this.normalise();
         link.addObserver(this);
         updateBoundingBox() ;
     }
 
     public function addComponent(component:Component):Void {
         componentArray.push(component);
-		this.normalise();
         component.addObserver(this);
         updateBoundingBox() ;
     }
@@ -133,14 +131,12 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
     public function deleteLink(link:Link):Void{
         link.disconnectEndpoints() ;
         linkArray.remove(link);
-		this.normalise();
         updateBoundingBox() ;
     }
 
     public function deleteComponent(component:Component):Void{
         component.disconnectAllPorts() ;
         componentArray.remove(component);
-		this.normalise();
         updateBoundingBox() ;
 
     }
@@ -247,7 +243,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 				if (otherConnection == connection) { continue ; }
 				var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
 				if (connectionDistance <= 5) {
-					// here 15 is what is being considered as "close" to each other
+					// here 5 is what is being considered as "close" to each other
 					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
 						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
 					} else {
