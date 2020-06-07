@@ -221,6 +221,23 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         }
         return worldPointArray;
     }
+
+    public function getConnections() : Set<Connection> {
+
+		var connectionSet = new Set<Connection>();
+		for (link in this.linkArray) {
+			connectionSet.push(link.get_endpoint(0).getConnection());
+			connectionSet.push(link.get_endpoint(1).getConnection());
+		}
+		for (component in this.componentArray) {
+			var ports = component.get_ports();
+			for (port in ports) {
+				connectionSet.push(port.getConnection());
+			}
+        }
+
+        return connectionSet ;
+    }
 	
 	public function normalise() : Void {
 		// For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
@@ -229,29 +246,19 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// else one or both don't contain a port
 			// if c0 contains a port, swap c0 and c1
 			// move everything in c0 to c1
-		var connectionSet = new Set<Connection>();
-		for (link in this.linkArray) {
-			connectionSet.push(link.get_endpoint(0).getConnection());
-			connectionSet.push(link.get_endpoint(1).getConnection());
-		}
-		
-		for (component in this.componentArray) {
-			var ports = component.get_ports();
-			for (port in ports) {
-				connectionSet.push(port.getConnection());
-			}
-        }
-        
+        trace( "Step 1" ) ;
+        var connectionSet = getConnections() ;
 		var alreadyProcessed = new Set<Connection>();
 		for (connection in connectionSet.iterator()) {
             alreadyProcessed.push( connection ) ;
 			for (otherConnection in connectionSet.iterator()) {
-				if ( alreadyProcessed.has( otherConnection ) ) { continue ; }
+                if ( alreadyProcessed.has( otherConnection ) ) { continue ; }
+                trace( "Considering " + connection + " and " + otherConnection ) ;
                 var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
 				if (connectionDistance <= 5) {
                     // The connections are close. Either we link them or we
                     // merge them.
-                    trace( "Found a pair of close connections:" + connection + " and " + otherConnection ) ;
+                    trace( "They are close." ) ;
 					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
                         trace( "Linking them" ) ;
 						this.addLink(new Link(this, connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition()));
@@ -260,10 +267,16 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 						if (connection.aPortIsConnecte()) {
 							var temp = connection ; 
 							connection = otherConnection; 
-							otherConnection = temp; }
-						for (element in connection.get_connectedElements()) {
-							otherConnection.connect(element);
+                            otherConnection = temp; }
+                        
+                        trace( "Merging from " + connection + " to " + otherConnection ) ;
+                        var connectables = new Set<Connectable>() ;
+                        for( item in connection.get_connectedElements() ) connectables.push(item) ;
+						for (item in connectables ) {
+                            trace( "Merging " + item ) ;
+							otherConnection.connect(item);
 						}
+                        trace( "Finished Merging from " + connection + " to " + otherConnection ) ;
 					}
 				}
 			}
@@ -273,6 +286,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// 		If c is not close to either endpoint of x, but is close to x
         // 			Split x into two links each with an endpoint added to c
         trace( "Step 2" ) ;
+        connectionSet = getConnections() ;
 		for (connection in connectionSet.iterator()) {
             trace( "Considering connection " +connection ) ;
             var removeLinks = new Array<Link>();
@@ -335,11 +349,13 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 			for (otherLink in this.linkArray) {
 				if (link == otherLink) continue ;
 				
-				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(1).getConnection()) {
+                if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(0).getConnection()
+                 && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(1).getConnection()) {
 					markedLinks.push(otherLink);
 				}
 				
-				if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection() && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(0).getConnection()) {
+                if (link.get_endpoint(0).getConnection() == otherLink.get_endpoint(1).getConnection()
+                 && link.get_endpoint(1).getConnection() == otherLink.get_endpoint(0).getConnection()) {
 					markedLinks.push(otherLink);
 				}
 			}
