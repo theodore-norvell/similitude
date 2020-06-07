@@ -27,15 +27,9 @@ import model.selectionModel.SelectionModel ;
  */
 class FlipFlop implements ComponentKind extends AbstractComponentKind implements ComponentKind {
 
-    var nameOfTheComponentKind:String="FlipFlop";
-
     public function new() {
-        super();
+        super( "FlipFlop");
         // TODO Add attributes.
-    }
-
-    public function getname():String {
-        return nameOfTheComponentKind;
     }
 
     // public function createPorts():Array<Port> {

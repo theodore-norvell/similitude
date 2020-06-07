@@ -26,16 +26,8 @@ import model.enumeration.Orientation;
  */
 class AND implements ComponentKind extends AbstractGate implements ComponentKind{
 
-
-    var nameOfTheComponentKind:String="AND";
-
     public function new() {
-        super() ;
-    }
-
-
-    public function getname():String{
-        return nameOfTheComponentKind;
+        super("AND") ;
     }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel ){

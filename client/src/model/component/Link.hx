@@ -28,6 +28,10 @@ class Link extends CircuitElement implements Observer {
         this.endpoints = [zero, one];
     }
 
+    public function toString() : String {
+        return "Link(from:" + endpoints[0] + " to " + endpoints[0] +")" ;
+    }
+
     public function update(target : ObservableI,?data: Any) : Void {
         notifyObservers( this ) ;
     }

@@ -28,6 +28,11 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         updateBoundingBox() ;
     }
 
+    public function toString() : String {
+        return "CircuitDiagram( components: " + componentArray
+                         + " links:" + linkArray + ")" ;
+    }
+
     public function checkInvariant( ) : Void {
         for( comp in componentArray ) Assert.assert( comp.get_CircuitDiagram() == this ) ;
         for( link in linkArray ) {

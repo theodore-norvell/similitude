@@ -15,4 +15,9 @@ class Endpoint extends Connectable  {
     public function new(cd : CircuitDiagramI, x:Float, y:Float) {
         super(cd, x, y) ;
     }
+
+    public function toString() : String {
+        return "Endpoint(" + this.connection + ")" ;
+    }
+
 }

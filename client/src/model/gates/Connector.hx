@@ -16,14 +16,8 @@ import model.selectionModel.SelectionModel ;
  */
 class Connector implements ComponentKind extends AbstractComponentKind implements ComponentKind {
 
-    var nameOfTheComponentKind:String="Connector";
-
     public function new() {
-        super() ;
-    }
-
-    public function getname():String{
-        return nameOfTheComponentKind;
+        super("Connector") ;
     }
 
     // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {

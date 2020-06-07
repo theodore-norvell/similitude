@@ -22,6 +22,13 @@ class Connection extends CircuitElement {
         connectedElements.push( connectable ) ;
     }
 
+    public function toString() : String {
+        return "Connection( x:" + coordinate.get_xPosition()
+                         + " y:" + coordinate.get_yPosition() 
+                         + " len: " + connectedElements.length + ")" ;
+    }
+
+
     public function location() : Coordinate {
         return coordinate ;
     }

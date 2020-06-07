@@ -27,14 +27,8 @@ import model.enumeration.Orientation;
  */
 class XOR implements ComponentKind extends AbstractGate implements ComponentKind {
 
-    var nameOfTheComponentKind:String="XOR";
-
     public function new() {
-        super() ;
-    }
-
-    public function getname():String{
-        return nameOfTheComponentKind;
+        super("XOR") ;
     }
 
     // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {

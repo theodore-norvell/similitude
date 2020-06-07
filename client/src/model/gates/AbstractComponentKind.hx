@@ -21,10 +21,18 @@ import global.Constant.portSize ;
 class AbstractComponentKind  {
 
     var attributes = new AttributeList() ;
+    var nameOfTheComponentKind : String ;
 
-    private function new() {
+    private function new( nameOfKind : String ) {
+        this.nameOfTheComponentKind = nameOfKind ;
         attributes.add( StandardAttributes.orientation ) ;
     }
+
+    public function toString() : String {
+        return this.getname();
+    }
+
+    public function getname():String { return nameOfTheComponentKind ; }
 
     public function getAttributes() : Iterator< AttributeUntyped > {
         return attributes.iterator() ;
