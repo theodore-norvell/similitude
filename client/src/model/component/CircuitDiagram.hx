@@ -310,6 +310,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// For all links x:
 		//     If both endpoints are in the same connection:
 		//         mark x for deletion
+        trace( "Step 3" ) ;
 		for (link in this.linkArray) {
 			if (link.get_endpoint(0).getConnection() == link.get_endpoint(1).getConnection()) {
 				markedLinks.push(link);
@@ -318,6 +319,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		
 		// delete all marked links
 		for (link in markedLinks) {
+            trace( "Deleting link " +link ) ;
 			this.deleteLink(link);
         }
 		
@@ -326,7 +328,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
 		// 			For all links y connected to x.endpoint(0) other than x
 		// 				If the other end of y connects to x.endpoint(1)
 		// 					Mark y for deletion
-        trace( "Step 3" ) ;
+        trace( "Step 4" ) ;
 		markedLinks = new Set<Link>();
 		for (link in this.linkArray) {
             if( markedLinks.has( link ) ) continue ;
