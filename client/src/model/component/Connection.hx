@@ -49,7 +49,7 @@ class Connection extends CircuitElement {
     public function connect( connectable : Connectable ) : Void {
         Assert.assert( connectable.get_CircuitDiagram() == this.get_CircuitDiagram() ) ;
         if( connectedElements.indexOf( connectable ) == -1 ) {
-            if( !connectable.isPort() || ! aPortIsConnecte() ) {
+            if( !connectable.isPort() || ! aPortIsConnected() ) {
                 var oldConnection = connectable.getConnection() ;
                 oldConnection.delete( connectable ) ;
                 connectable.setConnection( this ) ;
@@ -63,7 +63,7 @@ class Connection extends CircuitElement {
         connectedElements.remove( connectable ) ;
     }
 
-    public function aPortIsConnecte() {
+    public function aPortIsConnected() {
         for( c in connectedElements ) if( c.isPort() ) return true ;
         return false ;
     }

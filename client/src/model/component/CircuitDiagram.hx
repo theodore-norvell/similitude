@@ -259,7 +259,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
                     // The connections are close. Either we link them or we
                     // merge them.
                     trace( "They are close." ) ;
-					if (connection.aPortIsConnecte() && otherConnection.aPortIsConnecte()) {
+					if (connection.aPortIsConnected() && otherConnection.aPortIsConnected()) {
                         trace( "Linking them" ) ;
                         // This might create a redundant link.  However redundant links are eliminated later
                         // in normalization. So, we won't worry.
@@ -270,7 +270,7 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
                         otherConnection.connect( link.get_endpoint(1) ) ;
 					} else {
                         trace( "Merging them" ) ;
-						if (connection.aPortIsConnecte()) {
+						if (connection.aPortIsConnected()) {
 							var temp = connection ; 
 							connection = otherConnection; 
                             otherConnection = temp; }
