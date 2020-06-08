@@ -253,12 +253,12 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
             alreadyProcessed.push( connection ) ;
 			for (otherConnection in connectionSet.iterator()) {
                 if ( alreadyProcessed.has( otherConnection ) ) { continue ; }
-                trace( "Considering " + connection + " and " + otherConnection ) ;
+                //trace( "Considering " + connection + " and " + otherConnection ) ;
                 var connectionDistance = Link.pointsDistance(connection.get_xPosition(), connection.get_yPosition(), otherConnection.get_xPosition(), otherConnection.get_yPosition());
 				if (connectionDistance <= 5) {
                     // The connections are close. Either we link them or we
                     // merge them.
-                    trace( "They are close." ) ;
+                    trace( "Found close connections " + connection + " and " + otherConnection ) ;
 					if (connection.aPortIsConnected() && otherConnection.aPortIsConnected()) {
                         trace( "Linking them" ) ;
                         // This might create a redundant link.  However redundant links are eliminated later
@@ -294,11 +294,11 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         trace( "Step 2" ) ;
         connectionSet = getConnections() ;
 		for (connection in connectionSet.iterator()) {
-            trace( "Considering connection " +connection ) ;
+            //trace( "Considering connection " +connection ) ;
             var removeLinks = new Array<Link>();
             var linkArrayCopy = this.linkArray.copy() ;
 			for (link in linkArrayCopy ) {
-                trace( "Considering link " +link ) ;
+                //trace( "Considering link " +link ) ;
                 var c0 = link.get_endpoint(0).getConnection() ;
                 var c1 = link.get_endpoint(1).getConnection() ;
                 if( c0 != connection

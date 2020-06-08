@@ -49,18 +49,12 @@ class Connection extends CircuitElement {
     public function connect( connectable : Connectable ) : Void {
         Assert.assert( connectable.get_CircuitDiagram() == this.get_CircuitDiagram() ) ;
         if( connectedElements.indexOf( connectable ) == -1 ) {
-            if( !connectable.isPort() || ! aPortIsConnected() ) {
+            if( ! connectable.isPort() || ! aPortIsConnected() ) {
                 var oldConnection = connectable.getConnection() ;
-                oldConnection.delete( connectable ) ;
+                oldConnection.connectedElements.remove( connectable ) ;
                 connectable.setConnection( this ) ;
                 connectedElements.push( connectable ) ;
                 notifyObservers( this ) ; } }
-    }
-
-    // Dangerous function as it invalidates the invariant that 
-    // The connectable's connection should link back to the connectable.
-    private function delete(  connectable : Connectable ) {
-        connectedElements.remove( connectable ) ;
     }
 
     public function aPortIsConnected() {
