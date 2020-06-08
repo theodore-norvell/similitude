@@ -28,6 +28,8 @@ class MoveSelectionState implements ControllerStateI
 			canvasListener.getCommandManager().executeCommand(moveSelectionCommand, true);
 			canvasListener.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
+			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
+			circuitDiagram.normalise() ;
 			canvasListener.setState(new CanvasIdleState());
 		} else {
 			trace("Unknown transition");
