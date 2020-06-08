@@ -5,79 +5,59 @@ Reading this, one can form a map of how the states progress among ech other.
 
 CanvasIdleState -->
 	event( SidebarDragAndDropEvent )
-	test( drag a component from the sidebar and drop it on the canvas )
-	reaction( will add a new component to the circuit diagram and the canvas )
+	reaction( add a new component to the circuit diagram )
 	CanvasIdleState
 	
 CanvasIdleState -->
-	event( CanvasMouseDownEvent )
-	test( Click anywhere on the canvas with the mouse )
-	DownOnEmptyState
-
-CanvasIdleState -->
-	event( CanvasMouseDownEvent + an endpoint is hit )
-	test( click on an endpoint of an existing link )
-	EditLinkState
-	
-CanvasIdleState -->
-	event( CanvasMouseDownEvent + a component/link is hit )
-	test( click on a component/link pre-existing on the canvas )
-	reaction( Will *prepare* the clicked component/link for the selection )
-	AddToSelectionState
+	event( CanvasMouseDownEvent( x, y ) )
+	(  test( nothing was hit )
+	   reaction( clear the selection )
+	   DownOnEmptyState
+	|
+	   test( an endpoint was hit )
+	   let endpoint be any of the endpoints that were hit 
+	   EditLinkState( endpoint )
+	|
+	   test( something was hit but no endpoint was hit )
+	   let clickedObjects be the set of all links and components that were hit
+	   AddToSelectionState( clickedObjects, x, y )
+	)
 
 DownOnEmptyState --> 
 	event( CanvasMouseUpEvent )
-	test( click in an empty place on the canvas 
-		  -> then unpress the mouse )
-	reaction( nothing will happen )
 	CanvasIdleState
 
 DownOnEmptyState --> 
 	event( CanvasMouseMoveEvent )
-	test( click on an empty space in the canvas 
-		  -> move your mouse with the left mouse button depressed )
-	reaction( Will add a new link to the circuit diagram and the canvas and pass one of it's endpoint to the EditLinkState)
-	EditLinkState
+	reaction( Will add a new link to the circuit diagram)
+	EditLinkState( one of the endpoints of the new link )
 
-EditLinkState --> 
+EditLinkState( endpoint ) --> 
 	event( CanvasMouseUpEvent )
-	test( press down in an empty state in the canvas 
-		  -> move your mouse with the left button depressed 
-		  -> lift your mouse button up )
-	reaction( extends the added link using the passed endpoint to the desired point )
+	reaction( normalize the circuit diagram )
 	CanvasIdleState
 
-EditLinkState --> 
+EditLinkState( endpoint ) --> 
 	event( CanvasMouseMoveEvent )
-	test( press down in an empty state in the canvas 
-		  -> move your mouse with the left button depressed )
-	reaction( continously extend the earlier added link )
+	reaction( update the position of endpoint to match the mouse )
 	EditLinkState
 
-AddToSelectionState --> 
+AddToSelectionState( passedObjects, x, y ) --> 
 	event( CanvasMouseUpEvent )
-	test( click down on a cluster of components/links on the canvas 
-		  -> lift your finger from the left mouse button )
-	reaction( adds the prepared components/links to the selection )
+	reaction( add or remove passedObjects from the selection )
 	CanvasIdleState
 
-AddToSelectionState --> 
-	event( CanvasMouseMoveEvent )
-	test( click down on a cluster of components/links on the canvas 
-		  -> move your mouse with the left button depressed )
+AddToSelectionState( passedObjects, x, y ) --> 
+	event( CanvasMouseMoveEven( newX, newY ) )
 	reaction( moves the current selection around with the mouse )
-	MoveSelectionState
+	MoveSelectionState( newX, newY )
 
-MoveSelectionState --> 
+MoveSelectionState( x, y ) --> 
 	event( CanvasMouseUpEvent )
-	test( click down on a cluster of components/links on the canvas 
-		  -> move your mouse with the left button depressed 
-		  -> lift your mouse button up )
+	reaction( normalize the circuit diagram )
 	CanvasIdleState
 
-MoveSelectionState --> 
-	event( CanvasMouseMoveEvent )
-	test( click down on a cluster of components/links on the canvas 
-		  -> move your mouse with the left button depressed )
-	reaction( moves the selection around continously until the mouse moves )
-	MoveSelectionState
+MoveSelectionState( x, y ) --> 
+	event( CanvasMouseMoveEvent( newX, newY ) )
+	reaction( move the selection )
+	MoveSelectionState( newX, newY )
