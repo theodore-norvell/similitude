@@ -26,14 +26,8 @@ import model.enumeration.Orientation;
  */
 class OR implements ComponentKind extends AbstractGate implements ComponentKind {
 
-    var nameOfTheComponentKind:String="OR";
-
     public function new() {
-        super() ;
-    }
-
-    public function getname():String{
-        return nameOfTheComponentKind;
+        super("OR") ;
     }
 
     // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {

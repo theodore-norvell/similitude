@@ -147,9 +147,10 @@
 </ul>
 <p>A normalization process changes the diagram until it is normal. Here is a possible normalization process:</p>
 <ol>
-  <li>For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
+  <li>// Merge or connect connection points that are close to each other.<br>
+    For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
     <ol>
-      <li>if and both&nbsp;contain a port,
+      <li>if  both&nbsp;c0 and c1 contain a port,
         <ol>
           <li>create a link to connect them</li>
         </ol>
@@ -162,7 +163,8 @@
       </li>
     </ol>
   </li>
-  <li>For all connections c and for all links x not connected to c
+  <li>// Split links if a connection point is close to the link, but not close to an endpoint.<br>
+    For all connections c and for all links x not connected to c
     <ol>
       <li>If c is not close to either endpoint of x, but is close to x
         <ol>
@@ -171,34 +173,42 @@
       </li>
     </ol>
   </li>
-  <li>For all links x
+  <li>// Delete links that go nowhere
     <ol>
-      <li>If both endpoints are in the same connection, 
+      <li>For all links x
         <ol>
-          <li>Mark x for deletion</li>
+          <li>If both endpoints are in the same connection, 
+            <ol>
+              <li>Mark x for deletion</li>
+            </ol>
+          </li>
         </ol>
       </li>
+      <li>Delete all marked links</li>
     </ol>
   </li>
-  <li>Delete all marked links</li>
-  <li>For all remaining links x
+  <li>// Delete redundant links
     <ol>
-      <li>If x is not marked for deletion
+      <li>For all remaining links x
         <ol>
-          <li>For all links y connected to x.endpoint(0) other than x
+          <li>If x is not marked for deletion
             <ol>
-              <li>If the other end of y connects to x.endpoint(0)
+              <li>For all links y connected to x.endpoint(0) other than x
                 <ol>
-                  <li>Mark y for deletion</li>
+                  <li>If the other end of y connects to x.endpoint(1)
+                    <ol>
+                      <li>Mark y for deletion</li>
+                    </ol>
+                  </li>
                 </ol>
               </li>
             </ol>
           </li>
         </ol>
       </li>
+      <li>Delete all marked links</li>
     </ol>
   </li>
-  <li>Delete all marked links</li>
 </ol>
 <p>Prenormalization: As a visual aid, when some elements of the diagram are in motion, we could highlight any connections that will be affected by normalization.&nbsp; That is any connection that is</p>
 <ul>
@@ -217,7 +227,7 @@
     <p>Before:&nbsp; &nbsp;{x0}-------x-------{x1}{p}</p>
     <p>After:&nbsp; &nbsp; &nbsp;{x0}-------x---------{x1, p}</p>
   </blockquote>
-  <li>We move a component so that one of its ports is sufficiently close to the port of another component.&nbsp;If the diagram is then normalized, a link should appear connecting those ports (if they were not already connected.  </li>
+  <li>We move a component so that one of its ports is sufficiently close to the port of another component.&nbsp;If the diagram is then normalized, a link should appear connecting those ports.</li>
 </ul>
 <ul>
   <blockquote>
@@ -248,6 +258,7 @@
     <p>Before:&nbsp; {y0, a, b, c} ----------------y------------{y1, d, e, f}</p>
     <p>After:&nbsp;&nbsp;&nbsp; {y0, a, b, c}-----y----{y1,x1,z0}----z----{z1, d, e, f}  </p>
   </blockquote>
+  <li>Suppose a link is created that duplicates another link, then one of them will be deleted.</li>
 </ul>
 <h3>Use cases for editing</h3>
 <h4>&nbsp;</h4>
@@ -402,11 +413,11 @@
         <ol>
           <li>Let X be the set of all endpoints x is directly connected to (including x itself) and which are endpoints of selected links.</li>
           <li>Let Y be the set of all endpoints&nbsp;and ports directly connected to x that are not endpoints of selected links. (Y might be empty.)</li>
-          <li>All the endpoints in X are disconnected&nbsp;from anything else, but should remain connected together.</li>
+          <li>All the endpoints in X are disconnected&nbsp;from anything else, but should remain directly connected together.&nbsp; The items of Y should remain directly connected to each other. [Implementation note: This can be accomplished by first disconnecting x and then connecting all remaining endpoints in X to x.]</li>
         </ol>
       </li>
       <li>User moves mouse.</li>
-      <li>Client: As the mouse moves, a endpoints in X move. </li>
+      <li>Client: As the mouse moves, all endpoints in X move, but the endpoints and ports in Y should remain where they are.</li>
       <li>User releases mouse</li>
       <li>Client: Normalizes the diagram.
       </li>

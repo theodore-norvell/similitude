@@ -26,11 +26,13 @@ class DrawComponent {
         // TODO. Draw the text associated with each input, if any.
         // TODO. Draw pigtails for ports.
         // TODO. Change color for selected ports
-        drawingAdapter.setStrokeColor( "blue" ) ;
-        drawingAdapter.setFillColor("blue");
+        drawingAdapter.setStrokeColor( "black" ) ;
         for (port in component.get_ports()) {
-            if( ! port.isConnected() ) {
-                drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portSize, portSize); }
+            if( port.isConnected() ) {
+                drawingAdapter.setFillColor("black"); }
+            else {
+                drawingAdapter.setFillColor("white"); }
+            drawingAdapter.drawRect(port.get_xPosition(), port.get_yPosition(), portSize, portSize);
         }
     }
 }

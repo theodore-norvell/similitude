@@ -28,6 +28,10 @@ class Link extends CircuitElement implements Observer {
         this.endpoints = [zero, one];
     }
 
+    public function toString() : String {
+        return "Link(from:" + endpoints[0] + " to " + endpoints[1] +")" ;
+    }
+
     public function update(target : ObservableI,?data: Any) : Void {
         notifyObservers( this ) ;
     }
@@ -110,15 +114,16 @@ class Link extends CircuitElement implements Observer {
     /**
     * verify this coordinate on link or not
     * @param coordinate
-    * @return if the coordinate on the link then return the link
+    * @return if the coordinate on the link, but not close to either end point then return the link
     *           or  return null;
     **/
-    function isOnLink(coordinate:Coordinate):Link{
-
+    public function isOnLink(coordinate:Coordinate):Link{
+        // TODO Change this to a boolean function.
         if(pointToLine(endpoints[0].get_xPosition(), endpoints[0].get_yPosition(),
-        endpoints[1].get_xPosition(), endpoints[1].get_yPosition(),
-        coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToLineDistance){
-            //if the distance between the point to line less equal to 3, that means the line should be selected
+                       endpoints[1].get_xPosition(), endpoints[1].get_yPosition(),
+                       coordinate.get_xPosition(), coordinate.get_yPosition()) <= pointToLineDistance ){
+            //if the distance between the point to line less equal to pointToLineDistance,
+            // that means the line should be selected
             //only process the first link met
 
             //the mouse location should be a little away from the endpoint
@@ -132,22 +137,19 @@ class Link extends CircuitElement implements Observer {
                 Math.pow(Math.abs(coordinate.get_xPosition() - endpoints[1].get_xPosition()), 2) +
                 Math.pow(Math.abs(coordinate.get_yPosition() - endpoints[1].get_yPosition()), 2)
             );
-            if(theDistanaceToLeftEndpoint >= theDistanceToRightEndpoint){
-                if(theDistanceToRightEndpoint >= portSize ){
+            if( theDistanceToRightEndpoint >= pointToLineDistance
+            && theDistanaceToLeftEndpoint >= pointToLineDistance) {
                     return this;
-                }
-            }else{
-                if(theDistanaceToLeftEndpoint >= portSize){
-                    return this;
-                }
+            } else {
+                return null ;
             }
-
+        } else {
+            return null ;
         }
-        return null;
     }
 
     //the distance of point (x0,y0) to line [(x1,y1),(x2,y2)]
-    function pointToLine(x1:Float, y1:Float, x2:Float, y2:Float, x0:Float, y0:Float):Float{
+    public static function pointToLine(x1:Float, y1:Float, x2:Float, y2:Float, x0:Float, y0:Float):Float{
         var space:Float = 0;
         var a,b,c:Float;
 
@@ -189,7 +191,7 @@ class Link extends CircuitElement implements Observer {
     }
 
     //calculate the distance between two points
-    function pointsDistance(x1:Float, y1:Float, x2:Float, y2:Float):Float{
+    public static function pointsDistance(x1:Float, y1:Float, x2:Float, y2:Float):Float{
         var lineLength:Float = 0;
         lineLength = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         return lineLength;

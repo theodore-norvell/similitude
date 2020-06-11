@@ -116,4 +116,20 @@ interface CircuitDiagramI extends ObservableI {
     **/
     public function findWorldPoint(worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>;
 
+	/**
+	 * Performs normalisation for the entire circuit.
+	 * 
+	 * Normallization is a process of tidying up a cicuit diagram so that the way it is matches the way it looks. 
+	 * Generally normalization is done at the end of each user interaction that might change the diagram. 
+	 * A diagram might become denormailzed in the middle of an interaction, but at the end, it should be normal again.
+	 * 
+	 * A normal diagram has the following properties.
+	 * 
+	 *	 Any two distinct connections that are close to each other, both contain a port.
+	 *	 Any two disctinct connections that are close to each other (and therefor both contain ports) must be connected by a link.
+	 *	 No connection is close to a link unless it includes an endpoint of that link.
+	 *	 No link has two endpoints that are directly connected to each other.
+	 *	 No two links connect the same pair of connections.
+	 */
+	public function normalise() : Void;
 }

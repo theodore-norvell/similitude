@@ -14,9 +14,10 @@ import model.enumeration.Orientation;
   * 
   */
 class AbstractGate extends AbstractComponentKind {
+    // TODO. Is this class needed?
 
-    public function new() {
-        super() ;
+    public function new( nameOfKind : String ) {
+        super( nameOfKind ) ;
         // TODO Add attributes
     }
 

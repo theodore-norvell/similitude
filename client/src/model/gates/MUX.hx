@@ -32,16 +32,9 @@ import model.selectionModel.SelectionModel ;
  *
  */
 class MUX implements ComponentKind extends AbstractComponentKind implements ComponentKind {
-
-    var nameOfTheComponentKind:String="MUX";
-
     public function new() {
-        super() ;
+        super( "MUX") ;
         // TODO add attributes
-    }
-
-    public function getname():String{
-        return nameOfTheComponentKind;
     }
 
     // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {

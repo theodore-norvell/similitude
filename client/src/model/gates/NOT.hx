@@ -25,14 +25,8 @@ import model.enumeration.Orientation;
  */
 class NOT implements ComponentKind extends AbstractGate implements ComponentKind {
 
-    var nameOfTheComponentKind:String="NOT";
-
     public function new() {
-        super() ;
-    }
-
-    public function getname():String{
-        return nameOfTheComponentKind;
+        super("NOT") ;
     }
 
     override function initialNumberOfInPorts() : Int { return 1 ; }

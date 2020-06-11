@@ -1,0 +1,63 @@
+This document contains a context free grammar for the state pattern created for the Use cases.
+Reading this, one can form a map of how the states progress among ech other.
+
+=====================================================================================================
+
+CanvasIdleState -->
+	event( SidebarDragAndDropEvent )
+	reaction( add a new component to the circuit diagram )
+	CanvasIdleState
+	
+CanvasIdleState -->
+	event( CanvasMouseDownEvent( x, y ) )
+	(  test( nothing was hit )
+	   reaction( clear the selection )
+	   DownOnEmptyState
+	|
+	   test( an endpoint was hit )
+	   let endpoint be any of the endpoints that were hit 
+	   EditLinkState( endpoint )
+	|
+	   test( something was hit but no endpoint was hit )
+	   let clickedObjects be the set of all links and components that were hit
+	   AddToSelectionState( clickedObjects, x, y )
+	)
+
+DownOnEmptyState --> 
+	event( CanvasMouseUpEvent )
+	CanvasIdleState
+
+DownOnEmptyState --> 
+	event( CanvasMouseMoveEvent )
+	reaction( Will add a new link to the circuit diagram)
+	EditLinkState( one of the endpoints of the new link )
+
+EditLinkState( endpoint ) --> 
+	event( CanvasMouseUpEvent )
+	reaction( normalize the circuit diagram )
+	CanvasIdleState
+
+EditLinkState( endpoint ) --> 
+	event( CanvasMouseMoveEvent )
+	reaction( update the position of endpoint to match the mouse )
+	EditLinkState
+
+AddToSelectionState( passedObjects, x, y ) --> 
+	event( CanvasMouseUpEvent )
+	reaction( add or remove passedObjects from the selection )
+	CanvasIdleState
+
+AddToSelectionState( passedObjects, x, y ) --> 
+	event( CanvasMouseMoveEven( newX, newY ) )
+	reaction( moves the current selection around with the mouse )
+	MoveSelectionState( newX, newY )
+
+MoveSelectionState( x, y ) --> 
+	event( CanvasMouseUpEvent )
+	reaction( normalize the circuit diagram )
+	CanvasIdleState
+
+MoveSelectionState( x, y ) --> 
+	event( CanvasMouseMoveEvent( newX, newY ) )
+	reaction( move the selection )
+	MoveSelectionState( newX, newY )

@@ -64,4 +64,8 @@ class Connectable extends CircuitElement implements Observer {
         this.connection.moveTo( coordinate) ;
         notifyObservers( this ) ;
     }
+	
+	public function getConnection() : Connection {
+		return this.connection;
+	}
 }

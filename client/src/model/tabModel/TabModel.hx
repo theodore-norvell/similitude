@@ -27,7 +27,7 @@ class TabModel implements Observer extends Observable
 	// create this field using  the JS document and then set it using the set functionality in this class.
 	
 	
-	public function new(circuitDiagram: CircuitDiagramI, tabView: TabView) 
+	public function new(circuitDiagram: CircuitDiagramI) 
 	{
 		this.circuitDiagram = circuitDiagram;
 		this.selectionModel = new SelectionModel();

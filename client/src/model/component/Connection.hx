@@ -22,6 +22,13 @@ class Connection extends CircuitElement {
         connectedElements.push( connectable ) ;
     }
 
+    public function toString() : String {
+        return "Connection( x:" + coordinate.get_xPosition()
+                         + " y:" + coordinate.get_yPosition() 
+                         + " len: " + connectedElements.length + ")" ;
+    }
+
+
     public function location() : Coordinate {
         return coordinate ;
     }
@@ -42,14 +49,15 @@ class Connection extends CircuitElement {
     public function connect( connectable : Connectable ) : Void {
         Assert.assert( connectable.get_CircuitDiagram() == this.get_CircuitDiagram() ) ;
         if( connectedElements.indexOf( connectable ) == -1 ) {
-            if( !connectable.isPort() || ! aPortIsConnecte() ) {}
-                if( connectable.isConnected() ) connectable.disconnect() ;
+            if( ! connectable.isPort() || ! aPortIsConnected() ) {
+                var oldConnection = connectable.getConnection() ;
+                oldConnection.connectedElements.remove( connectable ) ;
                 connectable.setConnection( this ) ;
                 connectedElements.push( connectable ) ;
-                notifyObservers( this ) ; }
+                notifyObservers( this ) ; } }
     }
 
-    public function aPortIsConnecte() {
+    public function aPortIsConnected() {
         for( c in connectedElements ) if( c.isPort() ) return true ;
         return false ;
     }
@@ -64,7 +72,7 @@ class Connection extends CircuitElement {
         return connectedElements.length ;
     }
     
-    public function get_connectedElements() : Iterator<CircuitElement> {
+    public function get_connectedElements() : Iterator<Connectable> {
         return connectedElements.iterator()  ;
     }
 }

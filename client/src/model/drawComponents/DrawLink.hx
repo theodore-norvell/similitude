@@ -15,6 +15,7 @@ class DrawLink {
     public function new(link:Link, drawingAdapter:DrawingAdapterI, highlight : Bool) {
         this.link = link;
         this.drawingAdapter = drawingAdapter;
+        this.highlight = highlight ;
     }
 
     public function drawCorrespondingComponent():Void {
@@ -32,9 +33,11 @@ class DrawLink {
 
     private function drawEndpoint( endpoint : Endpoint ) : Void {
         drawingAdapter.setStrokeColor( "black" ) ;
-        drawingAdapter.setFillColor("white");
         if( endpoint.isConnected() ) {
-            drawingAdapter.drawRect(endpoint.get_xPosition(), endpoint.get_yPosition(), portSize, portSize); }
+            drawingAdapter.setFillColor("black"); }
+        else {
+            drawingAdapter.setFillColor("white"); }
+        drawingAdapter.drawRect(endpoint.get_xPosition(), endpoint.get_yPosition(), portSize, portSize);
     }
 
 }

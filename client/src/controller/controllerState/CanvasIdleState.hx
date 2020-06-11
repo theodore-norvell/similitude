@@ -36,6 +36,7 @@ class CanvasIdleState implements ControllerStateI
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
 			var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
 			canvasListener.getCommandManager().executeCommand(addComponentCommand);
+			circuitDiagram.normalise();
 			canvasListener.setState(this);
 			return;
 		}

@@ -17,6 +17,10 @@ class Port extends Connectable {
         this.description = IOTYPE.OUTPUT ; 
     }
 
+    public function toString() : String {
+        return "Port(at:" + this.connection +")" ;
+    }
+
     override public function isPort() { return true ; }
 
     public function get_sequence():Int {
