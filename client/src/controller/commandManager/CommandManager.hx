@@ -15,30 +15,30 @@ class CommandManager
 	var redoStack = new GenericStack<CommandI>();
 	
 	public function new () {}
+
+	/**
+	 *  Mark the end of a group of changes that will be undone or redone together.
+	 */
+	 public function checkPoint() {
+		this.currentCommandUID = "" ;
+	}
 	
 	/**
 	 * Can handle batch commands too
 	 * @param	command
 	 * @param	isBatch
 	 */
-	public function executeCommand(command: CommandI, ?isBatch: Bool = false) : Void {
-		if (isBatch) {
-			// in case of a batch command the CommandManager should be capable of remembering the UID of the 1st command through
-			if (this.currentCommandUID == "") {
-				this.currentCommandUID = command.getCommandUID();
-			} else {
-				command.setCommandUID(this.currentCommandUID);
-			}
-			command.execute();
-			undoStack.add(command);
-			while( ! redoStack.isEmpty() ) redoStack.pop() ;
+	public function executeCommand(command: CommandI) : Void {
+		
+		// in case of a batch command the CommandManager should be capable of remembering the UID of the 1st command through
+		if (this.currentCommandUID == "") {
+			this.currentCommandUID = command.getCommandUID();
 		} else {
-			// this block shall ensure that the invariant is respected  in case it is not a batch command.
-			command.execute();
-			undoStack.add(command);
-			while ( ! redoStack.isEmpty() ) redoStack.pop() ;
-			this.currentCommandUID = "";
+			command.setCommandUID(this.currentCommandUID);
 		}
+		command.execute();
+		undoStack.add(command);
+		while( ! redoStack.isEmpty() ) redoStack.pop() ;
 	}
 	
 	/**
@@ -46,20 +46,17 @@ class CommandManager
 	 * Reset the UID for the current batch back to "" to respect the invariant.
 	 */
 	public function undoCommand() : Void {
+		checkPoint() ;
 		if( ! undoStack.isEmpty() ) { 
-			var undoCommand = undoStack.pop();
-			undoCommand.undo();
-			this.currentCommandUID = undoCommand.getCommandUID();
-			redoStack.add(undoCommand);
-		}
+			var commandUID = undoStack.first().getCommandUID() ;
 		
-		while(! undoStack.isEmpty() && (this.currentCommandUID == undoStack.first().getCommandUID())) {
-			var undoCommand = undoStack.pop();
-			undoCommand.undo();
-			redoStack.add(undoCommand);
+			while(! undoStack.isEmpty()
+			&& undoStack.first().getCommandUID() == commandUID) {
+				var undoCommand = undoStack.pop();
+				undoCommand.undo();
+				redoStack.add(undoCommand);
+			}
 		}
-		
-		this.currentCommandUID = "";
 	}
 	
 	/**
@@ -67,19 +64,16 @@ class CommandManager
 	 * Reset the UID for the current batch back to "" to respect the invariant.
 	 */
 	public function redoCommand() : Void {
+		checkPoint() ;
 		if( ! redoStack.isEmpty() ) {
-			var redoCommand = redoStack.pop();
-			redoCommand.redo();
-			this.currentCommandUID = redoCommand.getCommandUID();
-			undoStack.add(redoCommand); 
-		}
+			var commandUID = redoStack.first().getCommandUID() ;
 		
-		while( ! redoStack.isEmpty() && (this.currentCommandUID == redoStack.first().getCommandUID())) {
-			var redoCommand = redoStack.pop();
-			redoCommand.redo();
-			undoStack.add(redoCommand);
+			while( ! redoStack.isEmpty()
+			&& redoStack.first().getCommandUID() == commandUID) {
+				var redoCommand = redoStack.pop();
+				redoCommand.redo();
+				undoStack.add(redoCommand);
+			}
 		}
-		
-		this.currentCommandUID = "";
 	}
 }
