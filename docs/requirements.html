@@ -344,11 +344,7 @@
 <ol>
   <li>User: Depresses mouse button at a place <em>x</em> somewhere on the diagram such that it does not hit a&nbsp;selected component or link.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>Client 
-    <ul>
-      <li>Creates a link&nbsp; ywith disconnected endpoints y0 and y1, with y0 and place x (converted into world coordinates)&nbsp;and y1 at the mouse's new position (converted into world coordinates). </li>
-    </ul>
-  </li>
+  <li>Client: Creates a link with disconnected endpoints y0 and y1, with y0 being at x (converted into world coordinates)&nbsp;and y1 at the mouse's new position (converted into world coordinates). </li>
   <li>User continues to move the mouse.</li>
   <li>Client: As the mouse moves, the position of y1 continues to be updated.</li>
   <li>User: releases the mouse or the mouse moves off the canvas</li>
@@ -361,7 +357,7 @@
   <li>If the original point <em>x</em> is within a compound component <em>c</em>&nbsp;(not in the current selection) and the compound component is has a white-box view, then there is an ambiguity as to whether the link should be added to the outer circuit (the circuit that the component is a part of, or the inner circuit (the circuit the component contains). The best way to decide is probably based on whether <em>x</em> is close to the edge&nbsp;of <em>c</em>. </li>
 </ul>
 
-<h4>Add to the selection or clear the selection.</h4>
+<h4>Add to the selection or clear the selection</h4>
 <p>Requirements: None</p>
 <p>Actors: The user and the client</p>
 <p>Precondition: The client is in editing mode.</p>
@@ -371,12 +367,15 @@
   <li>User: Clicks on the canvas</li>
   <li>Client: 
     <ul>
-      <li>If the click is on&nbsp;one or more links, let X be that set of links.</li>
-      <li>Otherwise, if the click is on a component, let X be the set of just that component.</li>
-      <li>Otherwise, let X be empty.</li>
-      <li>If any thing in X is not in the currect selection, then everything in X is added to the current selection.</li>
-      <li>Otherwise, if X is not empty, everything in X is removed from the current selection.</li>
-      <li>Otherwise, the current selection is cleared.</li>
+      <li>Let SL be&nbsp;the set of selected links under the mouse</li>
+      <li>Let SC be the set of selected components under the mouse</li>
+      <li>Let UL be the set of all other links under the mouse</li>
+      <li>Let UC be the set of all other components under the mouse.</li>
+      <li>If SL is not empty, remove SL from the selection.</li>
+      <li>Otherwise, if SC is not empty, remove SC from the selection</li>
+      <li>Otherwise if UL is not empty, add UL to the selection</li>
+      <li>Otherwise if UC is not empty, add UC to the selection.</li>
+      <li>Otherwise all are empty: remove everything from the selection.ß</li>
     </ul>
   </li>
 </ol>
@@ -387,10 +386,31 @@
   <li>If the mouse hits a component or link(s) inside a compound component (in whitebox view), the inner component or link(s) is selected or deselected. But if the mouse hits only the compound component and nothing inside, the compound component is selected or deselected.</li>
 </ul>
 <p></p>
-<h4>Move components, links, and endpoints.</h4>
+<h4>Move Selection</h4>
 <p>Requirements:</p>
 <ul>
   <li>Move components around the circuit diagram.</li>
+</ul>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and the selection is not empty.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Depresses mouse button over one or more selected components,&nbsp;but not over and selected links.</li>
+  <li>Client: As the mouse moves,&nbsp;all selected  components also move. (This will automatically move all endpoints connected to ports of these components, regardless of whether the endpoint's link is selected or not.)&nbsp; All endpoints of selected links should also move unless they are directly connected to a port of a   component that is not selected.</li>
+  <li>The user releases the mouse</li>
+  <li>Client: Normalizes the diagram.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>On a touch device, touch events can be used.</li>
+  <li>Disambiguating a mouse down should be done as follows: Endpoints have top priority, then links, then components.</li>
+  <li>Everything that moves, moves the same amount&nbsp;in terms of world coordinates.&nbsp; (This might not make a whole lot of sense when the Selection contains things from different circuits, but I'm not concerned about that anomalous case.)</li>
+  <li>In particular suppose&nbsp;<em>x</em> is in a circuit associated with compound component. The mouse coordinates will cease to mean anything once the mouse leaves the compound component. So the last coordinates that were in the component can be used in that case&nbsp;to calculate the amount of the move.</li>
+</ul>
+<h4>Move Endpoints</h4>
+<p>Requirements:</p>
+<ul>
   <li>Move an endpoint of a link</li>
 </ul>
 <p>Actors: The user and the client</p>
@@ -398,31 +418,13 @@
 <p>Postcondition: The client is in editing mode.</p>
 <p>Basic Flow</p>
 <ol>
-  <li>User: Depresses mouse button over a component or link or endpoint, <em>x</em> that is in the current selection.</li>
+  <li>User: Depresses mouse button over one or more endpoints of selected links</li>
+  <li>Let X be the set of all endpoints that are under the mouse that are endpoints of selected links.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>If the <em>x</em>  is a link or component in the current selection:
-    <ol>
-      <li>Client: As the mouse moves,&nbsp;all selected  components also move. (This will automatically move all endpoints connected to ports of these components, regardless of whether the endpoint's link is selected or not.)&nbsp; All endpoints of selected links should also move unless they are directly connected to a port of a   component that is not selected.</li>
-      <li>The user releases the mouse.</li>
-      <li>Client: Normalizes the diagram.</li>
-    </ol>
-  </li>
-  <li>Otherwise, <em>x</em> is the endpoint of a currently selected link.
-    <ol>
-      <li>Client:
-        <ol>
-          <li>Let X be the set of all endpoints x is directly connected to (including x itself) and which are endpoints of selected links.</li>
-          <li>Let Y be the set of all endpoints&nbsp;and ports directly connected to x that are not endpoints of selected links. (Y might be empty.)</li>
-          <li>All the endpoints in X are disconnected&nbsp;from anything else, but should remain directly connected together.&nbsp; The items of Y should remain directly connected to each other. [Implementation note: This can be accomplished by first disconnecting x and then connecting all remaining endpoints in X to x.]</li>
-        </ol>
-      </li>
-      <li>User moves mouse.</li>
-      <li>Client: As the mouse moves, all endpoints in X move, but the endpoints and ports in Y should remain where they are.</li>
-      <li>User releases mouse</li>
-      <li>Client: Normalizes the diagram.
-      </li>
-    </ol>
-  </li>
+  <li>Client: Disconnects all the items of X. (At this point each item of X is directly connected to nothing but itself.)</li>
+  <li>Client: As the mouse continues to move, all endpoints in X move along with the mouse..</li>
+  <li>User releases mouse</li>
+  <li>Client: Normalizes the diagram. </li>
 </ol>
 <p>Notes:</p>
 <ul>
@@ -433,6 +435,39 @@
   <li>Everything that moves, moves the same amount&nbsp;in terms of world coordinates.&nbsp; (This might not make a whole lot of sense when the Selection contains things from different circuits, but I'm not concerned about that anomalous case.)</li>
   <li>In particular suppose&nbsp;<em>x</em> is in a circuit associated with compound component. The mouse coordinates will cease to mean anything once the mouse leaves the compound component. So the last coordinates that were in the component can be used in that case&nbsp;to calculate the amount of the move.</li>
 </ul>
+<h4>Break link</h4>
+<p>Requirements:</p>
+<ul>
+  <li>TBA</li>
+</ul>
+<p>Actors: The user and the client</p>
+<p>Precondition: The client is in editing mode&nbsp;and the selection is not empty.</p>
+<p>Postcondition: The client is in editing mode.</p>
+<p>Basic Flow</p>
+<ol>
+  <li>User: Depresses mouse button at position (x,y) over one or more selected links P, but not over the endpoint of any selected link.</li>
+  <li>User: Moves mouse to another part of the diagram.</li>
+  <li>Let p any member of P&nbsp;and p0 and p1 be the locations of its two end points.</li>
+  <li>Client:
+    <ol>
+      <li>Removes p from the selection and from the diagram</li>
+      <li>Adds two new links&nbsp;to the diagram. One starts at position c0 and ends at (x,y). The other starts at c1and ends at (x,y).  </li>
+    </ol>
+  </li>
+  <li>Client: As the mouse continues to move, the two endpoints created at&nbsp;(x,y) move&nbsp;with the mouse.</li>
+  <li>User releases mouse.</li>
+  <li>Client: Normalizes the diagram. </li>
+</ol>
+<p>Notes:</p>
+<ul>
+  <li>On a touch device, touch events can be used.</li>
+  <li>Disambiguating a mouse down should be done as follows: Endpoints have top priority, then links, then components.</li>
+  <li>It may be that when the mouse is depressed, it is over a number of endpoints. If any of those endpoints' links are in the current selection, this use case applies, and all the endpoints whose links are in the current selection move together.</li>
+  <li>Moving an endpoint or link may make new connections or break existing connections.</li>
+  <li>Everything that moves, moves the same amount&nbsp;in terms of world coordinates.&nbsp; (This might not make a whole lot of sense when the Selection contains things from different circuits, but I'm not concerned about that anomalous case.)</li>
+  <li>In particular suppose&nbsp;<em>x</em> is in a circuit associated with compound component. The mouse coordinates will cease to mean anything once the mouse leaves the compound component. So the last coordinates that were in the component can be used in that case&nbsp;to calculate the amount of the move.</li>
+</ul>
+<h4></h4>
 <h4>Rotate components</h4>
 <p>Requirements: Rotate components.</p>
 <p>Actors: The user and the client</p>
@@ -445,8 +480,9 @@
 </ol>
 <p>Notes:</p>
 <ul>
-  <li>As a component rotates, its ports move and any endpoints Directly Connected to those ports should also move.</li>
+  <li>As a component rotate¢s, its ports move and any endpoints Directly Connected to those ports should also move.</li>
 </ul>
+<h4></h4>
 <h4>Delete components and links</h4>
 <p>Requirements: </p>
 <ul>
