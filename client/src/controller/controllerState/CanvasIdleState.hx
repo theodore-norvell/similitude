@@ -34,9 +34,7 @@ class CanvasIdleState implements ControllerStateI
 			trace('adding Component : ', dragNDropEvent.getComponent());
 			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
-			var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
-			canvasListener.getCommandManager().executeCommand(addComponentCommand);
-			circuitDiagram.normalise();
+			canvasListener.getModelManipulator().addComponent(circuitDiagram, component);
 			canvasListener.setState(this);
 			return;
 		}
@@ -45,8 +43,7 @@ class CanvasIdleState implements ControllerStateI
 			var canvasMouseDownEvent = Std.downcast(event, CanvasMouseDownEvent);
 			if (!canvasMouseDownEvent.didObjectsGetHit()) {
 				var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
-				var clearSelectionCommand = new ClearSelectionCommand(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
-				canvasListener.getCommandManager().executeCommand(clearSelectionCommand);
+				canvasListener.getModelManipulator().clearSelection(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
 				canvasListener.setState(new DownOnEmptyState());
 				return; // maybe return the link/endpoint to the controller?
 			}
