@@ -2,13 +2,12 @@ package controller.modelManipulationSublayer;
 import controller.commandManager.AddComponentCommand;
 import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
-import controller.commandManager.AddToSelectionCommand;
 import controller.commandManager.ClearSelectionCommand;
 import controller.commandManager.CommandManager;
 import controller.commandManager.EditLinkCommand;
 import controller.commandManager.MoveSelectionCommand;
 import controller.commandManager.RemoveLinkCommand;
-import controller.commandManager.SwapConnectionsCommand;
+import controller.commandManager.ToggleSelectionCommand;
 import model.component.*;
 import model.selectionModel.SelectionModel;
 import model.tabModel.TabModel;
@@ -27,50 +26,55 @@ class ModelManipulationSublayer
 	public function new(commandManager: CommandManager) {
 		this.commandManager = commandManager;
 	}
+
+	/**
+	 *  Mark the end of a group of changes that will be undone or redone together.
+	 */
+	public function checkPoint() { this.commandManager.checkPoint() ; }
 	
-	public function addComponent(circuitDiagram: CircuitDiagramI, component: Component, ?batch: Bool = false) {
+	public function addComponent(circuitDiagram: CircuitDiagramI, component: Component) {
 		var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
-		this.commandManager.executeCommand(addComponentCommand, batch);
-		this.normalise(circuitDiagram, true);
+		this.commandManager.executeCommand(addComponentCommand);
+		this.normalise(circuitDiagram);
 	}
 	
-	public function addLink(circuitDiagram: CircuitDiagramI, link: Link, ?batch: Bool = false) {
+	public function addLink(circuitDiagram: CircuitDiagramI, link: Link) {
 		var addLinkCommand = new AddLinkCommand(circuitDiagram, link);
-		this.commandManager.executeCommand(addLinkCommand, batch);
+		this.commandManager.executeCommand(addLinkCommand);
 	}
 	
-	public function editLink(circuitDiagram: CircuitDiagramI, linkEndpoint: Endpoint, x: Float, y: Float, ?batch: Bool = false) {
+	public function editLink(circuitDiagram: CircuitDiagramI, linkEndpoint: Endpoint, x: Float, y: Float) {
 		var editLinkCommand = new EditLinkCommand(circuitDiagram, linkEndpoint, new Coordinate(x, y));
-		this.commandManager.executeCommand(editLinkCommand, batch);
+		this.commandManager.executeCommand(editLinkCommand);
 	}
 	
-	public function removeLink(link: Link, circuitDiagram: CircuitDiagramI, ?batch: Bool = false) {
+	public function removeLink(link: Link, circuitDiagram: CircuitDiagramI) {
 		var removeLinkCommand = new RemoveLinkCommand(circuitDiagram, link);
-		this.commandManager.executeCommand(removeLinkCommand, batch);
+		this.commandManager.executeCommand(removeLinkCommand);
 	}
 	
-	public function addToSelection(activeTab: TabModel, clickedObjects: Array<CircuitElement>, ?batch: Bool = false) {
+	public function toggleSelection(activeTab: TabModel, clickedObjects: Array<CircuitElement>) {
 		for (object in clickedObjects) {
-			this.commandManager.executeCommand(new AddToSelectionCommand(activeTab.getCircuitDiagram(), activeTab.getSelectionModel(), object), batch);
+			this.commandManager.executeCommand(new ToggleSelectionCommand(activeTab.getCircuitDiagram(), activeTab.getSelectionModel(), object));
 		};
 	}
 	
-	public function moveSelection(activeTab: TabModel, currentX: Float, currentY: Float, nextX: Float, nextY: Float, ?batch: Bool = false) {
+	public function moveSelection(activeTab: TabModel, currentX: Float, currentY: Float, nextX: Float, nextY: Float) {
 		var moveSelectionCommand = new MoveSelectionCommand(activeTab.getCircuitDiagram(), activeTab.getSelectionModel(), currentX, currentY, nextX, nextY);
-		this.commandManager.executeCommand(moveSelectionCommand, batch);
+		this.commandManager.executeCommand(moveSelectionCommand);
 	}
 	
-	public function clearSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, ?batch: Bool = false) {
+	public function clearSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
 		var clearSelectionCommand = new ClearSelectionCommand(circuitDiagram, selectionModel);
-		this.commandManager.executeCommand(clearSelectionCommand, batch);
+		this.commandManager.executeCommand(clearSelectionCommand);
 	}
 	
-	public function addToConnection(circuitDiagram: CircuitDiagramI, connection: Connection, connectable: Connectable, ?batch: Bool = false) {
+	public function addToConnection(circuitDiagram: CircuitDiagramI, connection: Connection, connectable: Connectable) {
 		var addToConnectionCommand = new AddToConnectionCommand(circuitDiagram, connection, connectable);
-		this.commandManager.executeCommand(addToConnectionCommand, batch);
+		this.commandManager.executeCommand(addToConnectionCommand);
 	}
 	
-	public function normalise(circuitDiagram: CircuitDiagramI, ?batch: Bool = false) {
+	public function normalise(circuitDiagram: CircuitDiagramI) {
 		// For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
 		// if and both contain a port,
 			// create a link to connect them
@@ -96,13 +100,18 @@ class ModelManipulationSublayer
                         // in normalization. So, we won't worry.
                         var link = new Link(circuitDiagram, connection.get_xPosition(), connection.get_yPosition(),
                                                   otherConnection.get_xPosition(), otherConnection.get_yPosition()) ;
-						this.addLink(circuitDiagram, link, batch);
-						this.addToConnection(circuitDiagram, connection, link.get_endpoint(0), batch);
-						this.addToConnection(circuitDiagram, otherConnection, link.get_endpoint(1), batch);
+						this.addLink(circuitDiagram, link);
+						this.addToConnection(circuitDiagram, connection, link.get_endpoint(0));
+						this.addToConnection(circuitDiagram, otherConnection, link.get_endpoint(1));
 					} else {
                         trace( "Merging them" ) ;
 						if (connection.aPortIsConnected()) {
-							this.commandManager.executeCommand(new SwapConnectionsCommand(circuitDiagram, connection, otherConnection), batch);
+							// Swap them around so that we don't move
+							// the port to anothe connection that might
+							// be in a different location.
+							var temp = connection ;
+							connection = otherConnection ;
+							otherConnection = temp ;
 						}
                         
                         trace( "Merging from " + connection + " to " + otherConnection ) ;
@@ -110,7 +119,7 @@ class ModelManipulationSublayer
                         for( item in connection.get_connectedElements() ) connectables.push(item) ;
 						for (item in connectables ) {
                             trace( "Merging " + item ) ;
-							this.addToConnection(circuitDiagram, otherConnection, item, batch);
+							this.addToConnection(circuitDiagram, otherConnection, item);
 						}
                         trace( "Finished Merging from " + connection + " to " + otherConnection ) ;
 					}
@@ -137,21 +146,21 @@ class ModelManipulationSublayer
                         trace( "Connection " +connection+ " will split link " +link ) ;
                         var link1 = new Link(circuitDiagram, c0.get_xPosition(), c0.get_yPosition(),
                                                    connection.get_xPosition(), connection.get_yPosition());
-						this.addLink(circuitDiagram, link1, batch);
-						this.addToConnection(circuitDiagram, c0, link1.get_endpoint(0), batch);
-						this.addToConnection(circuitDiagram, connection, link1.get_endpoint(1), batch);
+						this.addLink(circuitDiagram, link1);
+						this.addToConnection(circuitDiagram, c0, link1.get_endpoint(0));
+						this.addToConnection(circuitDiagram, connection, link1.get_endpoint(1));
                         var link2 = new Link(circuitDiagram, connection.get_xPosition(), connection.get_yPosition(),
                                                    c1.get_xPosition(), c1.get_yPosition());
-						this.addLink(circuitDiagram, link2, batch);
-						this.addToConnection(circuitDiagram, connection, link2.get_endpoint(0), batch);
-						this.addToConnection(circuitDiagram, c1, link2.get_endpoint(1), batch);
+						this.addLink(circuitDiagram, link2);
+						this.addToConnection(circuitDiagram, connection, link2.get_endpoint(0));
+						this.addToConnection(circuitDiagram, c1, link2.get_endpoint(1));
 						removeLinks.push(link);
 					}
 				}
             }
             // Remove all links split by this connection.
             for (link in removeLinks) {
-				this.removeLink(link, circuitDiagram, batch);
+				this.removeLink(link, circuitDiagram);
                 //circuitDiagram.deleteLink(link);
             }
 		}
@@ -171,7 +180,7 @@ class ModelManipulationSublayer
 		// delete all marked links
 		for (link in markedLinks) {
             trace( "Deleting link " +link ) ;
-			this.removeLink(link, circuitDiagram, batch);
+			this.removeLink(link, circuitDiagram);
         }
 		
 		// For all remaining links x
@@ -201,7 +210,7 @@ class ModelManipulationSublayer
 		// delete all marked links
 		for (link in markedLinks) {
             trace( "Deleting link " +link ) ;
-			this.removeLink(link, circuitDiagram, batch);
+			this.removeLink(link, circuitDiagram);
         }
 	}
 }

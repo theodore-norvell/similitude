@@ -35,6 +35,7 @@ class CanvasIdleState implements ControllerStateI
 			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
 			canvasListener.getModelManipulator().addComponent(circuitDiagram, component);
+			canvasListener.getModelManipulator().checkPoint() ;
 			canvasListener.setState(this);
 			return;
 		}
@@ -45,7 +46,7 @@ class CanvasIdleState implements ControllerStateI
 				var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
 				canvasListener.getModelManipulator().clearSelection(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
 				canvasListener.setState(new DownOnEmptyState());
-				return; // maybe return the link/endpoint to the controller?
+				return;
 			}
 			
 			//// What if there are 2 endpoints in the objects hit array?

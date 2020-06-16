@@ -9,18 +9,20 @@ import model.component.Connection;
  */
 class AddToConnectionCommand extends AbstractCommand 
 {
-	var connection: Connection;
+	var newConnection: Connection;
+	var oldConnection: Connection;
 	var connectable: Connectable;
 
 	public function new(circuitDiagram: CircuitDiagramI, connection: Connection, connectable: Connectable) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
-		this.connection = connection;
+		this.newConnection = connection;
 		this.connectable = connectable;
+		this.oldConnection = connectable.getConnection() ;
 	}
 	
 	override public function execute() : Void {
-		this.connection.connect(this.connectable);
+		this.newConnection.connect(this.connectable);
 	}
 	
 	override public function redo() : Void {
@@ -28,6 +30,6 @@ class AddToConnectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		this.connection.disconnect(this.connectable);
+		this.oldConnection.connect(this.connectable);
 	};
 }
