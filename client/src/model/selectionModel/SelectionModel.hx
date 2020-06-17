@@ -35,7 +35,7 @@ class SelectionModel implements Observer extends Observable
 	 * Will throw a String exception if it is not a compatible type.
 	 * @param	element
 	 */
-	public function addCircuitElement(element : CircuitElement) : Void {
+	public function toggleCircuitElement(element : CircuitElement) : Void {
 		if (Std.is(element, Component)) {
 			var component = Std.downcast(element, Component);
 			this.containsComponent(component) ? this.removeComponent(component) : this.addComponent(component);
@@ -61,7 +61,7 @@ class SelectionModel implements Observer extends Observable
 	 * Will throw a String exception if it is not a compatible type.
 	 * @param	element
 	 */
-	public function removeCircuitElement(element : CircuitElement) {
+	public function removeCircuitElement(element : CircuitElement) : Void {
 		if (Std.is(element, Component)) {
 			if(this.containsComponent(Std.downcast(element, Component))) { this.removeComponent(Std.downcast(element, Component)); }
 		} else if (Std.is(element, Link)) {
@@ -75,12 +75,26 @@ class SelectionModel implements Observer extends Observable
 		}
 		this.update(this);
 	}
+
+	public function contains(element : CircuitElement) : Bool {
+		if (Std.is(element, Component)) {
+			return this.containsComponent(Std.downcast(element, Component)) ;
+		} else if (Std.is(element, Link)) {
+			 return this.containsLink(Std.downcast(element, Link)) ;
+		} else if (Std.is(element, Port)) {
+			return this.containsPort(Std.downcast(element, Port)) ;
+		} else if (Std.is(element, Endpoint)) {
+			return this.containsEndpoint(Std.downcast(element, Endpoint)) ;
+		} else {
+			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
+		}
+	}
 	
 	/**
 	 * Will clear the selection completely.
 	 * WARNING : only use this function if you know what you are doing.
 	 */
-	public function clearSelection() {
+	public function clearSelection()  : Void {
 		this.selectedComponents = new Array<Component>();
 		this.selectedEndpoints = new Array<Endpoint>();
 		this.selectedLinks = new Array<Link>();
@@ -94,7 +108,7 @@ class SelectionModel implements Observer extends Observable
 	 * @param	differenceX
 	 * @param	differenceY
 	 */
-	public function moveComponentsAndLinks(differenceX: Float, differenceY: Float) {
+	public function moveComponentsAndLinks(differenceX: Float, differenceY: Float) : Void {
 		for(component in this.selectedComponents) {
 			component.set_xPosition(component.get_xPosition() + differenceX);
 			component.set_yPosition(component.get_yPosition() + differenceY);
@@ -106,13 +120,6 @@ class SelectionModel implements Observer extends Observable
 			endpoint0.moveTo(new Coordinate(endpoint0.get_xPosition() + differenceX, endpoint0.get_yPosition() + differenceY));
 			endpoint1.moveTo(new Coordinate(endpoint1.get_xPosition() + differenceX, endpoint1.get_yPosition() + differenceY));
 		}
-		
-		// Ports and components in the selection belong to either a component or a link which are handled already.
-		// not sure what to do with them, so for now, it is better to leave them untouched. Implement in a new method.
-		//for ()  {}
-		//
-		//for ()  {}
-		this.update(this);
 	}
 	
 	/**

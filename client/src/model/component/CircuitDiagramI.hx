@@ -4,6 +4,7 @@ import haxe.ds.GenericStack;
 import type.HitObject;
 import model.enumeration.POINT_MODE;
 import type.Coordinate;
+import type.Set;
 import type.WorldPoint;
 import model.enumeration.MODE;
 import model.selectionModel.SelectionModel ;
@@ -132,4 +133,10 @@ interface CircuitDiagramI extends ObservableI {
 	 *	 No two links connect the same pair of connections.
 	 */
 	public function normalise() : Void;
+	
+	/**
+	 * Get all the connections in a circuitdiagram
+	 * @return
+	 */
+	public function getConnections() : Set<Connection>;
 }

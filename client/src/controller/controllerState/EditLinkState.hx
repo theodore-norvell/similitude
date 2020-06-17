@@ -24,11 +24,11 @@ class EditLinkState implements ControllerStateI
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
 			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
-			var editLinkCommand = new EditLinkCommand(circuitDiagram, this.linkEndpoint, new Coordinate( canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
-			canvasListener.getCommandManager().executeCommand(editLinkCommand, true);
+			canvasListener.getModelManipulator().editLink(circuitDiagram, this.linkEndpoint, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
 			canvasListener.setState(this);
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			canvasListener.getActiveTab().getCircuitDiagram().normalise() ;
+			canvasListener.getModelManipulator().normalise( canvasListener.getActiveTab().getCircuitDiagram() ) ;
+			canvasListener.getModelManipulator().checkPoint() ;
 			canvasListener.setState(new CanvasIdleState());
 		} else {
 			trace("Unknown transition");

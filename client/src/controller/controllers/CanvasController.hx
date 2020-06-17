@@ -7,6 +7,7 @@ import controller.controllerState.CanvasIdleState;
 import controller.controllerState.ControllerStateI;
 import controller.controllers.AbstractController;
 import controller.listenerInterfaces.CanvasListener;
+import controller.modelManipulationSublayer.ModelManipulationSublayer;
 import model.component.CircuitDiagram;
 import model.component.Component;
 import model.component.Link;
@@ -29,10 +30,11 @@ class CanvasController extends AbstractController implements CanvasListener
 	var commandManager = new CommandManager();
 	var componentTypesSingleton = new ComponentTypes(new CircuitDiagram());
 	var state: ControllerStateI = new CanvasIdleState();
+	var modelManipulator: ModelManipulationSublayer;
 	
 	public function new() 
 	{
-		
+		this.modelManipulator = new ModelManipulationSublayer(this.commandManager);
 	}
 	
 	public function setState(newState: ControllerStateI) : Void {
@@ -53,6 +55,10 @@ class CanvasController extends AbstractController implements CanvasListener
 	
 	public function getCommandManager() : CommandManager {
 		return this.commandManager;
+	}
+	
+	public function getModelManipulator() : ModelManipulationSublayer {
+		return this.modelManipulator;
 	}
 	
 	public function undoLastCanvasChange() {

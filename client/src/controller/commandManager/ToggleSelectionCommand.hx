@@ -1,4 +1,5 @@
 package controller.commandManager;
+import assertions.Assert ;
 import model.component.CircuitDiagramI;
 import model.component.CircuitElement;
 import model.selectionModel.SelectionModel;
@@ -7,7 +8,7 @@ import model.selectionModel.SelectionModel;
  * ...
  * @author AdvaitTrivedi
  */
-class AddToSelectionCommand extends AbstractCommand
+class ToggleSelectionCommand extends AbstractCommand
 {
 	var circuitElement: CircuitElement;
 	var selectionModel: SelectionModel;
@@ -20,7 +21,7 @@ class AddToSelectionCommand extends AbstractCommand
 	}
 	
 	override public function execute() : Void {
-		this.selectionModel.addCircuitElement(this.circuitElement);
+		this.selectionModel.toggleCircuitElement(this.circuitElement);
 		trace("Adding to selection model ::", this.selectionModel);
 	}
 	
@@ -29,6 +30,6 @@ class AddToSelectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		this.selectionModel.removeCircuitElement(this.circuitElement);
+		this.selectionModel.toggleCircuitElement(this.circuitElement);
 	};
 }
