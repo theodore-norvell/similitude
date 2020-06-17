@@ -45,7 +45,7 @@ class AttributeValueList {
     public function set<T : AttributeValue>( attribute : Attribute<T>, newValue : T ) {
         setUntyped( attribute, newValue ) ;
     }
-    public function setUntyped( attribute : AttributeUntyped, newValue : AttributeValue ) {
+    public function setUntyped( attribute : AttributeUntyped, newValue : AttributeValue ) : Void {
         var p : AttributeValuePair = pairMap.get( attribute ) ;
         Assert.assert( p != null ) ;
         Assert.assert( newValue.getType() == attribute.getType() ) ;

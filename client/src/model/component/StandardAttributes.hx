@@ -7,6 +7,5 @@ class StandardAttributes {
     static public var orientation(default, null) : Attribute<OrientationAttributeValue>
         = new Attribute<OrientationAttributeValue>(
             "orientation",
-            OrientationAttributeType.singleton,
             new OrientationAttributeValue( Orientation.EAST )) ;
 }

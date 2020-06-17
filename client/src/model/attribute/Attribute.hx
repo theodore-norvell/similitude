@@ -11,9 +11,9 @@ class Attribute< T : AttributeValue > implements AttributeUntyped {
 
     var name : String ;
 
-    public function new( name : String, type : AttributeType, defaultValue : T ) {
+    public function new( name : String, defaultValue : T ) {
         this.name = name ;
-        this.type = type ;
+        this.type = defaultValue.getType() ;
         this.defaultValue = defaultValue ;
     }
 
