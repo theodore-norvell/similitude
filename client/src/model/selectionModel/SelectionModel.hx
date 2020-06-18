@@ -102,6 +102,13 @@ class SelectionModel implements Observer extends Observable
 		this.update(this);
 	}
 	
+	public function isClear() : Bool {
+		if (this.selectedComponents.length == 0 && this.selectedEndpoints.length == 0 && this.selectedLinks.length == 0 && this.selectedPorts.length == 0 ) {
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * will move only components and links, as the endpoints and ports in the selection mostly belong to them.
 	 * If needed then implementing a new method with ports and endpoints would be helpful.
