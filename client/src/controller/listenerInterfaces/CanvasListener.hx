@@ -18,4 +18,5 @@ interface CanvasListener extends ViewListener
 	public function undoLastCanvasChange() : Void;
 	public function redoLastCanvasChange() : Void;
 	public function deleteSelection() : Void;
+	public function rotateSelectedComponent() : Void;
 }

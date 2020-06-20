@@ -72,4 +72,8 @@ class CanvasController extends AbstractController implements CanvasListener
 	public function deleteSelection() {
 		this.modelManipulator.deleteSelection(this.activeTab.getCircuitDiagram(), this.activeTab.getSelectionModel());
 	}
+	
+	public function rotateSelectedComponent() {
+		this.modelManipulator.rotateSelectedComponent(this.activeTab);
+	}
 }

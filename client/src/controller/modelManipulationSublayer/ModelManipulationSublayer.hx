@@ -8,6 +8,7 @@ import controller.commandManager.DeleteSelectionCommand;
 import controller.commandManager.EditLinkCommand;
 import controller.commandManager.MoveSelectionCommand;
 import controller.commandManager.RemoveLinkCommand;
+import controller.commandManager.RotateComponentCommand;
 import controller.commandManager.ToggleSelectionCommand;
 import model.component.*;
 import model.selectionModel.SelectionModel;
@@ -220,5 +221,20 @@ class ModelManipulationSublayer
             trace( "Deleting link " +link ) ;
 			this.removeLink(link, circuitDiagram);
         }
+	}
+	
+	public function rotateSelectedComponent(activeTab: TabModel) {
+		if (
+			activeTab.getSelectionModel().getComponents().length == 1 &&
+			activeTab.getSelectionModel().getEndpoint().length == 0 &&
+			activeTab.getSelectionModel().getLinks().length == 0 &&
+			activeTab.getSelectionModel().getPorts().length == 0
+		) {
+			var component = activeTab.getSelectionModel().getComponents()[0];
+			this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));
+			this.commandManager.checkPoint();
+		} else {
+			trace("Can rotate only 1 SELECTED component at a time");
+		}
 	}
 }
