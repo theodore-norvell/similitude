@@ -9,7 +9,6 @@ import model.component.StandardAttributes ;
 import model.drawingInterface.DrawingAdapterI ;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
-import model.selectionModel.SelectionModel ;
 import type.Coordinate;
 import type.HitObject;
 import type.WorldPoint;
@@ -18,7 +17,7 @@ import global.Constant.portSize ;
 * abstract class for gates
 * @author wanhui
 **/
-class AbstractComponentKind  {
+class AbstractComponentKind {
 
     var attributes = new AttributeList() ;
     var nameOfTheComponentKind : String ;
@@ -64,10 +63,6 @@ class AbstractComponentKind  {
     */
     private function updateHelper( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
         if( attribute == StandardAttributes.orientation ) updatePortPositions( component ) ;
-    }
-
-    public function createPorts( component : Component, addPort : Port -> Void ) : Void {
-        //TODO
     }
 
     public function updatePortPositions( component : Component  ) : Void {

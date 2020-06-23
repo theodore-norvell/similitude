@@ -234,6 +234,21 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind implements
     //     return portArray;
     // }
 
+    public function createPorts( component : Component ) : Void {
+
+        var q = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+        q.set_portDescription( IOTYPE.OUTPUT ) ;
+        component.addPort( q ) ;
+
+        var d = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+        d.set_portDescription( IOTYPE.INPUT ) ;
+        component.addPort( d ) ;
+        
+        var clk = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+        clk.set_portDescription( IOTYPE.CLK ) ;
+        component.addPort( clk ) ;
+    }
+
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
         var drawComponent:DrawFlipFlop = new DrawFlipFlop(component, drawingAdapter, highlight);
         drawComponent.drawCorrespondingComponent() ;

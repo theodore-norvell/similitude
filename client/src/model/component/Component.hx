@@ -51,7 +51,7 @@ class Component extends CircuitElement {
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, componentKind:ComponentKind) {
+    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, componentKind:ComponentKind) {
         super(circuitDiagram);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -61,12 +61,12 @@ class Component extends CircuitElement {
         this.componentKind = componentKind;
         this.boxType = BOX.WHITE_BOX;
 
-        //initial ports
-        this.componentKind.createPorts( this, function ( port : Port ) { ports.push( port ) ; } ) ;
-        this.componentKind.updatePortPositions( this ) ;
-
-        // TODO What is going on with this loop?  What about other attributes.
+        // Give all attributes their default value
         this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
+        var orientationValue = new OrientationAttributeValue( orientation ) ;
+        this.attributeValueList.set( StandardAttributes.orientation, orientationValue) ;
+        // Create the ports.  This also should set any attributes associated with ports.
+        this.componentKind.createPorts( this ) ;
     }
 
     public function toString() : String {
@@ -169,6 +169,14 @@ class Component extends CircuitElement {
 
     public function get_portCount() : Int {
         return ports.length ;
+    }
+
+    @:allow( model.gates ) function removePort() {
+        ports.pop() ;
+    }
+ 
+    @:allow( model.gates ) function addPort( port ) {
+        ports.push(port) ;
     }
 
     public function get_name():String {

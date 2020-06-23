@@ -30,7 +30,7 @@ interface ComponentKind {
 
     public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void ;
 
-    public function createPorts( component : Component, addPort : Port -> Void ) : Void ;
+    public function createPorts( component : Component ) : Void ;
 
     /**
      *  Update the positions of the ports of a component.

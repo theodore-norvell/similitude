@@ -1,36 +1,79 @@
 package model.gates;
 
+import assertions.Assert ;
 import type.Coordinate;
-import model.drawComponents.DrawAND;
-import model.drawComponents.DrawComponent;
-import model.drawingInterface.DrawingAdapterI;
-import model.selectionModel.SelectionModel ;
-import model.component.Component ;
-import model.component.Port;
+import model.attribute.* ;
+import model.component.* ;
 import model.enumeration.IOTYPE;
 import model.enumeration.Orientation;
+
  /**
   * A parent class for gates and gate-like things.
-  * 
+  * An abstract gate has at least 2 ports.
+  * In East orientation, port 0 is on the right and 
+  * all others are on the left.
   */
 class AbstractGate extends AbstractComponentKind {
-    // TODO. Is this class needed?
 
     public function new( nameOfKind : String ) {
         super( nameOfKind ) ;
-        // TODO Add attributes
+        attributes.add( StandardAttributes.numberOfInputPorts ) ;
     }
 
     function initialNumberOfInPorts() : Int { return 2 ; }
-    override public function createPorts( component : Component, addPort : Port -> Void ) : Void {
-        var port = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
-        port.set_portDescription( IOTYPE.OUTPUT ) ;
-        addPort( port ) ;
-        for( i in 0 ... initialNumberOfInPorts() ) {
-            port = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+    function minimumNumberOfInPorts() : Int { return 2 ; }
+
+    function maximumNumberOfInPorts() : Int { return 10 ; }
+    
+    public function createPorts( component : Component ) : Void {
+        var value = new IntegerAttributeValue( initialNumberOfInPorts() ) ;
+        update( component, StandardAttributes.numberOfInputPorts, value ) ;
+    }
+    function setTheNumberOfPortsTo( component : Component, count : Int ) {
+        var currentCount = component.get_portCount() ;
+        while( currentCount > count ) {
+                component.removePort() ;
+                currentCount -= 1 ; }
+
+        if( currentCount == 0 && count > 0 ) {
+            var port = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+            port.set_portDescription( IOTYPE.OUTPUT ) ;
+            component.addPort( port ) ;
+            currentCount = 1 ; }
+
+        while( currentCount < count ) {
+            var port = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
             port.set_portDescription( IOTYPE.INPUT ) ;
-            addPort( port ) ;
+            component.addPort( port ) ;
+            currentCount += 1 ;
         }
+    }
+
+    override public function canUpdateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Bool {
+        if( ! super.canUpdateUntyped( component, attribute, value) ) return false ;
+
+        if( attribute == StandardAttributes.numberOfInputPorts ) {
+            // The cast on the next lines is safe because the type of value has
+            // been checked above in the super call.
+            var val = cast( value, IntegerAttributeValue ) ;
+            var intVal = val.getValue() ;
+            return intVal >= minimumNumberOfInPorts() && intVal <= maximumNumberOfInPorts() ;
+        } else {
+            return true ; }
+        Assert.assert( attribute.getType() == value.getType() ) ;
+        return component.attributeValueList.has( attribute ) ;
+    }
+    override public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
+        Assert.assert( canUpdateUntyped( component, attribute, value ) ) ;
+        if( attribute == StandardAttributes.numberOfInputPorts ) {
+            // The cast on the next lines is safe because the type of value has
+            // been checkeda bove in precondition check.
+            var val = cast( value, IntegerAttributeValue ) ;
+            var intVal = val.getValue() ;
+            setTheNumberOfPortsTo( component, 1 + intVal ) ;
+            updatePortPositions( component ) ;
+        }
+        super.updateUntyped( component, attribute, value ) ;
     }
 
     override public function updatePortPositions( component : Component  ) : Void {

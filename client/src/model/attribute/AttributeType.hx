@@ -1,5 +1,10 @@
 package model.attribute;
 
-interface AttributeType {
+class AttributeType {
+    var uid : String ;
+
+    public function new( uid : String ) {
+        this.uid = uid ;
+    }
 
 }

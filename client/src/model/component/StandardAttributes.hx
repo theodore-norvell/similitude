@@ -8,4 +8,9 @@ class StandardAttributes {
         = new Attribute<OrientationAttributeValue>(
             "orientation",
             new OrientationAttributeValue( Orientation.EAST )) ;
+
+    static public var numberOfInputPorts(default, null) : Attribute<IntegerAttributeValue>
+        = new Attribute<IntegerAttributeValue>(
+            "input ports",
+            new IntegerAttributeValue( 2 )) ;
 }
