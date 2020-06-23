@@ -27,6 +27,10 @@ class NOT implements ComponentKind extends AbstractGate implements ComponentKind
         super("NOT") ;
     }
 
+    override function initialNumberOfInPorts() : Int { return 1 ; }
+    override function minimumNumberOfInPorts() : Int { return 1 ; }
+
+    override function maximumNumberOfInPorts() : Int { return 1 ; }
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
         var drawComponent:DrawNOT = new DrawNOT(component, drawingAdapter, highLight);
         drawComponent.drawCorrespondingComponent();

@@ -13,7 +13,7 @@ class StandardAttributes {
     static public var numberOfInputPorts(default, null) : Attribute<IntegerAttributeValue>
         = new Attribute<IntegerAttributeValue>(
             "input ports",
-            new IntegerAttributeValue( 2 )) ;
+            new IntegerAttributeValue( 1 )) ;
 
     static public var delay(default, null) : Attribute<TimeAttributeValue>
         = new Attribute<TimeAttributeValue>(
