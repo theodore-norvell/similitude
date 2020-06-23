@@ -1,5 +1,6 @@
 package model.attribute;
 import model.enumeration.Orientation;
+import type.TimeUnit ;
 
 class TimeAttributeValue implements AttributeValue {
 
@@ -15,34 +16,40 @@ class TimeAttributeValue implements AttributeValue {
 
     var unit : TimeUnit ;
     public function new( value : haxe.Int64, unit : TimeUnit ) {
-        this.unit = TimeUnit ;
+        this.unit = unit ;
         this.value = to_fs( value, unit );
     }
 
+    static var aThousand = haxe.Int64.make( 0, 1000 ) ;
+    static var aMillion = haxe.Int64.make( 0, 1000000 ) ;
+    static var aBillion = aMillion * aThousand ;
+    static var aTrillion = aBillion * aThousand ;
+    static var aQuadrillion = aBillion * aMillion ;
+
     private function to_fs( value : haxe.Int64, unit : TimeUnit ) : haxe.Int64 {
-        return swtich( unit ) {
+        return switch( unit ) {
             case FEMPTO_SECOND: value  ;
-            case PICO_SECOND:   value * haxe.Int64( 1000 ) ;
-            case NANO_SECOND:   value * haxe.Int64( 1000000 ) ;
-            case MICRO_SECOND:  value * haxe.Int64( 1000000000 ) ;
-            case MILI_SECOND:   value * haxe.Int64( 1000000000000 ) ;
-            case SECOND:        value * haxe.Int64( 1000000000000000 )  ;
-        }
+            case PICO_SECOND:   value * aThousand ;
+            case NANO_SECOND:   value * aMillion ;
+            case MICRO_SECOND:  value * aBillion ;
+            case MILI_SECOND:   value * aTrillion ;
+            case SECOND:        value * aQuadrillion  ;
+        } ;
     }
 
     private function from_fs( value : haxe.Int64, unit : TimeUnit ) : haxe.Int64 {
-        return swtich( unit ) {
+        return switch( unit ) {
             case FEMPTO_SECOND: value ;
-            case PICO_SECOND:   value / haxe.Int64( 1000 ) ;
-            case NANO_SECOND:   value / haxe.Int64( 1000000 ) ;
-            case MICRO_SECOND:  value / haxe.Int64( 1000000000 ) ;
-            case MILI_SECOND:   value / haxe.Int64( 1000000000000 ) ;
-            case SECOND:        value / haxe.Int64( 1000000000000000 )  ;
-        }
+            case PICO_SECOND:   value / aThousand ;
+            case NANO_SECOND:   value / aMillion ;
+            case MICRO_SECOND:  value / aBillion ;
+            case MILI_SECOND:   value / aTrillion ;
+            case SECOND:        value / aQuadrillion  ;
+        } ;
     }
 
     public function getValue() : haxe.Int64 {
-        return from_fs( value, unit )
+        return from_fs( value, unit ) ;
     }
 
     public function getValueIn( unit : TimeUnit ) : haxe.Int64 {
@@ -55,5 +62,18 @@ class TimeAttributeValue implements AttributeValue {
 
     public function getType() : AttributeType {
         return type ;
+    }
+
+    public function toString() : String {
+        var number = haxe.Int64.toStr( getValue() ) ;
+        var unit = switch( unit ) {
+            case FEMPTO_SECOND: "fs"  ;
+            case PICO_SECOND:   "ps" ;
+            case NANO_SECOND:   "ns" ;
+            case MICRO_SECOND:  "µs" ;
+            case MILI_SECOND:   "ms" ;
+            case SECOND:        "s"  ;
+        } ;
+        return number + " " + unit ;
     }
 }

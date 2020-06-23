@@ -9,6 +9,7 @@ import model.enumeration.MODE;
 import model.enumeration.Orientation ;
 import type.Coordinate;
 import type.HitObject ;
+import type.TimeUnit ;
 
 class TestAttributeChanges extends SingleSuite {
     public function new() {
@@ -278,6 +279,23 @@ class TestAttributeChanges extends SingleSuite {
                     port2.get_xPosition().should.be( 80 ) ;
                     port2.get_yPosition().should.be( 210 ) ;
                 }
+            }) ;
+
+            it("should be possible to change the delay of a gate", {
+                var kind = new AND() ;
+                var comp0 = new Component( cd, 100, 200, 40, 60, Orientation.EAST, kind ) ;
+                cd.addComponent( comp0 ) ;
+
+                cd.checkInvariant() ;
+
+                var attr = StandardAttributes.delay ;
+                var val = comp0.get( attr ) ;
+                val.toString().should.be("1 ns") ;
+
+                val = new TimeAttributeValue( 200, TimeUnit.MICRO_SECOND ) ;
+                comp0.update( attr, val ) ;
+                val = comp0.get( attr ) ;
+                val.toString().should.be("200 µs") ;
             }) ;
 
             afterEach({

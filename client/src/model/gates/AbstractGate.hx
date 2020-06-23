@@ -18,6 +18,7 @@ class AbstractGate extends AbstractComponentKind {
     public function new( nameOfKind : String ) {
         super( nameOfKind ) ;
         attributes.add( StandardAttributes.numberOfInputPorts ) ;
+        attributes.add( StandardAttributes.delay ) ;
     }
 
     function initialNumberOfInPorts() : Int { return 2 ; }

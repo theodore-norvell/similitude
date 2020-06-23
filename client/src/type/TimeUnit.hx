@@ -1,3 +1,5 @@
+package type ;
+
 enum TimeUnit {
     FEMPTO_SECOND;
     PICO_SECOND;
