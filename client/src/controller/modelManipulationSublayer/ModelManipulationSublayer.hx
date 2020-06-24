@@ -225,16 +225,17 @@ class ModelManipulationSublayer
 	
 	public function rotateSelectedComponent(activeTab: TabModel) {
 		if (
-			activeTab.getSelectionModel().getComponents().length == 1 &&
+			activeTab.getSelectionModel().getComponents().length > 0 &&
 			activeTab.getSelectionModel().getEndpoint().length == 0 &&
 			activeTab.getSelectionModel().getLinks().length == 0 &&
 			activeTab.getSelectionModel().getPorts().length == 0
 		) {
-			var component = activeTab.getSelectionModel().getComponents()[0];
-			this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));
-			this.commandManager.checkPoint();
+			checkPoint();
+			for (component in activeTab.getSelectionModel().getComponentSet()) {
+				this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));
+			}
 		} else {
-			trace("Can rotate only 1 SELECTED component at a time");
+			trace("Can rotate only SELECTED components at a time");
 		}
 	}
 }
