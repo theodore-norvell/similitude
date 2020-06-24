@@ -5,37 +5,33 @@ import model.component.Component;
 import model.component.Link;
 import model.component.Port;
 import model.component.Endpoint;
+import type.Set;
 
 /**
- * ...
  * @author AdvaitTrivedi
  */
-class DeleteSelectionCommand extends AbstractCommand 
+class DeleteSelectedComponentsAndLinksCommand extends AbstractCommand 
 {
 	var selectionModel: SelectionModel;
-	var selectedComponents = new Array<Component>();
-	var selectedLinks = new Array<Link>();
-	var selectedPorts = new Array<Port>();
-	var selectedEndpoints = new Array<Endpoint>();
+	var componentSet: Set<Component>;
+	var linkSet: Set<Link>;
 
 	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) 
 	{
 		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
-		this.selectedComponents = selectionModel.getComponents();
-		this.selectedLinks = selectionModel.getLinks();
-		this.selectedPorts = selectionModel.getPorts();
-		this.selectedEndpoints = selectionModel.getEndpoint();
+		this.componentSet = selectionModel.getComponentSet();
+		this.linkSet = selectionModel.getLinkSet();
 	}
 	
 	override public function execute() : Void {
 		this.selectionModel.clearSelection();
 		
-		for (component in this.selectedComponents) {
+		for (component in this.componentSet) {
 			this.circuitDiagram.deleteComponent(component);
 		}
 		
-		for (link in this.selectedLinks) {
+		for (link in this.linkSet) {
 			this.circuitDiagram.deleteLink(link);
 		}
 	}
@@ -45,16 +41,11 @@ class DeleteSelectionCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		this.selectionModel.setSelectedComponents(this.selectedComponents);
-		this.selectionModel.setSelectedEndpoints(this.selectedEndpoints);
-		this.selectionModel.setSelectedLinks(this.selectedLinks);
-		this.selectionModel.setSelectedPorts(this.selectedPorts);
-		
-		for (component in this.selectedComponents) {
+		for (component in this.componentSet) {
 			this.circuitDiagram.addComponent(component);
 		}
 		
-		for (link in this.selectedLinks) {
+		for (link in this.linkSet) {
 			this.circuitDiagram.addLink(link);
 		}
 	};

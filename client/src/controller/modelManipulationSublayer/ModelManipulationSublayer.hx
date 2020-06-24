@@ -4,7 +4,9 @@ import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
 import controller.commandManager.ClearSelectionCommand;
 import controller.commandManager.CommandManager;
-import controller.commandManager.DeleteSelectionCommand;
+import controller.commandManager.DeleteSelectedComponentsAndLinksCommand;
+import controller.commandManager.DisconnectComponentCommand;
+import controller.commandManager.DisconnectLinkCommand;
 import controller.commandManager.EditLinkCommand;
 import controller.commandManager.MoveSelectionCommand;
 import controller.commandManager.RemoveLinkCommand;
@@ -77,8 +79,22 @@ class ModelManipulationSublayer
 	
 	public function deleteSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
 		if (!selectionModel.isClear()) {
-			var deleteSelectionCommand = new DeleteSelectionCommand(circuitDiagram, selectionModel);
+			checkPoint();
+			
+			for (component in selectionModel.getComponentSet()) {
+				var disconnectcomponentsCommand = new DisconnectComponentCommand(circuitDiagram, component);
+				this.commandManager.executeCommand(disconnectcomponentsCommand);
+			}
+			
+			for (link in selectionModel.getLinkSet()) {
+				var disconnectLinkCommand = new DisconnectLinkCommand(circuitDiagram, link);
+				this.commandManager.executeCommand(disconnectLinkCommand);
+			}
+			
+			var deleteSelectionCommand = new DeleteSelectedComponentsAndLinksCommand(circuitDiagram, selectionModel);
 			this.commandManager.executeCommand(deleteSelectionCommand);
+			
+			checkPoint();
 		}
 	}
 	
