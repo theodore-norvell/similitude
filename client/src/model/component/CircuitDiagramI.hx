@@ -50,11 +50,6 @@ interface CircuitDiagramI extends ObservableI {
     public function deleteComponent(component:Component):Void;
 
     /**
-    * set name for component
-    **/
-    public function componentSetName(component:Component, name:String):Void;
-
-    /**
     * get the width of this diagram
     **/
     public function get_diagramWidth():Float;
@@ -86,9 +81,37 @@ interface CircuitDiagramI extends ObservableI {
 
     public function get_centre():Coordinate;
 
+    /** 
+     * Does the circuit diagram have a component with this name.
+     * @param name 
+     * @return Bool
+     */
+    public function hasComponent( name : String ) : Bool ;
+
     /**
-    * draw the circuit diagram itself
-    **/
+     * Get a component by its name.
+     * Precondition: hasComponent( name )
+     * 
+     * @param name 
+     * @return Component
+     */
+    public function getComponent( name : String ) : Component ;
+
+    /** Compute a component name that hasn't been used yet in this diagram
+     *  
+     * Postcondition: !hasComponent( result ) 
+     * 
+     * @param prefix 
+     * @return String
+     */
+    public function getUnusedComponentName( prefix : String ) : String ;
+
+    /**
+     * Draw the diagram using the given adapter.
+     * 
+     * @param drawingAdapter 
+     * @param selected 
+     */
     public function draw( drawingAdapter:DrawingAdapterI,
                           selected: SelectionModel ):Void;
 

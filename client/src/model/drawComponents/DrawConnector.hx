@@ -20,7 +20,7 @@ class DrawConnector extends DrawComponent{
         drawingAdapter.setFillColor("white"); 
         drawingAdapter.drawCircle(component.get_xPosition(), component.get_yPosition(), 7);
         drawingAdapter.setTextColor("black");
-        drawingAdapter.drawText( component.get_name(),
+        drawingAdapter.drawText( component.getName(),
                                  component.get_yPosition(),
                                  component.get_yPosition(),
                                  component.get_width() - 2) ;

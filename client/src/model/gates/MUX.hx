@@ -34,8 +34,11 @@ import model.selectionModel.SelectionModel ;
 class MUX implements ComponentKind extends AbstractGate implements ComponentKind {
     public function new() {
         super( "MUX") ;
-        // TODO add attributes
+        // TODO Add attribute for the number of control ports.
     }
+
+    // TODO overide createPorts and setTheNumberOfPortsTo so that there are
+    // Two classes of input ports: date ports and control ports.
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
         var drawComponent:DrawMUX = new DrawMUX(component, drawingAdapter, highlight);

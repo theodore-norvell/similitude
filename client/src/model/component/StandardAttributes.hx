@@ -19,4 +19,9 @@ class StandardAttributes {
         = new Attribute<TimeAttributeValue>(
             "delay",
             new TimeAttributeValue(1, TimeUnit.NANO_SECOND ) ) ;
+    
+    static public var name(default, null) : Attribute<StringAttributeValue>
+        = new Attribute<StringAttributeValue>(
+            "name",
+            new StringAttributeValue( "" ) ) ;
 }

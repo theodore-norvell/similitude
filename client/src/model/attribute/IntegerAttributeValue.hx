@@ -1,5 +1,4 @@
 package model.attribute;
-import model.enumeration.Orientation;
 
 class IntegerAttributeValue implements AttributeValue {
 

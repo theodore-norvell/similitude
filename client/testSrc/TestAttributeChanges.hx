@@ -298,6 +298,39 @@ class TestAttributeChanges extends SingleSuite {
                 val.toString().should.be("200 µs") ;
             }) ;
 
+            it("The name should be set automatically", {
+                var kind = new AND() ;
+                var comp0 = new Component( cd, 100, 200, 40, 60, Orientation.EAST, kind ) ;
+                cd.addComponent( comp0 ) ;
+
+                var comp1 = new Component( cd, 100, 200, 40, 60, Orientation.EAST, kind ) ;
+                cd.addComponent( comp1 ) ;
+
+                cd.checkInvariant() ;
+
+                var attr = StandardAttributes.name ;
+                var currentVal = comp0.get( attr ) ;
+                currentVal.getValue().should.be( "AND0" ) ;
+
+                currentVal = comp1.get( attr ) ;
+                currentVal.getValue().should.be( "AND1" ) ;
+
+                var newVal = new StringAttributeValue( "" ) ;
+                comp1.canUpdate( attr, newVal).should.be( false ) ;
+
+                newVal = new StringAttributeValue( "Fred" ) ;
+                comp1.canUpdate( attr, newVal).should.be( true ) ;
+                currentVal = comp1.get( attr ) ;
+                currentVal.getValue().should.be( "AND1" ) ; // Didn't change it yet.
+
+                comp1.update( attr, newVal ) ; // Now change it to Fred
+                currentVal = comp1.get( attr ) ;
+                currentVal.getValue().should.be( "Fred" ) ;
+
+                newVal = new StringAttributeValue( "AND0" ) ;
+                comp1.canUpdate( attr, newVal).should.be( false ) ;
+            }) ;
+
             afterEach({
             });
         });

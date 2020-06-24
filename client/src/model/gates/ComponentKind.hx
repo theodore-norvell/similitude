@@ -18,7 +18,7 @@ import model.enumeration.Orientation;
 **/
 interface ComponentKind {
 
-    public function getname():String;
+    public function getName():String;
 
     public function getAttributes() : Iterator< AttributeUntyped > ;
 
