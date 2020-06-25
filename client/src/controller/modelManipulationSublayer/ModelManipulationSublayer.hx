@@ -240,12 +240,7 @@ class ModelManipulationSublayer
 	}
 	
 	public function rotateSelectedComponent(activeTab: TabModel) {
-		if (
-			activeTab.getSelectionModel().getComponents().length > 0 &&
-			activeTab.getSelectionModel().getEndpoint().length == 0 &&
-			activeTab.getSelectionModel().getLinks().length == 0 &&
-			activeTab.getSelectionModel().getPorts().length == 0
-		) {
+		if (activeTab.getSelectionModel().onlyComponentsSelected()) {
 			checkPoint();
 			for (component in activeTab.getSelectionModel().getComponentSet()) {
 				this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));

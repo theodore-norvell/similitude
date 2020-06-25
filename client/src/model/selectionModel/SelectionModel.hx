@@ -104,10 +104,7 @@ class SelectionModel implements Observer extends Observable
 	}
 	
 	public function isClear() : Bool {
-		if (this.selectedComponents.length == 0 && this.selectedEndpoints.length == 0 && this.selectedLinks.length == 0 && this.selectedPorts.length == 0 ) {
-			return true;
-		}
-		return false;
+		return this.selectedComponents.length == 0 && this.selectedEndpoints.length == 0 && this.selectedLinks.length == 0 && this.selectedPorts.length == 0;
 	}
 	
 	/**
@@ -254,5 +251,12 @@ class SelectionModel implements Observer extends Observable
 	public function getLinkSet() : Set<Link> {
 		var linkSet = new Set<Link>();
 		return linkSet.fromArray(this.selectedLinks);
+	}
+	
+	public function onlyComponentsSelected() : Bool {
+		return this.getComponents().length > 0 &&
+			this.getEndpoint().length == 0 &&
+			this.getLinks().length == 0 &&
+			this.getPorts().length == 0;
 	}
 }
