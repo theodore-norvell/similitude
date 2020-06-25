@@ -30,7 +30,7 @@ class DrawCompoundComponent extends DrawComponent{
 
         if(component.get_boxType() == BOX.BLACK_BOX ){
             drawingAdapter.setTextColor("black");
-            drawingAdapter.drawText(component.get_name(), component.get_xPosition(), component.get_yPosition(), component.get_width());
+            drawingAdapter.drawText(component.getName(), component.get_xPosition(), component.get_yPosition(), component.get_width());
         }
 
         drawPorts() ;

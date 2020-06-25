@@ -125,6 +125,13 @@ class Connector implements ComponentKind extends AbstractComponentKind implement
     //     return portArray;
     // }
 
+    public function createPorts( component : Component ) : Void {
+
+        var port = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+        port.set_portDescription( IOTYPE.OUTPUT ) ;
+        component.addPort( port ) ;
+    }
+    
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
         var drawComponent:DrawConnector = new DrawConnector(component, drawingAdapter, highlight);
         drawComponent.drawCorrespondingComponent() ;

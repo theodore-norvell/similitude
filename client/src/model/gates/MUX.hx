@@ -31,141 +31,14 @@ import model.selectionModel.SelectionModel ;
  * @author wanhui
  *
  */
-class MUX implements ComponentKind extends AbstractComponentKind implements ComponentKind {
+class MUX implements ComponentKind extends AbstractGate implements ComponentKind {
     public function new() {
         super( "MUX") ;
-        // TODO add attributes
+        // TODO Add attribute for the number of control ports.
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
-    //     var portArray:Array<Port> = new Array<Port>();
-    //     //mux have one select inport and two input inports
-    //     switch (orientation){
-    //         case Orientation.EAST : {
-    //             //inport
-    //             var inport_S:Port = new Port(xPosition, yPosition - height / 2);
-    //             inport_S.set_portDescription(IOTYPE.S);
-    //             portArray.push(inport_S);
-    //             var inport_1:Port = new Port(xPosition - width / 2, height / 3 * 1 + (yPosition - height / 2));
-    //             inport_1.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_1);
-    //             var inport_2:Port = new Port(xPosition - width / 2, height / 3 * 2 + (yPosition - height / 2));
-    //             inport_2.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_2);
-    //             //outport
-    //             var outport_:Port = new Port(xPosition + width / 2, yPosition);
-    //             outport_.set_portDescription(IOTYPE.OUTPUT);
-    //             portArray.push(outport_);
-    //         };
-    //         case Orientation.WEST : {
-    //             //inport
-    //             var inport_S:Port = new Port(xPosition, yPosition - height / 2);
-    //             inport_S.set_portDescription(IOTYPE.S);
-    //             portArray.push(inport_S);
-    //             var inport_1:Port = new Port(xPosition + width / 2, height / 3 * 1 + (yPosition - height / 2));
-    //             inport_1.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_1);
-    //             var inport_2:Port = new Port(xPosition + width / 2, height / 3 * 2 + (yPosition - height / 2));
-    //             inport_2.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_2);
-    //             //outport
-    //             var outport_:Port = new Port(xPosition - width / 2, yPosition);
-    //             outport_.set_portDescription(IOTYPE.OUTPUT);
-    //             portArray.push(outport_);
-    //         };
-    //         case Orientation.SOUTH : {
-    //             //inport
-    //             var inport_S:Port = new Port(xPosition - width / 2, yPosition);
-    //             inport_S.set_portDescription(IOTYPE.S);
-    //             portArray.push(inport_S);
-    //             var inport_1:Port = new Port(xPosition - width / 2 + height / 3 * 2, yPosition - height / 2);
-    //             inport_1.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_1);
-    //             var inport_2:Port = new Port(xPosition - width / 2 + width / 3, yPosition - height / 2);
-    //             inport_2.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_2);
-    //             //outport
-    //             var outport_:Port = new Port(xPosition, yPosition + height / 2);
-    //             outport_.set_portDescription(IOTYPE.OUTPUT);
-    //             portArray.push(outport_);
-    //         };
-    //         case Orientation.NORTH : {
-    //             //inport
-    //             var inport_S:Port = new Port(xPosition + width / 2, yPosition);
-    //             inport_S.set_portDescription(IOTYPE.S);
-    //             portArray.push(inport_S);
-    //             var inport_1:Port = new Port(xPosition - width / 2 + height / 3 * 2, yPosition + height / 2);
-    //             inport_1.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_1);
-    //             var inport_2:Port = new Port(xPosition - width / 2 + width / 3, yPosition + height / 2);
-    //             inport_2.set_portDescription(IOTYPE.INPUT);
-    //             portArray.push(inport_2);
-    //             //outport
-    //             var outport_:Port = new Port(xPosition, yPosition - height / 2);
-    //             outport_.set_portDescription(IOTYPE.OUTPUT);
-    //             portArray.push(outport_);
-    //         };
-    //         default : {
-    //             //do nothing
-    //         }
-    //     }
-    //     return portArray;
-    // }
-    // /**
-    // * different from others, this function used in move command when the componenet has been re-located
-    // **/
-    // override public function updateInPortPosition(portArray:Array<Port>, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation):Array<Port> {
-    //     switch (orientation){
-    //         case Orientation.EAST : {
-    //             for (i in 0...portArray.length) {
-    //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
-    //                     portArray[i].set_xPosition(xPosition - width / 2);
-    //                     portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-    //                 }else{//IOTYPE.S
-    //                     portArray[i].set_xPosition(xPosition);
-    //                     portArray[i].set_yPosition(yPosition - height/2);
-    //                 }
-    //             }
-    //         };
-    //         case Orientation.NORTH : {
-    //             for (i in 0...portArray.length) {
-    //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
-    //                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
-    //                     portArray[i].set_yPosition(yPosition + height / 2);
-    //                 }else{//IOTYPE.S
-    //                     portArray[i].set_xPosition(xPosition - width/2);
-    //                     portArray[i].set_yPosition(yPosition);
-    //                 }
-    //             }
-    //         };
-    //         case Orientation.SOUTH : {
-    //             for (i in 0...portArray.length) {
-    //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
-    //                     portArray[i].set_xPosition(xPosition - width / 2 + width / (portArray.length + 1) * (i + 1));
-    //                     portArray[i].set_yPosition(yPosition - height / 2);
-    //                 }else{//IOTYPE.S
-    //                     portArray[i].set_xPosition(xPosition + width/2);
-    //                     portArray[i].set_yPosition(yPosition);
-    //                 }
-    //             }
-    //         };
-    //         case Orientation.WEST : {
-    //             for (i in 0...portArray.length) {
-    //                 if (portArray[i].get_portDescription() != IOTYPE.S) {
-    //                     portArray[i].set_xPosition(xPosition + width / 2);
-    //                     portArray[i].set_yPosition(height / (portArray.length + 1) * (i + 1) + (yPosition - height / 2));
-    //                 }else{//IOTYPE.S
-    //                     portArray[i].set_xPosition(xPosition);
-    //                     portArray[i].set_yPosition(yPosition - height/2);
-    //                 }
-    //             }
-    //         };
-    //         default:{
-    //             //do nothing
-    //         }
-    //     }
-    //     return portArray;
-    // }
+    // TODO overide createPorts and setTheNumberOfPortsTo so that there are
+    // Two classes of input ports: date ports and control ports.
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
         var drawComponent:DrawMUX = new DrawMUX(component, drawingAdapter, highlight);

@@ -12,6 +12,7 @@ import model.component.CircuitDiagramI;
 import model.component.Component ;
 import model.enumeration.POINT_MODE;
 import model.enumeration.BOX;
+import model.enumeration.IOTYPE;
 import model.enumeration.MODE;
 import type.Coordinate;
 import model.drawingInterface.Transform;
@@ -36,95 +37,16 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         return circuitDiagram;
     }
 
-    // public function createPorts(xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, ?inportNum:Int):Array<Port> {
-    //     var inportCount = 0 ;
-    //     var outportCount = 0 ;
-    //     for(i in circuitDiagram.get_componentIterator()){
-    //         if(i.getNameOfTheComponentKind() == "Input"){
-    //             inportCount += 1 ;
-    //         }else if(i.getNameOfTheComponentKind() == "Output"){
-    //             outportCount += 1 ;
-    //         }
-    //     }
-    //     var portArray:Array<Port> = new Array<Port>();
-    //     //find how many inputs gate in the sub-circuit diagram
-    //     switch(orientation){
-    //         case Orientation.EAST : {
-    //             for(i in circuitDiagram.get_componentIterator()){
-    //                 if(i.getNameOfTheComponentKind() == "Input"){
-    //                     //inport
-    //                     var inport_1:Port = new Port(xPosition - width / 2,
-    //                                                    height / (inportCount+1) * (i.get_sequence()+1)
-    //                                                    + (yPosition - height / 2));
-    //                     inport_1.set_sequence(i.get_sequence());
-    //                     portArray.push(inport_1);
-    //                 }else if(i.getNameOfTheComponentKind() == "Output"){
-    //                     //outport
-    //                     var outport_:Port = new Port(xPosition + width / 2,
-    //                                                     height / (outportCount+1) * (i.get_sequence()+1)
-    //                                                     + (yPosition - height / 2));
-    //                     outport_.set_sequence(i.get_sequence());
-    //                     portArray.push(outport_);
-    //                 }
-    //             }
-    //         };
-    //         case Orientation.NORTH : {
-    //             for(i in circuitDiagram.get_componentIterator()){
-    //                 if(i.getNameOfTheComponentKind() == "Input"){
-    //                     //inport
-    //                     var inport_1:Port = new Port(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
-    //                                                    height + height/2);
-    //                     inport_1.set_sequence(i.get_sequence());
-    //                     portArray.push(inport_1);
-    //                 }else if(i.getNameOfTheComponentKind() == "Output"){
-    //                     //outport
-    //                     var outport_:Port = new Port(xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
-    //                                                     height - height/2);
-    //                     outport_.set_sequence(i.get_sequence());
-    //                     portArray.push(outport_);
-    //                 }
-    //             }
-    //         };
-    //         case Orientation.SOUTH : {
-    //             for(i in circuitDiagram.get_componentIterator()){
-    //                 if(i.getNameOfTheComponentKind() == "Input"){
-    //                     //inport
-    //                     var inport_1:Port = new Port(xPosition - width / 2 + width/ (inportCount+1) * (i.get_sequence()+1),
-    //                                                    height - height/2);
-    //                     inport_1.set_sequence(i.get_sequence());
-    //                     portArray.push(inport_1);
-    //                 }else if(i.getNameOfTheComponentKind() == "Output"){
-    //                     //outport
-    //                     var outport_:Port = new Port( xPosition - width / 2 + width/ (outportCount+1) * (i.get_sequence()+1),
-    //                                                      height + height/2);
-    //                     outport_.set_sequence(i.get_sequence());
-    //                     portArray.push(outport_);
-    //                 }
-    //             }
-    //         };
-    //         case Orientation.WEST : {
-    //             for(i in circuitDiagram.get_componentIterator()){
-    //                 if(i.getNameOfTheComponentKind() == "Input"){
-    //                     //inport
-    //                     var inport_1:Port = new Port( xPosition + width / 2,
-    //                                                     height / (inportCount+1) * (i.get_sequence()+1) + (yPosition - height / 2));
-    //                     inport_1.set_sequence(i.get_sequence());
-    //                     portArray.push(inport_1);
-    //                 }else if(i.getNameOfTheComponentKind() == "Output"){
-    //                     //outport
-    //                     var outport_:Port = new Port( xPosition - width / 2,
-    //                                                      height / (outportCount+1) * (i.get_sequence()+1) + (yPosition - height / 2));
-    //                     outport_.set_sequence(i.get_sequence());
-    //                     portArray.push(outport_);
-    //                 }
-    //             }
-    //         };
-    //         default : {
-    //             Assert.assert( false ) ;
-    //         }
-    //     }
-    //     return portArray;
-    // }
+    public function createPorts( component : Component ) : Void {
+        // This needs more thought.  For now I'm just going to make two ports.
+        var port0 = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+        port0.set_portDescription( IOTYPE.OUTPUT ) ;
+        component.addPort( port0 ) ;
+
+        var port1 = new Port( component.get_CircuitDiagram(), 0, 0 ) ;
+        port1.set_portDescription( IOTYPE.INPUT ) ;
+        component.addPort( port1 ) ;
+    }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool,  selection : SelectionModel ):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform(component));

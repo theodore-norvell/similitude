@@ -1,5 +1,6 @@
 package model.component;
 
+import haxe.CallStack.StackItem;
 import model.attribute.* ;
 import model.selectionModel.SelectionModel;
 import model.observe.Observable;
@@ -13,7 +14,6 @@ import model.drawingInterface.DrawingAdapterI;
 import model.enumeration.IOTYPE;
 import model.enumeration.Orientation;
 import model.gates.ComponentKind;
-import assertions.Assert;
 
 /**
  * Component composite by gates and ports, in this class
@@ -32,11 +32,14 @@ class Component extends CircuitElement {
                             // input or an output. In that case, it represents
                             // the component's position relative to other inputs
                             // and outputs.
-    var componentKind:ComponentKind;//the actual gate in this component
+                            // TODO: Make this an attribute.(Or get rid of it.)
+    
+    // The kind of the component.
+    var componentKind:ComponentKind;
     // The ports that belong to this component.
     var  ports : Array<Port> = new Array<Port>() ;
     // TODO Make boxType an attribute for the kinds where it makes sense.
-    var boxType:BOX;
+    var boxType : BOX;
 
     @:allow( model.gates )
     var attributeValueList : AttributeValueList ;
@@ -51,7 +54,7 @@ class Component extends CircuitElement {
      *   @param componentkind: which componentkind belongs to
      *   @param inportNum: how many inports should be in this component, initial value should be depend on what kind of component it is
     **/
-    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, height:Float, width:Float, orientation:Orientation, componentKind:ComponentKind) {
+    public function new(circuitDiagram : CircuitDiagramI, xPosition:Float, yPosition:Float, width:Float, height:Float, orientation:Orientation, componentKind:ComponentKind) {
         super(circuitDiagram);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -61,12 +64,20 @@ class Component extends CircuitElement {
         this.componentKind = componentKind;
         this.boxType = BOX.WHITE_BOX;
 
-        //initial ports
-        this.componentKind.createPorts( this, function ( port : Port ) { ports.push( port ) ; } ) ;
-        this.componentKind.updatePortPositions( this ) ;
-
-        // TODO What is going on with this loop?  What about other attributes.
+        // Give all attributes their default value
         this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
+
+        // Set the name to a unique name.
+        var name = circuitDiagram.getUnusedComponentName( componentKind.getName() ) ;
+        var nameValue = new StringAttributeValue( name ) ;
+        this.updateUntyped( StandardAttributes.name, nameValue ) ;
+
+        // Set the orientation.
+        var orientationValue = new OrientationAttributeValue( orientation ) ;
+        this.attributeValueList.set( StandardAttributes.orientation, orientationValue) ;
+
+        // Create the ports.  This also should set any attributes associated with ports.
+        this.componentKind.createPorts( this ) ;
     }
 
     public function toString() : String {
@@ -74,6 +85,7 @@ class Component extends CircuitElement {
                          + " x:" + xPosition
                          + " y:" + yPosition
                          + "ports: " + ports
+                         + "attrs" + attributeValueList
                          + ")" ;
     }
 
@@ -171,13 +183,26 @@ class Component extends CircuitElement {
         return ports.length ;
     }
 
-    public function get_name():String {
-        // TODO
-        return "foo" ; 
+    @:allow( model.gates ) function removePort() {
+        ports.pop() ;
+    }
+ 
+    @:allow( model.gates ) function addPort( port ) {
+        ports.push(port) ;
     }
 
-    public function set_name(value:String) : Void {
-        // TODO
+    public function getName():String {
+        return this.get( StandardAttributes.name ).getValue() ;
+    }
+
+    public function canSetName( name : String ): Bool {
+        var attrVal = new StringAttributeValue( name ) ;
+        return this.canUpdate( StandardAttributes.name, attrVal ) ;
+    }
+
+    public function setName( name : String ):Void {
+        var attrVal = new StringAttributeValue( name ) ;
+        this.update( StandardAttributes.name, attrVal ) ;
     }
 
     public function get_height():Float {
@@ -199,7 +224,7 @@ class Component extends CircuitElement {
     }
 
     public function getNameOfTheComponentKind() : String{
-        return this.componentKind.getname();
+        return this.componentKind.getName();
     }
 
     

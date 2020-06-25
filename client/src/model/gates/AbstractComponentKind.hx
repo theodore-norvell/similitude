@@ -9,7 +9,6 @@ import model.component.StandardAttributes ;
 import model.drawingInterface.DrawingAdapterI ;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
-import model.selectionModel.SelectionModel ;
 import type.Coordinate;
 import type.HitObject;
 import type.WorldPoint;
@@ -18,7 +17,7 @@ import global.Constant.portSize ;
 * abstract class for gates
 * @author wanhui
 **/
-class AbstractComponentKind  {
+class AbstractComponentKind {
 
     var attributes = new AttributeList() ;
     var nameOfTheComponentKind : String ;
@@ -26,13 +25,14 @@ class AbstractComponentKind  {
     private function new( nameOfKind : String ) {
         this.nameOfTheComponentKind = nameOfKind ;
         attributes.add( StandardAttributes.orientation ) ;
+        attributes.add( StandardAttributes.name ) ;
     }
 
     public function toString() : String {
-        return this.getname();
+        return this.getName();
     }
 
-    public function getname():String { return nameOfTheComponentKind ; }
+    public function getName():String { return nameOfTheComponentKind ; }
 
     public function getAttributes() : Iterator< AttributeUntyped > {
         return attributes.iterator() ;
@@ -44,6 +44,12 @@ class AbstractComponentKind  {
 
     public function canUpdateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Bool {
         Assert.assert( attribute.getType() == value.getType() ) ;
+        if( attribute == StandardAttributes.name ) {
+            var stringVal = cast( value, StringAttributeValue ) ;
+            var name = stringVal.getValue() ;
+            var cd = component.get_CircuitDiagram() ;
+            if( name ==  "" || cd.hasComponent( name ) ) return false ;
+        }
         return component.attributeValueList.has( attribute ) ;
     }
 
@@ -64,10 +70,6 @@ class AbstractComponentKind  {
     */
     private function updateHelper( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void {
         if( attribute == StandardAttributes.orientation ) updatePortPositions( component ) ;
-    }
-
-    public function createPorts( component : Component, addPort : Port -> Void ) : Void {
-        //TODO
     }
 
     public function updatePortPositions( component : Component  ) : Void {
@@ -159,7 +161,7 @@ class AbstractComponentKind  {
     /**
     * for all component kinds except compound component, find world point always return a empty list
     **/
-    public function findWorldPoint(component : Component, worldCoordinate:Coordinate, mode:POINT_MODE):Array<WorldPoint>{
+    public function findWorldPoint(component:Component, worldCoordinate:Coordinate, mode:POINT_MODE) : Array<WorldPoint> {
         return new Array<WorldPoint>();
     }
 

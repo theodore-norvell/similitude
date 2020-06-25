@@ -18,7 +18,7 @@ import model.enumeration.Orientation;
 **/
 interface ComponentKind {
 
-    public function getname():String;
+    public function getName():String;
 
     public function getAttributes() : Iterator< AttributeUntyped > ;
 
@@ -30,7 +30,7 @@ interface ComponentKind {
 
     public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void ;
 
-    public function createPorts( component : Component, addPort : Port -> Void ) : Void ;
+    public function createPorts( component : Component ) : Void ;
 
     /**
      *  Update the positions of the ports of a component.

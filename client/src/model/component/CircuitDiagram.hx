@@ -113,6 +113,27 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         return yMax ;
     }
 
+    public function hasComponent( name : String ) : Bool {
+        for( c in componentArray ) if( c.getName() == name ) return true ;
+        return false ;
+    }
+
+    public function getComponent( name : String ) : Component {
+        // Precondition: It must be there.
+        for( c in componentArray ) if( c.getName() == name ) return c ;
+        Assert.assert( false ) ;
+        return null ;
+    }
+    
+    public function getUnusedComponentName( prefix : String ) : String {
+        var i = 0 ;
+        while( true ) {
+            var name = prefix + i ;
+            if( ! hasComponent( name ) ) return name ;
+            i += 1 ;
+        }
+    }
+
     public function get_componentIterator():Iterator<Component> {
         return componentArray.iterator();
     }
@@ -144,11 +165,6 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         componentArray.remove(component);
         updateBoundingBox() ;
 
-    }
-
-    public function componentSetName(component:Component, name:String):Void{
-        // TODO.  It must be enforced that components of a circuit have unique names.
-        component.set_name(name);
     }
 
     /**
