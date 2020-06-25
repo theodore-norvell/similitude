@@ -63,12 +63,13 @@ class CanvasController extends AbstractController implements CanvasListener
 	
 	public function undoLastCanvasChange() {
 		this.commandManager.undoCommand();
-		this.viewUpdater.updateCanvas();
 	}
-	
 	
 	public function redoLastCanvasChange() {
 		this.commandManager.redoCommand();
-		this.viewUpdater.updateCanvas();
+	}
+	
+	public function deleteSelection() {
+		this.modelManipulator.deleteSelection(this.activeTab.getCircuitDiagram(), this.activeTab.getSelectionModel());
 	}
 }

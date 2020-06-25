@@ -17,4 +17,5 @@ interface CanvasListener extends ViewListener
 	public function getModelManipulator() : ModelManipulationSublayer;
 	public function undoLastCanvasChange() : Void;
 	public function redoLastCanvasChange() : Void;
+	public function deleteSelection() : Void;
 }

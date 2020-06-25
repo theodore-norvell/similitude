@@ -4,6 +4,9 @@ import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
 import controller.commandManager.ClearSelectionCommand;
 import controller.commandManager.CommandManager;
+import controller.commandManager.DeleteSelectedComponentsAndLinksCommand;
+import controller.commandManager.DisconnectComponentCommand;
+import controller.commandManager.DisconnectLinkCommand;
 import controller.commandManager.EditLinkCommand;
 import controller.commandManager.MoveSelectionCommand;
 import controller.commandManager.RemoveLinkCommand;
@@ -72,6 +75,27 @@ class ModelManipulationSublayer
 	public function addToConnection(circuitDiagram: CircuitDiagramI, connection: Connection, connectable: Connectable) {
 		var addToConnectionCommand = new AddToConnectionCommand(circuitDiagram, connection, connectable);
 		this.commandManager.executeCommand(addToConnectionCommand);
+	}
+	
+	public function deleteSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
+		if (!selectionModel.isClear()) {
+			checkPoint();
+			
+			for (component in selectionModel.getComponentSet()) {
+				var disconnectcomponentsCommand = new DisconnectComponentCommand(circuitDiagram, component);
+				this.commandManager.executeCommand(disconnectcomponentsCommand);
+			}
+			
+			for (link in selectionModel.getLinkSet()) {
+				var disconnectLinkCommand = new DisconnectLinkCommand(circuitDiagram, link);
+				this.commandManager.executeCommand(disconnectLinkCommand);
+			}
+			
+			var deleteSelectionCommand = new DeleteSelectedComponentsAndLinksCommand(circuitDiagram, selectionModel);
+			this.commandManager.executeCommand(deleteSelectionCommand);
+			
+			checkPoint();
+		}
 	}
 	
 	public function normalise(circuitDiagram: CircuitDiagramI) {

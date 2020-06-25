@@ -8,6 +8,7 @@ import model.observe.Observable;
 import model.observe.ObservableI;
 import model.observe.Observer;
 import type.Coordinate;
+import type.Set;
 
 /**
  * This class represents a user selection.
@@ -102,6 +103,13 @@ class SelectionModel implements Observer extends Observable
 		this.update(this);
 	}
 	
+	public function isClear() : Bool {
+		if (this.selectedComponents.length == 0 && this.selectedEndpoints.length == 0 && this.selectedLinks.length == 0 && this.selectedPorts.length == 0 ) {
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * will move only components and links, as the endpoints and ports in the selection mostly belong to them.
 	 * If needed then implementing a new method with ports and endpoints would be helpful.
@@ -128,7 +136,8 @@ class SelectionModel implements Observer extends Observable
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	componentArray
 	 */
-	public function setSelectedComponents(componentArray: Array<Component>) : Void {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function setSelectedComponents(componentArray: Array<Component>) : Void {
 		this.selectedComponents = componentArray;
 		this.update(this);
 	}
@@ -139,7 +148,8 @@ class SelectionModel implements Observer extends Observable
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	linkArray
 	 */
-	public function setSelectedLinks(linkArray: Array<Link>) : Void {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function setSelectedLinks(linkArray: Array<Link>) : Void {
 		this.selectedLinks = linkArray;
 		this.update(this);
 	}
@@ -150,7 +160,8 @@ class SelectionModel implements Observer extends Observable
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	portArray
 	 */
-	public function setSelectedPorts(portArray: Array<Port>) : Void {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function setSelectedPorts(portArray: Array<Port>) : Void {
 		this.selectedPorts = portArray;
 		this.update(this);
 	}
@@ -161,12 +172,14 @@ class SelectionModel implements Observer extends Observable
 	 * WARNING : Use only if you know what you are doing.
 	 * @param	endpointArray
 	 */
-	public function setSelectedEndpoints(endpointArray: Array<Endpoint>) : Void {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function setSelectedEndpoints(endpointArray: Array<Endpoint>) : Void {
 		this.selectedEndpoints = endpointArray;
 		this.update(this);
 	}
 	
-	public function getComponents() : Array<Component> {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function getComponents() : Array<Component> {
 		return this.selectedComponents;
 	}
 	
@@ -174,7 +187,8 @@ class SelectionModel implements Observer extends Observable
 		return this.selectedComponents.indexOf(c) != -1 ;
 	}
 	
-	public function getLinks() : Array<Link> {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function getLinks() : Array<Link> {
 		return this.selectedLinks;
 	}
 	
@@ -210,7 +224,8 @@ class SelectionModel implements Observer extends Observable
 		return this.selectedPorts.indexOf(port) != -1;
 	}
 	
-	public function getPorts() : Array<Port> {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function getPorts() : Array<Port> {
 		return this.selectedPorts;
 	}
 	
@@ -226,8 +241,18 @@ class SelectionModel implements Observer extends Observable
 		return this.selectedEndpoints.indexOf(endpoint) != -1;
 	}
 	
-	public function getEndpoint() : Array<Endpoint> {
+	@:allow(controller.commandManager.ClearSelectionCommand)
+	function getEndpoint() : Array<Endpoint> {
 		return this.selectedEndpoints;
 	}
 	
+	public function getComponentSet() : Set<Component> {
+		var componentSet = new Set<Component>(); 
+		return componentSet.fromArray(this.selectedComponents);
+	}
+	
+	public function getLinkSet() : Set<Link> {
+		var linkSet = new Set<Link>();
+		return linkSet.fromArray(this.selectedLinks);
+	}
 }

@@ -5,7 +5,7 @@ package type;
  * @author AdvaitTrivedi
  */
 @:generic
-class Set<T>
+class Set<T> 
 {
 	var set: Array<T> = new Array<T>();
 
@@ -39,4 +39,10 @@ class Set<T>
 		return this.set.iterator();
 	}
 	
+	public function fromArray(array: Array<T>) {
+		for (element in array) {
+			this.push(element);
+		}
+		return this;
+	}
 }

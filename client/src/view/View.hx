@@ -52,6 +52,11 @@ class View implements Observer
 			this.canvasListener.redoLastCanvasChange();
         });
 		
+		document.querySelector("#delete").addEventListener('click', function (event) {
+            // do something
+			this.canvasListener.deleteSelection();
+        });
+		
 		document.querySelector("#Up").addEventListener('click', function (event) {
             // do something
 			this.activeTab.panCanvasUp();
