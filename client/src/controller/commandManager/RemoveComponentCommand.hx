@@ -1,14 +1,12 @@
 package controller.commandManager;
 import model.component.CircuitDiagramI;
 import model.component.Component;
-import model.gates.ComponentKind;
-import model.enumeration.Orientation;
 
 /**
  * ...
- * @author AdvaitTrivedi
+ * @author Theo
  */
-class AddComponentCommand extends AbstractCommand
+class RemoveComponentCommand extends AbstractCommand 
 {
 	var component: Component;
 	
@@ -19,7 +17,8 @@ class AddComponentCommand extends AbstractCommand
 	}
 	
 	override public function execute() : Void {
-		this.circuitDiagram.addComponent(this.component);
+		trace("Removing this component :: ", this.component);
+		this.circuitDiagram.deleteComponent(this.component);
 	}
 	
 	override public function redo() : Void {
@@ -27,7 +26,7 @@ class AddComponentCommand extends AbstractCommand
 	}
 	
 	override public function undo() : Void {
-		this.circuitDiagram.deleteComponent(this.component);
-	};	
-	
+		trace("adding this component :: ", this.component);
+		this.circuitDiagram.addComponent(this.component);
+	};
 }

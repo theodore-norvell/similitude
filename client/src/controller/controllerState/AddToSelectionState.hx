@@ -31,8 +31,8 @@ class AddToSelectionState implements ControllerStateI
 				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition );
 			canvasListener.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			var activeTab = canvasListener.getActiveTab();
-			canvasListener.getModelManipulator().toggleSelection(activeTab, this.clickedObjects);
+			var selectionModel = canvasListener.getActiveTab().getSelectionModel() ;
+			canvasListener.getModelManipulator().toggleSelectionArray(selectionModel, this.clickedObjects);
 			canvasListener.getModelManipulator().checkPoint() ;
 			canvasListener.setState(new CanvasIdleState());
 		} else {

@@ -4,11 +4,11 @@ import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
 import controller.commandManager.ClearSelectionCommand;
 import controller.commandManager.CommandManager;
-import controller.commandManager.DeleteSelectedComponentsAndLinksCommand;
 import controller.commandManager.DisconnectComponentCommand;
 import controller.commandManager.DisconnectLinkCommand;
 import controller.commandManager.EditLinkCommand;
 import controller.commandManager.MoveSelectionCommand;
+import controller.commandManager.RemoveComponentCommand ;
 import controller.commandManager.RemoveLinkCommand;
 import controller.commandManager.RotateComponentCommand;
 import controller.commandManager.ToggleSelectionCommand;
@@ -36,10 +36,16 @@ class ModelManipulationSublayer
 	 */
 	public function checkPoint() { this.commandManager.checkPoint() ; }
 	
-	public function addComponent(circuitDiagram: CircuitDiagramI, component: Component) {
-		var addComponentCommand = new AddComponentCommand(circuitDiagram, component);
+	public function addComponent(component: Component) {
+		var addComponentCommand = new AddComponentCommand(component);
 		this.commandManager.executeCommand(addComponentCommand);
-		this.normalise(circuitDiagram);
+	}
+
+	public function removeComponent(component: Component) {
+		var disconnectComponentCommand = new DisconnectComponentCommand(component);
+		this.commandManager.executeCommand(disconnectComponentCommand);
+		var removeComponentCommand = new RemoveComponentCommand(component);
+		this.commandManager.executeCommand(removeComponentCommand);
 	}
 	
 	public function addLink(circuitDiagram: CircuitDiagramI, link: Link) {
@@ -52,15 +58,23 @@ class ModelManipulationSublayer
 		this.commandManager.executeCommand(editLinkCommand);
 	}
 	
-	public function removeLink(link: Link, circuitDiagram: CircuitDiagramI) {
-		var removeLinkCommand = new RemoveLinkCommand(circuitDiagram, link);
+	public function removeLink(link: Link) {
+		var disconnectLinkCommand = new DisconnectLinkCommand(link);
+		this.commandManager.executeCommand(disconnectLinkCommand);
+		var removeLinkCommand = new RemoveLinkCommand(link);
 		this.commandManager.executeCommand(removeLinkCommand);
 	}
 	
-	public function toggleSelection(activeTab: TabModel, clickedObjects: Array<CircuitElement>) {
+	public function toggleSelectionArray( selectionModel: SelectionModel, clickedObjects: Array<CircuitElement>) {
 		for (object in clickedObjects) {
-			this.commandManager.executeCommand(new ToggleSelectionCommand(activeTab.getCircuitDiagram(), activeTab.getSelectionModel(), object));
-		};
+			this.commandManager.executeCommand(new ToggleSelectionCommand(selectionModel, object)) ;
+		}
+	}
+	
+	public function toggleSelection( selectionModel: SelectionModel, circuitElement: CircuitElement) {
+
+		this.commandManager.executeCommand(new ToggleSelectionCommand(selectionModel, circuitElement));
+
 	}
 	
 	public function moveSelection(activeTab: TabModel, currentX: Float, currentY: Float, nextX: Float, nextY: Float) {
@@ -79,27 +93,34 @@ class ModelManipulationSublayer
 	}
 	
 	public function deleteSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
-		if (!selectionModel.isClear()) {
-			checkPoint();
-			
-			for (component in selectionModel.getComponentSet()) {
-				var disconnectcomponentsCommand = new DisconnectComponentCommand(circuitDiagram, component);
-				this.commandManager.executeCommand(disconnectcomponentsCommand);
-			}
-			
-			for (link in selectionModel.getLinkSet()) {
-				var disconnectLinkCommand = new DisconnectLinkCommand(circuitDiagram, link);
-				this.commandManager.executeCommand(disconnectLinkCommand);
-			}
-			
-			var deleteSelectionCommand = new DeleteSelectedComponentsAndLinksCommand(circuitDiagram, selectionModel);
-			this.commandManager.executeCommand(deleteSelectionCommand);
-			
-			checkPoint();
+		
+		for (component in selectionModel.getComponentSet()) {
+			removeComponent( component ) ;
+			toggleSelection( selectionModel, component) ;
+		}
+		
+		for (link in selectionModel.getLinkSet()) {
+			removeLink( link ) ;
+			toggleSelection( selectionModel, link ) ;
 		}
 	}
 	
-	public function normalise(circuitDiagram: CircuitDiagramI) {
+	/**
+	 * Performs normalisation for the entire circuit.
+	 * 
+	 * Normallization is a process of tidying up a cicuit diagram so that the way it is matches the way it looks. 
+	 * Generally normalization is done at the end of each user interaction that might change the diagram. 
+	 * A diagram might become denormailzed in the middle of an interaction, but at the end, it should be normal again.
+	 * 
+	 * A normal diagram has the following properties.
+	 * 
+	 *	 Any two distinct connections that are close to each other, both contain a port.
+	 *	 Any two disctinct connections that are close to each other (and therefor both contain ports) must be connected by a link.
+	 *	 No connection is close to a link unless it includes an endpoint of that link.
+	 *	 No link has two endpoints that are directly connected to each other.
+	 *	 No two links connect the same pair of connections.
+	 */
+	 public function normalise(circuitDiagram: CircuitDiagramI) {
 		// For all pairs of connections {c0, c1} such that c0 != c1 and c0 is close to c1
 		// if and both contain a port,
 			// create a link to connect them
@@ -185,7 +206,7 @@ class ModelManipulationSublayer
             }
             // Remove all links split by this connection.
             for (link in removeLinks) {
-				this.removeLink(link, circuitDiagram);
+				this.removeLink(link);
                 //circuitDiagram.deleteLink(link);
             }
 		}
@@ -205,7 +226,7 @@ class ModelManipulationSublayer
 		// delete all marked links
 		for (link in markedLinks) {
             trace( "Deleting link " +link ) ;
-			this.removeLink(link, circuitDiagram);
+			this.removeLink(link);
         }
 		
 		// For all remaining links x
@@ -235,18 +256,13 @@ class ModelManipulationSublayer
 		// delete all marked links
 		for (link in markedLinks) {
             trace( "Deleting link " +link ) ;
-			this.removeLink(link, circuitDiagram);
+			this.removeLink(link);
         }
 	}
 	
 	public function rotateSelectedComponent(activeTab: TabModel) {
-		if (activeTab.getSelectionModel().onlyComponentsSelected()) {
-			checkPoint();
-			for (component in activeTab.getSelectionModel().getComponentSet()) {
-				this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));
-			}
-		} else {
-			trace("Can rotate only SELECTED components at a time");
+		for (component in activeTab.getSelectionModel().getComponentSet()) {
+			this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));
 		}
 	}
 }

@@ -10,9 +10,9 @@ class RemoveLinkCommand extends AbstractCommand
 {
 	var link: Link;
 	
-	public function new(circuitDiagram: CircuitDiagramI, link: Link) 
+	public function new(link: Link) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
+		this.setCircuitDiagram(link.getCircuitDiagram());
 		this.link = link;
 	}
 	

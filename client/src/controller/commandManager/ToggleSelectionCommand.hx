@@ -13,16 +13,14 @@ class ToggleSelectionCommand extends AbstractCommand
 	var circuitElement: CircuitElement;
 	var selectionModel: SelectionModel;
 	
-	public function new(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel, circuitElement: CircuitElement) 
+	public function new(selectionModel: SelectionModel, circuitElement: CircuitElement) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
 		this.selectionModel = selectionModel;
 		this.circuitElement = circuitElement;
 	}
 	
 	override public function execute() : Void {
 		this.selectionModel.toggleCircuitElement(this.circuitElement);
-		trace("Adding to selection model ::", this.selectionModel);
 	}
 	
 	override public function redo() : Void {
