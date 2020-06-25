@@ -13,9 +13,8 @@ class DisconnectComponentCommand extends AbstractCommand
 	var component: Component;
 	var connectionPortMap: Map<Connection, Port> = new Map<Connection, Port>();
 
-	public function new(circuitDiagram: CircuitDiagramI, component: Component) 
+	public function new(component: Component) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
 		this.component = component;
 	}
 	
