@@ -1,15 +1,10 @@
 package controller.controllerState;
-import controller.commandManager.AddLinkCommand;
-import controller.commandManager.ClearSelectionCommand;
 import model.component.Link;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 import controller.listenerInterfaces.CanvasListener;
 import controller.controllerState.ControllerStateI;
-import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.similitudeEvents.CanvasMouseMoveEvent;
-import model.similitudeEvents.CanvasMouseUpEvent;
 import model.similitudeEvents.EventTypesEnum;
-import hx.strings.RandomStrings;
 
 /**
  * Is hit when the canvas is clicked upon and the area is totally empty

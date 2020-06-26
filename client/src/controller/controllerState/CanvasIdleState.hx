@@ -1,10 +1,6 @@
 package controller.controllerState;
-import controller.commandManager.AddComponentCommand;
-import controller.commandManager.AddLinkCommand;
-import controller.commandManager.ClearSelectionCommand;
 import controller.listenerInterfaces.CanvasListener;
 import model.similitudeEvents.AbstractSimilitudeEvent;
-import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.component.Component;
 import model.component.Link;
 import model.component.Port;
@@ -13,7 +9,6 @@ import model.similitudeEvents.EventTypesEnum;
 import model.similitudeEvents.CanvasMouseDownEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.component.CircuitElement;
-import hx.strings.RandomStrings;
 import model.enumeration.Orientation;
 
 /**

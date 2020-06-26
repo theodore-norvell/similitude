@@ -1,5 +1,4 @@
 package controller.controllerState;
-import controller.commandManager.MoveSelectionCommand;
 import controller.listenerInterfaces.CanvasListener;
 import model.similitudeEvents.CanvasMouseMoveEvent;
 import model.similitudeEvents.AbstractSimilitudeEvent;
