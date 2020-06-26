@@ -2,7 +2,6 @@ package controller.modelManipulationSublayer;
 import controller.commandManager.AddComponentCommand;
 import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
-import controller.commandManager.ClearSelectionCommand;
 import controller.commandManager.CommandManager;
 import controller.commandManager.DisconnectComponentCommand;
 import controller.commandManager.DisconnectLinkCommand;
@@ -83,8 +82,14 @@ class ModelManipulationSublayer
 	}
 	
 	public function clearSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
-		var clearSelectionCommand = new ClearSelectionCommand(circuitDiagram, selectionModel);
-		this.commandManager.executeCommand(clearSelectionCommand);
+		
+		for (component in selectionModel.getComponentSet()) {
+			toggleSelection( selectionModel, component) ;
+		}
+		
+		for (link in selectionModel.getLinkSet()) {
+			toggleSelection( selectionModel, link ) ;
+		}
 	}
 	
 	public function addToConnection(circuitDiagram: CircuitDiagramI, connection: Connection, connectable: Connectable) {
@@ -95,13 +100,13 @@ class ModelManipulationSublayer
 	public function deleteSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
 		
 		for (component in selectionModel.getComponentSet()) {
-			removeComponent( component ) ;
 			toggleSelection( selectionModel, component) ;
+			removeComponent( component ) ;
 		}
 		
 		for (link in selectionModel.getLinkSet()) {
-			removeLink( link ) ;
 			toggleSelection( selectionModel, link ) ;
+			removeLink( link ) ;
 		}
 	}
 	
