@@ -5,4 +5,5 @@ package model.attribute;
  */
 interface AttributeValue {
     function getType() : AttributeType ;
+    function equals( other : AttributeValue ) : Bool ;
 }

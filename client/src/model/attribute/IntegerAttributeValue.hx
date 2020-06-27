@@ -15,4 +15,16 @@ class IntegerAttributeValue implements AttributeValue {
     public function getType() : AttributeType {
         return type ;
     }
+	
+	public static function getTypeForClass() : String {
+		return "IntegerAttributeValue";
+	}
+
+    public function equals( other : AttributeValue ) : Bool {
+        if( other.getType() != type ) return false ;
+        else {
+            var otherIntAV : IntegerAttributeValue = cast(other,IntegerAttributeValue) ;
+            return otherIntAV.value == this.value ;
+        }
+    }
 }
