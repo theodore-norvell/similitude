@@ -13,9 +13,8 @@ class DisconnectLinkCommand extends AbstractCommand
 	var connection0: Connection;
 	var connection1: Connection;
 
-	public function new(circuitDiagram: CircuitDiagramI, link: Link) 
+	public function new(link: Link) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
 		this.link = link;
 	}
 	

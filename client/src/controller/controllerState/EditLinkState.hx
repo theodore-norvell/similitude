@@ -1,11 +1,9 @@
 package controller.controllerState;
-import controller.commandManager.EditLinkCommand;
 import controller.listenerInterfaces.CanvasListener;
 import model.component.Endpoint;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.similitudeEvents.EventTypesEnum;
 import model.similitudeEvents.CanvasMouseMoveEvent;
-import type.Coordinate;
 
 /**
  * ...

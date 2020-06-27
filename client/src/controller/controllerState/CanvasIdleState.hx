@@ -1,10 +1,6 @@
 package controller.controllerState;
-import controller.commandManager.AddComponentCommand;
-import controller.commandManager.AddLinkCommand;
-import controller.commandManager.ClearSelectionCommand;
 import controller.listenerInterfaces.CanvasListener;
 import model.similitudeEvents.AbstractSimilitudeEvent;
-import model.similitudeEvents.CanvasMouseInteractionEvent;
 import model.component.Component;
 import model.component.Link;
 import model.component.Port;
@@ -13,7 +9,6 @@ import model.similitudeEvents.EventTypesEnum;
 import model.similitudeEvents.CanvasMouseDownEvent;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.component.CircuitElement;
-import hx.strings.RandomStrings;
 import model.enumeration.Orientation;
 
 /**
@@ -34,7 +29,8 @@ class CanvasIdleState implements ControllerStateI
 			trace('adding Component : ', dragNDropEvent.getComponent());
 			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
-			canvasListener.getModelManipulator().addComponent(circuitDiagram, component);
+			canvasListener.getModelManipulator().addComponent(component);
+			canvasListener.getModelManipulator().normalise( circuitDiagram );
 			canvasListener.getModelManipulator().checkPoint() ;
 			canvasListener.setState(this);
 			return;

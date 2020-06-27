@@ -70,10 +70,16 @@ class CanvasController extends AbstractController implements CanvasListener
 	}
 	
 	public function deleteSelection() {
+		this.modelManipulator.checkPoint() ;
 		this.modelManipulator.deleteSelection(this.activeTab.getCircuitDiagram(), this.activeTab.getSelectionModel());
+		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
+		this.modelManipulator.checkPoint() ;
 	}
 	
 	public function rotateSelectedComponent() {
+		this.modelManipulator.checkPoint() ;
 		this.modelManipulator.rotateSelectedComponent(this.activeTab);
+		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
+		this.modelManipulator.checkPoint() ;
 	}
 }
