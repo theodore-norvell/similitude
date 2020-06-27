@@ -76,4 +76,12 @@ class TimeAttributeValue implements AttributeValue {
         } ;
         return number + " " + unit ;
     }
+
+    public function equals( other : AttributeValue ) : Bool {
+        if( other.getType() != type ) return false ;
+        else {
+            var otherTimeAV : TimeAttributeValue = cast(other,TimeAttributeValue) ;
+            return otherTimeAV.value == this.value && otherTimeAV.unit == this.unit ;
+        }
+    }
 }

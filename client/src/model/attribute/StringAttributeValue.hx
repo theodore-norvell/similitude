@@ -15,4 +15,11 @@ class StringAttributeValue implements AttributeValue {
     public function getType() : AttributeType {
         return type ;
     }
+    public function equals( other : AttributeValue ) : Bool {
+        if( other.getType() != type ) return false ;
+        else {
+            var otherStrAV : StringAttributeValue = cast(other,StringAttributeValue) ;
+            return otherStrAV.value == this.value ;
+        }
+    }
 }
