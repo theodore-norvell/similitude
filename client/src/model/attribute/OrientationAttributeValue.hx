@@ -16,4 +16,11 @@ class OrientationAttributeValue implements AttributeValue {
     public function getType() : AttributeType {
         return type ;
     }
+    public function equals( other : AttributeValue ) : Bool {
+        if( other.getType() != type ) return false ;
+        else {
+            var otherOAV : OrientationAttributeValue = cast(other,OrientationAttributeValue) ;
+            return otherOAV.orientation == this.orientation ;
+        }
+    }
 }
