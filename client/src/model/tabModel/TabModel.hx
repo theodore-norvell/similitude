@@ -50,6 +50,6 @@ class TabModel implements Observer extends Observable
 	}
 	
 	public function update(target: ObservableI, ?data: Any) : Void {
-		this.notifyObservers(target, data);
+		this.notifyObservers(this, data);
 	}
 }

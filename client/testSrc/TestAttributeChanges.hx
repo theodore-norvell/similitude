@@ -348,8 +348,7 @@ class TestAttributeChanges extends SingleSuite {
                 var newValue = new TimeAttributeValue( 100, TimeUnit.PICO_SECOND ) ;
                 comp0.update( delay,newValue) ;
 
-                circuitObserver.count( cd ).should.be( 0 ) ;
-                circuitObserver.count( comp0 ).should.be( 1 ) ;
+                circuitObserver.count( cd ).should.be( 1 ) ;
                 compObserver.count( comp0 ).should.be( 1 ) ;
 
             }) ;
