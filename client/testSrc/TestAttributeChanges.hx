@@ -331,9 +331,33 @@ class TestAttributeChanges extends SingleSuite {
                 comp1.canUpdate( attr, newVal).should.be( false ) ;
             }) ;
 
+            it("should notify observers", {
+                var kind = new XOR() ;
+                var comp0 = new Component( cd, 100, 200, 40, 30, Orientation.EAST, kind ) ;
+                cd.addComponent( comp0 ) ;
+
+                cd.checkInvariant() ;
+
+                var circuitObserver = new MockObserver() ;
+                cd.addObserver( circuitObserver ) ;
+
+                var compObserver = new MockObserver() ;
+                comp0.addObserver( compObserver ) ;
+
+                var delay = StandardAttributes.delay ;
+                var newValue = new TimeAttributeValue( 100, TimeUnit.PICO_SECOND ) ;
+                comp0.update( delay,newValue) ;
+
+                circuitObserver.count( cd ).should.be( 0 ) ;
+                circuitObserver.count( comp0 ).should.be( 1 ) ;
+                compObserver.count( comp0 ).should.be( 1 ) ;
+
+            }) ;
+
             afterEach({
             });
         });
-        
+
+    
     }
 }
