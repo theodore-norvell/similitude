@@ -26,7 +26,7 @@ interface ComponentKind {
 
     public function canUpdateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Bool ;
 
-    public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void ;
+    public function updateAttribute<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void ;
 
     public function updateUntyped( component : Component, attribute : AttributeUntyped, value : AttributeValue ) : Void ;
 

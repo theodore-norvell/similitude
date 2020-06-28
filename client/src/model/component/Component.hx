@@ -3,7 +3,8 @@ package model.component;
 import haxe.CallStack.StackItem;
 import model.attribute.* ;
 import model.selectionModel.SelectionModel;
-import model.observe.Observable;
+import model.observe.Observable; 
+import model.observe.Observer;
 import type.HitObject;
 import model.enumeration.BOX;
 import model.enumeration.POINT_MODE;
@@ -22,7 +23,7 @@ import model.gates.ComponentKind;
  *
  */
 
-class Component extends CircuitElement {
+class Component extends CircuitElement  {
     var xPosition:Float;//the x position of the component
     var yPosition:Float;//the y position of the component
     var height:Float;//height
@@ -113,8 +114,8 @@ class Component extends CircuitElement {
         return this.componentKind.canUpdateUntyped( this, attribute, value) ;
     }
 
-    public function update<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Void {
-        this.componentKind.update( this, attribute, value) ;
+    public function updateAttribute<T : AttributeValue>( attribute : Attribute<T>, value : T ) : Void {
+        this.componentKind.updateAttribute( this, attribute, value) ;
     }
 
     public function updateUntyped( attribute : AttributeUntyped, value : AttributeValue ) : Void {
@@ -159,7 +160,7 @@ class Component extends CircuitElement {
     }
 
     public function set_orientation(value:Orientation) : Void {
-        update( StandardAttributes.orientation, new OrientationAttributeValue( value ) ) ;
+        updateAttribute( StandardAttributes.orientation, new OrientationAttributeValue( value ) ) ;
     } 
 
     public function get_componentKind():ComponentKind {
@@ -189,6 +190,7 @@ class Component extends CircuitElement {
  
     @:allow( model.gates ) function addPort( port ) {
         ports.push(port) ;
+        // TODO port.addObserver( this ) ;
     }
 
     public function getName():String {
@@ -202,7 +204,7 @@ class Component extends CircuitElement {
 
     public function setName( name : String ):Void {
         var attrVal = new StringAttributeValue( name ) ;
-        this.update( StandardAttributes.name, attrVal ) ;
+        this.updateAttribute( StandardAttributes.name, attrVal ) ;
     }
 
     public function get_height():Float {

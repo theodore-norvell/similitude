@@ -53,7 +53,7 @@ class AbstractComponentKind {
         return component.attributeValueList.has( attribute ) ;
     }
 
-    public function update<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
+    public function updateAttribute<T : AttributeValue>( component : Component, attribute : Attribute<T>, value : T ) : Void {
         updateUntyped( component, attribute, value ) ;
     }
 

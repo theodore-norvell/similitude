@@ -56,7 +56,7 @@ class TestAttributeChanges extends SingleSuite {
                     var ok = comp0.canUpdate( attr, south  ) ;
                     ok.should.be( true ) ;
 
-                    comp0.update( attr, south ) ;
+                    comp0.updateAttribute( attr, south ) ;
 
                     var actualOrientation = comp0.get_orientation() ;
                     (actualOrientation == Orientation.SOUTH).should.be( true ) ;
@@ -115,7 +115,7 @@ class TestAttributeChanges extends SingleSuite {
                     var ok = comp0.canUpdate( attr, south  ) ;
                     ok.should.be( true ) ;
 
-                    comp0.update( attr, south ) ;
+                    comp0.updateAttribute( attr, south ) ;
 
                     // Check that it is where I think it should be.
                     port0.get_xPosition().should.be( 100 ) ;
@@ -131,7 +131,7 @@ class TestAttributeChanges extends SingleSuite {
                     var ok = comp0.canUpdate( attr, west  ) ;
                     ok.should.be( true ) ;
 
-                    comp0.update( attr, west ) ;
+                    comp0.updateAttribute( attr, west ) ;
 
                     // Check that it is where I think it should be.
                     port0.get_xPosition().should.be(  80 ) ;
@@ -147,7 +147,7 @@ class TestAttributeChanges extends SingleSuite {
                     var ok = comp0.canUpdate( attr, north  ) ;
                     ok.should.be( true ) ;
 
-                    comp0.update( attr, north ) ;
+                    comp0.updateAttribute( attr, north ) ;
 
                     // Check that it is where I think it should be.
                     port0.get_xPosition().should.be( 100 ) ;
@@ -162,7 +162,7 @@ class TestAttributeChanges extends SingleSuite {
                     var ok = comp0.canUpdate( attr, east  ) ;
                     ok.should.be( true ) ;
 
-                    comp0.update( attr, east ) ;
+                    comp0.updateAttribute( attr, east ) ;
 
                     // Check that it is where I think it should be.
                     port0.get_xPosition().should.be( 120 ) ;
@@ -203,7 +203,7 @@ class TestAttributeChanges extends SingleSuite {
                 {
                     var val = new IntegerAttributeValue( 3 ) ;
                     comp0.canUpdate( attr, val ).should.be( true ) ;
-                    comp0.update( attr, val ) ;
+                    comp0.updateAttribute( attr, val ) ;
                     //trace( "comp0 is " + comp0 ) ;
 
                     comp0.get_portCount().should.be( 4 ) ;
@@ -228,7 +228,7 @@ class TestAttributeChanges extends SingleSuite {
                 {
                     var val = new IntegerAttributeValue( 4 ) ;
                     comp0.canUpdate( attr, val ).should.be( true ) ;
-                    comp0.update( attr, val ) ;
+                    comp0.updateAttribute( attr, val ) ;
                     //trace( "comp0 is " + comp0 ) ;
 
                     comp0.get_portCount().should.be( 5 ) ;
@@ -261,7 +261,7 @@ class TestAttributeChanges extends SingleSuite {
                 {
                     var val = new IntegerAttributeValue( 2 ) ;
                     comp0.canUpdate( attr, val ).should.be( true ) ;
-                    comp0.update( attr, val ) ;
+                    comp0.updateAttribute( attr, val ) ;
                     //trace( "comp0 is " + comp0 ) ;
 
                     comp0.get_portCount().should.be( 3 ) ;
@@ -293,7 +293,7 @@ class TestAttributeChanges extends SingleSuite {
                 val.toString().should.be("1 ns") ;
 
                 val = new TimeAttributeValue( 200, TimeUnit.MICRO_SECOND ) ;
-                comp0.update( attr, val ) ;
+                comp0.updateAttribute( attr, val ) ;
                 val = comp0.get( attr ) ;
                 val.toString().should.be("200 µs") ;
             }) ;
@@ -323,7 +323,7 @@ class TestAttributeChanges extends SingleSuite {
                 currentVal = comp1.get( attr ) ;
                 currentVal.getValue().should.be( "AND1" ) ; // Didn't change it yet.
 
-                comp1.update( attr, newVal ) ; // Now change it to Fred
+                comp1.updateAttribute( attr, newVal ) ; // Now change it to Fred
                 currentVal = comp1.get( attr ) ;
                 currentVal.getValue().should.be( "Fred" ) ;
 
@@ -346,7 +346,7 @@ class TestAttributeChanges extends SingleSuite {
 
                 var delay = StandardAttributes.delay ;
                 var newValue = new TimeAttributeValue( 100, TimeUnit.PICO_SECOND ) ;
-                comp0.update( delay,newValue) ;
+                comp0.updateAttribute( delay,newValue) ;
 
                 circuitObserver.count( cd ).should.be( 1 ) ;
                 compObserver.count( comp0 ).should.be( 1 ) ;
