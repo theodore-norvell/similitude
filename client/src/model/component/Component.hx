@@ -190,7 +190,6 @@ class Component extends CircuitElement  {
  
     @:allow( model.gates ) function addPort( port ) {
         ports.push(port) ;
-        // TODO port.addObserver( this ) ;
     }
 
     public function getName():String {
