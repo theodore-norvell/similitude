@@ -20,7 +20,6 @@ class OrientationAttributeValue implements AttributeValue {
 	public static function getTypeForClass() : String {
 		return "OrientationAttributeValue";
 	}
-
     public function equals( other : AttributeValue ) : Bool {
         if( other.getType() != type ) return false ;
         else {

@@ -99,6 +99,14 @@
 		margin-top: 305px;
 	}
 	
+	#attributePane {
+		position: absolute;
+		width: 34%;
+		height: 80%;
+		margin-left: 749px;
+		border: solid 1px;
+	}
+	
 	.panController{
 		border: solid 1px black;
 		width: 35px;
@@ -109,12 +117,12 @@
 <body>
   <!-- container div needed for example code -->
   <div class="container">
-	  <div id="sidebar">
-		  <table id="sidebarTable">
-			  <tbody></tbody>
-		  </table>
-		  </div>
-	  <div id="pallete">
+		<div id="sidebar">
+			<table id="sidebarTable">
+				<tbody></tbody>
+			</table>
+		</div>
+		<div id="pallete">
 		  <div id="topNavbar"></div>
 		  <div id="displayScreen">
 			<div id="CanvasPanControl">
@@ -125,7 +133,11 @@
 				<div id="Centre" class="panController">Centre</div>
 			</div>
 		  </div>
-	  </div>
+		<div id="attributePane">
+			<div style="position:relative;border-bottom:solid 1px;height:10%">Attribute Pane</div>
+			<div id="attribs"></div>
+		</div>
+		</div>
 	  <div id="undo">UNDO</div>
 	  <div id="redo">REDO</div>
 	  <div id="delete">DELETE</div>

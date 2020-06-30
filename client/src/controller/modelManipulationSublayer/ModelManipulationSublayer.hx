@@ -2,7 +2,7 @@ package controller.modelManipulationSublayer;
 import controller.commandManager.AddComponentCommand;
 import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
-import controller.commandManager.ClearSelectionCommand;
+import controller.commandManager.AttributeChangeCommand;
 import controller.commandManager.CommandManager;
 import controller.commandManager.DisconnectComponentCommand;
 import controller.commandManager.DisconnectLinkCommand;
@@ -14,6 +14,7 @@ import controller.commandManager.RotateComponentCommand;
 import controller.commandManager.ToggleSelectionCommand;
 import model.component.*;
 import model.selectionModel.SelectionModel;
+import model.similitudeEvents.AttributeChangeEvent;
 import model.tabModel.TabModel;
 import type.Coordinate;
 import type.Set;
@@ -270,5 +271,12 @@ class ModelManipulationSublayer
 		for (component in activeTab.getSelectionModel().getComponentSet()) {
 			this.commandManager.executeCommand(new RotateComponentCommand(activeTab.getCircuitDiagram(), component));
 		}
+	}
+	
+	public function editAttribute(circuitDiagram: CircuitDiagramI, eventObject: AttributeChangeEvent) {
+		this.checkPoint();
+		var attributeChangeCommand = new AttributeChangeCommand(circuitDiagram, eventObject.componentAffected, eventObject.attributeUntyped, eventObject.newAttributeValue);
+		this.commandManager.executeCommand(attributeChangeCommand);
+		this.normalise(circuitDiagram);
 	}
 }
