@@ -1,5 +1,4 @@
 import controller.controllers.CanvasController;
-import controller.controllers.SidebarController;
 import view.viewUpdaters.AttributeUpdate;
 import view.viewUpdaters.CanvasUpdate;
 import view.viewUpdaters.SidebarUpdate;
@@ -11,13 +10,11 @@ class Main {
 	  // create the main view
 	var viewHandler:View = new View();
 	
-	// create the controllers
-	var sidebarController:SidebarController = new SidebarController();
+	// create the controllersß
 	var canvasController:CanvasController = new CanvasController();
 	//var canvasController:CanvasController = new CanvasController();
 	
 	// attach the listeners/handlers to the view
-	viewHandler.setSidebarListener(sidebarController);
 	viewHandler.setCanvasListener(canvasController);
 	
 	// create the update pushers and bind them to the view.
@@ -26,7 +23,6 @@ class Main {
 	var attributeUpdater: AttributeUpdate = new AttributeUpdate(viewHandler);
 	
 	// bind the controllers to the ViewUpdate interfaces
-	sidebarController.setViewUpdater(sidebarUpdater);
 	canvasController.setViewUpdater(canvasUpdater);
 	canvasController.setAttributeUpdater(attributeUpdater);
 	

@@ -3,7 +3,7 @@ package controller.viewUpdateInterfaces;
 /**
  * @author ...
  */
-interface ViewUpdate extends CanvasUpdate extends SidebarUpdate
+interface ViewUpdate 
 {
-	public function updateView(string: String): Void;
+	public function updateCanvas( ): Void;
 }

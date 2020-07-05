@@ -36,7 +36,7 @@ class AttributeUpdate extends AbstractUpdate implements Observer
 		this.attributePane = document.querySelector("#attribs");
 	}
 	
-	public function setComponent(component: Component) {
+	private function setComponent(component: Component) {
 		if (this.component != component) {
 			component.addObserver(this);
 			if (this.component != null) {
