@@ -31,10 +31,16 @@ class AddToSelectionState implements ControllerStateI
 				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition );
 			canvasListener.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			var selectionModel = canvasListener.getActiveTab().getSelectionModel() ;
+			var activeTab = canvasListener.getActiveTab();
+			var selectionModel = activeTab.getSelectionModel() ;
 			canvasListener.getModelManipulator().toggleSelectionArray(selectionModel, this.clickedObjects);
 			canvasListener.getModelManipulator().checkPoint() ;
+			// will change in the future
 			canvasListener.setState(new CanvasIdleState());
+			var selectedComponents = activeTab.getSelectionModel().getComponentSet() ;
+			if ( selectedComponents.size() > 0 ) {
+				canvasListener.showAttributes( selectedComponents );
+			}
 		} else {
 			trace("Unknown transition");
 		}

@@ -33,6 +33,7 @@ class DownOnEmptyState implements ControllerStateI
 			// shift to the link edit state
 			canvasListener.setState(new EditLinkState(link.get_endpoint(1)));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
+			canvasListener.clearAttributes();
 			canvasListener.getModelManipulator().checkPoint() ;
 			canvasListener.setState(new CanvasIdleState());
 		} else {
