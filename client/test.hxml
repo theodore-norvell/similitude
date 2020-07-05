@@ -3,3 +3,4 @@
 -x TestMain
 -D dce=no
 -lib buddy
+-L haxe-strings
