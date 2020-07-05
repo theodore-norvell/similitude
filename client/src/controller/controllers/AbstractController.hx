@@ -1,9 +1,6 @@
 package controller.controllers;
-import controller.controllerState.ControllerStateI;
 import controller.viewUpdateInterfaces.ViewUpdate;
 import controller.listenerInterfaces.ViewListener;
-import js.html.webgl.ActiveInfo;
-import model.component.CircuitDiagramI;
 import model.tabModel.TabModel;
 
 /**

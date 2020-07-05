@@ -8,9 +8,13 @@ package model.similitudeEvents;
 enum EventTypesEnum
 {
 	SIDEBAR_DRAG_N_DROP;
+	
 	LINK_ADD;
 	LINK_EDIT;
+	
 	CANVAS_MOUSE_DOWN;
 	CANVAS_MOUSE_UP;
 	CANVAS_MOUSE_MOVE;
+	
+	ATTRIBUTE_CHANGED;
 }

@@ -63,6 +63,10 @@ class TimeAttributeValue implements AttributeValue {
     public function getType() : AttributeType {
         return type ;
     }
+	
+	public static function getTypeForClass() : AttributeType {
+		return type ;
+	}
 
     public function toString() : String {
         var number = haxe.Int64.toStr( getValue() ) ;

@@ -1,5 +1,6 @@
 import controller.controllers.CanvasController;
 import controller.controllers.SidebarController;
+import view.viewUpdaters.AttributeUpdate;
 import view.viewUpdaters.CanvasUpdate;
 import view.viewUpdaters.SidebarUpdate;
 import view.View;
@@ -22,10 +23,12 @@ class Main {
 	// create the update pushers and bind them to the view.
 	var sidebarUpdater:SidebarUpdate = new SidebarUpdate(viewHandler);
 	var canvasUpdater:CanvasUpdate = new CanvasUpdate(viewHandler);
+	var attributeUpdater: AttributeUpdate = new AttributeUpdate(viewHandler);
 	
 	// bind the controllers to the ViewUpdate interfaces
 	sidebarController.setViewUpdater(sidebarUpdater);
 	canvasController.setViewUpdater(canvasUpdater);
+	canvasController.setAttributeUpdater(attributeUpdater);
 	
 	viewHandler.setActiveTab();
   }

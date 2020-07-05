@@ -45,4 +45,12 @@ class Set<T>
 		}
 		return this;
 	}
+	
+	public function get(key: Int) : T {
+		if (key >= 0 && key < this.size()) {
+			return this.set[key];
+		}
+		
+		return null;
+	}
 }

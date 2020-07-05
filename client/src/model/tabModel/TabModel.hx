@@ -1,11 +1,8 @@
 package model.tabModel;
 import model.drawingInterface.DrawingAdapterI;
 import model.observe.*;
-import view.viewModelRepresentatives.TabView;
 //import js.html.CanvasRenderingContext2D;
 import model.component.CircuitDiagramI;
-import model.component.Component;
-import model.component.Link;
 import model.selectionModel.SelectionModel;
 //import js.Browser.document;  // No dependence from the Model package to Browser or HTML, please. TSN
 //import js.html.Console; // No dependence from the Model package to Browser or HTML, please. TSN

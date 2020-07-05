@@ -4,14 +4,12 @@ import controller.controllers.CanvasController;
 import controller.listenerInterfaces.CanvasListener;
 import model.similitudeEvents.SidebarDragAndDropEvent;
 import model.tabModel.TabModel;
-import view.viewModelRepresentatives.TabView;
 using buddy.Should;
 
 import assertions.Assert ;
 import model.component.* ;
 import model.gates.* ;
 import model.enumeration.Orientation ;
-import haxe.Unserializer;
 import model.enumeration.ComponentType;
 
 /**
@@ -42,7 +40,7 @@ class TestCanvasController extends SingleSuite
 				eventPassed.draggedToY = worldCoords.get_yPosition() ;
 				canvasController.handleCanvasMouseInteractions(eventPassed);
 				
-				var componentIterator = canvasController.getActiveTab().getCircuitDiagram().get_componentIterator()
+				var componentIterator = canvasController.getActiveTab().getCircuitDiagram().get_componentIterator() ;
 				componentIterator.hasNext().should.be(true);
 				var count = 0;
 				for(component in componentIterator) {

@@ -13,12 +13,10 @@ import model.component.Component;
 import model.component.Link;
 import model.enumeration.ComponentType;
 import model.enumeration.Orientation;
+import model.similitudeEvents.AttributeChangeEvent;
 import model.similitudeEvents.AbstractSimilitudeEvent;
-import model.similitudeEvents.CanvasMouseInteractionEvent;
-import model.similitudeEvents.LinkAddEvent;
-import model.similitudeEvents.LinkEditEvent;
-import model.similitudeEvents.SidebarDragAndDropEvent;
-import hx.strings.RandomStrings;
+import type.Set;
+import view.viewUpdaters.AttributeUpdate;
 // import js.html.Console;
 
 /**
@@ -31,18 +29,19 @@ class CanvasController extends AbstractController implements CanvasListener
 	var componentTypesSingleton = new ComponentTypes(new CircuitDiagram());
 	var state: ControllerStateI = new CanvasIdleState();
 	var modelManipulator: ModelManipulationSublayer;
+	var attributeUpdater: AttributeUpdate;
 	
 	public function new() 
 	{
 		this.modelManipulator = new ModelManipulationSublayer(this.commandManager);
 	}
 	
-	public function setState(newState: ControllerStateI) : Void {
-		this.state = newState;
+	public function setAttributeUpdater(attributeUpdater: AttributeUpdate) {
+		this.attributeUpdater = attributeUpdater;
 	}
 	
-	override public function update(a:String):Void {
-		this.viewUpdater.updateView("The element that was added to the canvas div is :: " + a );
+	public function setState(newState: ControllerStateI) : Void {
+		this.state = newState;
 	}
 	
 	public function getComponentTypesSingleton() : ComponentTypes {
@@ -81,5 +80,21 @@ class CanvasController extends AbstractController implements CanvasListener
 		this.modelManipulator.rotateSelectedComponent(this.activeTab);
 		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
 		this.modelManipulator.checkPoint() ;
+	}
+	
+	/**
+	 * TODO :: Will change...
+	 * @param	componentSet
+	 */
+	public function showAttributes(componentSet: Set<Component>) {
+		this.attributeUpdater.buildAttributes(componentSet.get(0));
+	}
+	
+	public function clearAttributes() {
+		this.attributeUpdater.clearAttributes();
+	}
+	
+	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) : Void {
+		this.modelManipulator.editAttribute(this.activeTab.getCircuitDiagram(), eventObject);
 	}
 }

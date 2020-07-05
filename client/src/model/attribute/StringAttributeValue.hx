@@ -15,6 +15,11 @@ class StringAttributeValue implements AttributeValue {
     public function getType() : AttributeType {
         return type ;
     }
+	
+	public static function getTypeForClass() : AttributeType {
+		return type ;
+	}
+
     public function equals( other : AttributeValue ) : Bool {
         if( other.getType() != type ) return false ;
         else {
