@@ -11,7 +11,7 @@ class TestCircuitDiagram extends SingleSuite {
         // A test suite:
         describe("CircuitDiagram", {
             var cd : CircuitDiagramI ;
-            var observer = new MockObserver() ;
+            var observer : MockObserver ;
 
             beforeEach({
                 cd = new CircuitDiagram() ;

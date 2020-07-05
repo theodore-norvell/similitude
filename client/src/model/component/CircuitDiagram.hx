@@ -17,10 +17,10 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
     var linkArray:Array<Link> = new Array<Link>();
 
     // The bounding box
-    var xMin:Float;
-    var yMin:Float;
-    var xMax:Float;
-    var yMax:Float;
+    var xMin:Float = 0 ;
+    var yMin:Float = 0;
+    var xMax:Float = 1 ;
+    var yMax:Float = 1 ;
     var centrePoint : Coordinate ;
     static var margin:Float = 50;
 
@@ -45,44 +45,52 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
     }
 
     public function updateBoundingBox():Void {
-        xMin = Math.POSITIVE_INFINITY ;
-        yMin =  Math.POSITIVE_INFINITY ;
-        xMax = Math.NEGATIVE_INFINITY ;
-        yMax = Math.NEGATIVE_INFINITY ;
+        var newXMin = Math.POSITIVE_INFINITY ;
+        var newYMin =  Math.POSITIVE_INFINITY ;
+        var newXMax = Math.NEGATIVE_INFINITY ;
+        var newYMax = Math.NEGATIVE_INFINITY ;
 
         for(i in componentArray){
-            xMin = Math.min( xMin, i.left() ) ;
-            xMax = Math.max( xMax, i.right() ) ;
-            yMin = Math.min( yMin, i.top() ) ;
-            yMax = Math.max( yMax, i.bottom() ) ;
+            newXMin = Math.min( newXMin, i.left() ) ;
+            newYMin = Math.min( newYMin, i.top() ) ;
+            newXMax = Math.max( newXMax, i.right() ) ;
+            newYMax = Math.max( newYMax, i.bottom() ) ;
         }
 
         for(i in linkArray){
-            xMin = Math.min( xMin, i.left() ) ;
-            xMax = Math.max( xMax, i.right() ) ;
-            yMin = Math.min( yMin, i.top() ) ;
-            yMax = Math.max( yMax, i.bottom() ) ;
+            newXMin = Math.min( newXMin, i.left() ) ;
+            newYMin = Math.min( newYMin, i.top() ) ;
+            newXMax = Math.max( newXMax, i.right() ) ;
+            newYMax = Math.max( newYMax, i.bottom() ) ;
         }
 
-        if( xMin == Math.POSITIVE_INFINITY ) xMin = 0 ;
-        if( yMin == Math.POSITIVE_INFINITY ) yMin = 0 ;
-        if( yMax == Math.NEGATIVE_INFINITY ) yMax = 0 ;
-        if( yMax == Math.NEGATIVE_INFINITY ) yMax = 0 ;
+        if( newXMin == Math.POSITIVE_INFINITY ) newXMin = 0 ;
+        if( newYMin == Math.POSITIVE_INFINITY ) newYMin = 0 ;
+        if( newXMax == Math.NEGATIVE_INFINITY ) newXMax = 0 ;
+        if( newYMax == Math.NEGATIVE_INFINITY ) newYMax = 0 ;
         
-        if( xMin >= xMax ) xMax = xMin + 1 ;
-        if( yMin >= yMax ) yMax = yMin + 1 ;
+        if( newXMin >= newXMax ) newXMax = newXMin + 1 ;
+        if( newYMin >= newYMax ) newYMax = newYMin + 1 ;
 
-        xMin = xMin - margin / 2 ;
-        yMin = yMin - margin / 2 ;
-        xMax = xMax + margin / 2 ;
-        yMax = yMax + margin / 2 ;
+        newXMin = newXMin - margin / 2 ;
+        newYMin = newYMin - margin / 2 ;
+        newXMax = newXMax + margin / 2 ;
+        newYMax = newYMax + margin / 2 ;
 
-        centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
-        notifyObservers(this) ;
+        if( newXMin != xMin || newYMin != yMin
+         || newXMax != xMax || newYMax != yMax ) {
+            xMin = newXMin ;
+            yMin = newYMin ;
+            xMax = newXMax ;
+            yMax = newYMax ;
+            centrePoint = new Coordinate( (xMax + xMin) / 2.0, (yMax + yMin) / 2.0 ) ;
+            notifyObservers(this) ;
+        }
     }
 
     public function update(target: ObservableI, ?data:Any) : Void{
-        updateBoundingBox() ; // This will also notify observers.
+        updateBoundingBox() ; // This will may also notify observers.
+        notifyObservers( this, data ) ;
     }
 
     public function get_centre() : Coordinate {

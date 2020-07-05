@@ -28,7 +28,7 @@ class AbstractGate extends AbstractComponentKind {
     
     public function createPorts( component : Component ) : Void {
         var value = new IntegerAttributeValue( initialNumberOfInPorts() ) ;
-        update( component, StandardAttributes.numberOfInputPorts, value ) ;
+        updateAttribute( component, StandardAttributes.numberOfInputPorts, value ) ;
     }
     function setTheNumberOfPortsTo( component : Component, count : Int ) {
         var currentCount = component.get_portCount() ;

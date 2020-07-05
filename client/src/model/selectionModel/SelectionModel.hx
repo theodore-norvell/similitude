@@ -5,8 +5,6 @@ import model.component.Link;
 import model.component.Port;
 import model.component.Endpoint;
 import model.observe.Observable;
-import model.observe.ObservableI;
-import model.observe.Observer;
 import type.Coordinate;
 import type.Set;
 
@@ -16,7 +14,7 @@ import type.Set;
  * 
  * @author AdvaitTrivedi
  */
-class SelectionModel implements Observer extends Observable
+class SelectionModel extends Observable
 {
 	var selectedComponents = new Array<Component>();
 	var selectedLinks = new Array<Link>();
@@ -24,10 +22,6 @@ class SelectionModel implements Observer extends Observable
 	var selectedEndpoints = new Array<Endpoint>();
 
 	public function new() {}
-	
-	public function update(target: ObservableI, ?data:Dynamic) : Void {
-		this.notifyObservers(target, data);
-	}
 	
 	/**
 	 * Allows a user to add a CircuitElement to the selection.
@@ -52,7 +46,6 @@ class SelectionModel implements Observer extends Observable
 		} else {
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
-		this.update(this);
 	}
 	
 	/**
@@ -74,7 +67,6 @@ class SelectionModel implements Observer extends Observable
 		} else {
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
-		this.update(this);
 	}
 
 	public function contains(element : CircuitElement) : Bool {
@@ -89,18 +81,6 @@ class SelectionModel implements Observer extends Observable
 		} else {
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
-	}
-	
-	/**
-	 * Will clear the selection completely.
-	 * WARNING : only use this function if you know what you are doing.
-	 */
-	public function clearSelection()  : Void {
-		this.selectedComponents = new Array<Component>();
-		this.selectedEndpoints = new Array<Endpoint>();
-		this.selectedLinks = new Array<Link>();
-		this.selectedPorts = new Array<Port>();
-		this.update(this);
 	}
 	
 	public function isClear() : Bool {
@@ -126,67 +106,8 @@ class SelectionModel implements Observer extends Observable
 			endpoint1.moveTo(new Coordinate(endpoint1.get_xPosition() + differenceX, endpoint1.get_yPosition() + differenceY));
 		}
 	}
-	
-	/**
-	 * Allows the user of this function to directly place an entire array of components in the selection.
-	 * Replaces the old selection of components.
-	 * WARNING : Use only if you know what you are doing.
-	 * @param	componentArray
-	 */
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function setSelectedComponents(componentArray: Array<Component>) : Void {
-		this.selectedComponents = componentArray;
-		this.update(this);
-	}
-	
-	/**
-	 * Allows the user of this function to directly place an entire array of link in the selection.
-	 * Replaces the old selection of links.
-	 * WARNING : Use only if you know what you are doing.
-	 * @param	linkArray
-	 */
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function setSelectedLinks(linkArray: Array<Link>) : Void {
-		this.selectedLinks = linkArray;
-		this.update(this);
-	}
-	
-	/**
-	 * Allows the user of this function to directly place an entire array of ports in the selection.
-	 * Replaces the old selection of ports.
-	 * WARNING : Use only if you know what you are doing.
-	 * @param	portArray
-	 */
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function setSelectedPorts(portArray: Array<Port>) : Void {
-		this.selectedPorts = portArray;
-		this.update(this);
-	}
-	
-	/**
-	 * Allows the user of this function to directly place an entire array of endpoints in the selection.
-	 * Replaces the old selection of endpoints.
-	 * WARNING : Use only if you know what you are doing.
-	 * @param	endpointArray
-	 */
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function setSelectedEndpoints(endpointArray: Array<Endpoint>) : Void {
-		this.selectedEndpoints = endpointArray;
-		this.update(this);
-	}
-	
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function getComponents() : Array<Component> {
-		return this.selectedComponents;
-	}
-	
 	public function containsComponent( c : Component ) : Bool {
 		return this.selectedComponents.indexOf(c) != -1 ;
-	}
-	
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function getLinks() : Array<Link> {
-		return this.selectedLinks;
 	}
 	
 	public function containsLink( link : Link ) : Bool {
@@ -195,52 +116,50 @@ class SelectionModel implements Observer extends Observable
 	
 	private function addLink(link: Link) : Void {
 		this.selectedLinks.push(link);
+		notifyObservers(this) ;
 	}
 	
 	private function addComponent(component: Component) : Void {
 		this.selectedComponents.push(component);
+		notifyObservers(this) ;
 	}
 	
 	private function removeLink(link: Link) : Void {
 		this.selectedLinks.remove(link);
+		notifyObservers(this) ;
 	}
 	
 	private function removeComponent(component : Component) : Void {
 		this.selectedComponents.remove(component);
+		notifyObservers(this) ;
 	}
 	
 	private function addPort(port: Port) : Void {
 		this.selectedPorts.push(port);
+		notifyObservers(this) ;
 	}
 	
 	private function removePort(port: Port) : Void {
 		this.selectedPorts.remove(port);
+		notifyObservers(this) ;
 	}
 	
 	public function containsPort(port: Port) : Bool {
 		return this.selectedPorts.indexOf(port) != -1;
 	}
 	
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function getPorts() : Array<Port> {
-		return this.selectedPorts;
-	}
-	
 	private function addEndpoint(endpoint: Endpoint) : Void {
 		this.selectedEndpoints.push(endpoint);
+		notifyObservers(this) ;
 	}
 	
 	private function removeEndpoint(endpoint: Endpoint) : Void {
 		this.selectedEndpoints.remove(endpoint);
+		notifyObservers(this) ;
 	}
 	
 	public function containsEndpoint(endpoint: Endpoint) : Bool {
 		return this.selectedEndpoints.indexOf(endpoint) != -1;
-	}
-	
-	@:allow(controller.commandManager.ClearSelectionCommand)
-	function getEndpoint() : Array<Endpoint> {
-		return this.selectedEndpoints;
 	}
 	
 	public function getComponentSet() : Set<Component> {
@@ -251,12 +170,5 @@ class SelectionModel implements Observer extends Observable
 	public function getLinkSet() : Set<Link> {
 		var linkSet = new Set<Link>();
 		return linkSet.fromArray(this.selectedLinks);
-	}
-	
-	public function onlyComponentsSelected() : Bool {
-		return this.getComponents().length > 0 &&
-			this.getEndpoint().length == 0 &&
-			this.getLinks().length == 0 &&
-			this.getPorts().length == 0;
 	}
 }
