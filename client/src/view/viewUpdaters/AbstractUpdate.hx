@@ -13,7 +13,6 @@ class AbstractUpdate implements ViewUpdate
 		this.viewToUpdate = view;
 	}
 	
-	public function updateView(string: String): Void {};
 	public function updateCanvas(): Void {};
 	
 }

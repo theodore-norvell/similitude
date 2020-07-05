@@ -1,4 +1,6 @@
 package controller.modelManipulationSublayer;
+import model.attribute.AttributeUntyped;
+import model.attribute.AttributeValue;
 import controller.commandManager.AddComponentCommand;
 import controller.commandManager.AddLinkCommand;
 import controller.commandManager.AddToConnectionCommand;
@@ -14,7 +16,6 @@ import controller.commandManager.RotateComponentCommand;
 import controller.commandManager.ToggleSelectionCommand;
 import model.component.*;
 import model.selectionModel.SelectionModel;
-import model.similitudeEvents.AttributeChangeEvent;
 import model.tabModel.TabModel;
 import type.Coordinate;
 import type.Set;
@@ -273,10 +274,10 @@ class ModelManipulationSublayer
 		}
 	}
 	
-	public function editAttribute(circuitDiagram: CircuitDiagramI, eventObject: AttributeChangeEvent) {
-		this.checkPoint();
-		var attributeChangeCommand = new AttributeChangeCommand(circuitDiagram, eventObject.componentAffected, eventObject.attributeUntyped, eventObject.newAttributeValue);
-		this.commandManager.executeCommand(attributeChangeCommand);
-		this.normalise(circuitDiagram);
+	public function editAttribute(component : Component, attribute : AttributeUntyped, newValue : AttributeValue ) {
+		if( component.canUpdateUntyped( attribute, newValue) )  {
+			var attributeChangeCommand = new AttributeChangeCommand(component, attribute, newValue);
+			this.commandManager.executeCommand(attributeChangeCommand);
+		}
 	}
 }

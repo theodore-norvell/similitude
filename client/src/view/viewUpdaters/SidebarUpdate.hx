@@ -103,8 +103,4 @@ class SidebarUpdate extends AbstractUpdate
 		}
 	}
 	
-	public override function updateView(string: String){
-		//this.viewToUpdate.updateThisBox(string);
-	}
-	
 }

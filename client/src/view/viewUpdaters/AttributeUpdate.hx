@@ -36,7 +36,7 @@ class AttributeUpdate extends AbstractUpdate implements Observer
 		this.attributePane = document.querySelector("#attribs");
 	}
 	
-	public function setComponent(component: Component) {
+	private function setComponent(component: Component) {
 		if (this.component != component) {
 			component.addObserver(this);
 			if (this.component != null) {
@@ -53,6 +53,7 @@ class AttributeUpdate extends AbstractUpdate implements Observer
 	}
 	
 	public function buildAttributes(component: Component) : Void {
+		this.clearAttributes() ;
 		this.setComponent(component);
 		for (attribute in component.getAttributes()) {
 			var strategy = this.attributeMap[attribute.getType()];

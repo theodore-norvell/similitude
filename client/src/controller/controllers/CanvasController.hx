@@ -95,6 +95,9 @@ class CanvasController extends AbstractController implements CanvasListener
 	}
 	
 	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) : Void {
-		this.modelManipulator.editAttribute(this.activeTab.getCircuitDiagram(), eventObject);
+		this.modelManipulator.checkPoint() ;
+		this.modelManipulator.editAttribute(eventObject.componentAffected, eventObject.attributeUntyped, eventObject.newAttributeValue );
+		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
+		this.modelManipulator.checkPoint() ;
 	}
 }
