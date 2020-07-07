@@ -5,6 +5,8 @@ import model.attribute.AttributeValue;
 import model.attribute.TimeAttributeValue;
 import model.component.Component;
 import js.Browser.document;
+import model.enumeration.AttributeHexColour;
+import model.selectionModel.SelectionModel;
 import model.similitudeEvents.AttributeChangeEvent;
 import type.TimeUnit ;
 import model.attribute.StringAttributeValue;
@@ -22,13 +24,16 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy
 		
 	}
 	
-	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, component: Component, view: View) : DivElement 
+	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, attributeStatus: AttributeHexColour, selectionModel: SelectionModel, view: View) : DivElement 
 	{
 		var timeAttribute = Std.downcast(attributeValue, TimeAttributeValue);
 		
 		var mainAttributeDivElement = document.createDivElement();
 		mainAttributeDivElement.id = attributeUntyped.getName() + "_attrib"; 
 		mainAttributeDivElement.style.height = "10%";
+		mainAttributeDivElement.style.width = "100%";
+		mainAttributeDivElement.style.display = "inline-block";
+		mainAttributeDivElement.style.backgroundColor = Std.string(attributeStatus);
 		
 		var editor = document.createDivElement();
 		editor.style.float = "left";
@@ -74,7 +79,7 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy
 			var attributeChangeEvent = new AttributeChangeEvent();
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new TimeAttributeValue(Int64.parseString(inputNode.value), Type.createEnum(TimeUnit, unitDropDown.value));
-			attributeChangeEvent.componentAffected = component;
+			attributeChangeEvent.selectionAffected = selectionModel;
 			view.handleAttributeInteractions(attributeChangeEvent);
 		}
 		
@@ -85,7 +90,7 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy
 			var attributeChangeEvent = new AttributeChangeEvent();
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new TimeAttributeValue(Int64.parseString(inputNode.value), Type.createEnum(TimeUnit, unitDropDown.value));
-			attributeChangeEvent.componentAffected = component;
+			attributeChangeEvent.selectionAffected = selectionModel;
 			view.handleAttributeInteractions(attributeChangeEvent);
 		}
 		

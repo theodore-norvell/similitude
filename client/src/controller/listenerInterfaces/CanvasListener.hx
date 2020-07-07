@@ -22,7 +22,7 @@ interface CanvasListener extends ViewListener
 	public function redoLastCanvasChange() : Void;
 	public function deleteSelection() : Void;
 	public function rotateSelectedComponent() : Void;
-	public function showAttributes(componentSet: Set<Component>) : Void;
+	public function showAttributes() : Void;
 	public function clearAttributes() : Void;
 	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) : Void;
 }

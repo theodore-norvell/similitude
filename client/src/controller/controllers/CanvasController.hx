@@ -86,8 +86,8 @@ class CanvasController extends AbstractController implements CanvasListener
 	 * TODO :: Will change...
 	 * @param	componentSet
 	 */
-	public function showAttributes(componentSet: Set<Component>) {
-		this.attributeUpdater.buildAttributes(componentSet.get(0));
+	public function showAttributes() {
+		this.attributeUpdater.buildAttributes(this.getActiveTab().getSelectionModel());
 	}
 	
 	public function clearAttributes() {
@@ -96,7 +96,7 @@ class CanvasController extends AbstractController implements CanvasListener
 	
 	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) : Void {
 		this.modelManipulator.checkPoint() ;
-		this.modelManipulator.editAttribute(eventObject.componentAffected, eventObject.attributeUntyped, eventObject.newAttributeValue );
+		this.modelManipulator.editAttribute(eventObject.selectionAffected, eventObject.attributeUntyped, eventObject.newAttributeValue );
 		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
 		this.modelManipulator.checkPoint() ;
 	}

@@ -2,6 +2,9 @@ package type;
 
 /**
  * A generic set object for the lack of one in Haxe 4.0.5, along with much needed features.
+ * 
+ * TODO : Should have generic <T : Equals/DeepEquals> where Equals is an interface that is implemented by consituent members for deep equality.
+ * This also points to the fact that the check methods should enable deep equality. (Even if it is using a boolean parameter)
  * @author AdvaitTrivedi
  */
 @:generic
@@ -15,12 +18,18 @@ class Set<T>
 		return this.set.length;
 	}
 	
+	/**
+	 * Attempts to push an element onto the set.
+	 * If element already exists in the set then the push will be rejected, and false will be returned.
+	 * @param	element
+	 * @return
+	 */
 	public function push(element: T) : Bool {
 		if (this.has(element)) {
 			return false;
 		}
 		this.set.push(element);
-		return false;
+		return true;
 	}
 	
 	public function remove(element: T) : Bool {

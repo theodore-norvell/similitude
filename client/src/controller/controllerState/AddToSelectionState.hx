@@ -39,7 +39,8 @@ class AddToSelectionState implements ControllerStateI
 			canvasListener.setState(new CanvasIdleState());
 			var selectedComponents = activeTab.getSelectionModel().getComponentSet() ;
 			if ( selectedComponents.size() > 0 ) {
-				canvasListener.showAttributes( selectedComponents );
+				trace("triggering show attributes");
+				canvasListener.showAttributes();
 			}
 		} else {
 			trace("Unknown transition");

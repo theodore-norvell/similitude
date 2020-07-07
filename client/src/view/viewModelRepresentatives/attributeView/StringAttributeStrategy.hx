@@ -5,6 +5,8 @@ import model.attribute.AttributeValue;
 import model.component.Component;
 import js.Browser.document;
 import model.attribute.StringAttributeValue;
+import model.enumeration.AttributeHexColour;
+import model.selectionModel.SelectionModel;
 import model.similitudeEvents.AttributeChangeEvent;
 
 /**
@@ -19,11 +21,14 @@ class StringAttributeStrategy extends AbstractAttributeStrategy
 		
 	}
 	
-	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, component: Component, view: View) : DivElement 
+	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, attributeStatus: AttributeHexColour, selectionModel: SelectionModel, view: View) : DivElement 
 	{
 		var mainAttributeDivElement = document.createDivElement();
 		mainAttributeDivElement.id = attributeUntyped.getName() + "_attrib"; 
 		mainAttributeDivElement.style.height = "10%";
+		mainAttributeDivElement.style.width = "100%";
+		mainAttributeDivElement.style.display = "inline-block";
+		mainAttributeDivElement.style.backgroundColor = Std.string(attributeStatus);
 		
 		var editor = document.createDivElement();
 		editor.style.float = "left";
@@ -38,7 +43,7 @@ class StringAttributeStrategy extends AbstractAttributeStrategy
 			var attributeChangeEvent = new AttributeChangeEvent();
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new StringAttributeValue(inputNode.value);
-			attributeChangeEvent.componentAffected = component;
+			attributeChangeEvent.selectionAffected = selectionModel;
 			view.handleAttributeInteractions(attributeChangeEvent);
 		}
 		
