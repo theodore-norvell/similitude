@@ -46,19 +46,27 @@ private class MetaAttribute {
 	}
 	
 	/**
-	 * sets the value of the metaAttribute to be used  further and reutnrs an Integer status code for further processing
+	 * sets the value of the metaAttribute to be used  further and reutnrs an Integer status code for further processing.
+	 * Uses the component to check if the concerned attributeUntyped is updatable or not.
 	 * @param	metaAttribute
 	 * @return
-	 * 0: Attribute Exists and the value was set
-	 * 1: Attribute exists and the values are the same
-	 * 2: No such attribute exists 
+	 * 0: AttributeUntyped matches and the value was set (difference in values detected)
+	 * 1: AttributeUntyped exists and the values are the same (No difference detected)
+	 * 2: AttributeUntyped does not match this.
+	 * 3: AttributeUntyped matches but the value cannot be updated at all.
 	 */
-	public function setValue(metaAttribute: MetaAttribute) : Int {
+	public function setValue(metaAttribute: MetaAttribute, component: Component) : Int {
 		if (this.attributeUntyped != null && metaAttribute.attributeUntyped == this.attributeUntyped)  {
 			if (this.attributeValue != null && !metaAttribute.attributeValue.equals(this.attributeValue)) {
 				this.attributeValue = metaAttribute.attributeValue;
-				this.attributeStatus = AttributeHexColour.DIFFERENT;
-				return 0;
+				if (!component.canUpdateUntyped(this.attributeUntyped, metaAttribute.attributeValue)) {
+					trace("cannot update :: ", this.attributeUntyped, "; with :: ", metaAttribute.attributeValue);
+					this.attributeStatus = AttributeHexColour.INVALID;
+					return 3;
+				} else {
+					this.attributeStatus = AttributeHexColour.DIFFERENT;
+					return 0;
+				}
 			} else {
 				return 1;
 			}
@@ -115,13 +123,16 @@ class AttributeUpdate extends AbstractUpdate implements Observer
 	
 	public function update(target: ObservableI, ?data:Dynamic) : Void {
 		this.clearAttributes();
-		buildAttributes(Std.downcast(target, SelectionModel));
+		buildAttributes(Std.downcast(target, SelectionModel), true);
 		//this.notifyObservers(target, data);
 	}
 	
-	public function buildAttributes(selectionModel: SelectionModel, ?internalUpdate: Bool = false) : Void {
+	public function buildAttributes(selectionModel: SelectionModel, ?refresh: Bool = false) : Void {
 		
-		this.clearAttributes() ;
+		if (!refresh) {
+			trace("rebuild triggered");
+			this.clearAttributes() ;
+		}
 		
 		this.setSelectionModel(selectionModel);
 		
@@ -138,8 +149,8 @@ class AttributeUpdate extends AbstractUpdate implements Observer
 					this.currentAttributeSet.push(newMetaAttribute);
 				} else {
 					for (currentMetaAttribute in this.currentAttributeSet) {
-						valueHasBeenSet = currentMetaAttribute.setValue(newMetaAttribute);
-						if (valueHasBeenSet < 2) {
+						valueHasBeenSet = currentMetaAttribute.setValue(newMetaAttribute, component);
+						if (valueHasBeenSet < 2 || valueHasBeenSet == 3) {
 							break;
 						}
 					}

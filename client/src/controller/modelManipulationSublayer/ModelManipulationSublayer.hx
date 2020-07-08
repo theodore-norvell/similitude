@@ -276,7 +276,6 @@ class ModelManipulationSublayer
 	
 	public function editAttribute(selectionModel : SelectionModel, attribute : AttributeUntyped, newValue : AttributeValue ) {
 		var componentSet = selectionModel.getComponentSet();
-		this.checkPoint();
 		for (component in componentSet) {
 			if( component.canUpdateUntyped( attribute, newValue) )  {
 				var attributeChangeCommand = new AttributeChangeCommand(component, attribute, newValue);
