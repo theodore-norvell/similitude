@@ -4,6 +4,8 @@ import model.attribute.AttributeUntyped;
 import model.attribute.AttributeValue;
 import model.component.Component;
 import js.Browser.document;
+import model.enumeration.AttributeHexColour;
+import model.selectionModel.SelectionModel;
 import model.similitudeEvents.AttributeChangeEvent;
 import model.attribute.OrientationAttributeValue;
 import model.enumeration.Orientation;
@@ -20,11 +22,14 @@ class OrientationAttributeStrategy extends AbstractAttributeStrategy
 		
 	}
 	
-	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, component: Component, view: View) : DivElement
+	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, attributeStatus: AttributeHexColour, selectionModel: SelectionModel, view: View) : DivElement
 	{
 		var mainAttributeDivElement = document.createDivElement();
 		mainAttributeDivElement.id = attributeUntyped.getName() + "_attrib"; 
 		mainAttributeDivElement.style.height = "10%";
+		mainAttributeDivElement.style.width = "100%";
+		mainAttributeDivElement.style.display = "inline-block";
+		mainAttributeDivElement.style.backgroundColor = Std.string(attributeStatus);
 		
 		var editor = document.createDivElement();
 		editor.style.float = "left";
@@ -57,7 +62,7 @@ class OrientationAttributeStrategy extends AbstractAttributeStrategy
 			var attributeChangeEvent = new AttributeChangeEvent();
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new OrientationAttributeValue(Type.createEnum(Orientation, orientationDropDown.value));
-			attributeChangeEvent.componentAffected = component;
+			attributeChangeEvent.selectionAffected = selectionModel;
 			view.handleAttributeInteractions(attributeChangeEvent);
 		}
 		

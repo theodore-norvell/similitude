@@ -274,10 +274,13 @@ class ModelManipulationSublayer
 		}
 	}
 	
-	public function editAttribute(component : Component, attribute : AttributeUntyped, newValue : AttributeValue ) {
-		if( component.canUpdateUntyped( attribute, newValue) )  {
-			var attributeChangeCommand = new AttributeChangeCommand(component, attribute, newValue);
-			this.commandManager.executeCommand(attributeChangeCommand);
-		}
+	public function editAttribute(selectionModel : SelectionModel, attribute : AttributeUntyped, newValue : AttributeValue ) {
+		var componentSet = selectionModel.getComponentSet();
+		for (component in componentSet) {
+			if( component.canUpdateUntyped( attribute, newValue) )  {
+				var attributeChangeCommand = new AttributeChangeCommand(component, attribute, newValue);
+				this.commandManager.executeCommand(attributeChangeCommand);
+			}
+		}		
 	}
 }

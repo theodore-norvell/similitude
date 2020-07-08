@@ -5,6 +5,8 @@ import model.component.Link;
 import model.component.Port;
 import model.component.Endpoint;
 import model.observe.Observable;
+import model.observe.ObservableI;
+import model.observe.Observer;
 import type.Coordinate;
 import type.Set;
 
@@ -14,7 +16,7 @@ import type.Set;
  * 
  * @author AdvaitTrivedi
  */
-class SelectionModel extends Observable
+class SelectionModel extends Observable implements Observer
 {
 	var selectedComponents = new Array<Component>();
 	var selectedLinks = new Array<Link>();
@@ -22,6 +24,10 @@ class SelectionModel extends Observable
 	var selectedEndpoints = new Array<Endpoint>();
 
 	public function new() {}
+	
+	public function update(target:ObservableI, ?data: Any) : Void {
+		this.notifyObservers(this, data);
+	}
 	
 	/**
 	 * Allows a user to add a CircuitElement to the selection.
@@ -121,6 +127,7 @@ class SelectionModel extends Observable
 	
 	private function addComponent(component: Component) : Void {
 		this.selectedComponents.push(component);
+		component.addObserver(this);
 		notifyObservers(this) ;
 	}
 	
@@ -131,6 +138,7 @@ class SelectionModel extends Observable
 	
 	private function removeComponent(component : Component) : Void {
 		this.selectedComponents.remove(component);
+		component.removeObserver(this);
 		notifyObservers(this) ;
 	}
 	

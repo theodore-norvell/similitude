@@ -7,6 +7,8 @@ import model.attribute.AttributeValue;
 import model.attribute.IntegerAttributeValue;
 import js.Browser.document;
 import model.component.Component;
+import model.enumeration.AttributeHexColour;
+import model.selectionModel.SelectionModel;
 import model.similitudeEvents.AttributeChangeEvent;
 import view.View;
 
@@ -21,11 +23,14 @@ class IntegerAttributeStrategy extends AbstractAttributeStrategy
 	{
 	}
 	
-	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, component: Component, view: View) : DivElement 
+	override public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, attributeStatus: AttributeHexColour, selectionModel: SelectionModel, view: View) : DivElement 
 	{
 		var mainAttributeDivElement = document.createDivElement();
 		mainAttributeDivElement.id = attributeUntyped.getName() + "_attrib"; 
 		mainAttributeDivElement.style.height = "10%";
+		mainAttributeDivElement.style.width = "100%";
+		mainAttributeDivElement.style.display = "inline-block"; 
+		mainAttributeDivElement.style.backgroundColor = Std.string(attributeStatus); // an enum abstract with an underlying class (String) should return as a string at runtime, so ideally the Std.string() is useless, but it won't compile without it.
 		
 		var editor = document.createDivElement();
 		editor.style.float = "left";
@@ -41,7 +46,7 @@ class IntegerAttributeStrategy extends AbstractAttributeStrategy
 			var attributeChangeEvent = new AttributeChangeEvent();
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new IntegerAttributeValue(Std.parseInt(event.data));
-			attributeChangeEvent.componentAffected = component;
+			attributeChangeEvent.selectionAffected = selectionModel;
 			view.handleAttributeInteractions(attributeChangeEvent);
 		}
 		

@@ -5,9 +5,11 @@ import model.attribute.AttributeUntyped;
 import model.attribute.AttributeValue;
 import js.Browser.document;
 import model.component.Component;
+import model.enumeration.AttributeHexColour;
 import model.observe.Observable;
 import model.observe.ObservableI;
 import model.observe.Observer;
+import model.selectionModel.SelectionModel;
 import view.View;
 
 /**
@@ -24,7 +26,7 @@ class AbstractAttributeStrategy  implements AttributeStrategyI
 	 * COMPULSORILY OVERRIDE in child classes
 	 * @return
 	 */
-	public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, component: Component, view: View):DivElement 
+	public function spawnHTMLAttribute(attributeUntyped: AttributeUntyped, attributeValue : AttributeValue, attributeStatus: AttributeHexColour, selectionModel: SelectionModel, view: View):DivElement 
 	{
 		return new DivElement();
 	}
@@ -38,7 +40,7 @@ class AbstractAttributeStrategy  implements AttributeStrategyI
 	 */
 	public function attributeElementsWrapper(attributeName: String, editorDivElement: DivElement) : DivElement {
 		var container = document.createDivElement();
-		container.style.margin = "10px 10px 0px 10px";
+		container.style.margin = "12px 10px";
 		
 		var label = this.createAttributeLabelElement(attributeName);
 		container.appendChild(label);
