@@ -19,7 +19,8 @@ class VectorValue implements VectorValueI
 	
 	/* INTERFACE model.values.VectorValueI */
 	
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function fromArray(instanteousValues: Array<InstantaneousValueI>) : VectorValueI {
 		for (value in instanteousValues) {
 			this.push(value);
@@ -28,13 +29,15 @@ class VectorValue implements VectorValueI
 		return this;
 	}
 	
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function push(instantaneousValue:InstantaneousValueI, ?index:Int = 0):Void 
 	{
 		this.vector.insert(index, instantaneousValue);
 	}
 	
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function removeFrom(?index:Int = 0):InstantaneousValueI 
 	{
 		if (index == 0) {
@@ -50,7 +53,8 @@ class VectorValue implements VectorValueI
 		return valuePopped;
 	}
 	
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function concat(vectorValue:VectorValueI):Void 
 	{
 		for (value in vectorValue) {
@@ -58,7 +62,8 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function slice(?startIndex:Int = 0, ?endIndex:Int):VectorValueI 
 	{
 		if (endIndex > this.length()) {
@@ -96,6 +101,7 @@ class VectorValue implements VectorValueI
 	}
 	
 	@:allow(model.gates.AND)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	function and(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.and(this);
@@ -107,6 +113,7 @@ class VectorValue implements VectorValueI
 	}
 	
 	@:allow(model.gates.OR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	function or(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.or(this);
@@ -117,10 +124,21 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	@a:allow(model.gates.NOT)
-	function not(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
+	@:allow(model.gates.NOT)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	function not() : InstantaneousValueI {
+		var vectorValue = new VectorValue();
+		for (value in this.vector) {
+			vectorValue.push(value.not());
+		}
+		return vectorValue;
+	}
+	
+	@a:allow(model.gates.XOR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	function xor(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {
-			return instantaneousValue.not(this);
+			return instantaneousValue.xor(this);
 		} else {
 			// Vector-Vector AND case
 			// TODO : Understand this better

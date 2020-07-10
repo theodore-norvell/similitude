@@ -17,21 +17,33 @@ interface InstantaneousValueI
 	 * @return
 	 */
 	@:allow(model.gates.AND)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	function and(instantaneousValue: InstantaneousValueI) : InstantaneousValueI;
 	
 	/**
-	 * performs a logical OR operation on the passed signalValue parameter with the this value
+	 * performs a logical OR operation on the passed signalValue parameter with the this value.
 	 * @param	signalValue
 	 * @return
 	 */
 	@:allow(model.gates.OR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	function or(instantaneousValue: InstantaneousValueI) : InstantaneousValueI;
 	
 	/**
-	 * performs a logical NOT operation on the passed signalValue parameter with the this value
+	 * performs a logical NOT operation on the passed signalValue parameter with the this value.
 	 * @param	signalValue
 	 * @return
 	 */
 	@:allow(model.gates.NOT)
-	function not(instantaneousValue: InstantaneousValueI) : InstantaneousValueI;
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	function not() : InstantaneousValueI;
+	
+	/**
+	 * performs a logical XOR operation on the passed signalValue parameter with the this value.
+	 * @param	signalValue
+	 * @return
+	 */
+	@:allow(model.gates.XOR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	function xor(instantaneousValue: InstantaneousValueI) : InstantaneousValueI;
 }

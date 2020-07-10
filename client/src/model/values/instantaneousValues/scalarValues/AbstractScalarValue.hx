@@ -1,0 +1,39 @@
+package model.values.instantaneousValues.scalarValues;
+import model.values.instantaneousValues.InstantaneousValueI;
+import model.values.instantaneousValues.vectorValues.VectorValue;
+import model.values.instantaneousValues.vectorValues.VectorValueI;
+
+/**
+ * ...
+ * @author AdvaitTrivedi
+ */
+class AbstractScalarValue implements ScalarValueI 
+{
+	/* INTERFACE model.values.instantaneousValues.scalarValues.ScalarValueI */
+	
+	public function toVectorValue():VectorValueI 
+	{
+		var vector = new VectorValue();
+		vector.push(this);
+		return vector;
+	}
+	
+	public function toString():String { return ""; }
+	
+	@:allow(model.gates.AND)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI { return this; }
+	
+	@:allow(model.gates.OR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI { return this; }
+	
+	@:allow(model.gates.NOT)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	public function not():InstantaneousValueI { return this; }
+	
+	@:allow(model.gates.XOR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI { return this; }
+	
+}

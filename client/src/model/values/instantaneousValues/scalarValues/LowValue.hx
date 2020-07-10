@@ -7,7 +7,7 @@ import model.values.instantaneousValues.vectorValues.VectorValue;
  * ...
  * @author AdvaitTrivedi
  */
-class LowValue implements ScalarValueI 
+class LowValue extends AbstractScalarValue
 {
 
 	public function new() 
@@ -15,47 +15,44 @@ class LowValue implements ScalarValueI
 		
 	}
 	
-	
-	/* INTERFACE model.values.scalarValues.ScalarValueI */
-	
-	public function toVectorValue():VectorValueI 
-	{
-		
-	}
-	
-	public function toString():String 
+	override public function toString():String 
 	{
 		return "L";
 	}
 	
 	@:allow(model.gates.AND)
-	function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
-	{
-		return this;
-	}
-	
-	@:allow(model.gates.OR)
-	function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	override function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var vectorValue = new VectorValue();
 			for (value in instantaneousValue) {
-				vectorValue.push(this.or(value));
+				vectorValue.push(this);
 			}
 			return vectorValue;
 		} else {
-			if (Std.is(instantaneousValue, LowValue)) {
-				return this;
-			} else {
-				return instantaneousValue;
-			}
+			return this;
 		}
 	}
 	
-	@:allow(model.gates.NOT)
-	function not(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	@:allow(model.gates.OR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	override function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
-		return new HighValue();
+		return instantaneousValue;
 	}
 	
+	@:allow(model.gates.NOT)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	override function not():InstantaneousValueI 
+	{
+		return Std.downcast(ScalarValueSingletons.HIGH, HighValue);
+	}
+	
+	@:allow(model.gates.XOR)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	override function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	{
+		return this.or(instantaneousValue);
+	}
 }

@@ -12,14 +12,16 @@ interface VectorValueI extends InstantaneousValueI
 	 * @param	instantaneousValues
 	 * @return
 	 */
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function fromArray(instantaneousValues : Array<InstantaneousValueI>) : VectorValueI;
 	
 	/**
 	 * Add a scalar value to the vector value.
 	 * @param	index
 	 */
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function push(instantaneousValue: InstantaneousValueI, ?index: Int = 0) : Void;
 	
 	/**
@@ -27,21 +29,24 @@ interface VectorValueI extends InstantaneousValueI
 	 * @param	index
 	 * @return
 	 */
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function removeFrom(?index: Int = 0) : InstantaneousValueI;
 	
 	/**
 	 * Concatenates given vector value to this vector.
 	 * @param	vectorValue
 	 */
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function concat(vectorValue: VectorValueI) : Void;
 	
 	/**
 	 * slice this vector to fethc a newer vector.
 	 * If end is omitted or exceeds this.length(), it defaults to the end of this vector.
 	 */
-	@:allow(model.values.SignalValue)
+	@:allow(model.values.SignalValueI)
+	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function slice(?startIndex: Int = 0, ?endIndex: Int) : VectorValueI;
 	
 	/**
