@@ -12,49 +12,15 @@ class VectorValue implements VectorValueI
 {
 	var vector : Array<InstantaneousValueI> = new Array<InstantaneousValueI>();
 
-	public function new() 
+	public function new(?instanteousValues: Array<InstantaneousValueI>) 
 	{
-		
+		if (instanteousValues.length != 0) {
+			this.vector.insert(0, instantaneousValue);
+		}
 	}
 	
 	
 	/* INTERFACE model.values.VectorValueI */
-	
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function fromArray(instanteousValues: Array<InstantaneousValueI>) : VectorValueI {
-		for (value in instanteousValues) {
-			this.insert(value);
-		}
-		
-		return this;
-	}
-	
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function insert(instantaneousValue:InstantaneousValueI, ?index:Int = 0):Void 
-	{
-		if (index > this.length() - 1 || index < 0) { throw "Invalid index"; }
-		
-		this.vector.insert(index, instantaneousValue);
-	}
-	
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function removeFrom(?index:Int = 0):InstantaneousValueI 
-	{
-		if (index == 0) {
-			return this.vector.shift();
-		}
-		
-		if (index > this.length() - 1 || index < 0) {
-			throw "Invalid index";
-		}
-		
-		var valuePopped = this.vector[index];
-		this.vector.remove(valuePopped);
-		return valuePopped;
-	}
 	
 	public function length():Int 
 	{
