@@ -9,7 +9,6 @@ import model.values.instantaneousValues.vectorValues.VectorValue;
  */
 class HighValue extends AbstractScalarValue
 {
-
 	public function new() 
 	{
 		

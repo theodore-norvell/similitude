@@ -4,7 +4,8 @@ import model.values.instantaneousValues.InstantaneousValueI;
 import model.values.instantaneousValues.scalarValues.ScalarValueI;
 
 /**
- * ...
+ * Vectorised values.
+ * Traversed as per the documentation for vectors. Array Indexing : Reverse : [2,1,0]. 2 denotes the end and 0 the beginning.
  * @author AdvaitTrivedi
  */
 class VectorValue implements VectorValueI 
@@ -23,7 +24,7 @@ class VectorValue implements VectorValueI
 	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
 	function fromArray(instanteousValues: Array<InstantaneousValueI>) : VectorValueI {
 		for (value in instanteousValues) {
-			this.push(value);
+			this.insert(value);
 		}
 		
 		return this;
@@ -31,8 +32,10 @@ class VectorValue implements VectorValueI
 	
 	@:allow(model.values.SignalValueI)
 	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function push(instantaneousValue:InstantaneousValueI, ?index:Int = 0):Void 
+	function insert(instantaneousValue:InstantaneousValueI, ?index:Int = 0):Void 
 	{
+		if (index > this.length() - 1 || index < 0) { throw "Invalid index"; }
+		
 		this.vector.insert(index, instantaneousValue);
 	}
 	
@@ -44,7 +47,7 @@ class VectorValue implements VectorValueI
 			return this.vector.shift();
 		}
 		
-		if (index > this.length()) {
+		if (index > this.length() - 1 || index < 0) {
 			throw "Invalid index";
 		}
 		
@@ -53,40 +56,12 @@ class VectorValue implements VectorValueI
 		return valuePopped;
 	}
 	
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function concat(vectorValue:VectorValueI):Void 
-	{
-		for (value in vectorValue) {
-			this.push(value);
-		}
-	}
-	
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function slice(?startIndex:Int = 0, ?endIndex:Int):VectorValueI 
-	{
-		if (endIndex > this.length()) {
-			throw "Invalid end index";
-		}
-		
-		var newVector = new VectorValue();
-		return newVector.fromArray(this.vector.slice(startIndex, endIndex));
-	}
-	
 	public function length():Int 
 	{
-		return this.vector.length;	
+		return this.vector.length;
 	}
 	
-	public function depth():Int 
-	{
-		// I need a better explaination of this.
-		// TODO : Implement
-		return 0;
-	}
-	
-	public function iterator():Iterator<ScalarValueI> 
+	public function iterator():Iterator<InstantaneousValueI> 
 	{
 		return this.vector.iterator();
 	}
@@ -129,12 +104,12 @@ class VectorValue implements VectorValueI
 	function not() : InstantaneousValueI {
 		var vectorValue = new VectorValue();
 		for (value in this.vector) {
-			vectorValue.push(value.not());
+			vectorValue.insert(value.not());
 		}
 		return vectorValue;
 	}
 	
-	@a:allow(model.gates.XOR)
+	@:allow(model.gates.XOR)
 	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	function xor(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {

@@ -3,12 +3,14 @@ import model.values.instantaneousValues.InstantaneousValueI;
 import model.values.instantaneousValues.scalarValues.ScalarValueI;
 
 /**
+ * Interface for a Vector Value.
+ * Traversed as per the documentation for vectors. Array Indexing : Reverse : [2,1,0]. 2 denotes the end and 0 the beginning.
  * @author AdvaitTrivedi
  */
 interface VectorValueI extends InstantaneousValueI
 {
 	/**
-	 * initializes the vector using an arrya of instantaneous values.
+	 * initializes the vector using an array of instantaneous values.
 	 * @param	instantaneousValues
 	 * @return
 	 */
@@ -17,15 +19,18 @@ interface VectorValueI extends InstantaneousValueI
 	function fromArray(instantaneousValues : Array<InstantaneousValueI>) : VectorValueI;
 	
 	/**
-	 * Add a scalar value to the vector value.
+	 * Add an instantaneous value to the vector value.
+	 * Will by default add to the end of the vector value.
+	 * WIll throw an invalid index error, if index bigger than length.
 	 * @param	index
 	 */
 	@:allow(model.values.SignalValueI)
 	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function push(instantaneousValue: InstantaneousValueI, ?index: Int = 0) : Void;
+	function insert(instantaneousValue: InstantaneousValueI, ?index: Int = 0) : Void;
 	
 	/**
 	 * removes a scalar value from the given index.
+	 * By default removes the last element of the vector value.
 	 * @param	index
 	 * @return
 	 */
@@ -34,32 +39,10 @@ interface VectorValueI extends InstantaneousValueI
 	function removeFrom(?index: Int = 0) : InstantaneousValueI;
 	
 	/**
-	 * Concatenates given vector value to this vector.
-	 * @param	vectorValue
-	 */
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function concat(vectorValue: VectorValueI) : Void;
-	
-	/**
-	 * slice this vector to fethc a newer vector.
-	 * If end is omitted or exceeds this.length(), it defaults to the end of this vector.
-	 */
-	@:allow(model.values.SignalValueI)
-	@:allow(model.values.instantaneousValues.scalarValues.ScalarValueI)
-	function slice(?startIndex: Int = 0, ?endIndex: Int) : VectorValueI;
-	
-	/**
 	 * Fetch the length of this vector.
 	 * @return
 	 */
 	public function length() : Int;
-	
-	/**
-	 * Fetch the depth of this vector.
-	 * @return
-	 */
-	public function depth() : Int;
 	
 	/**
 	 * returns an iterator for the underlying scalar values. Helpful for looping on vector values.
