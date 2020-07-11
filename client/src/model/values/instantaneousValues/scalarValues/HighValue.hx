@@ -14,7 +14,7 @@ class HighValue extends AbstractScalarValue
 		
 	}
 	
-	public function toString():String 
+	override public function toString():String 
 	{
 		return "H";
 	}
@@ -31,11 +31,11 @@ class HighValue extends AbstractScalarValue
 	override function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
-			var vectorValue = new VectorValue();
-			for (value in instantaneousValue) {
+			var vectorValue = new Array<InstantaneousValueI>();
+			for (value in Std.downcast(instantaneousValue, VectorValue)) {
 				vectorValue.push(this);
 			}
-			return vectorValue;
+			return new VectorValue(vectorValue);
 		} else {
 			return this;
 		}
@@ -53,11 +53,11 @@ class HighValue extends AbstractScalarValue
 	override function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
-			var vectorValue = new VectorValue();
-			for (value in instantaneousValue) {
+			var vectorValue = new Array<InstantaneousValueI>();
+			for (value in Std.downcast(instantaneousValue, VectorValue)) {
 				vectorValue.push(this.xor(value));
 			}
-			return vectorValue;
+			return new VectorValue(vectorValue);
 		} else {
 			if (Std.is(instantaneousValue, HighValue)) {
 				return new LowValue();

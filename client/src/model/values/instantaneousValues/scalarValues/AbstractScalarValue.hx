@@ -14,9 +14,7 @@ class AbstractScalarValue implements ScalarValueI
 	
 	public function toVectorValue():VectorValueI 
 	{
-		var vector = new VectorValue();
-		vector.push(this);
-		return vector;
+		return new VectorValue([this]);
 	}
 	
 	public function toString():String {

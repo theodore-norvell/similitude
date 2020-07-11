@@ -25,11 +25,11 @@ class LowValue extends AbstractScalarValue
 	override function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
-			var vectorValue = new VectorValue();
-			for (value in instantaneousValue) {
+			var vectorValue = new Array<InstantaneousValueI>();
+			for (value in Std.downcast(instantaneousValue, VectorValue)) {
 				vectorValue.push(this);
 			}
-			return vectorValue;
+			return new VectorValue(vectorValue);
 		} else {
 			return this;
 		}
