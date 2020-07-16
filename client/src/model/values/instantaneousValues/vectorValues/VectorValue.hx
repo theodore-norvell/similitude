@@ -15,7 +15,9 @@ class VectorValue implements VectorValueI
 	public function new(?instanteousValues: Array<InstantaneousValueI>) 
 	{
 		if (instanteousValues.length != 0) {
-			this.vector.insert(0, instantaneousValue);
+			for (value in instanteousValues) {
+				this.vector.insert(0, instantaneousValue);
+			}
 		}
 	}
 	
@@ -41,6 +43,11 @@ class VectorValue implements VectorValueI
 		return string;
 	}
 	
+	@:arrayAccess
+	public function get(index: Int) : InstantaneousValueI {
+		return this.vector[index];
+	}
+	
 	@:allow(model.gates.AND)
 	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	function and(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
@@ -59,7 +66,7 @@ class VectorValue implements VectorValueI
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.or(this);
 		} else {
-			// Vector-Vector AND case
+			// Vector-Vector OR case
 			// TODO : Understand this better
 			return this;
 		}
@@ -81,7 +88,7 @@ class VectorValue implements VectorValueI
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.xor(this);
 		} else {
-			// Vector-Vector AND case
+			// Vector-Vector XOR case
 			// TODO : Understand this better
 			return this;
 		}

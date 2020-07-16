@@ -20,4 +20,7 @@ interface VectorValueI extends InstantaneousValueI
 	 * @return
 	 */
 	public function iterator() : Iterator<InstantaneousValueI>;
+	
+	@:arrayAccess
+	public function get(index: Int) : InstantaneousValueI;
 }

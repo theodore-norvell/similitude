@@ -31,11 +31,12 @@ class HighValue extends AbstractScalarValue
 	override function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
-			var vectorValue = new Array<InstantaneousValueI>();
-			for (value in Std.downcast(instantaneousValue, VectorValue)) {
-				vectorValue.push(this);
+			var instantaneousValueArray = new Array<InstantaneousValueI>();
+			var vectorValue = Std.downcast(instantaneousValue, VectorValue);
+			for (value in vectorValue) {
+				instantaneousValueArray.push(this);
 			}
-			return new VectorValue(vectorValue);
+			return new VectorValue(instantaneousValueArray);
 		} else {
 			return this;
 		}
@@ -53,11 +54,12 @@ class HighValue extends AbstractScalarValue
 	override function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
-			var vectorValue = new Array<InstantaneousValueI>();
-			for (value in Std.downcast(instantaneousValue, VectorValue)) {
-				vectorValue.push(this.xor(value));
+			var instantaneousValueArray = new Array<InstantaneousValueI>();
+			var vectorValue = Std.downcast(instantaneousValue, VectorValue);
+			for (value in vectorValue) {
+				instantaneousValueArray.push(this.xor(value));
 			}
-			return new VectorValue(vectorValue);
+			return new VectorValue(instantaneousValueArray);
 		} else {
 			if (Std.is(instantaneousValue, HighValue)) {
 				return new LowValue();

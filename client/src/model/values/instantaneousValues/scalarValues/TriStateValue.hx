@@ -1,13 +1,13 @@
 package model.values.instantaneousValues.scalarValues;
 import model.values.instantaneousValues.InstantaneousValueI;
-import model.values.instantaneousValues.vectorValues.VectorValueI;
 import model.values.instantaneousValues.vectorValues.VectorValue;
+import model.values.instantaneousValues.vectorValues.VectorValueI;
 
 /**
  * ...
  * @author AdvaitTrivedi
  */
-class LowValue extends AbstractScalarValue
+class TriStateValue extends AbstractScalarValue
 {
 
 	public function new() 
@@ -15,15 +15,15 @@ class LowValue extends AbstractScalarValue
 		
 	}
 	
+	
+	/* INTERFACE model.values.instantaneousValues.scalarValues.ScalarValueI */
+	
 	override public function toString():String 
 	{
-		return "L";
+		return "Z";
 	}
 	
-	@:allow(model.gates.AND)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
-	{
+	function logicOperation(instantaneousValue:InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var instantaneousValueArray = new Array<InstantaneousValueI>();
 			var vectorValue = Std.downcast(instantaneousValue, VectorValue);
@@ -31,29 +31,36 @@ class LowValue extends AbstractScalarValue
 				instantaneousValueArray.push(this);
 			}
 			return new VectorValue(instantaneousValueArray);
-		} else {
-			return this;
 		}
+		return this;
+	}
+	
+	@:allow(model.gates.AND)
+	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+	override public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	{
+		return this.logicOperation(instantaneousValue);
 	}
 	
 	@:allow(model.gates.OR)
 	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
-		return instantaneousValue;
+		return this.logicOperation(instantaneousValue);
 	}
 	
 	@:allow(model.gates.NOT)
 	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function not():InstantaneousValueI 
+	public function not():InstantaneousValueI 
 	{
-		return Std.downcast(ScalarValueSingletons.HIGH, HighValue);
+		return this;
 	}
 	
 	@:allow(model.gates.XOR)
 	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
-		return this.or(instantaneousValue);
+		return this.logicOperation(instantaneousValue);
 	}
+	
 }
