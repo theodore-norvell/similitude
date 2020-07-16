@@ -113,4 +113,21 @@ class SignalValue implements SignalValueI
 		
 		this.valueMap.set(timeInstant, instantaneousValue);
 	}
+	
+	public function getContinuedTimeframe(timeInstant: Int64) : Int64 {
+		var givenValue = this.valueMap[timeInstant];
+		var timeFrame : Int64 = Int64.ofInt(0);
+		for (time => value in this.valueMap.keys()) {
+			if (time >= timeInstant && value == givenValue) {
+				timeFrame = timeFrame + Int64.ofInt(1);
+			}
+			
+			// side effect check. Will break loop once the value stops being the same
+			if (time >= timeInstant && value != givenValue) {
+				break;
+			}
+		}
+		
+		return timeFrame;
+	}
 }

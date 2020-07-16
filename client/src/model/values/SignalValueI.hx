@@ -53,4 +53,11 @@ interface SignalValueI
 	 * @param	instantaneousValue
 	 */
 	public function setValueAtTime(timeInstant0: Int64, timeInstant1: Int64, instantaneousValue: InstantaneousValueI) : Void;
+	
+	/**
+	 * This function returns the time frame (or gap) for which the value of the signal remains the same, starting from "timeInstant".
+	 * @param	timeInstant
+	 * @return
+	 */
+	public function getContinuedTimeframe(timeInstant: Int64) : Int64;
 }

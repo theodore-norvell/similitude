@@ -22,6 +22,11 @@ class AbstractScalarValue implements ScalarValueI
 		return ""; 
 	}
 	
+	@:op(A == B)
+	public function equal(scalarValue:ScalarValueI) : Bool {
+		return this.toString() == scalarValue.toString();
+	}
+	
 	@:allow(model.gates.AND)
 	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI {
