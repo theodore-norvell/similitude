@@ -1,4 +1,6 @@
 package model.values.instantaneousValues.vectorValues;
+import js.html.CanvasRenderingContext2D;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import model.values.instantaneousValues.vectorValues.VectorValueI;
 import model.values.instantaneousValues.InstantaneousValueI;
 import model.values.instantaneousValues.scalarValues.ScalarValueI;
@@ -15,7 +17,7 @@ class VectorValue implements VectorValueI
 	public function new(?instanteousValues: Array<InstantaneousValueI>) 
 	{
 		if (instanteousValues.length != 0) {
-			for (value in instanteousValues) {
+			for (instantaneousValue in instanteousValues) {
 				this.vector.insert(0, instantaneousValue);
 			}
 		}
@@ -48,9 +50,7 @@ class VectorValue implements VectorValueI
 		return this.vector[index];
 	}
 	
-	@:allow(model.gates.AND)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	function and(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
+	public function and(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.and(this);
 		} else {
@@ -60,9 +60,7 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	@:allow(model.gates.OR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	function or(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
+	public function or(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.or(this);
 		} else {
@@ -72,19 +70,15 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	@:allow(model.gates.NOT)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	function not() : InstantaneousValueI {
-		var vectorValue = new VectorValue();
+	public function not() : InstantaneousValueI {
+		var instantaneousValueArray = new Array<InstantaneousValueI>();
 		for (value in this.vector) {
-			vectorValue.insert(value.not());
+			instantaneousValueArray.push(value.not());
 		}
-		return vectorValue;
+		return new VectorValue(instantaneousValueArray);
 	}
 	
-	@:allow(model.gates.XOR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	function xor(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
+	public function xor(instantaneousValue: InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, ScalarValueI)) {
 			return instantaneousValue.xor(this);
 		} else {
@@ -92,5 +86,15 @@ class VectorValue implements VectorValueI
 			// TODO : Understand this better
 			return this;
 		}
+	}
+	
+	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
+		for (value in this.vector) {
+			value.setDrawingStrategy(stratFactory);
+		}
+	}
+	
+	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = false) : Void {
+		// TODO : handle multi-input drawing. Needs thinking to formulate the algorithm on a single canvas.
 	}
 }

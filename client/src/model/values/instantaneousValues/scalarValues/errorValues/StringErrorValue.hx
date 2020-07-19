@@ -1,6 +1,10 @@
 package model.values.instantaneousValues.scalarValues.errorValues;
 
+import js.html.CanvasRenderingContext2D;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import model.values.instantaneousValues.scalarValues.AbstractScalarValue;
+import model.values.instantaneousValues.vectorValues.VectorValue;
+import model.values.instantaneousValues.vectorValues.VectorValueI;
 
 /**
  * ...
@@ -20,10 +24,18 @@ class StringErrorValue extends AbstractScalarValue implements ErrorValueI
 		return "X"; 
 	}
 	
+	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
+		this.drawingStrategy = stratFactory.getErrorStrat();
+	}
+	
+	override public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		// TODO : Each error method has it's own drawing implementation (Maybe?). Look into it.
+	}
+	
 	function logicOperation(instantaneousValue:InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var instantaneousValueArray = new Array<InstantaneousValueI>();
-			var vectorValue = Std.downcast(instantaneousValue, VectorValue);
+			var vectorValue: VectorValue = Std.downcast(instantaneousValue, VectorValue);
 			for (value in vectorValue) {
 				instantaneousValueArray.push(this);
 			}
@@ -31,31 +43,23 @@ class StringErrorValue extends AbstractScalarValue implements ErrorValueI
 		}
 		return this;
 	}
-	
-	@:allow(model.gates.AND)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
+
 	override public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
 	}
-	
-	@:allow(model.gates.OR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+
+	override public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
 	}
-	
-	@:allow(model.gates.NOT)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	public function not():InstantaneousValueI 
+
+	override public function not():InstantaneousValueI 
 	{
 		return this;
 	}
 	
-	@:allow(model.gates.XOR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	override public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
 	}

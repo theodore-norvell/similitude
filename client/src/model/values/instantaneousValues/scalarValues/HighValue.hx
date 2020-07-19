@@ -1,5 +1,7 @@
 package model.values.instantaneousValues.scalarValues;
+import js.html.CanvasRenderingContext2D;
 import model.values.instantaneousValues.InstantaneousValueI;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import model.values.instantaneousValues.vectorValues.VectorValueI;
 import model.values.instantaneousValues.vectorValues.VectorValue;
 
@@ -19,16 +21,16 @@ class HighValue extends AbstractScalarValue
 		return "H";
 	}
 	
-	@:allow(model.gates.AND)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
+		this.drawingStrategy = stratFactory.getHighStrat();
+	}
+
+	override public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return instantaneousValue;
 	}
 	
-	@:allow(model.gates.OR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	override public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var instantaneousValueArray = new Array<InstantaneousValueI>();
@@ -42,16 +44,12 @@ class HighValue extends AbstractScalarValue
 		}
 	}
 	
-	@:allow(model.gates.NOT)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function not():InstantaneousValueI 
+	override public function not():InstantaneousValueI 
 	{
 		return Std.downcast(ScalarValueSingletons.LOW, LowValue);
 	}
 	
-	@:allow(model.gates.XOR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	override function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	override public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var instantaneousValueArray = new Array<InstantaneousValueI>();

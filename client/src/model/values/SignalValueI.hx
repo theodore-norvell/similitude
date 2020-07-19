@@ -1,7 +1,9 @@
 package model.values;
 import haxe.Int64;
+import js.html.CanvasRenderingContext2D;
 import model.attribute.TimeAttributeValue;
 import model.values.instantaneousValues.InstantaneousValueI;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import type.TimeUnit;
 
 /**
@@ -10,21 +12,13 @@ import type.TimeUnit;
  * @author AdvaitTrivedi
  */
 interface SignalValueI 
-{
-	/**
-	 * Checks if the given time instant falls in the permissible range of the signal defined, i.e. either between [startingTime, endingTime].
-	 * @param	timeInstant
-	 * @param	checkEnding
-	 * @return
-	 */
-	public function isTimeInBounds(timeInstant: Int64 , ?checkEnding: Bool = false) : Bool;
-	
+{	
 	/**
 	 * Calculates and gives you the total time the signal expands to.
 	 * Can be used as ending time too.
 	 * @return
 	 */
-	public function totalRunningTime() : TimeAttributeValue;
+	public function totalRunningTime() : Int64;
 	
 	/**
 	 * Get the unit of the time range.
@@ -56,8 +50,25 @@ interface SignalValueI
 	
 	/**
 	 * This function returns the time frame (or gap) for which the value of the signal remains the same, starting from "timeInstant".
+	 * 
+	 * This might or might not be needed. Remove if not needed.
+	 * 
 	 * @param	timeInstant
 	 * @return
 	 */
 	public function getContinuedTimeframe(timeInstant: Int64) : Int64;
+	
+	/**
+	 * Sets the signal drawing strategy in each value in the signal.
+	 * @param	stratFactory
+	 */
+	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void;
+	
+	/**
+	 * Draw the signal on a given canvas. the starting points refer to the bottom-left corner of the signal starting.
+	 * @param	context : CanvasContext (2D) refering to the relevant canvas.
+	 * @param	startX : Handled in the consumer.
+	 * @param	startY : Handled in the consumer.
+	 */
+	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float) : Void;
 }

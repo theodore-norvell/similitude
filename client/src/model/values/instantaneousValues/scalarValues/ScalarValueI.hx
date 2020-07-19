@@ -14,5 +14,5 @@ interface ScalarValueI extends InstantaneousValueI
 	public function toVectorValue() : VectorValueI;
 	
 	@:op(A == B)
-	public function equal(scalarValue: ScalarValueI) : Bool 
+	public function equal(scalarValue: ScalarValueI) : Bool;
 }

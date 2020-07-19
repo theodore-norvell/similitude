@@ -3,20 +3,14 @@ package view;
 import model.observe.*;
 import model.similitudeEvents.AttributeChangeEvent;
 import model.similitudeEvents.AbstractSimilitudeEvent;
-import model.similitudeEvents.CanvasMouseInteractionEvent;
-import model.similitudeEvents.LinkAddEvent;
-import model.similitudeEvents.LinkEditEvent;
-import type.Coordinate;
+import model.values.SignalValue;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactorySingletons;
+import model.values.instantaneousValues.scalarValues.ScalarValueSingletons;
 import controller.listenerInterfaces.CanvasListener;
 import js.Browser.document;
 import js.html.CanvasElement;
-import js.html.Console;
-import js.html.Window;
-import haxe.Json;
 import model.component.CircuitDiagram;
-import view.DrawingAdapter;
-import model.similitudeEvents.SidebarDragAndDropEvent;
-import model.tabModel.TabModel;
+import type.TimeUnit;
 import model.drawingInterface.Transform;
 import view.viewModelRepresentatives.TabView;
 
@@ -85,6 +79,35 @@ class View implements Observer
 				// do something
 				this.activeTab.panCanvasCentre();
 			});
+			
+			//// TEST :: USING VALUES from the model
+			//var simulationCanvas = Std.downcast(document.querySelector("#simulationCanvas"), CanvasElement);
+			//// create signal with a time unit for magnification, can change the unit later.
+			//var signal = new SignalValue(TimeUnit.MICRO_SECOND);
+			//// push values to signal.
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.HIGH);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//signal.pushValue(ScalarValueSingletons.LOW);
+			//
+			//// set drawing strategy to change the waveform drawing
+			//signal.setDrawingStrategy(InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY);
+			////draw the signal
+			//signal.draw(simulationCanvas.getContext2d(), 20, 20);
   	  });
 	
 	}

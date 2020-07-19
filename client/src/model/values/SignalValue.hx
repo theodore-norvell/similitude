@@ -2,7 +2,9 @@ package model.values;
 import assertions.Assert;
 import haxe.Int64;
 import haxe.ds.Map;
+import js.html.CanvasRenderingContext2D;
 import model.values.instantaneousValues.InstantaneousValueI;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import type.TimeUnit;
 import model.attribute.TimeAttributeValue;
 
@@ -26,35 +28,13 @@ class SignalValue implements SignalValueI
 	public function invariantCheck() : Void {
 		var beginning: Int64 = this.startingTime();
 		if (beginning != null) {
-			Assert.assert(Int64.eq(beginning, Int64.make(0,0)));
+			var assertion = Int64.eq(beginning, Int64.make(0, 0));
+			Assert.assert(assertion);
 		}
 	}
 	
 	/* INTERFACE model.values.SignalValueI */
-	
-	public function isTimeInBounds(timeInstant: Int64 , ?checkEnding: Bool = false) : Bool {
-		var beginning: Int64 = this.startingTime();
-		if (beginning != null) {
-			var comparison = Int64.compare(timeInstant, beginning);
-			if (comparison > 0 || comparison == 0)) {
-				if (checkEnding) {
-					var endingComparison = Int64.compare(timeInstant, this.totalRunningTime());
-					if (endingComparison > 0 || endingComparison == 0) {
-						return true;
-					} else {
-						return false;
-					}
-				} else {
-					return true;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-	
+
 	public function startingTime() : Int64 {
 		var beginning: Int64 = null;
 		var i = 0;
@@ -92,14 +72,17 @@ class SignalValue implements SignalValueI
 	@:arrayAccess
 	public function get(timeInstant:Int64):InstantaneousValueI 
 	{
-		return this.valueMap[timeInstant];
+		if (this.valueMap.exists(timeInstant)) {
+			return this.valueMap[timeInstant];
+		}
+		throw("this time instant does not exist");
 	}
 	
 	public function setValueAtTime(timeInstant0:Int64, timeInstant1:Int64, instantaneousValue:InstantaneousValueI):Void 
 	{
 		var comparison = Int64.compare(timeInstant1, timeInstant0);
-		if (this.isTimeInBounds(timeInstant0) && (comparison > 0 || comparison == 0)) {
-			for (i in timeInstant0...timeInstant1) {
+		if (this.valueMap.exists(timeInstant0)) {
+			for (i in Int64.toInt(timeInstant0)...Int64.toInt(timeInstant1)) {
 				this.valueMap.set(i, instantaneousValue);
 			}
 		}
@@ -108,7 +91,7 @@ class SignalValue implements SignalValueI
 	public function pushValue(instantaneousValue: InstantaneousValueI) : Void {
 		var timeInstant = Int64.ofInt(0);
 		if (this.startingTime() != null) {
-			var timeInstant = Int64.make(Int64.add(this.totalRunningTime(), Int64.ofInt(1)));
+			var timeInstant =this.totalRunningTime() + Int64.ofInt(1);
 		}
 		
 		this.valueMap.set(timeInstant, instantaneousValue);
@@ -117,7 +100,7 @@ class SignalValue implements SignalValueI
 	public function getContinuedTimeframe(timeInstant: Int64) : Int64 {
 		var givenValue = this.valueMap[timeInstant];
 		var timeFrame : Int64 = Int64.ofInt(0);
-		for (time => value in this.valueMap.keys()) {
+		for (time => value in this.valueMap) {
 			if (time >= timeInstant && value == givenValue) {
 				timeFrame = timeFrame + Int64.ofInt(1);
 			}
@@ -129,5 +112,32 @@ class SignalValue implements SignalValueI
 		}
 		
 		return timeFrame;
+	}
+	
+	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
+		for (time => value in this.valueMap) {
+			value.setDrawingStrategy(stratFactory);
+		}
+	}
+	
+	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float) : Void {
+		
+		var timeMagnitude : Float = switch( this.timeUnit ) {
+            case TimeUnit.FEMPTO_SECOND: 70;
+            case TimeUnit.PICO_SECOND: 60;
+            case TimeUnit.NANO_SECOND: 50;
+            case TimeUnit.MICRO_SECOND: 40;
+            case TimeUnit.MILI_SECOND: 30;
+            case TimeUnit.SECOND: 20;
+        } ;
+		var xPosition = startX;
+		var yPosition = startY;
+		context.lineWidth = 1.0;
+		var prevValue : InstantaneousValueI = this.valueMap[this.startingTime()];
+		for (time => value in this.valueMap) {
+			value.draw(context, xPosition, yPosition, timeMagnitude, (value == prevValue)); // test
+			xPosition += timeMagnitude; // test
+			prevValue = value;
+		}
 	}
 }

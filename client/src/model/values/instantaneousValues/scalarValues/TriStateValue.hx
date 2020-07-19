@@ -1,10 +1,12 @@
 package model.values.instantaneousValues.scalarValues;
+import js.html.CanvasRenderingContext2D;
 import model.values.instantaneousValues.InstantaneousValueI;
+import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import model.values.instantaneousValues.vectorValues.VectorValue;
 import model.values.instantaneousValues.vectorValues.VectorValueI;
 
 /**
- * ...
+ * This class denotes the Tri-state or High-Impedance Value, i.e. Z state.
  * @author AdvaitTrivedi
  */
 class TriStateValue extends AbstractScalarValue
@@ -15,7 +17,6 @@ class TriStateValue extends AbstractScalarValue
 		
 	}
 	
-	
 	/* INTERFACE model.values.instantaneousValues.scalarValues.ScalarValueI */
 	
 	override public function toString():String 
@@ -23,6 +24,10 @@ class TriStateValue extends AbstractScalarValue
 		return "Z";
 	}
 	
+	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
+		this.drawingStrategy = stratFactory.getTriStateStrat();
+	}
+
 	function logicOperation(instantaneousValue:InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var instantaneousValueArray = new Array<InstantaneousValueI>();
@@ -35,30 +40,22 @@ class TriStateValue extends AbstractScalarValue
 		return this;
 	}
 	
-	@:allow(model.gates.AND)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	override public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
 	}
 	
-	@:allow(model.gates.OR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	override public function or(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
 	}
 	
-	@:allow(model.gates.NOT)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	public function not():InstantaneousValueI 
+	override public function not():InstantaneousValueI 
 	{
 		return this;
 	}
 	
-	@:allow(model.gates.XOR)
-	@:allow(model.values.instantaneousValues.InstantaneousValueI)
-	public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
+	override public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
 	}
