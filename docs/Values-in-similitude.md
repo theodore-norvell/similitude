@@ -61,7 +61,7 @@ Catenation: Vectors can be catenated to make a new value whose length is the sum
 
 Index: $x(i)$ where $i$ is an integer. This is defined when $x$ is a vector and $0\le 0 < \#x$. When the indexing is not defined, the result is $E$.
 
-Substring: $x(i,..j)$, where $i$ and $j$ are integers. This is defined when $x$ is a vector and every $k$ such that $i \le i < j$ is such that $0 \le k < #x$. This is the value made by forming a vector $[x(j-1), x(j-2), ... x(i)]$.  In particular when $i \ge j$, the result is the empty vector.  In the undefined cases, it is $E$.
+Substring: $x(i,..j)$, where $i$ and $j$ are integers. This is defined when $x$ is a vector and every $k$ such that $i \le i < j$ is such that $0 \le k < \#x$. This is the value made by forming a vector $[x(j-1), x(j-2), ... x(i)]$.  In particular when $i \ge j$, the result is the empty vector.  In the undefined cases, it is $E$.
 
 [Note: When defined, the length of the result is $\max(j-i,0)$.]
 
@@ -96,12 +96,17 @@ In all other cases, $repr(n,k)$ is $[E]$.
 
 A time is a nonnegative number from 0 to $2^{64}-1$.  Each unit of time represents a femtosecond.
 
+[This model might change in the future to one where a time is a pair $(t,u)$ where $t$ is a number of femtoseconds and $u$ is a natural number of simulation cycles (deltas).]
+
 # Signal values
 
 A signal value is a function from time to the set of vector values. 
+
+Signal values are used to represent (a) inputs to a system, (b) values that are created by simulation, and (c) expected values used in tests.
 
 ## Vectorization
 
 If the result of an operation is a scalar, it can't be the value of a signal at any time, so  we sometimes need to convert the scalar to a vector of length 1.  For example the result of an operation might be $E$, but in this case, to add it to a signal, we need to convert it to $[E]$.
 
-#
+
+
