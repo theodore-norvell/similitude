@@ -104,10 +104,8 @@ class View implements Observer
 			//signal.pushValue(ScalarValueSingletons.LOW);
 			//signal.pushValue(ScalarValueSingletons.LOW);
 			//
-			//// set drawing strategy to change the waveform drawing
-			//signal.setDrawingStrategy(InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY);
 			////draw the signal
-			//signal.draw(simulationCanvas.getContext2d(), 20, 20);
+			//signal.draw(simulationCanvas.getContext2d(), InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY, 20, 20);
   	  });
 	
 	}

@@ -24,12 +24,9 @@ class StringErrorValue extends AbstractScalarValue implements ErrorValueI
 		return "X"; 
 	}
 	
-	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		this.drawingStrategy = stratFactory.getErrorStrat();
-	}
-	
-	override public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
-		// TODO : Each error method has it's own drawing implementation (Maybe?). Look into it.
+	override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		//drawingStrategy.getErrorStrat();
+		// TODO : Think this through. This might need changing drawing algorithms (Best way is to create a similar hierarchy in the strategies)
 	}
 	
 	function logicOperation(instantaneousValue:InstantaneousValueI) : InstantaneousValueI {

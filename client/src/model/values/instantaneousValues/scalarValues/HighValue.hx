@@ -20,10 +20,6 @@ class HighValue extends AbstractScalarValue
 	{
 		return "H";
 	}
-	
-	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		this.drawingStrategy = stratFactory.getHighStrat();
-	}
 
 	override public function and(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
@@ -67,5 +63,9 @@ class HighValue extends AbstractScalarValue
 				return instantaneousValue;
 			}
 		}
+	}
+	
+	override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		drawingStrategy.getHighStrat().draw(context, startX, startY, timeMagnitude, continuation);
 	}
 }

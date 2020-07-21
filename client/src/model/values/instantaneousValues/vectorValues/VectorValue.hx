@@ -23,7 +23,6 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	
 	/* INTERFACE model.values.VectorValueI */
 	
 	public function length():Int 
@@ -88,13 +87,7 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		for (value in this.vector) {
-			value.setDrawingStrategy(stratFactory);
-		}
-	}
-	
-	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = false) : Void {
-		// TODO : handle multi-input drawing. Needs thinking to formulate the algorithm on a single canvas.
+	public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		// TODO : Think about drawing vectors
 	}
 }

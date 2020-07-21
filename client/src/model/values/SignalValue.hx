@@ -114,13 +114,7 @@ class SignalValue implements SignalValueI
 		return timeFrame;
 	}
 	
-	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		for (time => value in this.valueMap) {
-			value.setDrawingStrategy(stratFactory);
-		}
-	}
-	
-	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float) : Void {
+	public function draw(context: CanvasRenderingContext2D, stratFactory: InstantaneousStratFactoryI, startX: Float, startY: Float) : Void {
 		
 		var timeMagnitude : Float = switch( this.timeUnit ) {
             case TimeUnit.FEMPTO_SECOND: 70;
@@ -135,7 +129,7 @@ class SignalValue implements SignalValueI
 		context.lineWidth = 1.0;
 		var prevValue : InstantaneousValueI = this.valueMap[this.startingTime()];
 		for (time => value in this.valueMap) {
-			value.draw(context, xPosition, yPosition, timeMagnitude, (value == prevValue)); // test
+			value.draw(context, stratFactory, xPosition, yPosition, timeMagnitude, (value == prevValue)); // test
 			xPosition += timeMagnitude; // test
 			prevValue = value;
 		}

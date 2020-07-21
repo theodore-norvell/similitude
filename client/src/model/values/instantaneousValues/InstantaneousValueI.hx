@@ -12,13 +12,7 @@ interface InstantaneousValueI
 	 * @return
 	 */
 	public function toString() : String;
-	
-	/**
-	 * Sets the appropriate drawing strategy for the a relevant signal drawing.
-	 * @param	stratFactory
-	 */
-	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void;
-	
+
 	/**
 	 * This function essentially let's every value draw itself.
 	 * The reference , i.e. startX and startY always are at the bottom left starting point of the value. The value then uses this start point to make it's way.
@@ -28,7 +22,7 @@ interface InstantaneousValueI
 	 * @param	timeMagnitude : Refers to the magnification in time units. This will enable zooming into the time in the signal.
 	 * @param	continuation : Is this value in continuation to the last one or is it different from the last one.
 	 */
-	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = false) : Void;
+	public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = false) : Void;
 	
 	/**
 	 * performs Logical AND operation on the passed signalValue parameter with the this value. 

@@ -12,14 +12,8 @@ import model.values.instantaneousValues.vectorValues.VectorValueI;
  * @author AdvaitTrivedi
  */
 class AbstractScalarValue implements ScalarValueI 
-{
-	var drawingStrategy: InstantaneousDrawStrategyI;
-	
+{	
 	/* INTERFACE model.values.instantaneousValues.scalarValues.ScalarValueI */
-	
-	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		Assert.assert(false);
-	}
 	
 	public function toVectorValue():VectorValueI 
 	{
@@ -31,8 +25,8 @@ class AbstractScalarValue implements ScalarValueI
 		return ""; 
 	}
 	
-	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
-		this.drawingStrategy.draw(context, startX, startY, timeMagnitude, continuation);
+	public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		Assert.assert(false);
 	}
 	
 	@:op(A == B)

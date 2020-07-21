@@ -23,10 +23,6 @@ class TriStateValue extends AbstractScalarValue
 	{
 		return "Z";
 	}
-	
-	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		this.drawingStrategy = stratFactory.getTriStateStrat();
-	}
 
 	function logicOperation(instantaneousValue:InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, VectorValueI)) {
@@ -60,4 +56,7 @@ class TriStateValue extends AbstractScalarValue
 		return this.logicOperation(instantaneousValue);
 	}
 	
+	override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		drawingStrategy.getTriStateStrat().draw(context, startX, startY, timeMagnitude, continuation);
+	}
 }

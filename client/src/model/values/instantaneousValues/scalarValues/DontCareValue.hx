@@ -20,10 +20,6 @@ class DontCareValue extends AbstractScalarValue
 		return "X"; 
 	}
 	
-	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		this.drawingStrategy = stratFactory.getDontCareStrat();
-	}
-	
 	function logicOperation(instantaneousValue:InstantaneousValueI) : InstantaneousValueI {
 		if (Std.is(instantaneousValue, VectorValueI)) {
 			var instantaneousValueArray = new Array<InstantaneousValueI>();
@@ -54,5 +50,9 @@ class DontCareValue extends AbstractScalarValue
 	override public function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.logicOperation(instantaneousValue);
+	}
+	
+	override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		drawingStrategy.getDontCareStrat().draw(context, startX, startY, timeMagnitude, continuation);
 	}
 }

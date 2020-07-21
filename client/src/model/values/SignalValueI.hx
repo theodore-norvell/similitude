@@ -59,16 +59,10 @@ interface SignalValueI
 	public function getContinuedTimeframe(timeInstant: Int64) : Int64;
 	
 	/**
-	 * Sets the signal drawing strategy in each value in the signal.
-	 * @param	stratFactory
-	 */
-	public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void;
-	
-	/**
 	 * Draw the signal on a given canvas. the starting points refer to the bottom-left corner of the signal starting.
 	 * @param	context : CanvasContext (2D) refering to the relevant canvas.
 	 * @param	startX : Handled in the consumer.
 	 * @param	startY : Handled in the consumer.
 	 */
-	public function draw(context: CanvasRenderingContext2D, startX: Float, startY: Float) : Void;
+	public function draw(context: CanvasRenderingContext2D, stratFactory: InstantaneousStratFactoryI, startX: Float, startY: Float) : Void;
 }

@@ -22,10 +22,6 @@ class LowValue extends AbstractScalarValue
 		return "L";
 	}
 	
-	override public function setDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : Void {
-		this.drawingStrategy = stratFactory.getLowStrat();
-	}
-	
 	@:allow(model.gates.AND)
 	//@:allow(model.values.instantaneousValues.InstantaneousValueI)
 	@:allow(model.values.instantaneousValues.vectorValues.VectorValue)
@@ -81,5 +77,9 @@ class LowValue extends AbstractScalarValue
 	override function xor(instantaneousValue:InstantaneousValueI):InstantaneousValueI 
 	{
 		return this.or(instantaneousValue);
+	}
+	
+	override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		drawingStrategy.getLowStrat().draw(context, startX, startY, timeMagnitude, continuation);
 	}
 }
