@@ -25,6 +25,11 @@ class AbstractScalarValue implements ScalarValueI
 		return ""; 
 	}
 	
+	public function getDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : InstantaneousDrawStrategyI {
+		Assert.assert(false);
+		return null;
+	}	
+	
 	public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
 		Assert.assert(false);
 	}

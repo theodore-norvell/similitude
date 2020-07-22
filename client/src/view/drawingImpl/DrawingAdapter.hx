@@ -1,4 +1,4 @@
-package view ;
+package view.drawingImpl ;
 
 import view.Box;
 import type.Coordinate;

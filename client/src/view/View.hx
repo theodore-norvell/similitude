@@ -12,6 +12,7 @@ import js.html.CanvasElement;
 import model.component.CircuitDiagram;
 import type.TimeUnit;
 import model.drawingInterface.Transform;
+import view.drawingImpl.SignalDrawingAdapater;
 import view.viewModelRepresentatives.TabView;
 
 class View implements Observer
@@ -80,32 +81,35 @@ class View implements Observer
 				this.activeTab.panCanvasCentre();
 			});
 			
-			//// TEST :: USING VALUES from the model
-			//var simulationCanvas = Std.downcast(document.querySelector("#simulationCanvas"), CanvasElement);
-			//// create signal with a time unit for magnification, can change the unit later.
-			//var signal = new SignalValue(TimeUnit.MICRO_SECOND);
-			//// push values to signal.
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.HIGH);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//signal.pushValue(ScalarValueSingletons.LOW);
-			//
-			////draw the signal
-			//signal.draw(simulationCanvas.getContext2d(), InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY, 20, 20);
+			// TEST :: USING VALUES from the model
+			var simulationCanvas = Std.downcast(document.querySelector("#simulationCanvas"), CanvasElement);
+			
+			var signalDrawingAdapter = new SignalDrawingAdapater(Transform.identity(), simulationCanvas.getContext2d());
+			
+			// create signal with a time unit for magnification, can change the unit later.
+			var signal = new SignalValue(TimeUnit.MICRO_SECOND);
+			// push values to signal.
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.HIGH);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			signal.pushValue(ScalarValueSingletons.LOW);
+			
+			//draw the signal
+			signal.draw(signalDrawingAdapter, InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY, 20, 20);
   	  });
 	
 	}

@@ -3,6 +3,7 @@ import assertions.Assert;
 import haxe.Int64;
 import haxe.ds.Map;
 import js.html.CanvasRenderingContext2D;
+import model.drawingInterface.SignalDrawingAdapterI;
 import model.values.instantaneousValues.InstantaneousValueI;
 import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import type.TimeUnit;
@@ -114,7 +115,7 @@ class SignalValue implements SignalValueI
 		return timeFrame;
 	}
 	
-	public function draw(context: CanvasRenderingContext2D, stratFactory: InstantaneousStratFactoryI, startX: Float, startY: Float) : Void {
+	public function draw(signalDrawingAdapter: SignalDrawingAdapterI, stratFactory: InstantaneousStratFactoryI, startX: Float, startY: Float) : Void {
 		
 		var timeMagnitude : Float = switch( this.timeUnit ) {
             case TimeUnit.FEMPTO_SECOND: 70;
@@ -126,10 +127,11 @@ class SignalValue implements SignalValueI
         } ;
 		var xPosition = startX;
 		var yPosition = startY;
-		context.lineWidth = 1.0;
+		//context.lineWidth = 1.0;
 		var prevValue : InstantaneousValueI = this.valueMap[this.startingTime()];
 		for (time => value in this.valueMap) {
-			value.draw(context, stratFactory, xPosition, yPosition, timeMagnitude, (value == prevValue)); // test
+			signalDrawingAdapter.drawSignalValue(value, stratFactory, xPosition, yPosition, timeMagnitude, (value == prevValue));
+			//value.draw(context, stratFactory, xPosition, yPosition, timeMagnitude, (value == prevValue)); // test
 			xPosition += timeMagnitude; // test
 			prevValue = value;
 		}

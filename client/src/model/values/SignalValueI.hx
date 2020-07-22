@@ -2,6 +2,7 @@ package model.values;
 import haxe.Int64;
 import js.html.CanvasRenderingContext2D;
 import model.attribute.TimeAttributeValue;
+import model.drawingInterface.SignalDrawingAdapterI;
 import model.values.instantaneousValues.InstantaneousValueI;
 import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import type.TimeUnit;
@@ -64,5 +65,5 @@ interface SignalValueI
 	 * @param	startX : Handled in the consumer.
 	 * @param	startY : Handled in the consumer.
 	 */
-	public function draw(context: CanvasRenderingContext2D, stratFactory: InstantaneousStratFactoryI, startX: Float, startY: Float) : Void;
+	public function draw(signalDrawingAdapter: SignalDrawingAdapterI, stratFactory: InstantaneousStratFactoryI, startX: Float, startY: Float) : Void;
 }

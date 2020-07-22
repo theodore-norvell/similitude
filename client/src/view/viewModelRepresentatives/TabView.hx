@@ -18,6 +18,7 @@ import view.View;
 import haxe.Unserializer;
 import js.Browser.document;
 import model.enumeration.MODE;
+import view.drawingImpl.DrawingAdapter;
 
 /**
  * ...

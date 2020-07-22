@@ -1,6 +1,7 @@
 package model.values.instantaneousValues.scalarValues;
 import js.html.CanvasRenderingContext2D;
 import model.values.instantaneousValues.InstantaneousValueI;
+import model.values.instantaneousValues.displayStrategies.InstantaneousDrawStrategyI;
 import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import model.values.instantaneousValues.vectorValues.VectorValueI;
 import model.values.instantaneousValues.vectorValues.VectorValue;
@@ -65,7 +66,11 @@ class HighValue extends AbstractScalarValue
 		}
 	}
 	
-	override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
-		drawingStrategy.getHighStrat().draw(context, startX, startY, timeMagnitude, continuation);
+	override public function getDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : InstantaneousDrawStrategyI {
+		return stratFactory.getHighStrat();
 	}
+	
+	//override public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		//drawingStrategy.getHighStrat().draw(context, startX, startY, timeMagnitude, continuation);
+	//}
 }

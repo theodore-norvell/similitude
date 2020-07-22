@@ -1,5 +1,6 @@
 package model.values.instantaneousValues.vectorValues;
 import js.html.CanvasRenderingContext2D;
+import model.values.instantaneousValues.displayStrategies.InstantaneousDrawStrategyI;
 import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactoryI;
 import model.values.instantaneousValues.vectorValues.VectorValueI;
 import model.values.instantaneousValues.InstantaneousValueI;
@@ -87,7 +88,13 @@ class VectorValue implements VectorValueI
 		}
 	}
 	
-	public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
-		// TODO : Think about drawing vectors
+	public function getDrawingStrategy(stratFactory: InstantaneousStratFactoryI) : InstantaneousDrawStrategyI {
+		// TODO : This will point towards a different srawing implementation for vectors, there might be selective waveforms that can work by just drawing consistent values.
+		// But, this is a case to be thought through.
+		return null;
 	}
+	
+	//public function draw(context: CanvasRenderingContext2D, drawingStrategy: InstantaneousStratFactoryI, startX: Float, startY: Float, timeMagnitude: Float, ?continuation:Bool = true) : Void {
+		//// TODO : Think about drawing vectors
+	//}
 }
