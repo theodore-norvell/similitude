@@ -21,8 +21,6 @@ class LowDigitalWaveStrat implements DigitalWaveformStratI
 		var xPosition = startX;
 		var yPosition = startY;
 		
-		trace("in low ::", xPosition , yPosition);
-		
 		context.beginPath();
 		context.moveTo(xPosition, yPosition);
 		

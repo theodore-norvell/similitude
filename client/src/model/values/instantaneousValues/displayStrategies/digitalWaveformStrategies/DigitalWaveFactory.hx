@@ -9,6 +9,7 @@ class DigitalWaveFactory implements InstantaneousStratFactoryI
 {
 	var highStrategy : DigitalWaveformStratI = new HighDigitalWaveStrat();
 	var lowStrategy: DigitalWaveformStratI = new LowDigitalWaveStrat();
+	var dontCareStrategy: DigitalWaveformStratI = new DontCareDigitalWaveStrat();
 	// TODO : Add the remaining strategies, and update their getter functions.
 	
 	public function new() {}
@@ -26,7 +27,7 @@ class DigitalWaveFactory implements InstantaneousStratFactoryI
 	}
 	
 	public function getDontCareStrat() : InstantaneousDrawStrategyI {
-		return null;
+		return dontCareStrategy;
 	}
 	
 	public function getErrorStrat() : InstantaneousDrawStrategyI {

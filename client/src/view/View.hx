@@ -1,5 +1,6 @@
 package view;
 
+import haxe.Int64;
 import model.observe.*;
 import model.similitudeEvents.AttributeChangeEvent;
 import model.similitudeEvents.AbstractSimilitudeEvent;
@@ -81,35 +82,30 @@ class View implements Observer
 				this.activeTab.panCanvasCentre();
 			});
 			
-			// TEST :: USING VALUES from the model
-			var simulationCanvas = Std.downcast(document.querySelector("#simulationCanvas"), CanvasElement);
-			
-			var signalDrawingAdapter = new SignalDrawingAdapater(Transform.identity(), simulationCanvas.getContext2d());
-			
-			// create signal with a time unit for magnification, can change the unit later.
-			var signal = new SignalValue(TimeUnit.MICRO_SECOND);
-			// push values to signal.
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.HIGH);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			signal.pushValue(ScalarValueSingletons.LOW);
-			
-			//draw the signal
-			signal.draw(signalDrawingAdapter, InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY, 20, 20);
+			//// TEST :: USING VALUES from the model
+			//var simulationCanvas = Std.downcast(document.querySelector("#simulationCanvas"), CanvasElement);
+			//
+			//var signalDrawingAdapter = new SignalDrawingAdapater(Transform.identity(), simulationCanvas.getContext2d());
+			//
+			//// create signal with a time unit for magnification, can change the unit later.
+			//var signal = new SignalValue();
+			//
+			//// Simple cascading wave
+			//signal.setValueAtTime(Int64.ofInt(0), Int64.ofInt(5), ScalarValueSingletons.HIGH);
+			//signal.setValueAtTime(Int64.ofInt(6), Int64.ofInt(10), ScalarValueSingletons.LOW);
+			//signal.setValueAtTime(Int64.ofInt(11), Int64.ofInt(15), ScalarValueSingletons.HIGH);
+			//
+			//// only firstAffectedFrame (the reverse case is not possible and should be deemed wrong)
+			//signal.setValueAtTime(Int64.ofInt(12), Int64.ofInt(17), ScalarValueSingletons.LOW);
+			//
+			//// for adjacent first and last affected (Really?)
+			//signal.setValueAtTime(Int64.ofInt(4), Int64.ofInt(8), ScalarValueSingletons.HIGH);
+			//
+			////more frames between first and last affected, and this marks only lastAffectedFrame too.
+			//signal.setValueAtTime(Int64.ofInt(9), Int64.ofInt(13), ScalarValueSingletons.HIGH);
+						//
+			////draw the signal
+			//signal.draw(signalDrawingAdapter, InstantaneousStratFactorySingletons.DIGITAL_WAVE_FACTORY, 20, 20);
   	  });
 	
 	}

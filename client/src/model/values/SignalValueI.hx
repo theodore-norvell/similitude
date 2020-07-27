@@ -25,13 +25,13 @@ interface SignalValueI
 	 * Get the unit of the time range.
 	 * @return
 	 */
-	public function getUnit() : TimeUnit;
+	//public function getUnit() : TimeUnit;
 	
 	/**
 	 * Set the unit of the time range
 	 * @param	timeUnit
 	 */
-	public function setUnit(timeUnit: TimeUnit) : Void;
+	//public function setUnit(timeUnit: TimeUnit) : Void;
 	
 	/**
 	 * Gets the instantaneous value at a particular time.
@@ -43,6 +43,7 @@ interface SignalValueI
 	
 	/**
 	 * Sets the instantaneous values at a specific time range.
+	 * Here timeInstant0 and timeInstant1 are included in the frame, i.e. a frame from 6 to 10, includes the 6th and 10th value, [6, 10].
 	 * @param	timeInstant0
 	 * @param	timeInstant1
 	 * @param	instantaneousValue
@@ -55,7 +56,7 @@ interface SignalValueI
 	 * This might or might not be needed. Remove if not needed.
 	 * 
 	 * @param	timeInstant
-	 * @return
+	 * @return Int64(-1) if frame not found in signal.
 	 */
 	public function getContinuedTimeframe(timeInstant: Int64) : Int64;
 	
