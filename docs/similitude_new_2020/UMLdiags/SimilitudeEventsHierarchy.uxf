@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>736</x>
+      <y>248</y>
+      <w>208</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>/AbstractSimilitudeEvent/
+--
+- var eventTypes: EventTypesEnum
+--
++ getEventType(): EventTypesEnum
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>408</x>
+      <y>416</y>
+      <w>272</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Abstract&gt;&gt;
+/CanvasMouseInteractionEvent/
+--
++ var xPosition: Float;
++ var yPosition: Float;
+- var objectsHit: Array&lt;HitObject&gt;;
+--
++ getObjectsHit(): Array&lt;HitObject&gt;
++ didObjectsGetHit(): Boolean
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>536</x>
+      <y>296</y>
+      <w>312</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>370.0;10.0;370.0;70.0;10.0;70.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>352</x>
+      <y>568</y>
+      <w>144</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>CanvasMouseMoveEvent</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>544</x>
+      <y>568</y>
+      <w>136</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>CanvasMouseUpEvent</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>448</x>
+      <y>600</y>
+      <w>144</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>CanvasMouseDownEvent</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>512</x>
+      <y>520</y>
+      <w>24</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>512</x>
+      <y>520</y>
+      <w>120</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0;130.0;40.0;130.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>416</x>
+      <y>520</y>
+      <w>120</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>130.0;10.0;130.0;40.0;10.0;40.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>488</x>
+      <y>176</y>
+      <w>184</w>
+      <h>128</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Enumeration&gt;&gt;
+EventTypesEnum
+--
++ SIDEBAR_DRAG_N_DROP;
++ LINK_ADD;
++ LINK_EDIT;
++ CANVAS_MOUSE_DOWN;
++ CANVAS_MOUSE_UP;
++ CANVAS_MOUSE_MOVE;
++ ATTRIBUTE_CHANGED;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>696</x>
+      <y>488</y>
+      <w>216</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>AttributeChangeEvent
+--
++ var attributeUntyped: AttributeUntyped;
++ var newAttributeValue : AttributeValue;
++ var selectionAffected: SelectionModel;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>992</x>
+      <y>416</y>
+      <w>144</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>LinkAddEvent
+--
++ var addedAtX: Float = 0;
++ var addedAtY: Float = 0;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>736</x>
+      <y>416</y>
+      <w>192</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>LinkEditEvent
+--
++ var worldCoordinates: Coordinate;
++ var endpoint: Endpoint;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>928</x>
+      <y>488</y>
+      <w>208</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>SidebarDragAndDropEvent
+--
+- var component: ComponentType;
++ var draggedToX: Float = 0;
++ var draggedToY: Float = 0;
+--
++ getComponent(): ComponentType;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>696</x>
+      <y>296</y>
+      <w>152</w>
+      <h>208</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>170.0;10.0;170.0;70.0;10.0;70.0;10.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>824</x>
+      <y>296</y>
+      <w>168</w>
+      <h>208</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0;190.0;70.0;190.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>824</x>
+      <y>296</y>
+      <w>256</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0;300.0;70.0;300.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>824</x>
+      <y>296</y>
+      <w>24</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>344</x>
+      <y>136</y>
+      <w>824</w>
+      <h>496</h>
+    </coordinates>
+    <panel_attributes>model.similitudeEvents</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>664</x>
+      <y>272</y>
+      <w>88</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+</diagram>

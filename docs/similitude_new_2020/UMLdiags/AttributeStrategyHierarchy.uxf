@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <zoom_level>11</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>198</y>
+      <w>297</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Interface&gt;&gt;
+AttributeStrategyI
+--
+--
++ spawnHTMLAttribute(...): DivElement;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>330</y>
+      <w>341</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>/AbstractAttributeStrategy/
+--
+- var canvasListener: CanvasListener;
+- var attributeUntyped: AttributeUntyped;
+--
++ attributeElementsWrapper(...): DivElement;
++ createAttributeLabelElement(...): DivElement;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1012</x>
+      <y>264</y>
+      <w>33</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>484</y>
+      <w>198</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>IntegerAttributeStrategy</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>539</y>
+      <w>209</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>OrientationAttributeStrategy</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>594</y>
+      <w>198</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>StringAttributeStrategy</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>880</x>
+      <y>649</y>
+      <w>187</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>TimeAttributeStrategy</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1056</x>
+      <y>429</y>
+      <w>121</w>
+      <h>253</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>90.0;10.0;90.0;210.0;10.0;210.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1067</x>
+      <y>429</y>
+      <w>110</w>
+      <h>198</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;80.0;160.0;10.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1078</x>
+      <y>429</y>
+      <w>99</w>
+      <h>143</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;10.0;70.0;110.0;10.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1067</x>
+      <y>429</y>
+      <w>110</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>80.0;10.0;80.0;60.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>198</x>
+      <y>429</y>
+      <w>583</w>
+      <h>253</h>
+    </coordinates>
+    <panel_attributes>AttributeUpdate
+--
+- var attributePane: Element;
+- var currentAttributeSet= new Set&lt;MetaAttribute&gt;();
+- var attributeMap: Map&lt;AttributeType, AttributeStrategyI&gt; = [
+		IntegerAttributeValue.getTypeForClass() =&gt; new IntegerAttributeStrategy(),
+		OrientationAttributeValue.getTypeForClass() =&gt; new OrientationAttributeStrategy(),
+		StringAttributeValue.getTypeForClass() =&gt; new StringAttributeStrategy(),
+		TimeAttributeValue.getTypeForClass() =&gt; new TimeAttributeStrategy()
+	];
+--
++ setSelectionModel(selectionModel: SelectionModel);
++ update(target: ObservableI, ?data:Dynamic);
++ buildAttributes(selectionModel: SelectionModel, ?refresh: Bool = false);
++ clearAttributes();</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>330</x>
+      <y>275</y>
+      <w>275</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>AbstractUpdate
+--
+- var view: View;
+--
++ setViewToUpdate(view: View): Void;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>462</x>
+      <y>341</y>
+      <w>33</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>770</x>
+      <y>484</y>
+      <w>132</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>770</x>
+      <y>539</y>
+      <w>132</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>770</x>
+      <y>561</y>
+      <w>132</w>
+      <h>66</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>100.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>770</x>
+      <y>561</y>
+      <w>132</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>100.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>187</x>
+      <y>231</y>
+      <w>616</w>
+      <h>473</h>
+    </coordinates>
+    <panel_attributes>view.viewUpdaters</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>847</x>
+      <y>154</y>
+      <w>418</w>
+      <h>561</h>
+    </coordinates>
+    <panel_attributes>view.viewModelRepresentatives.attributeView</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
