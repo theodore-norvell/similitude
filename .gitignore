@@ -17,3 +17,6 @@ similitudeClient.js
 ClassDiagram.vux
 *.orig
 client/similitude_proto.hxproj
+*.vpp.bak_*
+*.vpp.vbak
+*.vux.vbak

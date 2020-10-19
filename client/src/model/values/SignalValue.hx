@@ -69,6 +69,7 @@ class SignalValue implements SignalValueI
 	
 	public function new() 
 	{
+		invariantCheck() ;
 	}
 	
 	public function invariantCheck() : Void {
@@ -237,7 +238,7 @@ class SignalValue implements SignalValueI
 		
 		this.signalFrameArray = newSignalArray;
 
-		return;
+		invariantCheck() ;
 	}
 
 	public function getContinuedTimeframe(timeInstant: Int64) : Int64 {
