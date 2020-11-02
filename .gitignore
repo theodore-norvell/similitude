@@ -20,3 +20,5 @@ client/similitude_proto.hxproj
 *.vpp.bak_*
 *.vpp.vbak
 *.vux.vbak
+*.vpp.lck
+*.vpp*.tmp
