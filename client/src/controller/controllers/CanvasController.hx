@@ -7,7 +7,7 @@ import controller.controllerState.CanvasIdleState;
 import controller.controllerState.ControllerStateI;
 import controller.controllers.AbstractController;
 import controller.listenerInterfaces.CanvasListener;
-import controller.modelManipulationSublayer.ModelManipulationSublayer;
+import controller.modelManipulationSublayer.ModelManipulator;
 import model.component.CircuitDiagram;
 import model.component.Component;
 import model.component.Link;
@@ -28,12 +28,12 @@ class CanvasController extends AbstractController implements CanvasListener
 	var commandManager = new CommandManager();
 	var componentTypesSingleton = new ComponentTypes(new CircuitDiagram());
 	var state: ControllerStateI = new CanvasIdleState();
-	var modelManipulator: ModelManipulationSublayer;
+	var modelManipulator: ModelManipulator;
 	var attributeUpdater: AttributeUpdate;
 	
 	public function new() 
 	{
-		this.modelManipulator = new ModelManipulationSublayer(this.commandManager);
+		this.modelManipulator = new ModelManipulator(this.commandManager);
 	}
 	
 	public function setAttributeUpdater(attributeUpdater: AttributeUpdate) {
@@ -56,7 +56,7 @@ class CanvasController extends AbstractController implements CanvasListener
 		return this.commandManager;
 	}
 	
-	public function getModelManipulator() : ModelManipulationSublayer {
+	public function getModelManipulator() : ModelManipulator {
 		return this.modelManipulator;
 	}
 	
@@ -66,20 +66,6 @@ class CanvasController extends AbstractController implements CanvasListener
 	
 	public function redoLastCanvasChange() {
 		this.commandManager.redoCommand();
-	}
-	
-	public function deleteSelection() {
-		this.modelManipulator.checkPoint() ;
-		this.modelManipulator.deleteSelection(this.activeTab.getCircuitDiagram(), this.activeTab.getSelectionModel());
-		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
-		this.modelManipulator.checkPoint() ;
-	}
-	
-	public function rotateSelectedComponent() {
-		this.modelManipulator.checkPoint() ;
-		this.modelManipulator.rotateSelectedComponent(this.activeTab);
-		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;
-		this.modelManipulator.checkPoint() ;
 	}
 	
 	/**

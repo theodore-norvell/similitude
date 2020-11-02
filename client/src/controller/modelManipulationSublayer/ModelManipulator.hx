@@ -1,4 +1,5 @@
 package controller.modelManipulationSublayer;
+
 import model.attribute.AttributeUntyped;
 import model.attribute.AttributeValue;
 import controller.commandManager.AddComponentCommand;
@@ -25,7 +26,7 @@ import type.Set;
  * Is a sub-layer and should be considered a child in the Controller
  * @author AdvaitTrivedi
  */
-class ModelManipulationSublayer 
+class ModelManipulator 
 {
 	var commandManager: CommandManager;
 
