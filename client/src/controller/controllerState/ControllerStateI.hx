@@ -1,5 +1,5 @@
 package controller.controllerState;
-import controller.listenerInterfaces.CanvasListener;
+import controller.Controller;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 
 /**
@@ -7,5 +7,5 @@ import model.similitudeEvents.AbstractSimilitudeEvent;
  */
 interface ControllerStateI 
 {
-	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) : Void;
+	public function operate(controller: Controller, event: AbstractSimilitudeEvent) : Void;
 }

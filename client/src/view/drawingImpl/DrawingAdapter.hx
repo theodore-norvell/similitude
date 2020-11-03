@@ -1,6 +1,5 @@
 package view.drawingImpl ;
 
-import view.Box;
 import type.Coordinate;
 import model.drawingInterface.DrawingAdapterI;
 import model.drawingInterface.Transform;

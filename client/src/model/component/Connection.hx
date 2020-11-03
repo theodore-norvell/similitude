@@ -1,6 +1,5 @@
 package model.component;
 
-import controller.commandManager.CommandI;
 import assertions.Assert ;
 import type.Coordinate;
 

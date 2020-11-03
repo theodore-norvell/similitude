@@ -1,35 +1,27 @@
-import controller.controllers.CanvasController;
-import view.viewUpdaters.AttributeUpdate;
-import view.viewUpdaters.CanvasUpdate;
-import view.viewUpdaters.SidebarUpdate;
+import controller.Controller;
+import view.attributeView.AttributeView;
+import view.SidebarView;
 import view.View;
 
 class Main {
   // static entrypoint
   static function main() {
 	  // create the main view
-	var viewHandler:View = new View();
+	var view:View = new View();
 	
-	// create the controllersß
-	var canvasController:CanvasController = new CanvasController();
-	//var canvasController:CanvasController = new CanvasController();
+	// create the controllers
+	var controller:Controller = new Controller();
 	
-	// attach the listeners/handlers to the view
-	viewHandler.setCanvasListener(canvasController);
+	// attach the controller to the view
+	view.setController(controller);
 	
 	// create the update pushers and bind them to the view.
-	var sidebarUpdater:SidebarUpdate = new SidebarUpdate(viewHandler);
-	var canvasUpdater:CanvasUpdate = new CanvasUpdate(viewHandler);
-	var attributeUpdater: AttributeUpdate = new AttributeUpdate(viewHandler);
+	var sidebarView:SidebarView = new SidebarView();
+	var attributeView: AttributeView = new AttributeView( view );
 	
-	// bind the controllers to the ViewUpdate interfaces
-	canvasController.setViewUpdater(canvasUpdater);
-	canvasController.setAttributeUpdater(attributeUpdater);
+	// bind the controllers to the View interfaces
+	controller.setAttributeView(attributeView);
 	
-	viewHandler.setActiveTab();
+	view.setActiveTab();
   }
-
-  // constructor
-  //function new() {
-  //}
 }

@@ -1,5 +1,5 @@
 package controller.controllerState;
-import controller.listenerInterfaces.CanvasListener;
+import controller.Controller;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.component.Component;
 import model.component.Link;
@@ -23,25 +23,25 @@ class CanvasIdleState implements ControllerStateI
 		
 	}
 	
-	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) : Void {
+	public function operate(controller: Controller, event: AbstractSimilitudeEvent) : Void {
 		if (event.getEventType() == EventTypesEnum.SIDEBAR_DRAG_N_DROP) {
 			var dragNDropEvent = Std.downcast(event, SidebarDragAndDropEvent);
 			trace('adding Component : ', dragNDropEvent.getComponent());
-			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
-			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, canvasListener.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
-			canvasListener.getModelManipulator().addComponent(component);
-			canvasListener.getModelManipulator().normalise( circuitDiagram );
-			canvasListener.getModelManipulator().checkPoint() ;
-			canvasListener.setState(this);
+			var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
+			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, controller.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
+			controller.getModelManipulator().addComponent(component);
+			controller.getModelManipulator().normalise( circuitDiagram );
+			controller.getModelManipulator().checkPoint() ;
+			controller.setState(this);
 			return;
 		}
 		
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_DOWN) {
 			var canvasMouseDownEvent = Std.downcast(event, CanvasMouseDownEvent);
 			if (!canvasMouseDownEvent.didObjectsGetHit()) {
-				var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
-				canvasListener.getModelManipulator().clearSelection(circuitDiagram, canvasListener.getActiveTab().getSelectionModel());
-				canvasListener.setState(new DownOnEmptyState());
+				var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
+				controller.getModelManipulator().clearSelection(circuitDiagram, controller.getActiveTab().getSelectionModel());
+				controller.setState(new DownOnEmptyState());
 				return;
 			}
 			
@@ -72,7 +72,7 @@ class CanvasIdleState implements ControllerStateI
 			
 			if (endpointsHit.length > 0) {
 				// shift to link edit state
-				canvasListener.setState(new EditLinkState(endpointsHit[0]));
+				controller.setState(new EditLinkState(endpointsHit[0]));
 				return;
 			} 
 			
@@ -92,7 +92,7 @@ class CanvasIdleState implements ControllerStateI
 					clickedObjects.push(link);
 				}
 				
-				canvasListener.setState(new AddToSelectionState(clickedObjects, canvasMouseDownEvent.xPosition, canvasMouseDownEvent.yPosition));
+				controller.setState(new AddToSelectionState(clickedObjects, canvasMouseDownEvent.xPosition, canvasMouseDownEvent.yPosition));
 				return;
 			}
 		} else {

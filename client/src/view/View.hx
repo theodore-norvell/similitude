@@ -7,18 +7,17 @@ import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.values.SignalValue;
 import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactorySingletons;
 import model.values.instantaneousValues.scalarValues.ScalarValueSingletons;
-import controller.listenerInterfaces.CanvasListener;
+import controller.ControllerI;
 import js.Browser.document;
 import js.html.CanvasElement;
 import model.component.CircuitDiagram;
 import type.TimeUnit;
 import model.drawingInterface.Transform;
 import view.drawingImpl.SignalDrawingAdapater;
-import view.viewModelRepresentatives.TabView;
 
 class View implements Observer
 {
-	var canvasListener: CanvasListener;
+	var controller: ControllerI;
 	var activeTab: TabView;
 	var allTabs = new Array<TabView>();
 	/**
@@ -38,23 +37,23 @@ class View implements Observer
 			// for undo button
 			document.querySelector("#undo").addEventListener('click', function (event) {
 				// do something
-				this.canvasListener.undoLastCanvasChange();
+				this.controller.undoLastCanvasChange();
 			});
 			
 			// for redo button
 			document.querySelector("#redo").addEventListener('click', function (event) {
 				// do something
-				this.canvasListener.redoLastCanvasChange();
+				this.controller.redoLastCanvasChange();
 			});
 			
 			document.querySelector("#delete").addEventListener('click', function (event) {
 				// do something
-				this.canvasListener.deleteSelection();
+				this.controller.deleteSelection();
 			});
 			
 			document.querySelector("#rotate").addEventListener('click', function (event) {
 				// do something
-				this.canvasListener.rotateSelectedComponent();
+				this.controller.rotateSelectedComponent();
 			});
 			
 			document.querySelector("#Up").addEventListener('click', function (event) {
@@ -110,16 +109,16 @@ class View implements Observer
 	
 	}
 	
-	public function setCanvasListener(listener: CanvasListener){
-		this.canvasListener = listener;
+	public function setController(controller: ControllerI){
+		this.controller = controller;
 	}
 
 	public function handleCanvasMouseInteractions(eventObject: AbstractSimilitudeEvent) {
-		this.canvasListener.handleCanvasMouseInteractions(eventObject);
+		this.controller.handleCanvasMouseInteractions(eventObject);
 	}
 	
 	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) {
-		this.canvasListener.handleAttributeInteractions(eventObject);
+		this.controller.handleAttributeInteractions(eventObject);
 	}
 	
 	/**
@@ -132,7 +131,7 @@ class View implements Observer
 	public function setActiveTab(){
 		// do something for the active tab field
 		//after that push it to the canvas controller
-		this.canvasListener.setActiveTab(this.activeTab.tabModel);
+		this.controller.setActiveTab(this.activeTab.tabModel);
 	}
 	
 	/**

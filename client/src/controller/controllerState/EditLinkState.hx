@@ -1,5 +1,5 @@
 package controller.controllerState;
-import controller.listenerInterfaces.CanvasListener;
+import controller.Controller;
 import model.component.Endpoint;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.similitudeEvents.EventTypesEnum;
@@ -18,16 +18,16 @@ class EditLinkState implements ControllerStateI
 		this.linkEndpoint = endpoint;
 	}
 	
-	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) : Void {
+	public function operate(controller: Controller, event: AbstractSimilitudeEvent) : Void {
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
-			var circuitDiagram = canvasListener.getActiveTab().getCircuitDiagram() ;
-			canvasListener.getModelManipulator().editLink(circuitDiagram, this.linkEndpoint, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
-			canvasListener.setState(this);
+			var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
+			controller.getModelManipulator().editLink(circuitDiagram, this.linkEndpoint, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
+			controller.setState(this);
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			canvasListener.getModelManipulator().normalise( canvasListener.getActiveTab().getCircuitDiagram() ) ;
-			canvasListener.getModelManipulator().checkPoint() ;
-			canvasListener.setState(new CanvasIdleState());
+			controller.getModelManipulator().normalise( controller.getActiveTab().getCircuitDiagram() ) ;
+			controller.getModelManipulator().checkPoint() ;
+			controller.setState(new CanvasIdleState());
 		} else {
 			trace("Unknown transition");
 		}

@@ -1,5 +1,5 @@
 package controller.controllerState;
-import controller.listenerInterfaces.CanvasListener;
+import controller.Controller;
 import model.component.CircuitElement;
 import model.similitudeEvents.CanvasMouseMoveEvent;
 import model.similitudeEvents.AbstractSimilitudeEvent;
@@ -22,25 +22,25 @@ class AddToSelectionState implements ControllerStateI
 		this.yPosition = yOnClick;
 	}
 	
-	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) {
+	public function operate(controller: Controller, event: AbstractSimilitudeEvent) {
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
-			var activeTab = canvasListener.getActiveTab();
-			canvasListener.getModelManipulator().moveSelection(activeTab, 
+			var activeTab = controller.getActiveTab();
+			controller.getModelManipulator().moveSelection(activeTab, 
 				this.xPosition, this.yPosition,
 				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition );
-			canvasListener.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
+			controller.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			var activeTab = canvasListener.getActiveTab();
+			var activeTab = controller.getActiveTab();
 			var selectionModel = activeTab.getSelectionModel() ;
-			canvasListener.getModelManipulator().toggleSelectionArray(selectionModel, this.clickedObjects);
-			canvasListener.getModelManipulator().checkPoint() ;
+			controller.getModelManipulator().toggleSelectionArray(selectionModel, this.clickedObjects);
+			controller.getModelManipulator().checkPoint() ;
 			// will change in the future
-			canvasListener.setState(new CanvasIdleState());
+			controller.setState(new CanvasIdleState());
 			var selectedComponents = activeTab.getSelectionModel().getComponentSet() ;
 			if ( selectedComponents.size() > 0 ) {
 				trace("triggering show attributes");
-				canvasListener.showAttributes();
+				controller.showAttributes();
 			}
 		} else {
 			trace("Unknown transition");

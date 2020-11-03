@@ -1,5 +1,5 @@
 package controller.controllerState;
-import controller.listenerInterfaces.CanvasListener;
+import controller.Controller;
 import model.similitudeEvents.CanvasMouseMoveEvent;
 import model.similitudeEvents.AbstractSimilitudeEvent;
 import model.similitudeEvents.EventTypesEnum;
@@ -19,19 +19,19 @@ class MoveSelectionState implements ControllerStateI
 		this.oldYPosition = oldY;
 	}
 	
-	public function operate(canvasListener: CanvasListener, event: AbstractSimilitudeEvent) {
+	public function operate(controller: Controller, event: AbstractSimilitudeEvent) {
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
-			var activeTab = canvasListener.getActiveTab();
-			canvasListener.getModelManipulator().moveSelection(
+			var activeTab = controller.getActiveTab();
+			controller.getModelManipulator().moveSelection(
 				activeTab,
 				this.oldXPosition, this.oldYPosition,
 				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
-			canvasListener.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
+			controller.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			canvasListener.getModelManipulator().normalise(canvasListener.getActiveTab().getCircuitDiagram() );
-			canvasListener.getModelManipulator().checkPoint() ;
-			canvasListener.setState(new CanvasIdleState());
+			controller.getModelManipulator().normalise(controller.getActiveTab().getCircuitDiagram() );
+			controller.getModelManipulator().checkPoint() ;
+			controller.setState(new CanvasIdleState());
 		} else {
 			trace("Unknown transition");
 		}
