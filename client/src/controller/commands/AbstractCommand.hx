@@ -8,12 +8,12 @@ import hx.strings.RandomStrings;
  * ...
  * @author AdvaitTrivedi
  */
-class AbstractCommand implements CommandI
+class AbstractCommand
 {
 	var commandUID: String = RandomStrings.randomAsciiAlphaNumeric(12);
 	var circuitDiagram: CircuitDiagramI;
 	
-	public function setCircuitDiagram(circuitDiagram: CircuitDiagramI) {
+	private function new(circuitDiagram: CircuitDiagramI) {
 		this.circuitDiagram = circuitDiagram;
 	}
 	
@@ -28,8 +28,5 @@ class AbstractCommand implements CommandI
 	public function setCommandUID(uid: String) : Void {
 		this.commandUID = uid;
 	}
-	
-	public function execute() : Void {};
-	public function redo() : Void {};
-	public function undo() : Void {};
+
 }

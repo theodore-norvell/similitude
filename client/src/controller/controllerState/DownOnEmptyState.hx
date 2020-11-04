@@ -29,13 +29,13 @@ class DownOnEmptyState implements ControllerStateI
 			var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
 			// initate link adding sequence
 			var link = new Link(circuitDiagram, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition, canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition - 10);
-			controller.getModelManipulator().addLink(circuitDiagram, link);
+			controller.getCommander().addLink(circuitDiagram, link);
 			// shift to the link edit state
-			controller.setState(new EditLinkState(link.get_endpoint(1)));
+			controller.setState(new MoveEndpointState(link.get_endpoint(1)));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
 			controller.clearAttributes();
-			controller.getModelManipulator().checkPoint() ;
-			controller.setState(new CanvasIdleState());
+			controller.getCommander().checkPoint() ;
+			controller.setState(new IdleState());
 		} else {
 			trace("Unknown transition");
 		}

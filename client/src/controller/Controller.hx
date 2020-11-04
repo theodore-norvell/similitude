@@ -1,10 +1,10 @@
 package controller ;
 
-import controller.controllerState.CanvasIdleState;
+import controller.controllerState.IdleState;
 import controller.controllerState.ControllerStateI;
 
 import controller.viewInterfaces.AttributeViewI ;
-import controller.modelManipulationSublayer.ModelManipulator;
+import controller.commander.Commander;
 import commandManager.CommandManager ;
 import model.component.CircuitDiagram;
 import model.component.Component;
@@ -25,14 +25,14 @@ class Controller implements ControllerI
 {
 	var commandManager = new CommandManager();
 	var componentTypesSingleton = new ComponentTypes(new CircuitDiagram());
-	var state: ControllerStateI = new CanvasIdleState();
-	var modelManipulator: ModelManipulator;
+	var state: ControllerStateI = new IdleState();
+	var modelManipulator: Commander;
 	var attributeView: AttributeViewI;
 	var activeTab: TabModel;
 	
 	public function new() 
 	{
-		this.modelManipulator = new ModelManipulator(this.commandManager);
+		this.modelManipulator = new Commander(this.commandManager);
 	}
 	
 	public function setActiveTab(activeTabModel: TabModel) {
@@ -63,7 +63,7 @@ class Controller implements ControllerI
 		return this.commandManager;
 	}
 	
-	public function getModelManipulator() : ModelManipulator {
+	public function getCommander() : Commander {
 		return this.modelManipulator;
 	}
 	
@@ -106,7 +106,7 @@ class Controller implements ControllerI
 		this.attributeView.clearAttributes();
 	}
 	
-	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) : Void {
+	public function changeAttributeValue(eventObject: AttributeChangeEvent) : Void {
 		this.modelManipulator.checkPoint() ;
 		this.modelManipulator.editAttribute(eventObject.selectionAffected, eventObject.attributeUntyped, eventObject.newAttributeValue );
 		this.modelManipulator.normalise(this.activeTab.getCircuitDiagram()) ;

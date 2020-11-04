@@ -8,25 +8,25 @@ import model.component.Link;
  * ...
  * @author AdvaitTrivedi
  */
-class AddLinkCommand extends AbstractCommand
+class AddLinkCommand extends AbstractCommand implements CommandI
 {
 	var link: Link;
 	
 	public function new(circuitDiagram: CircuitDiagramI, link: Link) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
+		super(circuitDiagram);
 		this.link = link;
 	}
 	
-	override public function execute() : Void {
+	public function execute() : Void {
 		this.circuitDiagram.addLink(this.link);
 	}
 	
-	override public function redo() : Void {
+	public function redo() : Void {
 		this.execute();
 	}
 	
-	override public function undo() : Void {
+	public function undo() : Void {
 		this.circuitDiagram.deleteLink(this.link);
 	};		
 }

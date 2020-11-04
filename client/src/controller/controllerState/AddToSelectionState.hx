@@ -26,17 +26,17 @@ class AddToSelectionState implements ControllerStateI
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
 			var activeTab = controller.getActiveTab();
-			controller.getModelManipulator().moveSelection(activeTab, 
+			controller.getCommander().moveSelection(activeTab, 
 				this.xPosition, this.yPosition,
 				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition );
 			controller.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
 			var activeTab = controller.getActiveTab();
 			var selectionModel = activeTab.getSelectionModel() ;
-			controller.getModelManipulator().toggleSelectionArray(selectionModel, this.clickedObjects);
-			controller.getModelManipulator().checkPoint() ;
+			controller.getCommander().toggleSelectionArray(selectionModel, this.clickedObjects);
+			controller.getCommander().checkPoint() ;
 			// will change in the future
-			controller.setState(new CanvasIdleState());
+			controller.setState(new IdleState());
 			var selectedComponents = activeTab.getSelectionModel().getComponentSet() ;
 			if ( selectedComponents.size() > 0 ) {
 				trace("triggering show attributes");

@@ -18,5 +18,5 @@ interface ControllerI
 	public function redoLastCanvasChange() : Void;
 	public function deleteSelection() : Void;
 	public function rotateSelectedComponent() : Void;
-	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) : Void;
+	public function changeAttributeValue(eventObject: AttributeChangeEvent) : Void;
 }

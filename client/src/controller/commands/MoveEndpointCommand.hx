@@ -9,7 +9,7 @@ import type.Coordinate;
  * ...
  * @author AdvaitTrivedi
  */
-class EditLinkCommand extends AbstractCommand
+class MoveEndpointCommand extends AbstractCommand implements CommandI
 {
 	var endpoint: Endpoint;
 	var previousWorldCoordinates: Coordinate;
@@ -17,21 +17,21 @@ class EditLinkCommand extends AbstractCommand
 	
 	public function new(circuitDiagram: CircuitDiagramI, endpoint: Endpoint, newCoordinates: Coordinate) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
+		super(circuitDiagram);
 		this.endpoint = endpoint;
 		this.previousWorldCoordinates = new Coordinate(this.endpoint.get_xPosition(), this.endpoint.get_yPosition());
 		this.newWorldCoordinates = newCoordinates;
 	}
 	
-	override public function execute() : Void {
+	public function execute() : Void {
 		this.endpoint.moveTo(this.newWorldCoordinates);
 	}
 	
-	override public function redo() : Void {
+	public function redo() : Void {
 		this.execute();
 	}
 	
-	override public function undo() : Void {
+	public function undo() : Void {
 		this.endpoint.moveTo(this.previousWorldCoordinates);
 	};		
 }

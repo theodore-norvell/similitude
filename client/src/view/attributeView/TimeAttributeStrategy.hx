@@ -80,7 +80,7 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy  implements Attrib
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new TimeAttributeValue(Int64.parseString(inputNode.value), Type.createEnum(TimeUnit, unitDropDown.value));
 			attributeChangeEvent.selectionAffected = selectionModel;
-			view.handleAttributeInteractions(attributeChangeEvent);
+			view.changeAttributeValue(attributeChangeEvent);
 		}
 		
 		unitDropDown.style.marginLeft = "3px";
@@ -91,7 +91,7 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy  implements Attrib
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new TimeAttributeValue(Int64.parseString(inputNode.value), Type.createEnum(TimeUnit, unitDropDown.value));
 			attributeChangeEvent.selectionAffected = selectionModel;
-			view.handleAttributeInteractions(attributeChangeEvent);
+			view.changeAttributeValue(attributeChangeEvent);
 		}
 		
 		editor.appendChild(inputNode);

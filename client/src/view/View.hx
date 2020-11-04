@@ -117,8 +117,8 @@ class View implements Observer
 		this.controller.handleCanvasMouseInteractions(eventObject);
 	}
 	
-	public function handleAttributeInteractions(eventObject: AttributeChangeEvent) {
-		this.controller.handleAttributeInteractions(eventObject);
+	public function changeAttributeValue(eventObject: AttributeChangeEvent) {
+		this.controller.changeAttributeValue(eventObject);
 	}
 	
 	/**

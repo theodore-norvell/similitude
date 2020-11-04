@@ -10,7 +10,7 @@ import model.component.Component;
  * ...
  * @author AdvaitTrivedi
  */
-class AttributeChangeCommand extends AbstractCommand 
+class AttributeChangeCommand extends AbstractCommand  implements CommandI
 {
 	var componentAffected: Component;
 	var attributeUntyped: AttributeUntyped;
@@ -19,24 +19,24 @@ class AttributeChangeCommand extends AbstractCommand
 
 	public function new(component : Component, attribute : AttributeUntyped, newValue : AttributeValue) 
 	{
-		this.setCircuitDiagram(component.get_CircuitDiagram() );
+		super(component.get_CircuitDiagram() );
 		this.componentAffected = component;
 		this.newAttributeValue = newValue;
 		this.attributeUntyped = attribute;
 		this.oldAttributeValue = this.componentAffected.getUntyped(this.attributeUntyped);
 	}
 	
-	override public function execute() : Void {
+	public function execute() : Void {
 		Assert.assert( this.componentAffected.canUpdateUntyped(this.attributeUntyped, this.newAttributeValue)) ;
 		trace("changing attribute");
 		this.componentAffected.updateUntyped(this.attributeUntyped, this.newAttributeValue);
 	}
 	
-	override public function redo() : Void {
+	public function redo() : Void {
 		this.execute();
 	}
 	
-	override public function undo() : Void {
+	public function undo() : Void {
 		Assert.assert( this.componentAffected.canUpdateUntyped(this.attributeUntyped, this.oldAttributeValue)) ;
 		this.componentAffected.updateUntyped(this.attributeUntyped, this.oldAttributeValue);
 	}

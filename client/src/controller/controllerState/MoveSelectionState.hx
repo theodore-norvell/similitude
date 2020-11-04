@@ -23,15 +23,15 @@ class MoveSelectionState implements ControllerStateI
 		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
 			var activeTab = controller.getActiveTab();
-			controller.getModelManipulator().moveSelection(
+			controller.getCommander().moveSelection(
 				activeTab,
 				this.oldXPosition, this.oldYPosition,
 				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
 			controller.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
 		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
-			controller.getModelManipulator().normalise(controller.getActiveTab().getCircuitDiagram() );
-			controller.getModelManipulator().checkPoint() ;
-			controller.setState(new CanvasIdleState());
+			controller.getCommander().normalise(controller.getActiveTab().getCircuitDiagram() );
+			controller.getCommander().checkPoint() ;
+			controller.setState(new IdleState());
 		} else {
 			trace("Unknown transition");
 		}

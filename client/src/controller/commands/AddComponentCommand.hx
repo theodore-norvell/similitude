@@ -10,25 +10,25 @@ import model.enumeration.Orientation;
  * ...
  * @author AdvaitTrivedi
  */
-class AddComponentCommand extends AbstractCommand
+class AddComponentCommand extends AbstractCommand  implements CommandI
 {
 	var component: Component;
 	
 	public function new(component: Component) 
 	{
-		this.setCircuitDiagram(component.get_CircuitDiagram());
+		super(component.get_CircuitDiagram());
 		this.component = component;
 	}
 	
-	override public function execute() : Void {
+	public function execute() : Void {
 		this.circuitDiagram.addComponent(this.component);
 	}
 	
-	override public function redo() : Void {
+	public function redo() : Void {
 		this.execute();
 	}
 	
-	override public function undo() : Void {
+	public function undo() : Void {
 		this.circuitDiagram.deleteComponent(this.component);
 	};	
 	

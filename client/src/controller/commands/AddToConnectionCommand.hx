@@ -9,7 +9,7 @@ import model.component.Connection;
  * ...
  * @author AdvaitTrivedi
  */
-class AddToConnectionCommand extends AbstractCommand 
+class AddToConnectionCommand extends AbstractCommand  implements CommandI
 {
 	var newConnection: Connection;
 	var oldConnection: Connection;
@@ -17,21 +17,21 @@ class AddToConnectionCommand extends AbstractCommand
 
 	public function new(circuitDiagram: CircuitDiagramI, connection: Connection, connectable: Connectable) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
+		super(circuitDiagram);
 		this.newConnection = connection;
 		this.connectable = connectable;
 		this.oldConnection = connectable.getConnection() ;
 	}
 	
-	override public function execute() : Void {
+	public function execute() : Void {
 		this.newConnection.connect(this.connectable);
 	}
 	
-	override public function redo() : Void {
+	public function redo() : Void {
 		this.execute();
 	}
 	
-	override public function undo() : Void {
+	public function undo() : Void {
 		this.oldConnection.connect(this.connectable);
 	};
 }

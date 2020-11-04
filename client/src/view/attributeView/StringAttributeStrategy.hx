@@ -43,7 +43,7 @@ import model.similitudeEvents.AttributeChangeEvent;
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new StringAttributeValue(inputNode.value);
 			attributeChangeEvent.selectionAffected = selectionModel;
-			view.handleAttributeInteractions(attributeChangeEvent);
+			view.changeAttributeValue(attributeChangeEvent);
 		}
 		
 		editor.appendChild(inputNode);

@@ -15,7 +15,7 @@ import model.enumeration.Orientation;
  * ...
  * @author AdvaitTrivedi
  */
-class CanvasIdleState implements ControllerStateI
+class IdleState implements ControllerStateI
 {
 
 	public function new() 
@@ -29,9 +29,9 @@ class CanvasIdleState implements ControllerStateI
 			trace('adding Component : ', dragNDropEvent.getComponent());
 			var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
 			var component = new Component(circuitDiagram, dragNDropEvent.draggedToX, dragNDropEvent.draggedToY, 70, 70, Orientation.EAST, controller.getComponentTypesSingleton().toComponentKind(dragNDropEvent.getComponent()) );
-			controller.getModelManipulator().addComponent(component);
-			controller.getModelManipulator().normalise( circuitDiagram );
-			controller.getModelManipulator().checkPoint() ;
+			controller.getCommander().addComponent(component);
+			controller.getCommander().normalise( circuitDiagram );
+			controller.getCommander().checkPoint() ;
 			controller.setState(this);
 			return;
 		}
@@ -40,7 +40,7 @@ class CanvasIdleState implements ControllerStateI
 			var canvasMouseDownEvent = Std.downcast(event, CanvasMouseDownEvent);
 			if (!canvasMouseDownEvent.didObjectsGetHit()) {
 				var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
-				controller.getModelManipulator().clearSelection(circuitDiagram, controller.getActiveTab().getSelectionModel());
+				controller.getCommander().clearSelection(circuitDiagram, controller.getActiveTab().getSelectionModel());
 				controller.setState(new DownOnEmptyState());
 				return;
 			}
@@ -72,7 +72,7 @@ class CanvasIdleState implements ControllerStateI
 			
 			if (endpointsHit.length > 0) {
 				// shift to link edit state
-				controller.setState(new EditLinkState(endpointsHit[0]));
+				controller.setState(new MoveEndpointState(endpointsHit[0]));
 				return;
 			} 
 			

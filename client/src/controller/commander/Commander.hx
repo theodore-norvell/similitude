@@ -1,4 +1,4 @@
-package controller.modelManipulationSublayer;
+package controller.commander;
 
 import model.attribute.AttributeUntyped;
 import model.attribute.AttributeValue;
@@ -9,7 +9,7 @@ import controller.commands.AttributeChangeCommand;
 import commandManager.CommandManager;
 import controller.commands.DisconnectComponentCommand;
 import controller.commands.DisconnectLinkCommand;
-import controller.commands.EditLinkCommand;
+import controller.commands.MoveEndpointCommand;
 import controller.commands.MoveSelectionCommand;
 import controller.commands.RemoveComponentCommand ;
 import controller.commands.RemoveLinkCommand;
@@ -26,7 +26,7 @@ import type.Set;
  * Is a sub-layer and should be considered a child in the Controller
  * @author AdvaitTrivedi
  */
-class ModelManipulator 
+class Commander 
 {
 	var commandManager: CommandManager;
 
@@ -56,9 +56,9 @@ class ModelManipulator
 		this.commandManager.executeCommand(addLinkCommand);
 	}
 	
-	public function editLink(circuitDiagram: CircuitDiagramI, linkEndpoint: Endpoint, x: Float, y: Float) {
-		var editLinkCommand = new EditLinkCommand(circuitDiagram, linkEndpoint, new Coordinate(x, y));
-		this.commandManager.executeCommand(editLinkCommand);
+	public function moveEndpoint(circuitDiagram: CircuitDiagramI, linkEndpoint: Endpoint, x: Float, y: Float) {
+		var moveEndpointCommand = new MoveEndpointCommand(circuitDiagram, linkEndpoint, new Coordinate(x, y));
+		this.commandManager.executeCommand(moveEndpointCommand);
 	}
 	
 	public function removeLink(link: Link) {

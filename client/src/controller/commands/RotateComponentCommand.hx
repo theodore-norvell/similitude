@@ -9,17 +9,17 @@ import model.enumeration.Orientation;
  * ...
  * @author AdvaitTrivedi
  */
-class RotateComponentCommand extends AbstractCommand 
+class RotateComponentCommand extends AbstractCommand  implements CommandI
 {
 	var component: Component;
 
 	public function new(circuitDiagram: CircuitDiagramI, component: Component) 
 	{
-		this.setCircuitDiagram(circuitDiagram);
+		super(circuitDiagram);
 		this.component = component;
 	}
 	
-	override public function execute() : Void {
+	public function execute() : Void {
 		switch(this.component.get_orientation()) {
 			case Orientation.EAST: component.set_orientation(Orientation.SOUTH);
 			case Orientation.SOUTH: component.set_orientation(Orientation.WEST);
@@ -29,11 +29,11 @@ class RotateComponentCommand extends AbstractCommand
 		}
 	}
 	
-	override public function redo() : Void {
+	public function redo() : Void {
 		this.execute();
 	}
 	
-	override public function undo() : Void {
+	public function undo() : Void {
 		switch(this.component.get_orientation()) {
 			case Orientation.EAST: component.set_orientation(Orientation.NORTH);
 			case Orientation.SOUTH: component.set_orientation(Orientation.EAST);

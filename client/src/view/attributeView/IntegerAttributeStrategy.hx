@@ -47,7 +47,7 @@ import view.View;
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new IntegerAttributeValue(Std.parseInt(event.data));
 			attributeChangeEvent.selectionAffected = selectionModel;
-			view.handleAttributeInteractions(attributeChangeEvent);
+			view.changeAttributeValue(attributeChangeEvent);
 		}
 		
 		editor.appendChild(inputNode);

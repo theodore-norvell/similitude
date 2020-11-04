@@ -63,7 +63,7 @@ import model.enumeration.Orientation;
 			attributeChangeEvent.attributeUntyped = attributeUntyped;
 			attributeChangeEvent.newAttributeValue = new OrientationAttributeValue(Type.createEnum(Orientation, orientationDropDown.value));
 			attributeChangeEvent.selectionAffected = selectionModel;
-			view.handleAttributeInteractions(attributeChangeEvent);
+			view.changeAttributeValue(attributeChangeEvent);
 		}
 		
 		editor.appendChild(orientationDropDown);
