@@ -3,7 +3,7 @@ package model.drawComponents;
 import model.component.Endpoint;
 import model.component.Link;
 import model.drawingInterface.DrawingAdapterI;
-import global.Constant.portSize ;
+import global.Constant.joinRadius ;
 /**
 * draw link
 **/
@@ -27,17 +27,26 @@ class DrawLink {
                                 zero.get_yPosition(),
                                 one.get_xPosition(),
                                 one.get_yPosition() );
-        drawEndpoint(zero) ;
-        drawEndpoint(one) ;
+        drawEndpoint(zero, highlight) ;
+        drawEndpoint(one, highlight) ;
     }
 
-    private function drawEndpoint( endpoint : Endpoint ) : Void {
-        drawingAdapter.setStrokeColor( "black" ) ;
-        if( endpoint.isConnected() ) {
-            drawingAdapter.setFillColor("black"); }
-        else {
-            drawingAdapter.setFillColor("white"); }
-        drawingAdapter.drawRect(endpoint.get_xPosition(), endpoint.get_yPosition(), portSize, portSize);
+    private function drawEndpoint( endpoint : Endpoint, highlight : Bool ) : Void {
+        var connection = endpoint.getConnection() ;
+        if( highlight ) {
+            drawingAdapter.setStrokeColor( "red" ) ;
+            drawingAdapter.setFillColor("red" );
+            drawingAdapter.drawCircle(endpoint.get_xPosition(), endpoint.get_yPosition(), joinRadius);
+        } else {
+            if( connection.aPortIsConnected() ) return ; // Let the port do the drawing.
+            if( connection.get_count() == 2 ) return ; // This is a connection of two links.
+            drawingAdapter.setStrokeColor( "black" ) ;
+            if( endpoint.isConnected() ) {
+                drawingAdapter.setFillColor("black"); }
+            else {
+                drawingAdapter.setFillColor("white"); }
+            drawingAdapter.drawCircle(endpoint.get_xPosition(), endpoint.get_yPosition(), joinRadius);
+        }
     }
 
 }
