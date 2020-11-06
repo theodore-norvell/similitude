@@ -85,7 +85,7 @@ class Commander
 		this.commandManager.executeCommand(moveSelectionCommand);
 	}
 	
-	public function clearSelection(circuitDiagram: CircuitDiagramI, selectionModel: SelectionModel) {
+	public function clearSelection(selectionModel: SelectionModel) {
 		
 		for (component in selectionModel.getComponentSet()) {
 			toggleSelection( selectionModel, component) ;

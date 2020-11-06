@@ -7,7 +7,7 @@ import js.Browser.document;
 import model.attribute.StringAttributeValue;
 import model.enumeration.AttributeHexColour;
 import model.selectionModel.SelectionModel;
-import model.similitudeEvents.AttributeChangeEvent;
+import controller.similitudeEvents.AttributeChangeEvent;
 
 /**
  * ...
@@ -39,10 +39,8 @@ import model.similitudeEvents.AttributeChangeEvent;
 		inputNode.value = Std.downcast(attributeValue, StringAttributeValue).getValue();
 		inputNode.onchange = function (event) {
 			// trigger change to canvas as attribute is changed
-			var attributeChangeEvent = new AttributeChangeEvent();
-			attributeChangeEvent.attributeUntyped = attributeUntyped;
-			attributeChangeEvent.newAttributeValue = new StringAttributeValue(inputNode.value);
-			attributeChangeEvent.selectionAffected = selectionModel;
+			 var newAttributeValue = new StringAttributeValue(inputNode.value);
+			var attributeChangeEvent = new AttributeChangeEvent(attributeUntyped, newAttributeValue, selectionModel);
 			view.changeAttributeValue(attributeChangeEvent);
 		}
 		

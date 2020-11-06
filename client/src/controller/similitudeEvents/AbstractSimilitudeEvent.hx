@@ -1,4 +1,4 @@
-package model.similitudeEvents;
+package controller.similitudeEvents;
 
 /**
  * This class is not to be instantiated.
@@ -7,9 +7,9 @@ package model.similitudeEvents;
  */
 class AbstractSimilitudeEvent
 {
-	var eventTypes: EventTypesEnum;
-	
-	public function getEventType(): EventTypesEnum {
-		return this.eventTypes;
+	public var eventType( default, null): EventTypesEnum;
+
+	public function new( eventType: EventTypesEnum ) {
+		this.eventType = eventType ;
 	}
 }

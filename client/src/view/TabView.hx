@@ -1,11 +1,9 @@
 package view ;
 import model.observe.* ;
-import model.similitudeEvents.CanvasMouseDownEvent;
-import model.similitudeEvents.CanvasMouseMoveEvent;
-import model.similitudeEvents.CanvasMouseUpEvent;
-import model.similitudeEvents.LinkAddEvent;
-import model.similitudeEvents.LinkEditEvent;
-import model.similitudeEvents.SidebarDragAndDropEvent;
+import controller.similitudeEvents.CanvasMouseDownEvent;
+import controller.similitudeEvents.CanvasMouseMoveEvent;
+import controller.similitudeEvents.CanvasMouseUpEvent;
+import controller.similitudeEvents.SidebarDragAndDropEvent;
 import type.Coordinate;
 import js.html.CanvasElement;
 import js.html.DragEvent ;
@@ -142,9 +140,9 @@ class TabView implements Observer extends Observable
 			var viewCoord = getCoordsRelativeToCanvas( event ) ;
 			var worldCoords = viewToWorld( viewCoord );
 			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
-			var eventPassed = new CanvasMouseDownEvent(objectsHit);
-			eventPassed.xPosition = worldCoords.get_xPosition();
-			eventPassed.yPosition = worldCoords.get_yPosition();
+			var x = worldCoords.get_xPosition();
+			var y = worldCoords.get_yPosition();
+			var eventPassed = new CanvasMouseDownEvent(x, y, objectsHit);
 			this.view.handleCanvasMouseInteractions(eventPassed);
 		}
 		
@@ -155,9 +153,9 @@ class TabView implements Observer extends Observable
 			var viewCoord = getCoordsRelativeToCanvas( event ) ;
 			var worldCoords = viewToWorld( viewCoord );
 			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
-			var eventPassed = new CanvasMouseMoveEvent(objectsHit);
-			eventPassed.xPosition = worldCoords.get_xPosition();
-			eventPassed.yPosition = worldCoords.get_yPosition();
+			var x = worldCoords.get_xPosition();
+			var y = worldCoords.get_yPosition();
+			var eventPassed = new CanvasMouseMoveEvent(x, y, objectsHit);
 			this.view.handleCanvasMouseInteractions(eventPassed);
 		}
 		
@@ -167,9 +165,9 @@ class TabView implements Observer extends Observable
 			var viewCoord = getCoordsRelativeToCanvas( event ) ;
 			var worldCoords = getCoordsRelativeToCanvas( event ) ;
 			var objectsHit = circuitDiagram.findHitList(worldCoords, MODE.INCLUDE_PARENTS);
-			var eventPassed = new CanvasMouseUpEvent(objectsHit);
-			eventPassed.xPosition = worldCoords.get_xPosition();
-			eventPassed.yPosition = worldCoords.get_yPosition();
+			var x = worldCoords.get_xPosition();
+			var y = worldCoords.get_yPosition();
+			var eventPassed = new CanvasMouseUpEvent(x, y, objectsHit);
 			this.view.handleCanvasMouseInteractions(eventPassed);
 		}
 		

@@ -1,7 +1,7 @@
 package controller;
 
-import model.similitudeEvents.AttributeChangeEvent;
-import model.similitudeEvents.AbstractSimilitudeEvent;
+import controller.similitudeEvents.AttributeChangeEvent;
+import controller.similitudeEvents.AbstractSimilitudeEvent;
 import model.tabModel.TabModel ;
 
 /** This is the interface that the Controller presents to the view

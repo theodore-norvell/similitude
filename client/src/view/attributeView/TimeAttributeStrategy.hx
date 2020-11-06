@@ -7,7 +7,7 @@ import model.component.Component;
 import js.Browser.document;
 import model.enumeration.AttributeHexColour;
 import model.selectionModel.SelectionModel;
-import model.similitudeEvents.AttributeChangeEvent;
+import controller.similitudeEvents.AttributeChangeEvent;
 import type.TimeUnit ;
 import model.attribute.StringAttributeValue;
 import haxe.Int64;
@@ -76,10 +76,9 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy  implements Attrib
 		
 		unitDropDown.onchange = function (event) {
 			// trigger change to canvas as attribute is changed
-			var attributeChangeEvent = new AttributeChangeEvent();
-			attributeChangeEvent.attributeUntyped = attributeUntyped;
-			attributeChangeEvent.newAttributeValue = new TimeAttributeValue(Int64.parseString(inputNode.value), Type.createEnum(TimeUnit, unitDropDown.value));
-			attributeChangeEvent.selectionAffected = selectionModel;
+			var newAttributeValue = new TimeAttributeValue( Int64.parseString(inputNode.value),
+			                                                Type.createEnum(TimeUnit, unitDropDown.value));
+			var attributeChangeEvent = new AttributeChangeEvent(attributeUntyped, newAttributeValue, selectionModel );
 			view.changeAttributeValue(attributeChangeEvent);
 		}
 		
@@ -87,10 +86,9 @@ class TimeAttributeStrategy extends AbstractAttributeStrategy  implements Attrib
 		
 		inputNode.onchange = function (event) {
 			// trigger change to canvas as attribute is changed
-			var attributeChangeEvent = new AttributeChangeEvent();
-			attributeChangeEvent.attributeUntyped = attributeUntyped;
-			attributeChangeEvent.newAttributeValue = new TimeAttributeValue(Int64.parseString(inputNode.value), Type.createEnum(TimeUnit, unitDropDown.value));
-			attributeChangeEvent.selectionAffected = selectionModel;
+			var newAttributeValue = new TimeAttributeValue( Int64.parseString(inputNode.value),
+			                                                Type.createEnum(TimeUnit, unitDropDown.value));
+			var attributeChangeEvent = new AttributeChangeEvent(attributeUntyped, newAttributeValue, selectionModel);
 			view.changeAttributeValue(attributeChangeEvent);
 		}
 		

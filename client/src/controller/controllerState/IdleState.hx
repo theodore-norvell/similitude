@@ -1,13 +1,13 @@
 package controller.controllerState;
 import controller.Controller;
-import model.similitudeEvents.AbstractSimilitudeEvent;
+import controller.similitudeEvents.AbstractSimilitudeEvent;
 import model.component.Component;
 import model.component.Link;
 import model.component.Port;
 import model.component.Endpoint;
-import model.similitudeEvents.EventTypesEnum;
-import model.similitudeEvents.CanvasMouseDownEvent;
-import model.similitudeEvents.SidebarDragAndDropEvent;
+import controller.similitudeEvents.EventTypesEnum;
+import controller.similitudeEvents.CanvasMouseDownEvent;
+import controller.similitudeEvents.SidebarDragAndDropEvent;
 import model.component.CircuitElement;
 import model.enumeration.Orientation;
 
@@ -24,7 +24,8 @@ class IdleState implements ControllerStateI
 	}
 	
 	public function operate(controller: Controller, event: AbstractSimilitudeEvent) : Void {
-		if (event.getEventType() == EventTypesEnum.SIDEBAR_DRAG_N_DROP) {
+		// TODO.  Make this state consistant with the documented state machine.
+		if (event.eventType == EventTypesEnum.SIDEBAR_DRAG_N_DROP) {
 			var dragNDropEvent = Std.downcast(event, SidebarDragAndDropEvent);
 			trace('adding Component : ', dragNDropEvent.getComponent());
 			var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
@@ -36,17 +37,16 @@ class IdleState implements ControllerStateI
 			return;
 		}
 		
-		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_DOWN) {
+		if (event.eventType == EventTypesEnum.CANVAS_MOUSE_DOWN) {
 			var canvasMouseDownEvent = Std.downcast(event, CanvasMouseDownEvent);
 			if (!canvasMouseDownEvent.didObjectsGetHit()) {
 				var circuitDiagram = controller.getActiveTab().getCircuitDiagram() ;
-				controller.getCommander().clearSelection(circuitDiagram, controller.getActiveTab().getSelectionModel());
-				controller.setState(new DownOnEmptyState());
+				controller.setState(new DownOnEmptyState( canvasMouseDownEvent.x, canvasMouseDownEvent.y ));
 				return;
 			}
 			
 			//// What if there are 2 endpoints in the objects hit array?
-			var objectsHit  = canvasMouseDownEvent.getObjectsHit();
+			var objectsHit  = canvasMouseDownEvent.objectsHit ;
 			var endpointsHit = new Array<Endpoint>();
 			var componentsHit = new Array<Component>();
 			var linksHit = new Array<Link>();
@@ -92,7 +92,10 @@ class IdleState implements ControllerStateI
 					clickedObjects.push(link);
 				}
 				
-				controller.setState(new AddToSelectionState(clickedObjects, canvasMouseDownEvent.xPosition, canvasMouseDownEvent.yPosition));
+				controller.setState(
+					new AddToSelectionState(clickedObjects,
+											canvasMouseDownEvent.x,
+											canvasMouseDownEvent.y));
 				return;
 			}
 		} else {

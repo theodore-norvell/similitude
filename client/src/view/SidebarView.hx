@@ -4,13 +4,13 @@ import haxe.Serializer;
 import js.html.DivElement;
 import model.component.Component;
 import view.drawingImpl.DrawingAdapter;
-import model.similitudeEvents.SidebarDragAndDropEvent;
+import controller.similitudeEvents.SidebarDragAndDropEvent;
 import model.enumeration.Orientation;
 import model.enumeration.ComponentType;
 import model.drawingInterface.Transform;
 import js.Browser.document;
 import js.html.Console;
-import model.similitudeEvents.*;
+import controller.similitudeEvents.*;
 
 /**
  * Class in charge of handling the updates sent by the controller to the UI.
@@ -50,9 +50,8 @@ class SidebarView
 		// also set the dragStart event to send data through the drag and drop
 		sidebarItem.addEventListener('dragstart', function(event) {
 			// do not forget to set data before the transfer
-			var dndEvent = new SidebarDragAndDropEvent(drawComponentString);
-			var draggedItemEvent = dndEvent;
-			var stringEvent = Serializer.run(draggedItemEvent);
+			var dndEvent = new SidebarDragAndDropEvent(drawComponentString, 0, 0);
+			var stringEvent = Serializer.run(dndEvent);
 			trace(stringEvent);
 			event.dataTransfer.setData("text/plain", stringEvent);
 			event.dataTransfer.dropEffect = "move";

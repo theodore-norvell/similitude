@@ -1,6 +1,6 @@
 package controller.controllerState;
 import controller.Controller;
-import model.similitudeEvents.AbstractSimilitudeEvent;
+import controller.similitudeEvents.AbstractSimilitudeEvent;
 
 /**
  * @author AdvaitTrivedi

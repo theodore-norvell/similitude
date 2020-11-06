@@ -6,7 +6,7 @@ import model.component.Component;
 import js.Browser.document;
 import model.enumeration.AttributeHexColour;
 import model.selectionModel.SelectionModel;
-import model.similitudeEvents.AttributeChangeEvent;
+import controller.similitudeEvents.AttributeChangeEvent;
 import model.attribute.OrientationAttributeValue;
 import model.enumeration.Orientation;
 
@@ -59,10 +59,10 @@ import model.enumeration.Orientation;
 		
 		orientationDropDown.onchange = function (event) {
 			// trigger change to canvas as attribute is changed
-			var attributeChangeEvent = new AttributeChangeEvent();
-			attributeChangeEvent.attributeUntyped = attributeUntyped;
-			attributeChangeEvent.newAttributeValue = new OrientationAttributeValue(Type.createEnum(Orientation, orientationDropDown.value));
-			attributeChangeEvent.selectionAffected = selectionModel;
+			 var newAttributeValue = new OrientationAttributeValue(
+											 Type.createEnum( Orientation,
+												              orientationDropDown.value));
+			var attributeChangeEvent = new AttributeChangeEvent(attributeUntyped, newAttributeValue, selectionModel);
 			view.changeAttributeValue(attributeChangeEvent);
 		}
 		

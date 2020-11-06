@@ -9,7 +9,7 @@ import js.Browser.document;
 import model.component.Component;
 import model.enumeration.AttributeHexColour;
 import model.selectionModel.SelectionModel;
-import model.similitudeEvents.AttributeChangeEvent;
+import controller.similitudeEvents.AttributeChangeEvent;
 import view.View;
 
 /**
@@ -43,10 +43,8 @@ import view.View;
 		inputNode.value = Std.string(Std.downcast(attributeValue, IntegerAttributeValue).getValue());
 		inputNode.oninput = function (event) {
 			// trigger change to canvas as attribute is changed
-			var attributeChangeEvent = new AttributeChangeEvent();
-			attributeChangeEvent.attributeUntyped = attributeUntyped;
-			attributeChangeEvent.newAttributeValue = new IntegerAttributeValue(Std.parseInt(event.data));
-			attributeChangeEvent.selectionAffected = selectionModel;
+			var newAttributeValue = new IntegerAttributeValue(Std.parseInt(event.data));
+			var attributeChangeEvent = new AttributeChangeEvent(attributeUntyped,newAttributeValue, selectionModel );
 			view.changeAttributeValue(attributeChangeEvent);
 		}
 		

@@ -1,4 +1,4 @@
-package model.similitudeEvents;
+package controller.similitudeEvents;
 
 /**
  * This enum describes all possible events in the system
@@ -8,9 +8,6 @@ package model.similitudeEvents;
 enum EventTypesEnum
 {
 	SIDEBAR_DRAG_N_DROP;
-	
-	LINK_ADD;
-	LINK_EDIT;
 	
 	CANVAS_MOUSE_DOWN;
 	CANVAS_MOUSE_UP;

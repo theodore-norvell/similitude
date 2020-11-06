@@ -1,4 +1,4 @@
-package model.similitudeEvents;
+package controller.similitudeEvents;
 import model.enumeration.ComponentType;
 
 /**
@@ -8,13 +8,13 @@ import model.enumeration.ComponentType;
 class SidebarDragAndDropEvent extends AbstractSimilitudeEvent
 {
 	var component: ComponentType;
-	public var draggedToX: Float = 0;
-	public var draggedToY: Float = 0;
+	public var draggedToX: Float ;
+	public var draggedToY: Float ;
 
-	public function new(component: ComponentType) 
+	public function new(component: ComponentType, x : Float, y : Float ) 
 	{
+		super( SIDEBAR_DRAG_N_DROP ) ;
 		this.component = component;
-		this.eventTypes = EventTypesEnum.SIDEBAR_DRAG_N_DROP;
 	}
 	
 	public function getComponent(): ComponentType {

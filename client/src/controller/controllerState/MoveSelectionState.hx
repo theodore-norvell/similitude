@@ -1,8 +1,8 @@
 package controller.controllerState;
 import controller.Controller;
-import model.similitudeEvents.CanvasMouseMoveEvent;
-import model.similitudeEvents.AbstractSimilitudeEvent;
-import model.similitudeEvents.EventTypesEnum;
+import controller.similitudeEvents.CanvasMouseMoveEvent;
+import controller.similitudeEvents.AbstractSimilitudeEvent;
+import controller.similitudeEvents.EventTypesEnum;
 
 /**
  * ...
@@ -20,15 +20,15 @@ class MoveSelectionState implements ControllerStateI
 	}
 	
 	public function operate(controller: Controller, event: AbstractSimilitudeEvent) {
-		if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_MOVE) {
+		if (event.eventType == EventTypesEnum.CANVAS_MOUSE_MOVE) {
 			var canvasMouseMoveEvent = Std.downcast(event, CanvasMouseMoveEvent);
 			var activeTab = controller.getActiveTab();
 			controller.getCommander().moveSelection(
 				activeTab,
 				this.oldXPosition, this.oldYPosition,
-				canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition);
-			controller.setState(new MoveSelectionState(canvasMouseMoveEvent.xPosition, canvasMouseMoveEvent.yPosition));
-		} else if (event.getEventType() == EventTypesEnum.CANVAS_MOUSE_UP) {
+				canvasMouseMoveEvent.x, canvasMouseMoveEvent.y);
+			controller.setState(new MoveSelectionState(canvasMouseMoveEvent.x, canvasMouseMoveEvent.y));
+		} else if (event.eventType == EventTypesEnum.CANVAS_MOUSE_UP) {
 			controller.getCommander().normalise(controller.getActiveTab().getCircuitDiagram() );
 			controller.getCommander().checkPoint() ;
 			controller.setState(new IdleState());

@@ -2,8 +2,8 @@ package view;
 
 import haxe.Int64;
 import model.observe.*;
-import model.similitudeEvents.AttributeChangeEvent;
-import model.similitudeEvents.AbstractSimilitudeEvent;
+import controller.similitudeEvents.AttributeChangeEvent;
+import controller.similitudeEvents.AbstractSimilitudeEvent;
 import model.values.SignalValue;
 import model.values.instantaneousValues.displayStrategies.InstantaneousStratFactorySingletons;
 import model.values.instantaneousValues.scalarValues.ScalarValueSingletons;
