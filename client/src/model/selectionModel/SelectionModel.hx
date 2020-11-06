@@ -53,27 +53,6 @@ class SelectionModel extends Observable implements Observer
 			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
 		}
 	}
-	
-	/**
-	 * Allows a user to remove a CircuitElement to the selection.
-	 * Element will be removed only if the selection contains it.
-	 * Compatible Types : Component, Link, Port, Endpoint.
-	 * Will throw a String exception if it is not a compatible type.
-	 * @param	element
-	 */
-	public function removeCircuitElement(element : CircuitElement) : Void {
-		if (Std.is(element, Component)) {
-			if(this.containsComponent(Std.downcast(element, Component))) { this.removeComponent(Std.downcast(element, Component)); }
-		} else if (Std.is(element, Link)) {
-			if(this.containsLink(Std.downcast(element, Link))) { this.removeLink(Std.downcast(element, Link)); }
-		} else if (Std.is(element, Port)) {
-			if (this.containsPort(Std.downcast(element, Port))) { this.removePort(Std.downcast(element, Port)); }
-		} else if (Std.is(element, Endpoint)) {
-			if (this.containsEndpoint(Std.downcast(element, Endpoint))) { this.removeEndpoint(Std.downcast(element, Endpoint)); }
-		} else {
-			throw ("Circuit Element incompatible with types that can be selected. Permitted types are Component, Link, Port, Endpoint. Received :: " + Type.getClassName(Type.getClass(element)));
-		}
-	}
 
 	public function contains(element : CircuitElement) : Bool {
 		if (Std.is(element, Component)) {

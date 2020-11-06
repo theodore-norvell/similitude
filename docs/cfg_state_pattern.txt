@@ -3,6 +3,9 @@ Reading this, one can form a map of how the states progress among ech other.
 
 =====================================================================================================
 
+
+TODO.  Either delete this file or make it agree with the VPP state diagram.
+
 CanvasIdleState -->
 	event( SidebarDragAndDropEvent )
 	reaction( add a new component to the circuit diagram )
@@ -11,50 +14,63 @@ CanvasIdleState -->
 CanvasIdleState -->
 	event( CanvasMouseDownEvent( x, y ) )
 	(  test( nothing was hit )
-	   reaction( clear the selection )
-	   DownOnEmptyState
+	   DownOnEmptyState(x, y)
 	|
-	   test( an endpoint was hit )
+	   test( Something was hit, but nothing hit was selected )
 	   let endpoint be any of the endpoints that were hit 
-	   EditLinkState( endpoint )
+	   DownOnNonSelection( x, y )
 	|
-	   test( something was hit but no endpoint was hit )
+	   test( something was hit that is selected )
 	   let clickedObjects be the set of all links and components that were hit
-	   AddToSelectionState( clickedObjects, x, y )
+	   MouseDownOnSelection( clickedObjects, x, y )
 	)
 
-DownOnEmptyState --> 
+DownOnEmptyState(x, y) --> 
 	event( CanvasMouseUpEvent )
+	reaction( clear the selection and checkpoint )
 	CanvasIdleState
 
-DownOnEmptyState --> 
+DownOnEmptyState(x, y) --> 
 	event( CanvasMouseMoveEvent )
 	reaction( Will add a new link to the circuit diagram)
-	EditLinkState( one of the endpoints of the new link )
+	MoveEndpointState( one of the endpoints of the new link )
 
-EditLinkState( endpoint ) --> 
+DownOnNonSelection( x, y ) --> 
 	event( CanvasMouseUpEvent )
-	reaction( normalize the circuit diagram )
+	reaction( If the mouse-down event was over any links, let X be that set of links. 
+              Otherwise let X be the set of components the mouse-down event was over. 
+              Add X to the selection 
+              Checkpoint )
 	CanvasIdleState
 
-EditLinkState( endpoint ) --> 
+DownOnEmptyState(x, y) --> 
+	event( CanvasMouseMoveEvent )
+	reaction( Will add a new link to the circuit diagram)
+	MoveEndpointState( one of the endpoints of the new link )
+
+MoveEndpointState( endpoint ) --> 
+	event( CanvasMouseUpEvent )
+	reaction( normalize the circuit diagram and checkpoint )
+	CanvasIdleState
+
+MoveEndpointState( endpoint ) --> 
 	event( CanvasMouseMoveEvent )
 	reaction( update the position of endpoint to match the mouse )
-	EditLinkState
+	MoveEndpointState( endPoint )
 
-AddToSelectionState( passedObjects, x, y ) --> 
+MouseDownOnSelection( passedObjects, x, y ) --> 
 	event( CanvasMouseUpEvent )
-	reaction( add or remove passedObjects from the selection )
+	reaction( remove passedObjects from the selection. Normalize. Checkpoint )
 	CanvasIdleState
 
-AddToSelectionState( passedObjects, x, y ) --> 
-	event( CanvasMouseMoveEven( newX, newY ) )
+MouseDownOnSelection( passedObjects, x, y ) --> 
+	event( CanvasMouseMoveEvent( newX, newY ) )
 	reaction( moves the current selection around with the mouse )
 	MoveSelectionState( newX, newY )
 
 MoveSelectionState( x, y ) --> 
 	event( CanvasMouseUpEvent )
-	reaction( normalize the circuit diagram )
+	reaction( normalize the circuit diagram and checkpoint )
 	CanvasIdleState
 
 MoveSelectionState( x, y ) --> 
