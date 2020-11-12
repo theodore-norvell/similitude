@@ -99,6 +99,6 @@ class XOR implements ComponentKind extends AbstractGate implements ComponentKind
     // }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        DrawComponent.drawXOr(component, drawingAdapter, highLight);
+        DrawingUtility.drawXOr(component, drawingAdapter, highLight);
     }
 }

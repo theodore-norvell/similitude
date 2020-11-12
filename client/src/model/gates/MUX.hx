@@ -40,6 +40,6 @@ class MUX implements ComponentKind extends AbstractGate implements ComponentKind
     // Two classes of input ports: date ports and control ports.
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
-        DrawComponent.drawMUX(component, drawingAdapter, highlight);
+        DrawingUtility.drawMUX(component, drawingAdapter, highlight);
     }
 }

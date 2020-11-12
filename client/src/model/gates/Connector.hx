@@ -132,6 +132,6 @@ class Connector implements ComponentKind extends AbstractComponentKind implement
     }
     
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
-        DrawComponent.drawConnector(component, drawingAdapter, highlight) ;
+        DrawingUtility.drawConnector(component, drawingAdapter, highlight) ;
     }
 }

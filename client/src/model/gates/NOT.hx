@@ -32,6 +32,6 @@ class NOT implements ComponentKind extends AbstractGate implements ComponentKind
 
     override function maximumNumberOfInPorts() : Int { return 1 ; }
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        DrawComponent.drawNot(component, drawingAdapter, highLight);
+        DrawingUtility.drawNot(component, drawingAdapter, highLight);
     }
 }

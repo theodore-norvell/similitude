@@ -99,6 +99,6 @@ class OR implements ComponentKind extends AbstractGate implements ComponentKind 
     // }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        DrawComponent.drawOr(component, drawingAdapter, highLight);
+        DrawingUtility.drawOr(component, drawingAdapter, highLight);
     }
 }

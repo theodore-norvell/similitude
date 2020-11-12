@@ -7,7 +7,7 @@ import model.enumeration.Orientation ;
 import model.enumeration.IOTYPE ;
 import type.Coordinate ;
 
-class DrawComponent {
+class DrawingUtility {
 
     public static function drawAnd(component:Component, drawingAdapter:DrawingAdapterI, highlight : Bool) : Void {
         setColor( highlight, drawingAdapter ) ;

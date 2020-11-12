@@ -249,6 +249,6 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind implements
     }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
-        DrawComponent.drawFlipFlopComponent(component, drawingAdapter, highlight) ;
+        DrawingUtility.drawFlipFlopComponent(component, drawingAdapter, highlight) ;
     }
 }

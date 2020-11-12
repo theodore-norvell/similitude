@@ -29,7 +29,7 @@ class AND implements ComponentKind extends AbstractGate implements ComponentKind
     }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel ){
-        DrawComponent.drawAnd(component, drawingAdapter, highlight);
+        DrawingUtility.drawAnd(component, drawingAdapter, highlight);
     }
 
 }

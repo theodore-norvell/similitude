@@ -49,12 +49,12 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool,  selection : SelectionModel ):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform(component));
-        DrawComponent.drawCompoundComponent( component, drawingAdapter, highlight, drawingAdapterTrans ) ;
+        DrawingUtility.drawCompoundComponent( component, drawingAdapter, highlight, drawingAdapterTrans ) ;
 
         if(component.get_boxType() == Box.WHITE_BOX){
             // Draw the inside of the circuit.
             circuitDiagram.draw(drawingAdapterTrans, selection);
-            DrawComponent.connectPortsToConnectors(component, drawingAdapter, highlight, drawingAdapterTrans) ;
+            DrawingUtility.connectPortsToConnectors(component, drawingAdapter, highlight, drawingAdapterTrans) ;
         }
     }
 
