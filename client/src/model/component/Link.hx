@@ -5,15 +5,14 @@ package model.component;
  * @author wanhui
  *
  */
-import model.observe.*;
-import type.HitObject;
 import global.Constant.portSize;
 import global.Constant.pointToLineDistance ;
 import model.enumeration.MODE;
-import type.Coordinate;
-import model.drawComponents.DrawComponent;
-import model.drawComponents.DrawLink;
+import model.observe.*;
+import model.gates.DrawingUtility;
 import model.drawingInterface.DrawingAdapterI;
+import type.HitObject;
+import type.Coordinate;
 
 class Link extends CircuitElement implements Observer {
     var endpoints : Array<Endpoint>;
@@ -71,8 +70,7 @@ class Link extends CircuitElement implements Observer {
                          this.endpoints[0].get_yPosition() ) ; }
 
     public function drawLink(drawingAdapter:DrawingAdapterI, highlight:Bool){
-        var drawComponent:DrawLink = new DrawLink(this, drawingAdapter, highlight );
-        drawComponent.drawCorrespondingComponent( ) ;
+        DrawingUtility.drawLink( this, drawingAdapter, highlight ) ;
     }
 
     public function findHitList(coordinate:Coordinate, mode:MODE):Array<HitObject>{

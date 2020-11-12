@@ -6,7 +6,7 @@ import model.selectionModel.SelectionModel;
 import model.observe.Observable; 
 import model.observe.Observer;
 import type.HitObject;
-import model.enumeration.BOX;
+import model.enumeration.Box;
 import model.enumeration.POINT_MODE;
 import model.enumeration.MODE;
 import type.Coordinate;
@@ -40,7 +40,7 @@ class Component extends CircuitElement  {
     // The ports that belong to this component.
     var  ports : Array<Port> = new Array<Port>() ;
     // TODO Make boxType an attribute for the kinds where it makes sense.
-    var boxType : BOX;
+    var boxType : Box;
 
     @:allow( model.gates )
     var attributeValueList : AttributeValueList ;
@@ -63,7 +63,7 @@ class Component extends CircuitElement  {
         this.width = width;
         this.sequenceNumber = -1 ;
         this.componentKind = componentKind;
-        this.boxType = BOX.WHITE_BOX;
+        this.boxType = Box.WHITE_BOX;
 
         // Give all attributes their default value
         this.attributeValueList = new AttributeValueList( this.componentKind.getAttributes() ) ;
@@ -167,11 +167,11 @@ class Component extends CircuitElement  {
         return componentKind;
     }
 
-    public function get_boxType():BOX {
+    public function get_boxType():Box {
         return boxType;
     }
 
-    public function set_boxType(value:BOX) {
+    public function set_boxType(value:Box) {
         this.boxType = value;
         notifyObservers(this) ;
     }

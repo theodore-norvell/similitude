@@ -1,9 +1,7 @@
 package model.gates;
 
 import model.component.Component;
-import model.drawComponents.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawXOR;
 import model.selectionModel.SelectionModel ;
 import model.component.Component ;
 import model.component.Port;
@@ -101,7 +99,6 @@ class XOR implements ComponentKind extends AbstractGate implements ComponentKind
     // }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        var drawComponent:DrawXOR = new DrawXOR(component, drawingAdapter, highLight);
-        drawComponent.drawCorrespondingComponent();
+        DrawingUtility.drawXOr(component, drawingAdapter, highLight);
     }
 }

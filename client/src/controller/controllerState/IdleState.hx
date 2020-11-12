@@ -71,8 +71,8 @@ class IdleState implements ControllerStateI
 			}
 			
 			if (endpointsHit.length > 0) {
-				// shift to link edit state
-				controller.setState(new MoveEndpointState(endpointsHit[0]));
+				var endpoint = endpointsHit[0] ;
+				controller.setState(new MoveEndpointState( endpoint ));
 				return;
 			} 
 			

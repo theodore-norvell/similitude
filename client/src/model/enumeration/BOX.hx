@@ -1,5 +1,5 @@
 package model.enumeration;
-enum BOX {
+enum Box {
     WHITE_BOX;
     BLACK_BOX;
 }
