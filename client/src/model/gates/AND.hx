@@ -1,7 +1,6 @@
 package model.gates;
 
-import model.drawComponents.DrawAND;
-import model.drawComponents.DrawComponent;
+import model.component.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import model.selectionModel.SelectionModel ;
 import model.component.Component ;
@@ -31,8 +30,7 @@ class AND implements ComponentKind extends AbstractGate implements ComponentKind
     }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel ){
-        var drawComponent:DrawAND = new DrawAND(component, drawingAdapter, highlight);
-        drawComponent.drawCorrespondingComponent();
+        DrawComponent.drawAnd(component, drawingAdapter, highlight);
     }
 
 }

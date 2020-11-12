@@ -1,9 +1,8 @@
 package model.gates;
 
 import assertions.Assert ;
-import model.drawComponents.DrawComponent;
+import model.component.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawFlipFlop;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
@@ -250,7 +249,6 @@ class FlipFlop implements ComponentKind extends AbstractComponentKind implements
     }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
-        var drawComponent:DrawFlipFlop = new DrawFlipFlop(component, drawingAdapter, highlight);
-        drawComponent.drawCorrespondingComponent() ;
+        DrawComponent.drawFlipFlopComponent(component, drawingAdapter, highlight) ;
     }
 }

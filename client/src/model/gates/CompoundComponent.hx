@@ -6,12 +6,11 @@ import model.observe.Observable;
 import model.observe.Observer;
 import type.HitObject;
 import type.WorldPoint;
-import model.drawComponents.DrawComponent;
-import model.drawComponents.DrawCompoundComponent;
+import model.component.DrawComponent;
 import model.component.CircuitDiagramI;
 import model.component.Component ;
 import model.enumeration.POINT_MODE;
-import model.enumeration.BOX;
+import model.enumeration.Box;
 import model.enumeration.IOTYPE;
 import model.enumeration.MODE;
 import type.Coordinate;
@@ -50,12 +49,12 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool,  selection : SelectionModel ):Void {
         var drawingAdapterTrans:DrawingAdapterI = drawingAdapter.transform(makeTransform(component));
-        var drawComponent:DrawCompoundComponent = new DrawCompoundComponent(component, drawingAdapter, highlight, drawingAdapterTrans);
-        drawComponent.drawCorrespondingComponent() ;
+        DrawComponent.drawCompoundComponent( component, drawingAdapter, highlight, drawingAdapterTrans ) ;
 
-        if(component.get_boxType() == BOX.WHITE_BOX){
+        if(component.get_boxType() == Box.WHITE_BOX){
             // Draw the inside of the circuit.
             circuitDiagram.draw(drawingAdapterTrans, selection);
+            DrawComponent.connectPortsToConnectors(component, drawingAdapter, highlight, drawingAdapterTrans) ;
         }
     }
 
@@ -73,7 +72,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
         var hitObjectArray:Array<HitObject> = super.findHitList(component, outerWorldCoordinates, mode, mode==MODE.INCLUDE_PARENTS) ;
 
         if( isInComponent(component, outerWorldCoordinates) && 
-            component.get_boxType() == BOX.WHITE_BOX )
+            component.get_boxType() == Box.WHITE_BOX )
         {
             var transform:Transform = makeTransform(component);
             var innerWorldCoordinates:Coordinate = transform.pointInvert(outerWorldCoordinates);
@@ -94,7 +93,7 @@ class CompoundComponent implements ComponentKind extends AbstractComponentKind{
 
         if(isInComponent(component, worldCoordinate) == null){
             return worldPointArray;
-        }else if(component.get_boxType() == BOX.WHITE_BOX){
+        }else if(component.get_boxType() == Box.WHITE_BOX){
             var transform:Transform = makeTransform(component);
             var wForDiagram:Coordinate = transform.pointInvert(worldCoordinate);
             return circuitDiagram.findWorldPoint(wForDiagram, mode);

@@ -344,9 +344,11 @@
 <ol>
   <li>User: Depresses mouse button at a place <em>x</em> somewhere on the diagram such that it does not hit a&nbsp;selected component or link.</li>
   <li>User: Moves mouse to another part of the diagram.</li>
-  <li>Client: Creates a link with disconnected endpoints y0 and y1, with y0 being at x (converted into world coordinates)&nbsp;and y1 at the mouse's new position (converted into world coordinates). </li>
+  <li>Client: Creates a link with disconnected endpoints y0 and y1, with y0 being at <em>x</em> (converted into world coordinates)&nbsp;and y1 at the mouse's new position (converted into world coordinates).  </li>
   <li>User continues to move the mouse.</li>
-  <li>Client: As the mouse moves, the position of y1 continues to be updated.</li>
+  <ol>
+    <li>Client: As the mouse moves, the position of y1 continues to be updated.</li>
+  </ol>
   <li>User: releases the mouse or the mouse moves off the canvas</li>
   <li>Client: Normalizes the diagram.</li>
 </ol>

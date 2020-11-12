@@ -1,8 +1,8 @@
 package model.gates;
 
 
+import model.component.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawNOT;
 import model.selectionModel.SelectionModel ;
 import model.component.*;
 import model.enumeration.IOTYPE;
@@ -32,7 +32,6 @@ class NOT implements ComponentKind extends AbstractGate implements ComponentKind
 
     override function maximumNumberOfInPorts() : Int { return 1 ; }
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        var drawComponent:DrawNOT = new DrawNOT(component, drawingAdapter, highLight);
-        drawComponent.drawCorrespondingComponent();
+        DrawComponent.drawNot(component, drawingAdapter, highLight);
     }
 }

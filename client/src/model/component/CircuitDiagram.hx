@@ -191,15 +191,15 @@ class CircuitDiagram extends Observable implements CircuitDiagramI implements Ob
         drawingAdapter.setFillColor( "white" ) ;
         drawingAdapter.drawRect( centre.get_xPosition(), centre.get_yPosition(), width, height ) ;
 
+        for(i in linkArray){
+            var highlight = selection.containsLink( i ) ;
+            i.drawLink(drawingAdapter, highlight);
+        }
+
         //update component array
         for(i in componentArray){
             var highlight = selection.containsComponent( i ) ;
             i.drawComponent(drawingAdapter, highlight, selection);
-        }
-
-        for(i in linkArray){
-            var highlight = selection.containsLink( i ) ;
-            i.drawLink(drawingAdapter, highlight);
         }
 
     }

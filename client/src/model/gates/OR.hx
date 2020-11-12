@@ -1,8 +1,7 @@
 package model.gates;
 
-import model.drawComponents.DrawComponent;
+import model.component.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawOR;
 import model.selectionModel.SelectionModel ;
 import model.component.Component ;
 import model.component.Port;
@@ -101,7 +100,6 @@ class OR implements ComponentKind extends AbstractGate implements ComponentKind 
     // }
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highLight:Bool, selection : SelectionModel){
-        var drawComponent:DrawOR = new DrawOR(component, drawingAdapter, highLight);
-        drawComponent.drawCorrespondingComponent();
+        DrawComponent.drawOr(component, drawingAdapter, highLight);
     }
 }

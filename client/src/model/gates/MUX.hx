@@ -1,8 +1,7 @@
 package model.gates;
 
-import model.drawComponents.DrawComponent;
+import model.component.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawMUX;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
@@ -41,7 +40,6 @@ class MUX implements ComponentKind extends AbstractGate implements ComponentKind
     // Two classes of input ports: date ports and control ports.
 
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
-        var drawComponent:DrawMUX = new DrawMUX(component, drawingAdapter, highlight);
-        drawComponent.drawCorrespondingComponent();
+        DrawComponent.drawMUX(component, drawingAdapter, highlight);
     }
 }

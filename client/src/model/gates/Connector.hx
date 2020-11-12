@@ -1,8 +1,7 @@
 package model.gates;
 
-import model.drawComponents.DrawComponent;
+import model.component.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
-import model.drawComponents.DrawConnector;
 import model.component.Component ;
 import model.component.Port;
 import model.enumeration.IOTYPE;
@@ -133,7 +132,6 @@ class Connector implements ComponentKind extends AbstractComponentKind implement
     }
     
     public function drawComponent(component : Component, drawingAdapter:DrawingAdapterI, highlight:Bool, selection : SelectionModel){
-        var drawComponent:DrawConnector = new DrawConnector(component, drawingAdapter, highlight);
-        drawComponent.drawCorrespondingComponent() ;
+        DrawComponent.drawConnector(component, drawingAdapter, highlight) ;
     }
 }
