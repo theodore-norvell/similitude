@@ -1,4 +1,4 @@
-package model.component ;
+package model.gates ;
 
 import model.component.*;
 import model.drawingInterface.DrawingAdapterI;

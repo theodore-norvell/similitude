@@ -1,7 +1,7 @@
 package model.gates;
 
 import assertions.Assert ;
-import model.component.DrawComponent;
+
 import model.drawingInterface.DrawingAdapterI;
 import model.component.Component ;
 import model.component.Port;

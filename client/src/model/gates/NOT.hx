@@ -1,7 +1,7 @@
 package model.gates;
 
 
-import model.component.DrawComponent;
+
 import model.drawingInterface.DrawingAdapterI;
 import model.selectionModel.SelectionModel ;
 import model.component.*;

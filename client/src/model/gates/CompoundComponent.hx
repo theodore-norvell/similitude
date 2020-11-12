@@ -6,7 +6,7 @@ import model.observe.Observable;
 import model.observe.Observer;
 import type.HitObject;
 import type.WorldPoint;
-import model.component.DrawComponent;
+
 import model.component.CircuitDiagramI;
 import model.component.Component ;
 import model.enumeration.POINT_MODE;

@@ -9,7 +9,7 @@ import global.Constant.portSize;
 import global.Constant.pointToLineDistance ;
 import model.enumeration.MODE;
 import model.observe.*;
-import model.component.DrawComponent;
+import model.gates.DrawComponent;
 import model.drawingInterface.DrawingAdapterI;
 import type.HitObject;
 import type.Coordinate;
